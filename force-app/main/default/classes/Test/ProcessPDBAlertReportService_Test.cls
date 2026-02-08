@@ -1,0 +1,745 @@
+/**
+ *********************************************************
+ * Apex Class Name    : ProcessPDBAlertReportService_Test
+ * Created Date       : 03-19-2025
+ * @description       : Test Class used for ProcessPDBAlertReportService. Asserts all records fields used in the integration and tests delete scenarios
+ * @author            : Stefan Nidzovic
+ * Modification Log:
+ * Ver   Date         Author                   Modification
+ * 1.0   03-19-2025   Stefan Nidzovic          Initial Version
+ * 1.1   12-25-2025   Stefan Nidzovic          Renamed from ImportNIPRDataToSalesforceService_Test
+ *********************************************************
+ **/
+@isTest
+private class ProcessPDBAlertReportService_Test {
+    
+    // TEST METHODS
+    @isTest
+    private static void importData_testInsertOfPDBAlertData() {
+        // Prepare Mocks
+        HttpSoapMultiMockFactory mockFactory = new HttpSoapMultiMockFactory()
+            .addMock(
+                'ind:receiveSpecificReportForSubscription', 
+                200, 
+                TestDataFactory.getPDBSpecificAlertResponse(),
+                false
+            );
+
+        Test.setMock(HttpCalloutMock.class, mockFactory);
+
+        // Execute
+        Test.startTest();
+            ProcessPDBAlertReportService service = new ProcessPDBAlertReportService();
+            service.importData('2025-03-31', 'TestTwo');
+        Test.stopTest();
+
+        // Assert
+        assertRecordCounts();
+        assertExternalIds();
+        assertFieldValues();
+    }
+
+    @isTest
+    private static void importData_testUpdateDeleteOfPDBAlertData() {
+        // Prepare Mocks
+        TestDataFactory.createNIPRPDBAlertTestData();
+
+        HttpSoapMultiMockFactory mockFactory = new HttpSoapMultiMockFactory()
+            .addMock(
+                'ind:receiveSpecificReportForSubscription',
+                200,
+                TestDataFactory.getPDBSpecificAlertResponse(),
+                false
+            );
+
+
+        // Assert that desired counts of records are currently in the database
+        assertRecordCounts();
+
+        Test.setMock(HttpCalloutMock.class, mockFactory);
+
+        // Disable subscription validation for bulk data import
+        ProducerTriggerHandler.disableSubscriptionValidation = true;
+
+        // Execute
+        Test.startTest();
+            ProcessPDBAlertReportService service = new ProcessPDBAlertReportService();
+            service.importData('2025-03-31', 'TestTwo');
+        Test.stopTest();
+
+        // Assert that desired counts are in the database after running the service
+        assertRecordCountsPerParentObject();
+    }
+
+    @isTest
+    private static void importData_testMixedScenarioLicenseAndAppointmentNodes() {
+        // Prepare Mock - first with initial data, then with mixed scenario
+        HttpSoapMultiMockFactory mockFactory = new HttpSoapMultiMockFactory()
+            .addMock(
+                'ind:receiveSpecificReportForSubscription',
+                200,
+                TestDataFactory.getPDBSpecificAlertResponse(),
+                false
+            );
+
+        Test.setMock(HttpCalloutMock.class, mockFactory);
+
+        // Disable subscription validation for bulk data import
+        ProducerTriggerHandler.disableSubscriptionValidation = true;
+
+        // Execute - First import
+        ProcessPDBAlertReportService service = new ProcessPDBAlertReportService();
+        service.importData('2025-03-31', 'Test Initial Import');
+
+        HttpSoapMultiMockFactory.mockResponses =  new Map<String, HttpSoapMultiMockFactory.MockResponseData>();
+
+        mockFactory.addMock(
+            'ind:receiveSpecificReportForSubscription',
+            200,
+            TestDataFactory.getPDBMixedDeleteScenarioResponse(),
+            false
+        );
+        Test.setMock(HttpCalloutMock.class, mockFactory);
+
+        Test.startTest();
+            ProcessPDBAlertReportService secondService = new ProcessPDBAlertReportService();
+            secondService.importData('2025-03-31', 'TestMixedScenario');
+        Test.stopTest();
+
+        // Assert - reusing updateDeletePDBAlertResponse, so expect same counts
+        assertRecordCountsMixedDelete();
+    }
+
+    @isTest
+    private static void importData_invalidPDBAlertsResponse() {
+        // Prepare mock
+        HttpSoapMultiMockFactory mockFactory = new HttpSoapMultiMockFactory()
+            .addMock(
+                'ind:receiveSpecificReportForSubscription', 
+                500, 
+                '',
+                false
+            );
+
+        Test.setMock(HttpCalloutMock.class, mockFactory);
+
+        // Execute
+        Test.startTest();
+            try {
+                ProcessPDBAlertReportService service = new ProcessPDBAlertReportService();
+                service.importData('2025-03-31', 'TestTwo');
+            } catch (ProcessPDBAlertReportService.PDBAlertReportException ex) {
+                // Assert
+                assertRecordCountsInvalidResponse();
+            }
+
+        Test.stopTest();
+    }
+
+
+    // ASSERT METHODS
+    private static void assertRecordCounts() {
+        System.assertEquals(5, getCount('ht_Producer__c'), 'Producer count mismatch');
+        System.assertEquals(7, getCount('ht_ProducerAddress__c'), 'Address count mismatch');
+        System.assertEquals(13, getCount('ht_ProducerCommunication__c'), 'Communications count mismatch');
+        System.assertEquals(1, getCount('ht_Carrier__c'), 'Carrier count mismatch');
+        System.assertEquals(12, getCount('ht_License__c'), 'License count mismatch');
+        System.assertEquals(36, getCount('ht_LineOfAuthority__c'), 'LOA count mismatch - only License LOAs, no Carrier Appointment LOAs');
+        System.assertEquals(6, getCount('ht_CarrierAppointment__c'), 'Appointment count mismatch');
+        System.assertEquals(5, getCount('ht_CarrierAppointment__c', 'WHERE ht_LineOfAuthorityCode__c != NULL'), 'Should have 5 carrier appointments with LOA fields populated (1 appointment has no LOA data)');
+    }
+
+    // ASSERT METHODS
+    private static void assertRecordCountsMixedDelete() {
+        System.assertEquals(5, getCount('ht_Producer__c'), 'Producer count mismatch');
+        System.assertEquals(7, getCount('ht_ProducerAddress__c'), 'Address count mismatch');
+        System.assertEquals(13, getCount('ht_ProducerCommunication__c'), 'Communications count mismatch');
+        System.assertEquals(1, getCount('ht_Carrier__c'), 'Carrier count mismatch');
+        System.assertEquals(9, getCount('ht_License__c'), 'License count mismatch');
+        System.assertEquals(3, getCount('ht_CarrierAppointment__c'), 'Appointment count mismatch');
+    }
+
+    private static void assertRecordCountsPerParentObject() {
+        System.assertEquals(9, getCount('ht_ProducerCommunication__c', 'WHERE ht_Producer__r.ht_NPN__c = \'22138233\''));
+        System.assertEquals(4, getCount('ht_ProducerCommunication__c', 'WHERE ht_Producer__r.ht_NPN__c = \'22166967\''));
+        System.assertEquals(4, getCount('ht_ProducerAddress__c', 'WHERE ht_Producer__r.ht_NPN__c = \'22138233\''));
+        System.assertEquals(3, getCount('ht_ProducerAddress__c', 'WHERE ht_Producer__r.ht_NPN__c = \'22166967\''));
+        System.assertEquals(4, getCount('ht_LineOfAuthority__c', 'WHERE ht_License__r.ht_UniqueIdentifier__c = \'675353522CA3\''));
+        System.assertEquals(2, getCount('ht_CarrierAppointment__c', 'WHERE ht_Producer__r.ht_NPN__c = \'22138233\''));
+        System.assertEquals(1, getCount('ht_CarrierAppointment__c', 'WHERE ht_Producer__r.ht_NPN__c = \'22166967\''));
+    }
+
+    private static void assertRecordCountsInvalidResponse() {
+        System.assertEquals(0, getCount('ht_Producer__c'), 'Producer count mismatch');
+        System.assertEquals(0, getCount('ht_ProducerAddress__c'), 'Address count mismatch');
+        System.assertEquals(0, getCount('ht_ProducerCommunication__c'), 'Communications count mismatch');
+        System.assertEquals(0, getCount('ht_Carrier__c'), 'Carrier count mismatch');
+        System.assertEquals(0, getCount('ht_License__c'), 'License count mismatch');
+        System.assertEquals(0, getCount('ht_LineOfAuthority__c'), 'LOA count mismatch - only License LOAs');
+        System.assertEquals(0, getCount('ht_CarrierAppointment__c'), 'Appointment count mismatch');
+    }
+
+    private static void assertMixedScenarioRecordCountsPerParentObject() {
+        // Producer 22138233 - CA: Both present, NE: No licenses, CT: No appointments
+        System.assertEquals(2, getCount('ht_License__c', 'WHERE ht_Producer__r.ht_NPN__c = \'22138233\' AND ht_StateOrProvinceCode__c = \'CA\''),
+            'Producer 22138233 should have 2 CA licenses (has license nodes)');
+        System.assertEquals(2, getCount('ht_CarrierAppointment__c', 'WHERE ht_Producer__r.ht_NPN__c = \'22138233\' AND ht_StateOrProvinceCode__c = \'CA\''),
+            'Producer 22138233 should have 2 CA appointments (has appointment nodes)');
+        System.assertEquals(1, getCount('ht_License__c', 'WHERE ht_Producer__r.ht_NPN__c = \'22138233\' AND ht_StateOrProvinceCode__c = \'NE\''),
+            'Producer 22138233 should still have 1 NE license (NO license nodes in payload = no deletion)');
+        System.assertEquals(1, getCount('ht_License__c', 'WHERE ht_Producer__r.ht_NPN__c = \'22138233\' AND ht_StateOrProvinceCode__c = \'CT\''),
+            'Producer 22138233 should have 1 CT license (has license nodes)');
+
+        // Producer 22138253 - GA: No appointments, CT: No licenses
+        System.assertEquals(2, getCount('ht_License__c', 'WHERE ht_Producer__r.ht_NPN__c = \'22138253\' AND ht_StateOrProvinceCode__c = \'GA\''),
+            'Producer 22138253 should have 2 GA licenses (has license nodes)');
+        System.assertEquals(2, getCount('ht_CarrierAppointment__c', 'WHERE ht_Producer__r.ht_NPN__c = \'22138253\' AND ht_StateOrProvinceCode__c = \'CT\''),
+            'Producer 22138253 should have 2 CT appointments (has appointment nodes)');
+
+        // Producer 22166967 - SC: No appointments, CA: Neither, TN: No licenses
+        System.assertEquals(2, getCount('ht_License__c', 'WHERE ht_Producer__r.ht_NPN__c = \'22166967\' AND ht_StateOrProvinceCode__c = \'SC\''),
+            'Producer 22166967 should have 2 SC licenses (has license nodes)');
+        System.assertEquals(1, getCount('ht_License__c', 'WHERE ht_Producer__r.ht_NPN__c = \'22166967\' AND ht_StateOrProvinceCode__c = \'CA\''),
+            'Producer 22166967 should still have 1 CA license (NO nodes in payload = no deletion)');
+        System.assertEquals(1, getCount('ht_CarrierAppointment__c', 'WHERE ht_Producer__r.ht_NPN__c = \'22166967\' AND ht_StateOrProvinceCode__c = \'TN\''),
+            'Producer 22166967 should have 1 TN appointment (has appointment nodes)');
+
+        // Producer 22166100 - ID: No appointments, TN: Neither, SC: No licenses
+        System.assertEquals(1, getCount('ht_License__c', 'WHERE ht_Producer__r.ht_NPN__c = \'22166100\' AND ht_StateOrProvinceCode__c = \'ID\''),
+            'Producer 22166100 should have 1 ID license (has license nodes)');
+        System.assertEquals(1, getCount('ht_License__c', 'WHERE ht_Producer__r.ht_NPN__c = \'22166100\' AND ht_StateOrProvinceCode__c = \'TN\''),
+            'Producer 22166100 should still have 1 TN license (NO nodes in payload = no deletion)');
+        System.assertEquals(1, getCount('ht_CarrierAppointment__c', 'WHERE ht_Producer__r.ht_NPN__c = \'22166100\' AND ht_StateOrProvinceCode__c = \'SC\''),
+            'Producer 22166100 should have 1 SC appointment (has appointment nodes)');
+
+        // Producer 22234021 - GA: No appointments
+        System.assertEquals(1, getCount('ht_License__c', 'WHERE ht_Producer__r.ht_NPN__c = \'22234021\' AND ht_StateOrProvinceCode__c = \'GA\''),
+            'Producer 22234021 should have 1 GA license (has license nodes)');
+
+        // Verify LOA counts remain stable
+        System.assertEquals(43, getCount('ht_LineOfAuthority__c'), 'Total LOA count should remain 43');
+
+        // Verify total counts match expected
+        System.assertEquals(12, getCount('ht_License__c'), 'Total license count should be 12');
+        System.assertEquals(6, getCount('ht_CarrierAppointment__c'), 'Total appointment count should be 6');
+    }
+
+    private static void assertDeletionMarkerRecordCounts() {
+        // Producer 22138233 - TX licenses and appointments should be DELETED
+        System.assertEquals(0, getCount('ht_License__c', 'WHERE ht_Producer__r.ht_NPN__c = \'22138233\' AND ht_StateOrProvinceCode__c = \'TX\''),
+            'Producer 22138233 TX licenses should be deleted via deletion marker');
+        System.assertEquals(0, getCount('ht_CarrierAppointment__c', 'WHERE ht_Producer__r.ht_NPN__c = \'22138233\' AND ht_StateOrProvinceCode__c = \'TX\''),
+            'Producer 22138233 TX appointments should be deleted via deletion marker');
+
+        // Producer 22138233 - CA data should remain untouched
+        System.assertEquals(2, getCount('ht_License__c', 'WHERE ht_Producer__r.ht_NPN__c = \'22138233\' AND ht_StateOrProvinceCode__c = \'CA\''),
+            'Producer 22138233 CA licenses should remain (normal data in payload)');
+        System.assertEquals(2, getCount('ht_CarrierAppointment__c', 'WHERE ht_Producer__r.ht_NPN__c = \'22138233\' AND ht_StateOrProvinceCode__c = \'CA\''),
+            'Producer 22138233 CA appointments should remain (normal data in payload)');
+
+        // Producer 22166967 - FL appointments should be DELETED
+        System.assertEquals(0, getCount('ht_CarrierAppointment__c', 'WHERE ht_Producer__r.ht_NPN__c = \'22166967\' AND ht_StateOrProvinceCode__c = \'FL\''),
+            'Producer 22166967 FL appointments should be deleted via deletion marker');
+
+        // Producer 22166967 - SC data should remain
+        System.assertEquals(2, getCount('ht_License__c', 'WHERE ht_Producer__r.ht_NPN__c = \'22166967\' AND ht_StateOrProvinceCode__c = \'SC\''),
+            'Producer 22166967 SC licenses should remain (normal data in payload)');
+
+        // Verify total counts match expected (12 licenses initially + 2 TX added - 2 TX deleted = 12)
+        System.assertEquals(12, getCount('ht_License__c'), 'Total license count after deletion marker should be 12');
+        // Appointments: 6 initially + 1 TX + 2 FL added - 1 TX - 2 FL deleted = 6
+        System.assertEquals(6, getCount('ht_CarrierAppointment__c'), 'Total appointment count after deletion marker should be 6');
+
+        // Verify other producers unaffected
+        System.assertEquals(1, getCount('ht_License__c', 'WHERE ht_Producer__r.ht_NPN__c = \'22138253\' AND ht_StateOrProvinceCode__c = \'CT\''),
+            'Producer 22138253 CT license should remain');
+        System.assertEquals(2, getCount('ht_CarrierAppointment__c', 'WHERE ht_Producer__r.ht_NPN__c = \'22138253\' AND ht_StateOrProvinceCode__c = \'CT\''),
+            'Producer 22138253 CT appointments should remain');
+        System.assertEquals(1, getCount('ht_CarrierAppointment__c', 'WHERE ht_Producer__r.ht_NPN__c = \'22166100\' AND ht_StateOrProvinceCode__c = \'SC\''),
+            'Producer 22166100 SC appointment should remain');
+        System.assertEquals(1, getCount('ht_License__c', 'WHERE ht_Producer__r.ht_NPN__c = \'22234021\' AND ht_StateOrProvinceCode__c = \'GA\''),
+            'Producer 22234021 GA license should remain');
+    }
+
+    private static void assertExternalIds() {
+        assertProducerNPNs();
+        assertProducerCommunicationIds();
+        assertProducerAddressIds();
+        assertCarrierCoCodes();
+        assertLicenseNumbers();
+        assertLineOfAuthorityIds();
+        assertCarrierAppointmentIds();
+    }
+    
+    private static void assertFieldValues() {
+        assertProducerFields();
+        assertProducerCommunicationFields();
+        assertCarrierFields();
+        assertLicenseFields();
+        assertLineOfAuthorityFields();
+        assertCarrierAppointmentFields();
+        assertCarrierAppointmentLOAFields();
+    }
+    
+    private static Integer getCount(String objectName) {
+        String queryString = 'SELECT count() FROM ' + objectName;
+        return Database.countQuery(queryString);
+    }
+
+    private static Integer getCount(String objectName, String whereClause) {
+        String queryString = 'SELECT count() FROM ' + objectName + ' ' + whereClause;
+        return Database.countQuery(queryString);
+    }
+    
+    private static void assertProducerNPNs() {
+        Set<String> producerNPNs = new Set<String>{
+            '22138253', '22138233', '22234021', '22166967', '22166100'
+        };
+
+        List<ht_Producer__c> producers = getAllProducers();
+
+        for (ht_Producer__c producer : producers) {
+            System.assert(producerNPNs.contains(producer.ht_NPN__c), 
+                'Unexpected producer NPN: ' + producer.ht_NPN__c);
+        }
+    }
+    
+private static void assertProducerCommunicationIds() {
+        Set<String> producerCommunicationIds = new Set<String>{
+            '+1-219-313-6379Wired22138233',
+            '+1-419-906-3223Fax22138233',
+            '+1-419-906-3221Wired22138233',
+            'silvana1.zapoticky@cblmaycfqw.comBusiness22138233',
+            'silvana2.zapoticky@cblmaycfqw.comPersonal22138233',
+            '+1-219-313-6370Wired22138233',
+            '+1-419-906-3229Fax22138233',
+            'silvana3.zapoticky@cblmaycfqw.comBusiness22138233',
+            'silvana4.zapoticky@cblmaycfqw.comPersonal22138233',
+            '+1-219-313-6370Wired22166967',
+            '+1-419-906-3229Fax22166967',
+            'silvana3.zapoticky@cblmaycfqw.comBusiness22166967',
+            'silvana4.zapoticky@cblmaycfqw.comPersonal22166967'
+        };
+    
+        List<ht_ProducerCommunication__c> communications = getAllProducerCommunications();
+
+        for (ht_ProducerCommunication__c comm : communications) {
+            System.assert(producerCommunicationIds.contains(comm.ht_UniqueIdentifier__c),
+                'Unexpected producer communication ID: ' + comm.ht_UniqueIdentifier__c);
+        }
+    }
+    
+    private static void assertProducerAddressIds() {
+        Set<String> producerAddressIds = new Set<String>{
+            '245FrancisLewisBlvd#9536GardenaCA90248U.S.A.Mailing22138233',
+            '245FrancisLewisBlvd#9536GardenaCA90248U.S.A.Residential22138233',
+            '7SeBishopAve#9SanBernardinoCA92410U.S.A.Mailing22138233',
+            '245FrancisLewisBlvd#9536GardenaCA90248U.S.A.Physical22138233',
+            '7SeBishopAve#9SanBernardinoCA92410U.S.A.Mailing22166967',
+            '245FrancisLewisBlvd#9536GardenaCA90248U.S.A.Physical22166967',
+            '7SeBishopAve#9SanBernardinoCA92410U.S.A.Principal22166967'
+        };
+
+        List<ht_ProducerAddress__c> addresses = getAllProducerAddresses();
+
+        for (ht_ProducerAddress__c address : addresses) {
+            System.assert(producerAddressIds.contains(address.ht_UniqueIdentifier__c),
+                'Unexpected producer address ID: ' + address.ht_UniqueIdentifier__c);
+        }
+    }
+    
+    private static void assertCarrierCoCodes() {
+        Set<String> carrierCoCodes = new Set<String>{'19232'};
+
+        List<ht_Carrier__c> carriers = getAllCarriers();
+
+        for (ht_Carrier__c carrier : carriers) {
+            System.assert(carrierCoCodes.contains(carrier.ht_CoCode__c),
+                'Unexpected carrier CoCode: ' + carrier.ht_CoCode__c);
+        }
+    }
+    
+    private static void assertLicenseNumbers() {
+        Set<String> licenseNumbers = new Set<String>{
+            '12043222', '273647826', '832938456', '675353522', '671453522', '22138233',
+            '57355422', '12950', '856932547', '854698745', '345127867', '458975823'
+        };
+
+        List<ht_License__c> licenses = getAllLicenses();
+
+        for (ht_License__c license : licenses) {
+            System.assert(licenseNumbers.contains(license.ht_LicenseNumber__c),
+                'Unexpected license number: ' + license.ht_LicenseNumber__c);
+        }
+    }
+    
+    private static void assertLineOfAuthorityIds() {
+        Set<String> loaIds = new Set<String>{
+            // License LOAs
+            '11CA2023-10-10675353522CA3', '12CA2023-10-10675353522CA3', '16CA2023-10-10675353522CA3', '935CA2023-10-10675353522CA3',
+            '11CA2023-10-10671453522CA3', '12CA2023-10-10671453522CA3', '16CA2023-10-10671453522CA3', '935CA2023-10-10671453522CA3',
+            '11NE2023-04-1122138233NE3', '12NE2023-04-1122138233NE3', '16NE2023-04-1122138233NE3', '935NE2023-04-1122138233NE3',
+            '11CT2023-10-1057355422CT3', '12CT2023-10-1057355422CT3', '16CT2023-10-1057355422CT3', '935CT2023-10-1057355422CT3',
+            '11SC2023-10-1112950SC3', '12SC2023-10-1112950SC3', '16SC2023-10-1112950SC3', '935SC2023-10-1112950SC3',
+            '11CA2023-11-11856932547CA3', '12CA2023-11-11856932547CA3', '16CA2023-11-11856932547CA3', '935CA2023-11-11856932547CA3',
+            '101SC2023-04-11854698745SC4', '11ID2023-11-11345127867ID3', '12ID2023-11-11345127867ID3', '16ID2023-11-11345127867ID3', '935ID2023-11-11345127867ID3',
+            '13343TN2023-04-11458975823TN1405', '5139GA2023-02-2712043222GA1929', '5140GA2023-02-2712043222GA1929',
+            '5133GA2025-03-29273647826GA1931', '5134GA2025-03-29273647826GA1931', '5139GA2025-03-29832938456GA1929', '5140GA2025-03-29832938456GA1929'
+        };
+
+        List<ht_LineOfAuthority__c> loas = getAllLinesOfAuthority();
+
+        for (ht_LineOfAuthority__c loa : loas) {
+            System.assert(loaIds.contains(loa.ht_UniqueIdentifier__c),
+                'Unexpected Line of Authority ID: ' + loa.ht_UniqueIdentifier__c);
+        }
+    }
+    
+    private static void assertCarrierAppointmentIds() {
+        Set<String> carrierAppointmentIds = new Set<String>{
+            // Updated: This carrier appt had multiple LOAs in XML, now uses only first LOA (code 11)
+            '2213823319232360719665CATerminated221382332213823319232360719665CATerminated2025-04-3011',
+            '2213823319232360719665CATerminated221382332213823319232360719665CATerminated2025-04-3016',
+            '2213825319232360719665CTTerminated221382532213825319232360719665CTTerminated2025-04-3016',
+            '2213825319232360719665CTTerminated221382532213825319232360719665CTTerminated2025-04-3011',
+            '2216610019232360719665SCAppointed221661002216610019232360719665SCAppointed2025-04-29101',
+            '2216696719232360719665TNAppointed221669672216696719232360719665TNAppointed2025-04-29'
+        };
+
+        List<ht_CarrierAppointment__c> appointments = getAllCarrierAppointments();
+
+        for (ht_CarrierAppointment__c app : appointments) {
+            System.assert(carrierAppointmentIds.contains(app.ht_UniqueIdentifier__c),
+                'Unexpected Carrier Appointment ID: ' + app.ht_UniqueIdentifier__c);
+        }
+    }
+    
+    // Methods for asserting field values
+    
+    private static void assertProducerFields() {
+        ht_Producer__c producer = getProducerByNPN('22138233');
+        
+        System.assertEquals('22138233', producer.ht_NPN__c, 'Incorrect NPN');
+        System.assertEquals(Date.newInstance(1950, 4, 22), producer.ht_BirthDate__c, 'Incorrect Date of Birth');
+        System.assertEquals('Primary', producer.ht_NameTypeCode__c, 'Incorrect Name Type Code');
+        System.assertEquals('MR', producer.ht_NameSuffix__c, 'Incorrect Name Suffix');
+        System.assertEquals('Rory W Destefanis', producer.ht_FullName__c, 'Incorrect Full Name');
+        System.assertEquals('Destefanis', producer.ht_SurName__c, 'Incorrect Surname');
+        System.assertEquals('W', producer.ht_MiddleName__c, 'Incorrect Middle Name');
+        System.assertEquals('Rory', producer.ht_GivenName__c, 'Incorrect Given Name');
+        System.assertEquals('Rory', producer.ht_OtherGivenName__c, 'Incorrect Other Given Name');
+        System.assertEquals('Agent', producer.ht_Type__c);
+    }
+    
+    private static void assertProducerCommunicationFields() {
+        ht_Producer__c producer = getProducerByNPN('22138233');
+        
+        // Assert Phone communication data
+        ht_ProducerCommunication__c phoneComm = getProducerCommunicationByIdentifier('+1-219-313-6379Wired22138233');
+        
+        System.assertEquals('+1-219-313-6379Wired22138233', phoneComm.ht_UniqueIdentifier__c, 'Incorrect Unique Identifier for Phone Communication');
+        System.assertEquals('Wired', phoneComm.ht_PhoneType__c, 'Incorrect Phone Type');
+        System.assertEquals('+1-219-313-6379', phoneComm.ht_PhoneNumber__c, 'Incorrect Phone Number');
+        System.assertEquals(producer.Id, phoneComm.ht_Producer__c, 'Incorrect Producer');
+        
+        // Assert Email Communication data
+        ht_ProducerCommunication__c emailComm = getProducerCommunicationByIdentifier('silvana1.zapoticky@cblmaycfqw.comBusiness22138233');
+        
+        System.assertEquals('silvana1.zapoticky@cblmaycfqw.comBusiness22138233', emailComm.ht_UniqueIdentifier__c, 'Incorrect Unique Identifier for Email Communication');
+        System.assertEquals('Business', emailComm.ht_EmailType__c, 'Incorrect Email Type');
+        System.assertEquals('silvana1.zapoticky@cblmaycfqw.com', emailComm.ht_EmailAddress__c, 'Incorrect Email Address');
+        System.assertEquals(producer.Id, emailComm.ht_Producer__c, 'Incorrect Producer');
+    }
+    
+    private static void assertCarrierFields() {
+        ht_Carrier__c carrier = getCarrierByCoCode('19232');
+        
+        System.assertEquals('19232', carrier.ht_CoCode__c, 'Incorrect Carrier CoCode');
+        System.assertEquals('Allstate Ins Co', carrier.ht_FullName__c, 'Incorrect Carrier Name');
+        System.assertEquals('360719665', carrier.ht_FEIN__c, 'Incorrect FEIN');
+        System.assertEquals('19232360719665', carrier.ht_UniqueIdentifier__c, 'Incorrect Carrier Unique Identifier');
+    }
+    
+    private static void assertLicenseFields() {
+        ht_License__c license = getLicenseByNumber('675353522');
+        ht_Producer__c producer = getProducerByNPN('22138233');
+        
+        // Basic license fields
+        System.assertEquals(true, license.ht_ResidentLicenseIndicator__c, 'Incorrect Resident License Indicator');
+        System.assertEquals(true, license.ht_QualifyingInsuranceLicenseIndicator__c, 'Incorrect Qualifying Insurance License Indicator');
+        System.assertEquals('Producer', license.ht_TypeCode__c, 'Incorrect License TypeCode');
+        System.assertEquals('675353522', license.ht_LicenseNumber__c, 'Incorrect License Number');
+        System.assertEquals(Date.valueOf('2024-03-29'), license.ht_StartDate__c, 'Incorrect License Start Date');
+        System.assertEquals(Date.valueOf('2025-03-29'), license.ht_EndDate__c, 'Incorrect License End Date');
+        System.assertEquals('Inactive', license.ht_StatusCode__c, 'Incorrect License Status Code');
+        System.assertEquals('Test description', license.ht_StatusDescription__c, 'Incorrect License Status Description');
+        System.assertEquals(Date.valueOf('2023-10-10'), license.ht_IssueDate__c, 'Incorrect License Issue Date');
+        System.assertEquals('3', license.ht_LicenseClassCode__c, 'Incorrect License Class Code');
+        System.assertEquals('Insurance Producer', license.ht_LicenseClassDescription__c, 'Incorrect License Class Description');
+        System.assertEquals('CA', license.ht_StateOrProvinceCode__c, 'Incorrect License StateOrProvinceCode');
+        System.assertEquals('CA', license.ht_StateOrProvinceName__c, 'Incorrect License StateOrProvinceName');
+        System.assertEquals(Date.valueOf('2025-03-28'), license.ht_AsOfDate__c, 'Incorrect License As Of Date');
+        System.assertEquals('675353522CA3', license.ht_UniqueIdentifier__c, 'Incorrect License Unique Identifier');
+        
+        // Continuing Education fields
+        System.assertEquals('CA', license.ht_CEStateOrProvince_Code__c, 'Incorrect CE StateOrProvinceCode');
+        System.assertEquals('IN COMPLIANCE', license.ht_CEStatusDescription__c, 'Incorrect CE Status Description');
+        System.assertEquals(Date.valueOf('2025-03-29'), license.ht_CEStartDate__c, 'Incorrect CE Start Date');
+        System.assertEquals(Date.valueOf('2026-03-29'), license.ht_CEEndDate__c, 'Incorrect CE End Date');
+        System.assertEquals(1, license.ht_PeriodDuration__c, 'Incorrect CE Period Duration');
+        System.assertEquals('Test measure', license.ht_CEUnitsRequiredMeasure__c, 'Incorrect CE Units Required Measure');
+        
+        // Verify the License is linked to the correct Producer
+        System.assertEquals(producer.Id, license.ht_Producer__c, 'License linked to incorrect Producer');
+    }
+    
+    private static void assertLineOfAuthorityFields() {
+        String loaUniqueId = '11CA2023-10-10675353522CA3';
+        ht_LineOfAuthority__c loa = getLineOfAuthorityByIdentifier(loaUniqueId);
+        ht_License__c license = getLicenseByNumber('675353522');
+        
+        // Assertions for LOA fields
+        System.assertEquals(Date.valueOf('2023-10-10'), loa.ht_IssueDate__c, 'Incorrect LOA Issue Date');
+        System.assertEquals(Date.valueOf('2025-10-10'), loa.ht_RenewalDate__c, 'Incorrect LOA Renewal Date');
+        System.assertEquals('CA', loa.ht_StateOrProvinceCode__c, 'Incorrect LOA StateOrProvinceCode');
+        System.assertEquals('CA', loa.ht_StateOrProvinceName__c, 'Incorrect LOA StateOrProvinceName');
+        System.assertEquals('11', loa.ht_LineOfAuthorityCode__c, 'Incorrect LOA Code');
+        System.assertEquals('Casualty', loa.ht_LineOfAuthorityDescription__c, 'Incorrect LOA Description');
+        System.assertEquals('Inactive', loa.ht_StatusCode__c, 'Incorrect LOA Status Code');
+        System.assertEquals('Inactive', loa.ht_StatusDescription__c, 'Incorrect LOA Status Description');
+        System.assertEquals('Cancelled', loa.ht_StatusReasonCode__c, 'Incorrect LOA Status Reason Code');
+        System.assertEquals('Inactive test', loa.ht_StatusReasonDescription__c, 'Incorrect LOA Status Reason Description');
+        System.assertEquals(Date.valueOf('2025-02-25'), loa.ht_StartDate__c, 'Incorrect LOA Status Period Start Date');
+        
+        // Assert that LOA is correctly related to the License
+        System.assertEquals(license.Id, loa.ht_License__c, 'LOA linked to incorrect License');
+    }
+    
+    private static void assertCarrierAppointmentFields() {
+        // Updated: This carrier appt had multiple LOAs in XML, now uses only first LOA (code 11)
+        String carrierAppUniqueIdentifier = '2213823319232360719665CATerminated221382332213823319232360719665CATerminated2025-04-3011';
+
+        ht_CarrierAppointment__c carrierApp = getCarrierAppointmentByIdentifierPattern(carrierAppUniqueIdentifier);
+        ht_Producer__c producer = getProducerByNPN('22138233');
+        ht_Carrier__c carrier = getCarrierByCoCode('19232');
+        
+        // Assertions for Carrier Appointment fields
+        System.assertEquals('CA', carrierApp.ht_StateOrProvinceCode__c, 'Incorrect State or Province Code');
+        System.assertEquals('Terminated', carrierApp.ht_StatusCode__c, 'Incorrect Status Code');
+        System.assertEquals('Test descr', carrierApp.ht_StatusDescription__c, 'Incorrect Status Description');
+        System.assertEquals('Terminated reason', carrierApp.ht_StatusReasonCode__c, 'Incorrect Status Reason Code');
+        System.assertEquals('Test Reason Description', carrierApp.ht_StatusReasonDescription__c, 'Incorrect Status Reason Description');
+        System.assertEquals(Date.valueOf('2025-03-30'), carrierApp.ht_AppointmentEffectiveDate__c, 'Incorrect Appointment Effective Date');
+        System.assertEquals(Date.valueOf('2025-03-29'), carrierApp.ht_TerminationEffectiveDate__c, 'Incorrect Termination Effective Date');
+        System.assertEquals(Date.valueOf('2025-03-28'), carrierApp.ht_AsOfDate__c, 'Incorrect As Of Date');
+        
+        // Assertions to verify related Producer and Carrier Ids
+        System.assertEquals(producer.Id, carrierApp.ht_Producer__c, 'Carrier Appointment linked to incorrect Producer');
+        System.assertEquals(carrier.Id, carrierApp.ht_Carrier__c, 'Carrier Appointment linked to incorrect Carrier');
+    }
+    
+    private static void assertCarrierAppointmentLOAFields() {
+        // Query carrier appointment that should have LOA fields populated
+        ht_CarrierAppointment__c carrierApp = getCarrierAppointmentByIdentifierPattern('2213825319232360719665CTTerminated221382532213825319232360719665CTTerminated2025-04-3011');
+
+        // Assertions for LOA fields directly on Carrier Appointment
+        System.assertEquals(Date.valueOf('2025-04-30'), carrierApp.ht_RenewalDate__c, 'Incorrect LOA Renewal Date');
+        System.assertEquals('11', carrierApp.ht_LineOfAuthorityCode__c, 'Incorrect LOA Code');
+        System.assertEquals('Casualty', carrierApp.ht_LineOfAuthorityDescription__c, 'Incorrect LOA Description');
+    }
+    
+    // QUERY METHODS
+    private static List<ht_Producer__c> getAllProducers() {
+        return [
+            SELECT 
+                Id,
+                ht_NPN__c 
+            FROM ht_Producer__c
+        ];
+    }
+    
+    private static ht_Producer__c getProducerByNPN(String npn) {
+        return [
+            SELECT 
+                Id, 
+                ht_NPN__c, 
+                ht_BirthDate__c, 
+                ht_NameTypeCode__c,
+                ht_NameSuffix__c,
+                ht_FullName__c,
+                ht_SurName__c,
+                ht_MiddleName__c,
+                ht_GivenName__c,
+                ht_OtherGivenName__c,
+                ht_Type__c
+            FROM 
+                ht_Producer__c
+            WHERE 
+                ht_NPN__c = :npn
+            LIMIT 1
+        ];
+    }
+    
+    private static List<ht_ProducerCommunication__c> getAllProducerCommunications() {
+        return [
+            SELECT 
+                Id, 
+                ht_UniqueIdentifier__c 
+            FROM ht_ProducerCommunication__c
+        ];
+    }
+    
+    private static ht_ProducerCommunication__c getProducerCommunicationByIdentifier(String identifier) {
+        return [
+            SELECT 
+                Id, 
+                ht_UniqueIdentifier__c, 
+                ht_PhoneType__c, 
+                ht_PhoneNumber__c, 
+                ht_EmailType__c, 
+                ht_EmailAddress__c, 
+                ht_Producer__c
+            FROM ht_ProducerCommunication__c
+            WHERE ht_UniqueIdentifier__c = :identifier
+            LIMIT 1
+        ];
+    }
+    
+    private static List<ht_ProducerAddress__c> getAllProducerAddresses() {
+        return [
+            SELECT 
+                Id, 
+                ht_UniqueIdentifier__c 
+            FROM ht_ProducerAddress__c
+        ];
+    }
+    
+    private static List<ht_Carrier__c> getAllCarriers() {
+        return [
+            SELECT 
+                Id, 
+                ht_CoCode__c, 
+                ht_UniqueIdentifier__c
+            FROM ht_Carrier__c
+        ];
+    }
+    
+    private static ht_Carrier__c getCarrierByCoCode(String coCode) {
+        return [
+            SELECT 
+                Id, 
+                ht_CoCode__c, 
+                ht_FullName__c, 
+                ht_FEIN__c, 
+                ht_UniqueIdentifier__c
+            FROM ht_Carrier__c
+            WHERE ht_CoCode__c = :coCode
+            LIMIT 1
+        ];
+    }
+    
+    private static List<ht_License__c> getAllLicenses() {
+        return [
+            SELECT 
+                Id, 
+                ht_LicenseNumber__c, 
+                ht_UniqueIdentifier__c 
+            FROM ht_License__c
+        ];
+    }
+    
+    private static ht_License__c getLicenseByNumber(String licenseNumber) {
+        return [
+            SELECT
+                Id,
+                ht_ResidentLicenseIndicator__c,
+                ht_QualifyingInsuranceLicenseIndicator__c,
+                ht_TypeCode__c,
+                ht_LicenseNumber__c,
+                ht_StartDate__c,
+                ht_EndDate__c,
+                ht_StatusCode__c,
+                ht_StatusDescription__c,
+                ht_IssueDate__c,
+                ht_LicenseClassCode__c,
+                ht_LicenseClassDescription__c,
+                ht_StateOrProvinceCode__c,
+                ht_StateOrProvinceName__c,
+                ht_AsOfDate__c,
+                ht_CEStateOrProvince_Code__c,
+                ht_CEStatusDescription__c,
+                ht_CEStartDate__c,
+                ht_CEEndDate__c,
+                ht_PeriodDuration__c,
+                ht_CEUnitsRequiredMeasure__c,
+                ht_Producer__c,
+                ht_UniqueIdentifier__c
+            FROM ht_License__c
+            WHERE ht_LicenseNumber__c = :licenseNumber
+            LIMIT 1
+        ];
+    }
+    
+    private static List<ht_LineOfAuthority__c> getAllLinesOfAuthority() {
+        return [
+            SELECT 
+                Id, 
+                ht_UniqueIdentifier__c 
+            FROM ht_LineOfAuthority__c
+        ];
+    }
+    
+    private static ht_LineOfAuthority__c getLineOfAuthorityByIdentifier(String identifier) {
+        return [
+            SELECT 
+                Id,
+                ht_IssueDate__c,
+                ht_RenewalDate__c,
+                ht_StateOrProvinceCode__c,
+                ht_StateOrProvinceName__c,
+                ht_LineOfAuthorityCode__c,
+                ht_LineOfAuthorityDescription__c,
+                ht_StatusCode__c,
+                ht_StatusDescription__c,
+                ht_StatusReasonCode__c,
+                ht_StatusReasonDescription__c,
+                ht_StartDate__c,
+                ht_License__c
+            FROM ht_LineOfAuthority__c
+            WHERE ht_UniqueIdentifier__c = :identifier
+            LIMIT 1
+        ];
+    }
+    
+    private static List<ht_CarrierAppointment__c> getAllCarrierAppointments() {
+        return [
+            SELECT 
+                Id, 
+                ht_UniqueIdentifier__c 
+            FROM ht_CarrierAppointment__c
+        ];
+    }
+    
+    private static ht_CarrierAppointment__c getCarrierAppointmentByIdentifierPattern(String identifierPattern) {
+        return [
+            SELECT
+                Id,
+                ht_StateOrProvinceCode__c,
+                ht_StatusCode__c,
+                ht_StatusDescription__c,
+                ht_StatusReasonCode__c,
+                ht_StatusReasonDescription__c,
+                ht_AppointmentEffectiveDate__c,
+                ht_TerminationEffectiveDate__c,
+                ht_AsOfDate__c,
+                ht_Producer__c,
+                ht_Carrier__c,
+                ht_LineOfAuthorityCode__c,
+                ht_LineOfAuthorityDescription__c,
+                ht_RenewalDate__c
+            FROM ht_CarrierAppointment__c
+            WHERE ht_UniqueIdentifier__c LIKE :identifierPattern + '%'
+            LIMIT 1
+        ];
+    }
+}

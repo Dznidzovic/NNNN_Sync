@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <!-- API Version -->
+    <version>63.0</version>
+
+    <!-- Test Classes (excluding Account/Contact/Lead ProducerAssignmentService tests) -->
+    <types>
+        <members>BaseApiInvoker_Test</members>
+        <members>CascadeDeletionLoa_Test</members>
+        <members>CreateSubscriptionQueueable_Test</members>
+        <members>DMLExecutor_Test</members>
+        <members>DeleteLogsBatchableTest</members>
+        <members>EntityInfoApiController_Test</members>
+        <members>HttpMockFactory</members>
+        <members>HttpSoapMultiMockFactory</members>
+        <members>ProcessPDBAlertReportService_Test</members>
+        <members>Logger_Test</members>
+        <members>PDBAlertReportSchedulable_Test</members>
+        <members>ProcessEntityInfoApiService_Test</members>
+        <members>ProducerTriggerHandler_Test</members>
+        <members>RemoveNPNFromSubscriptionQueueable_Test</members>
+        <members>RunEntityInfoReportBatchable_Test</members>
+        <members>RunPDBAlertReportBatchable_Test</members>
+        <members>RunPDBAlert_Test</members>
+        <members>SubscriptionQueueable_Test</members>
+        <members>TestDataFactory</members>
+        <name>ApexClass</name>
+    </types>
+</Package>

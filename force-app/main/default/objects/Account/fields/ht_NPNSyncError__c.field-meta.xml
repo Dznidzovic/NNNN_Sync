@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ht_NPNSyncError__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(
+  AND(
+    TEXT(ht_Producer__r.ht_NPNStatus__c) = &quot;Active&quot;,
+    ISPICKVAL(ht_Producer__r.ht_Type__c, &apos;Agent&apos;)
+  ),
+  &quot;NPN is for an Agent (Not an Agency)&quot;,
+
+  IF(
+    TEXT(ht_Producer__r.ht_NPNStatus__c) = &quot;Invalid NPN&quot;,
+    &quot;The NPN was rejected by NIPR&quot;,
+
+    IF(
+      OR(
+        TEXT(ht_Producer__r.ht_NPNStatus__c) = &quot;Active&quot;,
+        TEXT(ht_Producer__r.ht_NPNStatus__c) = &quot;Processing&quot;
+      ),
+      &quot;&quot;,
+      ht_Producer__r.ht_NPNSyncError__c
+    )
+  )
+)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>NPN Sync Error</label>
+    <required>false</required>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ht_License__c</fullName>
+    <label>License</label>
+    <referenceTo>ht_License__c</referenceTo>
+    <relationshipLabel>NIPR Lines Of Authority</relationshipLabel>
+    <relationshipName>Lines_Of_Authority</relationshipName>
+    <relationshipOrder>0</relationshipOrder>
+    <reparentableMasterDetail>false</reparentableMasterDetail>
+    <trackTrending>false</trackTrending>
+    <type>MasterDetail</type>
+    <writeRequiresMasterRead>false</writeRequiresMasterRead>
+</CustomField>

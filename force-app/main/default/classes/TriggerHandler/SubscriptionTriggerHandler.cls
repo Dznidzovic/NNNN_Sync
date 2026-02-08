@@ -1,0 +1,88 @@
+/*********************************************************
+ * Apex Class Name    : SubscriptionTriggerHandler
+ * Created Date       : 2025-12-24
+ * @description       : Trigger handler for ht_Subscription__c that increments the
+ *                      custom settings counter (ht_NIPRSubscriptionDetails__c.ht_Latest_Number__c)
+ *                      whenever a new subscription is created
+ * @author            : Stefan Nidzovic
+ * Modification Log:
+ * Ver   Date         Author                   Modification
+ * 1.0   2025-12-24   Stefan Nidzovic                   Initial Version
+ *********************************************************
+ **/
+public with sharing class SubscriptionTriggerHandler extends BaseTriggerHandler {
+    @TestVisible
+    private static Boolean triggerDisabled = false;
+
+    public override Boolean isDisabled() {
+        return triggerDisabled || super.isDisabled();
+    }
+
+    /**
+     *********************************************************
+     * @Method Name    : afterInsert
+     * @description    : Increments the custom settings counter when subscriptions are created
+     *                   The counter tracks the latest subscription number used
+     * @param          : newItems - Map of new subscription records
+     * @return         : void
+     *********************************************************
+     **/
+    public override void afterInsert(Map<Id, SObject> newItems) {
+        // Find the highest subscription number from the newly inserted subscriptions
+        Decimal maxNumber = 0;
+
+        for (SObject obj : newItems.values()) {
+            ht_Subscription__c subscription = (ht_Subscription__c) obj;
+
+            // Extract number from ht_Subscription_Name__c (format: S-XXXX)
+            if (String.isNotBlank(subscription.ht_Subscription_Name__c)) {
+                String subscriptionName = subscription.ht_Subscription_Name__c;
+
+                // Parse the number from S-XXXX format
+                if (subscriptionName.startsWith('S-') && subscriptionName.length() >= 6) {
+                    String numberPart = subscriptionName.substring(2); // Remove 'S-'
+                    try {
+                        Decimal subscriptionNumber = Decimal.valueOf(numberPart);
+                        if (subscriptionNumber > maxNumber) {
+                            maxNumber = subscriptionNumber;
+                        }
+                    } catch (Exception e) {
+                        // Skip invalid format - continue processing other subscriptions
+                    }
+                }
+            }
+        }
+
+        // Only update counter if we found valid subscription numbers
+        if (maxNumber > 0) {
+            updateCustomSettingsCounter(maxNumber);
+        }
+    }
+
+    /**
+     *********************************************************
+     * @Method Name    : updateCustomSettingsCounter
+     * @description    : Updates the custom settings counter if the new value is higher
+     * @param          : newNumber - The new subscription number to set
+     * @return         : void
+     *********************************************************
+     **/
+    private void updateCustomSettingsCounter(Decimal newNumber) {
+        ht_NIPRSubscriptionDetails__c settings = ht_NIPRSubscriptionDetails__c.getOrgDefaults();
+
+        // getOrgDefaults() returns an object with null Id if no settings exist
+        if (settings == null || settings.Id == null) {
+            settings = new ht_NIPRSubscriptionDetails__c(
+                SetupOwnerId = UserInfo.getOrganizationId(),
+                ht_Latest_Number__c = newNumber
+            );
+            insert settings;
+        } else {
+            // Only update if the new number is higher than current
+            if (settings.ht_Latest_Number__c == null || newNumber > settings.ht_Latest_Number__c) {
+                settings.ht_Latest_Number__c = newNumber;
+                update settings;
+            }
+        }
+    }
+}

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <help><!-- Stores a stack trace for Apex logs (optional). --></help>
+    <label><!-- Stack Trace --></label>
+    <name>ht_StackTrace__c</name>
+</CustomFieldTranslation>

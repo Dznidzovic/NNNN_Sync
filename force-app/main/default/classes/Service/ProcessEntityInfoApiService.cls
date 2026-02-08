@@ -1,0 +1,947 @@
+/**
+ *********************************************************
+ * Apex Class Name    : ProcessEntityInfoApiService
+ * Created Date       : 04-08-2025
+ * @description       : Imports data from the NIPR Entity Info API and maps it to Salesforce records.
+ *                      This class processes the EntityInfoDTO structure and generates records for
+ *                      ht_Producer__c, ht_ProducerCommunication__c, ht_ProducerAddress__c, ht_License__c,
+ *                      ht_LineOfAuthority__c, and ht_CarrierAppointment__c.
+ * @author            : Stefan Nidzovic
+ * Modification Log:
+ * Ver   Date         Author             Modification
+ * 1.0   04-08-2025   Stefan Nidzovic    Initial Version
+ * 1.1   10-24-2025   Stefan Nidzovic    Added Exclude Carrier Appointments flag handling
+ *********************************************************
+ **/
+public with sharing class ProcessEntityInfoApiService {
+    // Stores the NPN of the producer being processed
+    private String producerNPN;
+    // Stores the producer record to be upserted
+    private ht_Producer__c producer;
+    // Stores new or updated producer communication records (Phone, Email)
+    private List<ht_ProducerCommunication__c> producerCommunications = new List<ht_ProducerCommunication__c>();
+    // Stores new or updated producer address records
+    private List<ht_ProducerAddress__c> producerAddresses = new List<ht_ProducerAddress__c>();
+    // Stores new or updated license records
+    private List<ht_License__c> licenses = new List<ht_License__c>();
+    // Stores new or updated Line of Authority records for licenses
+    private List<ht_LineOfAuthority__c> licenseLoas = new List<ht_LineOfAuthority__c>();
+    // Stores new or updated carrier appointment records
+    private List<ht_CarrierAppointment__c> carrierAppointments = new List<ht_CarrierAppointment__c>();
+    // Stores new or updated Line of Authority records for carrier appointments
+    // Stores new or updatedCarrier records for carriers upsert
+    private list<ht_Carrier__c> carriers = new List<ht_Carrier__c>();
+    // Tracks unique record Identifiers to remove duplicates where needed
+    private Set<String> uniqueRecordIds = new Set<String>();
+
+    private final String CLASS_NAME = 'ProcessEntityInfoApiService';
+
+    /**
+     *********************************************************
+     * @methodName      : processData
+     * @description     : Main entry point for importing a single EntityInfoDTO record into Salesforce.
+     * @param npn       : The National Producer Number to retrieve and process.
+     *********************************************************
+     **/
+    public void processData(String npn) {
+        String methodName = 'processData';
+
+        producerNPN = npn;
+
+        // Execute request to NIPR EntityInfo API
+        RetrieveEntityInfoApiData entityInfoCallout = new RetrieveEntityInfoApiData();
+        EntityInfoDTO entityInfoDTO = entityInfoCallout.retrieveData(npn);
+
+        // Check if this is an error response
+        if (!entityInfoDTO.isSuccess) {
+            Logger.error(CLASS_NAME, methodName,
+                    'NPN: ' + producerNPN + ' - Entity Info API returned error',
+                    'Error Type: ' + entityInfoDTO.errorType +
+                    ', Error Message: ' + entityInfoDTO.errorMessage,
+                    null);
+
+            Logger.commitAsync();
+
+            throw new EntityInfoAPIException(entityInfoDTO.errorMessage + ': ' + entityInfoDTO.errorType);
+        }
+
+        // Create a sanitized clone for logging with masked SSN
+        // EntityInfoDTO sanitizedDTO = createSanitizedClone(entityInfoDTO);
+        // Logger.debug(CLASS_NAME, methodName, 'Entity Info API Data for NPN: ' + npn, JSON.serialize(sanitizedDTO), null);
+
+        // Process producer data if available (either Individual or Firm)
+        if (entityInfoDTO?.PRODUCER?.INDIVIDUAL != null) {
+            processProducer(entityInfoDTO.PRODUCER.INDIVIDUAL);
+        } else if (entityInfoDTO?.PRODUCER?.FIRM != null) {
+            processProducer(entityInfoDTO.PRODUCER.FIRM);
+        }
+
+        producer.ht_NPNSyncError__c = null;
+        producer.ht_IntegrationError__c = null;
+        producer.ht_LastNIPRSync__c = Datetime.now();
+
+        // Set exclude carrier appointments flag based on what was determined in RetrieveEntityInfoApiData
+        // That class handles checking existing producer value and payload size
+        producer.ht_ExcludeCarrierAppointments__c = entityInfoCallout.shouldExcludeCarrierAppointments;
+
+        try {
+            syncDataWithSalesforce();
+        } catch (Exception ex) {
+            Logger.commitAsync();
+
+            throw ex;
+        }
+
+        // Log heap and CPU usage
+        Logger.debug(CLASS_NAME, methodName, 'NPN: ' + producerNPN + ' - Finished processing Entity Info',
+                'Heap Size: ' + Limits.getHeapSize() + ' bytes, ' +
+                'CPU Usage: ' + Limits.getCpuTime() + ' ms', 
+                null);
+        
+        Logger.commitAsync();
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : processProducer
+     * @description     : Maps the INDIVIDUAL(AGENT) node to a ht_Producer__c record and queues
+     *                    related communications for upsert.
+     * @param individual : INDIVIDUAL node from the DTO.
+     *********************************************************
+     **/
+    private void processProducer(EntityInfoDTO.INDIVIDUAL individual) {
+        if (individual == null || individual.ENTITY_BIOGRAPHIC == null || individual.ENTITY_BIOGRAPHIC.BIOGRAPHIC == null) {
+            return;
+        }
+
+        EntityInfoDTO.BIOGRAPHIC bio = individual.ENTITY_BIOGRAPHIC.BIOGRAPHIC;
+        
+        producer = createProducerRecord(bio);
+        producer.ht_Type__c = 'Agent';
+
+        // Process communications if available
+        if (individual.ENTITY_BIOGRAPHIC?.CONTACT_INFOS != null) {
+            processProducerCommunications(individual.ENTITY_BIOGRAPHIC.CONTACT_INFOS);
+        }
+
+        if (individual.ENTITY_BIOGRAPHIC?.ADDRESSES != null) {
+            processProducerAddresses(individual.ENTITY_BIOGRAPHIC.ADDRESSES);
+        }
+
+        if (individual.PRODUCER_LICENSING?.LICENSE_INFORMATION != null) {
+            processLicenseRecords(individual.PRODUCER_LICENSING?.LICENSE_INFORMATION);
+        }
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : processProducer
+     * @description     : Maps the FIRM(AGENCY) node to a ht_Producer__c record and queues
+     *                    related communications for upsert.
+     * @param firm      : FIRM node from the DTO.
+     *********************************************************
+     **/
+    private void processProducer(EntityInfoDTO.FIRM firm) {
+        if (firm == null || firm.ENTITY_BIOGRAPHIC == null || firm.ENTITY_BIOGRAPHIC.BIOGRAPHIC == null) {
+            return;
+        }
+
+        EntityInfoDTO.BIOGRAPHIC bio = firm.ENTITY_BIOGRAPHIC.BIOGRAPHIC;
+        
+        producer = createProducerRecord(bio, true);
+        producer.ht_Type__c = 'Agency';
+
+        // Process communications if available
+        if (firm.ENTITY_BIOGRAPHIC?.CONTACT_INFOS != null) {
+            processProducerCommunications(firm.ENTITY_BIOGRAPHIC.CONTACT_INFOS);
+        }
+
+        if (firm.ENTITY_BIOGRAPHIC?.ADDRESSES != null) {
+            processProducerAddresses(firm.ENTITY_BIOGRAPHIC.ADDRESSES);
+        }
+
+        if (firm.PRODUCER_LICENSING?.LICENSE_INFORMATION != null) {
+            processLicenseRecords(firm.PRODUCER_LICENSING?.LICENSE_INFORMATION);
+        }
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : processProducerCommunications
+     * @description     : Extracts business phones, faxes, and emails from CONTACT_INFOS and
+     *                    stores them as `ht_ProducerCommunication__c` records for the given NPN.
+     * @param contactInfos : Contact info section of the EntityInfoDTO.
+     *********************************************************
+     **/
+    private void processProducerCommunications(EntityInfoDTO.CONTACT_INFOS contactInfos) {
+        if (contactInfos == null || contactInfos.STATE == null) {
+            return;
+        }
+
+        for (EntityInfoDTO.STATE_CONTACT stateContact : contactInfos.STATE) {
+            if (stateContact == null || stateContact.CONTACT_INFO == null || stateContact.CONTACT_INFO.isEmpty()) {
+                continue;
+            }
+
+            // Process all CONTACT_INFO nodes for this STATE
+            for (EntityInfoDTO.CONTACT_INFO info : stateContact.CONTACT_INFO) {
+                if (info == null) {
+                    continue;
+                }
+                
+                // Process business phone
+                processPhoneCommunication(info.BUSINESS_PHONE, 'Wired');
+                
+                // Process fax
+                processPhoneCommunication(info.FAX, 'Fax');
+                
+                // Process email
+                processEmail(info.BUSINESS_EMAIL, 'Business');
+            }
+        }
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : processPhoneCommunication
+     * @description     : Creates a phone communication record for various phone types.
+     * @param phoneNumber : number of the phone
+     * @param phoneType   : Type of phone ('Wired', 'Fax', etc).
+     *********************************************************
+     **/
+    private void processPhoneCommunication(String phoneNumber, String phoneType) {
+        
+        // Return if blank
+        if (String.isBlank(phoneNumber)) {
+            return;
+        }
+        
+        String formattedPhone = StringUtils.formatNIPREntityInfoNumber(phoneNumber);
+
+        if (String.isNotBlank(formattedPhone)) {
+            String uniqueId = formattedPhone + phoneType + producerNPN;
+            
+            if (!uniqueRecordIds.contains(uniqueId)) {
+                ht_ProducerCommunication__c comm = new ht_ProducerCommunication__c();
+
+                comm.ht_Producer__r = new ht_Producer__c(ht_NPN__c = producerNPN);
+                comm.ht_PhoneType__c = phoneType;
+                comm.ht_PhoneNumber__c = formattedPhone;
+                comm.ht_UniqueIdentifier__c = uniqueId;
+                
+                producerCommunications.add(comm);
+                uniqueRecordIds.add(uniqueId);
+            }
+        }
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : processEmail
+     * @description     : Creates an email communication record from email data.
+     * @param email     : Email address
+     * @param emailType : Type of Email address
+     * 
+     *********************************************************
+     **/
+    private void processEmail(String email, String emailType) {
+        if (String.isBlank(email) || !StringUtils.isValidEmail(email)) {
+            return;
+        }
+        
+        String uniqueId = email + emailType + producerNPN;
+        
+        if (!uniqueRecordIds.contains(uniqueId)) {
+            ht_ProducerCommunication__c emailComm = new ht_ProducerCommunication__c();
+
+            emailComm.ht_Producer__r = new ht_Producer__c(ht_NPN__c = producerNPN);
+            emailComm.ht_EmailType__c = emailType;
+            emailComm.ht_EmailAddress__c = email;
+            emailComm.ht_UniqueIdentifier__c = uniqueId;
+            
+            producerCommunications.add(emailComm);
+            uniqueRecordIds.add(uniqueId);
+        }
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : processProducerAddresses
+     * @description     : Processes addresses from the entity biography and creates producer address records.
+     * @param addresses : Addresses from the Entity Info DTO.
+     *********************************************************
+     **/
+    private void processProducerAddresses(EntityInfoDTO.ADDRESSES addresses) {
+        if (addresses == null || addresses.STATE == null) {
+            return;
+        }
+
+        for (EntityInfoDTO.STATE_ADDRESS stateAddress : addresses.STATE) {
+            if (stateAddress == null || stateAddress.ADDRESS == null || stateAddress.ADDRESS.isEmpty()) {
+                continue;
+            }
+            
+            processStateAddresses(stateAddress);
+        }
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : processStateAddresses
+     * @description     : Processes addresses for a specific state and creates producer address records.
+     * @param stateAddress : State address information from the Entity Info DTO.
+     *********************************************************
+     **/
+    private void processStateAddresses(EntityInfoDTO.STATE_ADDRESS stateAddress) {
+        for (EntityInfoDTO.ADDRESS address : stateAddress.ADDRESS) {
+            if (address == null) {
+                continue;
+            }
+            
+            ht_ProducerAddress__c producerAddress = createProducerAddressRecord(address);
+
+            if (producerAddress != null && !uniqueRecordIds.contains(producerAddress.ht_UniqueIdentifier__c)) {
+                producerAddresses.add(producerAddress);
+                uniqueRecordIds.add(producerAddress.ht_UniqueIdentifier__c);
+            }
+        }
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : processLicenseRecords
+     * @description     : Processes license information and creates license records with lines of authority.
+     * @param licenseInfo : LICENSE_INFORMATION node from the DTO.
+     *********************************************************
+     **/
+    private void processLicenseRecords(EntityInfoDTO.LICENSE_INFORMATION licenseInfo) {
+        if (licenseInfo == null || licenseInfo.STATE == null) {
+            return;
+        }
+        
+        for (EntityInfoDTO.STATE_LICENSE stateLicense : licenseInfo.STATE) {
+            if (stateLicense == null || stateLicense.LICENSE == null) {
+                continue;
+            }
+            
+            // Process each license in the list
+            for (EntityInfoDTO.LICENSE license : stateLicense.LICENSE) {
+                // Create license record
+                ht_License__c licenseRecord = createLicenseRecord(license, stateLicense.attributes?.name);
+
+                String licenseUniqueId = licenseRecord.ht_LicenseNumber__c + StringUtils.safeParseNullString(licenseRecord.ht_StateOrProvinceCode__c) + StringUtils.safeParseNullString(licenseRecord.ht_LicenseClassCode__c);
+
+                licenseRecord.ht_UniqueIdentifier__c = licenseUniqueId;
+                
+                if (licenseRecord != null) {
+                    licenses.add(licenseRecord);
+                    
+                    // Process lines of authority if available
+                    if (license.DETAILS != null && license.DETAILS.DETAIL != null) {
+                        processLinesOfAuthority(license.DETAILS.DETAIL, licenseRecord.ht_UniqueIdentifier__c, stateLicense.attributes?.name);
+                    }
+                }
+            }
+            
+            // Process carrier appointments if available
+            if (stateLicense.APPOINTMENT_INFORMATION != null && stateLicense.APPOINTMENT_INFORMATION.APPOINTMENT != null) {
+                processCarrierAppointments(stateLicense.APPOINTMENT_INFORMATION.APPOINTMENT, null, stateLicense.attributes?.name);
+            }
+        }
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : processLinesOfAuthority
+     * @description     : Processes lines of authority for a license from DETAILS.DETAIL nodes.
+     * @param details   : List of DETAIL nodes containing line of authority information.
+     * @param licenseUniqueId : The license unique Id to associate with these lines of authority.
+     * @param stateCode : The state code for the license.
+     *********************************************************
+     **/
+    private void processLinesOfAuthority(List<EntityInfoDTO.DETAIL> details, String licenseUniqueId, String stateCode) {
+        if (details == null || details.isEmpty() || String.isBlank(licenseUniqueId)) {
+            return;
+        }
+        
+        for (EntityInfoDTO.DETAIL detail : details) {
+            if (detail == null || String.isBlank(detail.LOA_CODE)) {
+                continue;
+            }
+            
+            ht_LineOfAuthority__c loaRecord = createLineOfAuthorityRecord(detail, licenseUniqueId, stateCode);
+            
+            if (loaRecord != null) {
+                // Generate a unique identifier for this LOA
+                String uniqueId = loaRecord.ht_LineOfAuthorityCode__c + stateCode + StringUtils.safeParseFromDate(loaRecord.ht_IssueDate__c) + licenseUniqueId;
+                loaRecord.ht_UniqueIdentifier__c = uniqueId;
+                licenseLoas.add(loaRecord);
+            }
+        }
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : processCarrierAppointments
+     * @description     : Processes carrier appointments from APPOINTMENT nodes.
+     * @param appointments : List of APPOINTMENT nodes containing carrier appointment information.
+     * @param licenseNumber : The license number associated with these appointments.
+     * @param stateCode : The state code for the appointments.
+     *********************************************************
+     **/
+    private void processCarrierAppointments(List<EntityInfoDTO.APPOINTMENT> appointments, String licenseNumber, String stateCode) {
+        if (appointments == null || appointments.isEmpty()) {
+            return;
+        }
+        
+        for (EntityInfoDTO.APPOINTMENT appointment : appointments) {
+            if (appointment == null || (String.isBlank(appointment.COCODE) && String.isBlank(appointment.FEIN))) {
+                continue;
+            }
+
+            // Create a Carrier Record
+            ht_Carrier__c carrierRecord = createCarrierRecord(appointment);
+
+            // Make sure only one carrier record is being added to the list for upsert, as multiple nodes can contain carrier information
+            if (carrierRecord != null && !uniqueRecordIds.contains(carrierRecord.ht_UniqueIdentifier__c)) {
+                carriers.add(carrierRecord);
+                uniqueRecordIds.add(carrierRecord.ht_UniqueIdentifier__c);
+            }
+            
+            ht_CarrierAppointment__c appointmentRecord = createCarrierAppointmentRecord(appointment, stateCode);
+            
+            if (appointmentRecord != null) {       
+                // Set the producer lookup using external ID
+                appointmentRecord.ht_Producer__r = new ht_Producer__c(ht_NPN__c = producerNPN);
+                appointmentRecord.ht_Carrier__r = new ht_Carrier__c(ht_UniqueIdentifier__c = carrierRecord.ht_UniqueIdentifier__c);
+
+                String countyCode = StringUtils.safeParseNullString(appointmentRecord.ht_CountyCode__c);
+
+                // Generate a unique identifier for this carrier appointment
+                String carrierAppIdentifier = producerNPN + carrierRecord.ht_UniqueIdentifier__c + stateCode + countyCode + appointment.STATUS;
+                appointmentRecord.ht_UniqueIdentifier__c = carrierAppIdentifier;
+                
+                // Populate LOA fields directly on carrier appointment if available
+                if (String.isNotBlank(appointment.LINE_OF_AUTHORITY)) {
+                    // Set LOA fields directly on carrier appointment
+                    appointmentRecord.ht_LineOfAuthorityCode__c = StringUtils.truncateField(appointment.LOA_CODE, 50);
+                    appointmentRecord.ht_LineOfAuthorityDescription__c = StringUtils.truncateField(appointment.LINE_OF_AUTHORITY, 255);
+
+                    // Parse renewal date - format from 'MM/dd/yyyy' to 'yyyy-MM-dd' and convert to Date
+                    String formattedRenewalDate = StringUtils.convertToISODateFormat(
+                        StringUtils.swapCharacters(appointment.APPONT_RENEWAL_DATE, '/', '-')
+                    );
+                    appointmentRecord.ht_RenewalDate__c = DateUtils.safeParseDateFromString(formattedRenewalDate);
+
+                    String loaCode = StringUtils.safeParseNullString(appointment.LOA_CODE);
+                    String loaRenewalDate = StringUtils.safeParseFromDate(appointmentRecord.ht_RenewalDate__c);
+                    String statusReasonDate = StringUtils.safeParseFromDate(appointmentRecord.ht_StatusReasonDate__c);
+
+                    // Create the unique identifier component for the LOA info
+                    String loaUniqueId = producerNPN + carrierRecord.ht_UniqueIdentifier__c + loaRenewalDate + statusReasonDate + countyCode + loaCode;
+
+                    // Carrier appointment Unique Id has to be combined with it's LOA information in order to stay Unique
+                    carrierAppIdentifier += loaUniqueId;
+                    appointmentRecord.ht_UniqueIdentifier__c = carrierAppIdentifier;
+                }
+
+                if (!uniqueRecordIds.contains(appointmentRecord.ht_UniqueIdentifier__c)) {
+                    carrierAppointments.add(appointmentRecord);
+                    uniqueRecordIds.add(appointmentRecord.ht_UniqueIdentifier__c);
+                }
+            }
+        }
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : createProducerRecord
+     * @description     : Creates a producer (Individual) record with data from the biographic section.
+     * @param bio       : Biographic data from the Entity Info DTO.
+     * @return          : Populated ht_Producer__c record.
+     *********************************************************
+     **/
+    private ht_Producer__c createProducerRecord(EntityInfoDTO.BIOGRAPHIC bio) {
+        return createProducerRecord(bio, false);
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : createProducerRecord
+     * @description     : Creates a producer record with data from the biographic section.
+     *                    Can create either an Individual (Agent) or Firm (Agency) record.
+     * @param bio       : Biographic data from the Entity Info DTO.
+     * @param isFirm    : Boolean flag indicating if this is a Firm (Agency) record.
+     * @return          : Populated ht_Producer__c record.
+     *********************************************************
+     **/
+    private ht_Producer__c createProducerRecord(EntityInfoDTO.BIOGRAPHIC bio, Boolean isFirm) {
+        ht_Producer__c producerRecord = new ht_Producer__c();
+        
+        producerRecord.ht_NPN__c = producerNPN;
+        producerRecord.ht_NPNStatus__c = 'Active';
+        producerRecord.ht_SyncRecordToNIPR__c = 'On';
+
+        if (isFirm) {
+            // Set Agency-specific fields
+            producerRecord.ht_FullName__c = StringUtils.truncateField(bio.NAME_COMPANY, 255);
+            producerRecord.ht_FEIN__c = StringUtils.truncateField(StringUtils.swapCharacters(bio.ID_FEIN, '-', ''), 9);
+            producerRecord.ht_StateCOID__c = bio.STATE_CO_ID;
+            producerRecord.ht_StateDomicile__c = bio.STATE_DOMICILE;
+            
+            // Set name type code if available
+            if (bio?.OTHER_NAME?.STATE?.NAME?.attributes != null) {
+                producerRecord.ht_NameTypeCode__c = bio.OTHER_NAME.STATE.NAME.attributes.type;
+            }
+        } else {
+            // Set Individual-specific fields
+            producerRecord.ht_GivenName__c = bio.NAME_FIRST;
+            producerRecord.ht_MiddleName__c = bio.NAME_MIDDLE;
+            producerRecord.ht_SurName__c = bio.NAME_LAST;
+            producerRecord.ht_NameSuffix__c = bio.NAME_SUFFIX;
+            producerRecord.ht_SSN__c = bio.ID_SSN;
+
+            // Format and parse birth date
+            String formattedBirthDate = StringUtils.convertToISODateFormat(
+                StringUtils.swapCharacters(bio.DATE_BIRTH, '/', '-')
+            );
+
+            producerRecord.ht_BirthDate__c = DateUtils.safeParseDateFromString(formattedBirthDate);
+            
+            // Set name type code if available
+            if (bio?.OTHER_NAME?.STATE?.NAME?.attributes != null) {
+                producerRecord.ht_NameTypeCode__c = bio.OTHER_NAME.STATE.NAME.attributes.type;
+            }
+        }
+
+        return producerRecord;
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : createProducerAddressRecord
+     * @description     : Creates a Producer Address record based on provided address information.
+     * @param address   : Address information from the Entity Info DTO.
+     * @return          : A new ht_ProducerAddress__c record.
+     *********************************************************
+     **/
+    private ht_ProducerAddress__c createProducerAddressRecord(EntityInfoDTO.ADDRESS address) {
+        ht_ProducerAddress__c producerAddress = new ht_ProducerAddress__c();
+        
+        if (address != null) {
+            // Format and parse as of date
+            String formattedAsOfDate = StringUtils.convertToISODateFormat(
+                StringUtils.swapCharacters(address.DATE_UPDATED, '/', '-')
+            );
+
+            producerAddress.ht_AsOfDate__c = DateUtils.safeParseDateFromString(formattedAsOfDate);
+            producerAddress.ht_AddressLineOne__c = address.ADDR_LINE_1;
+            producerAddress.ht_AddressLineTwo__c = address.ADDR_LINE_2;
+            producerAddress.ht_AddressLineThree__c = address.ADDR_LINE_3;
+            producerAddress.ht_City__c = address.NAME_CITY;
+            producerAddress.ht_CountryCode__c = address.COUNTRY;
+            producerAddress.ht_PostalCode__c = address.ZIP;
+            producerAddress.ht_State__c = address.NAME_STATE;
+
+            String addressType = address.ADDR_TYPE == 'Residence' ? 'Residential' : address.ADDR_TYPE;
+            producerAddress.ht_AddressType__c = addressType;            
+                
+            ht_Producer__c producerForExtId = new ht_Producer__c(ht_NPN__c = producerNPN);
+            producerAddress.ht_Producer__r = producerForExtId;
+            
+            String uniqueId = 
+                producerAddress.ht_AddressLineOne__c + 
+                producerAddress.ht_AddressLineTwo__c +
+                producerAddress.ht_AddressLineThree__c +
+                producerAddress.ht_City__c + 
+                producerAddress.ht_State__c + 
+                producerAddress.ht_PostalCode__c + 
+                producerAddress.ht_CountryCode__c +
+                producerAddress.ht_AddressType__c + 
+                producerNPN;
+
+            // Remove spaces and nulls
+            List<String> patternsToRemove = new List<String>{ '\\s+', 'null' };
+            producerAddress.ht_UniqueIdentifier__c = StringUtils.cleanString(uniqueId, patternsToRemove);
+
+        }
+        
+        return producerAddress;
+    }
+
+
+    /**
+     *********************************************************
+     * @methodName      : createCarrierAppointmentRecord
+     * @description     : Creates a carrier appointment record from an APPOINTMENT node.
+     * @param appointment : APPOINTMENT node containing carrier appointment information.
+     * @param stateCode : The state code for the appointment.
+     * @return          : A populated ht_CarrierAppointment__c record.
+     *********************************************************
+     **/
+    private ht_CarrierAppointment__c createCarrierAppointmentRecord(EntityInfoDTO.APPOINTMENT appointment, String stateCode) {
+        if (appointment == null) {
+            return null;
+        }
+        
+        ht_CarrierAppointment__c carrierApp = new ht_CarrierAppointment__c();
+        
+        // Map basic appointment fields
+        carrierApp.ht_StateOrProvinceCode__c = stateCode;
+        carrierApp.ht_CountyCode__c = appointment.COUNTY_CODE;
+        carrierApp.ht_AppointerStateCOID__c = appointment.APPOINTER_STATE_CO_ID;
+        carrierApp.ht_StatusCode__c = appointment.STATUS;
+        carrierApp.ht_TerminationReason__c = StringUtils.truncateField(appointment.TERMINATION_REASON, 255);
+        
+        // Format and parse dates
+        if (String.isNotBlank(appointment.STATUS_REASON_DATE)) {
+            String formattedStatusReasonDate = StringUtils.convertToISODateFormat(
+                StringUtils.swapCharacters(appointment.STATUS_REASON_DATE, '/', '-')
+            );
+
+            carrierApp.ht_StatusReasonDate__c = DateUtils.safeParseDateFromString(formattedStatusReasonDate);
+        }
+        
+        if (String.isNotBlank(appointment.APPONT_RENEWAL_DATE)) {
+            String formattedRenewalDate = StringUtils.convertToISODateFormat(
+                StringUtils.swapCharacters(appointment.APPONT_RENEWAL_DATE, '/', '-')
+            );
+
+            carrierApp.ht_RenewalDate__c = DateUtils.safeParseDateFromString(formattedRenewalDate);
+        }
+        
+        return carrierApp;
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : createCarrierRecord
+     * @description     : Creates a carrier record from an APPOINTMENT node.
+     * @param appointment : APPOINTMENT node containing carrier information.
+     * @return          : A populated ht_Carrier__c record.
+     *********************************************************
+     **/
+    private ht_Carrier__c createCarrierRecord(EntityInfoDTO.APPOINTMENT appointment) {
+        if (appointment == null || (String.isBlank(appointment.COCODE) && String.isBlank(appointment.FEIN))) {
+            return null;
+        }
+        
+        ht_Carrier__c carrier = new ht_Carrier__c();
+        
+        // Set the key fields
+        carrier.ht_CoCode__c = appointment.COCODE;
+        carrier.ht_FullName__c = StringUtils.truncateField(appointment.COMPANY_NAME, 255);
+        carrier.Name = StringUtils.truncateField(appointment.COMPANY_NAME, 80);
+        carrier.ht_FEIN__c = StringUtils.truncateField(StringUtils.swapCharacters(appointment.FEIN, '-', ''), 9);
+
+        // Concatenate CoCode and FEIN
+        String uniqueIdentifier = StringUtils.safeParseNullString(carrier.ht_CoCode__c) + StringUtils.safeParseNullString(carrier.ht_FEIN__c);
+        carrier.ht_UniqueIdentifier__c = uniqueIdentifier;
+
+        return carrier;
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : createLineOfAuthorityRecord
+     * @description     : Creates a line of authority record from a DETAIL node.
+     * @param detail    : DETAIL node containing line of authority information.
+     * @param licenseUniqueId : The license unique Id to associate with this line of authority.
+     * @param stateCode : The state code for the license.
+     * @return          : A populated ht_LineOfAuthority__c record.
+     *********************************************************
+     **/
+    private ht_LineOfAuthority__c createLineOfAuthorityRecord(EntityInfoDTO.DETAIL detail, String licenseUniqueId, String stateCode) {
+        if (detail == null) {
+            return null;
+        }
+        
+        ht_LineOfAuthority__c loa = new ht_LineOfAuthority__c();
+        
+        // Set the license lookup using external ID
+        loa.ht_License__r = new ht_License__c(ht_UniqueIdentifier__c = licenseUniqueId);
+        
+        // Map fields from DETAIL to ht_LineOfAuthority__c
+        loa.ht_LineOfAuthorityCode__c = detail.LOA_CODE;
+        loa.ht_LineOfAuthorityDescription__c = StringUtils.truncateField(detail.LOA, 255);
+        loa.ht_StateOrProvinceCode__c = stateCode;
+        loa.ht_StateOrProvinceName__c = stateCode;
+        loa.ht_StatusCode__c = detail.STATUS;
+        loa.ht_StatusReasonCode__c = detail.STATUS_REASON;
+        
+        // Map CE (Continuing Education) fields if available
+        loa.ht_CEStatusDescription__c = StringUtils.truncateField(detail.CE_COMPLIANCE, 255);
+        loa.ht_CEUnitsRequiredMeasure__c = detail.CE_CREDITS_NEEDED;
+
+        // Format and parse dates
+        if (String.isNotBlank(detail.AUTHORITY_ISSUE_DATE)) {
+            String formattedIssueDate = StringUtils.convertToISODateFormat(
+                StringUtils.swapCharacters(detail.AUTHORITY_ISSUE_DATE, '/', '-')
+            );
+
+            loa.ht_IssueDate__c = DateUtils.safeParseDateFromString(formattedIssueDate);
+        }
+
+        if (String.isNotBlank(detail.STATUS_REASON_DATE)) {
+            String formattedIssueDate = StringUtils.convertToISODateFormat(
+                StringUtils.swapCharacters(detail.STATUS_REASON_DATE, '/', '-')
+            );
+
+            loa.ht_StartDate__c = DateUtils.safeParseDateFromString(formattedIssueDate);
+        }
+
+        if (String.isNotBlank(detail.CE_RENEWAL_DATE)) {
+            String formattedIssueDate = StringUtils.convertToISODateFormat(
+                StringUtils.swapCharacters(detail.CE_RENEWAL_DATE, '/', '-')
+            );
+
+            loa.ht_CERenewalDate__c = DateUtils.safeParseDateFromString(formattedIssueDate);
+        }
+        
+        
+        return loa;
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : createLicenseRecord
+     * @description     : Creates a license record from license data.
+     * @param license   : LICENSE node from the DTO.
+     * @param stateCode : State code from the STATE node attributes.
+     * @return          : A populated ht_License__c record.
+     *********************************************************
+     **/
+    private ht_License__c createLicenseRecord(EntityInfoDTO.LICENSE license, String stateCode) {
+        if (license == null) {
+            return null;
+        }
+        
+        ht_License__c licenseRecord = new ht_License__c();
+        
+        // Set the producer lookup using external ID
+        licenseRecord.ht_Producer__r = new ht_Producer__c(ht_NPN__c = producerNPN);
+        
+        // Set basic license fields
+        licenseRecord.ht_LicenseNumber__c = license.LICENSE_NUM;
+        licenseRecord.ht_StateOrProvinceCode__c = stateCode;
+        licenseRecord.ht_StateOrProvinceName__c = stateCode;
+        licenseRecord.ht_LicenseClassCode__c = license.LICENSE_CLASS_CODE;
+        licenseRecord.ht_LicenseClassDescription__c = StringUtils.truncateField(license.LICENSE_CLASS, 255);
+        licenseRecord.ht_StatusCode__c = license.ACTIVE == 'Yes' ? 'Active' : 'Inactive';
+        licenseRecord.ht_ResidentLicenseIndicator__c = license.RESIDENCY_STATUS == 'R' ? true: false;
+        licenseRecord.ht_TypeCode__c = 'Producer';
+        
+        // Format and parse dates
+        String formattedIssueDate = StringUtils.convertToISODateFormat(
+            StringUtils.swapCharacters(license.DATE_ISSUE_LICENSE_ORIG, '/', '-')
+        );
+
+        licenseRecord.ht_IssueDate__c = DateUtils.safeParseDateFromString(formattedIssueDate);
+        
+        String formattedExpirationDate = StringUtils.convertToISODateFormat(
+            StringUtils.swapCharacters(license.DATE_EXPIRE_LICENSE, '/', '-')
+        );
+
+        licenseRecord.ht_EndDate__c = DateUtils.safeParseDateFromString(formattedExpirationDate);
+
+        String formattedDateUpdated = StringUtils.convertToISODateFormat(
+            StringUtils.swapCharacters(license.DATE_UPDATED, '/', '-')
+        );
+
+        licenseRecord.ht_AsOfDate__c = DateUtils.safeParseDateFromString(formattedDateUpdated);
+                
+        return licenseRecord;
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : deleteExistingRelatedRecords
+     * @description     : Deletes existing producer communications and addresses
+     *                    associated with the NPN being processed.
+     *********************************************************
+     **/
+    private void deleteExistingRelatedRecords() {
+        try {
+            // Use a set for the NPN to pass to selector methods
+            Set<String> npnSet = new Set<String>{ producerNPN };
+            
+            // Delete existing producer communications
+            deleteExistingProducerCommunications(npnSet);
+            
+            // Delete existing producer addresses
+            deleteExistingProducerAddresses(npnSet);
+
+            // Delete existing producer licenses
+            deleteExistingLicenses(npnSet);
+
+            // Delete existing Carrier Appointments
+            deleteExistingCarrierAppointments(npnSet);
+        } catch(Exception e) {
+            throw new EntityInfoDMLException(e.getMessage() + '\n' + JSON.serialize(e.getStackTraceString()));
+        }
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : deleteExistingProducerCommunications
+     * @description     : Deletes existing producer communications associated with the NPNs.
+     * @param npnSet    : Set of producer NPNs to query for related communications.
+     *********************************************************
+     **/
+    private void deleteExistingProducerCommunications(Set<String> npnSet) {
+        // Query for existing producer communications
+        ProducerCommunicationSelector communicationSelector = new ProducerCommunicationSelector();
+        List<ht_ProducerCommunication__c> existingCommunications = communicationSelector.getProducerCommsByProducerNPNs(npnSet);
+        
+        if (!existingCommunications.isEmpty()) {
+            Logger.debug(CLASS_NAME, 'DeleteExistingProducerCommunication', 'Deleting ' + existingCommunications.size() + ' existing Producer Communication records for NPN: ' + producerNPN,
+                null,
+                null);
+
+            delete existingCommunications;
+        }
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : deleteExistingProducerAddresses
+     * @description     : Deletes existing producer addresses associated with the NPNs.
+     * @param npnSet    : Set of producer NPNs to query for related addresses.
+     *********************************************************
+     **/
+    private void deleteExistingProducerAddresses(Set<String> npnSet) {
+        // Query for existing producer addresses
+        ProducerAddressSelector addressSelector = new ProducerAddressSelector();
+        List<ht_ProducerAddress__c> existingAddresses = addressSelector.getProducerAddressByProducerNPNs(npnSet);
+        
+        if (!existingAddresses.isEmpty()) {
+            Logger.debug(CLASS_NAME, 'deleteExistingProducerAddresses', 'Deleting ' + existingAddresses.size() + ' existing Producer Address records for NPN: ' + producerNPN,
+                null,
+                null);
+
+            delete existingAddresses;
+        }
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : deleteExistingLicenses
+     * @description     : Deletes existing producer licenses associated with the NPNs.
+     * @param npnSet    : Set of producer NPNs to query for related licenses.
+     *********************************************************
+     **/
+    private void deleteExistingLicenses(Set<String> npnSet) {
+        // Query for existing producer addresses
+        LicenseSelector LicenseSelector = new LicenseSelector();
+        List<ht_License__c> existinglicenses = LicenseSelector.getLicensesByProducerNpn(npnSet);
+        
+        if (!existinglicenses.isEmpty()) {
+            Logger.debug(CLASS_NAME, 'deleteExistingProducerAddresses', 'Deleting ' + existinglicenses.size() + ' existing Producer Licenses records for NPN: ' + producerNPN,
+                null,
+                null);
+            
+            delete existinglicenses;
+        }
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : deleteExistingCarrierAppointments
+     * @description     : Deletes existing carrier appointments associated with the NPNs.
+     * @param npnSet    : Set of producer NPNs to query for related carrier appointments.
+     *********************************************************
+     **/
+    private void deleteExistingCarrierAppointments(Set<String> npnSet) {
+        // Query for existing carrier appointments
+        CarrierAppointmentSelector appointmentSelector = new CarrierAppointmentSelector();
+        List<ht_CarrierAppointment__c> existingAppointments = appointmentSelector.getCarrierAppointmentsByProducerNpn(npnSet);
+        
+        if (!existingAppointments.isEmpty()) {
+            Logger.debug(CLASS_NAME, 'deleteExistingProducerAddresses', 'Deleting ' + existingAppointments.size() + ' existing Carrier Appointment records for NPN: ' + producerNPN,
+                null,
+                null);
+            
+            delete existingAppointments;
+        }
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : syncDataWithSalesforce
+     * @description     : Performs DML operations to sync all processed data to Salesforce.
+     *********************************************************
+     **/
+    private void syncDataWithSalesforce() {
+        String methodName = 'syncDataWithSalesforce';
+        
+        try {
+            Logger.info(CLASS_NAME, methodName, 'Starting deletion of existing related records',
+                    'NPN: ' + producerNPN, null);
+            
+            deleteExistingRelatedRecords();
+
+            ListUtils.deduplicateByField(producerCommunications, 'ht_UniqueIdentifier__c');
+            ListUtils.deduplicateByField(producerAddresses, 'ht_UniqueIdentifier__c');
+            ListUtils.deduplicateByField(carriers, 'ht_UniqueIdentifier__c');
+            ListUtils.deduplicateByField(licenses, 'ht_UniqueIdentifier__c');
+            ListUtils.deduplicateByField(licenseLoas, 'ht_UniqueIdentifier__c');
+            ListUtils.deduplicateByField(carrierAppointments, 'ht_UniqueIdentifier__c');
+            
+            Logger.info(CLASS_NAME, methodName, 'Beginning upsert operations for producer',
+                    'NPN: ' + producerNPN, null);
+            
+            upsert producer ht_NPN__c;
+            
+            Logger.info(CLASS_NAME, methodName, 'Producer Communication records for Upsert', 
+                    'Count: ' + producerCommunications.size() + ', NPN: ' + producerNPN, null);
+            
+            upsert producerCommunications ht_UniqueIdentifier__c;
+            
+            Logger.info(CLASS_NAME, methodName, 'Producer Address records for Upsert', 
+                    'Count: ' + producerAddresses.size() + ', NPN: ' + producerNPN, null);
+            
+            upsert producerAddresses ht_UniqueIdentifier__c;
+            
+            Logger.info(CLASS_NAME, methodName, 'Carrier records for Upsert', 
+                    'Count: ' + carriers.size() + ', NPN: ' + producerNPN, null);
+            
+            upsert carriers ht_UniqueIdentifier__c;
+            
+            Logger.info(CLASS_NAME, methodName, 'Producer License records for Upsert', 
+                    'Count: ' + licenses.size() + ', NPN: ' + producerNPN, null);
+            
+            upsert licenses ht_UniqueIdentifier__c;
+            
+            Logger.info(CLASS_NAME, methodName, 'Line Of Authority records for Upsert', 
+                    'Count: ' + licenseLoas.size() + ', NPN: ' + producerNPN, null);
+            
+            upsert licenseLoas ht_uniqueIdentifier__c;
+            
+            Logger.info(CLASS_NAME, methodName, 'Carrier Appointment records for Upsert',
+                    'Count: ' + carrierAppointments.size() + ', NPN: ' + producerNPN, null);
+
+            upsert carrierAppointments ht_UniqueIdentifier__c;
+
+            Logger.info(CLASS_NAME, methodName, 'Successfully completed all upsert operations',
+                    'NPN: ' + producerNPN + ', Total records processed: ' +
+                    (1 + producerCommunications.size() + producerAddresses.size() +
+                        carriers.size() + licenses.size() + licenseLoas.size() +
+                        carrierAppointments.size()), null);
+            
+        } catch(Exception e) {
+            Logger.error(CLASS_NAME, methodName, 
+                        'Error syncing data with Salesforce', 
+                        'NPN: ' + producerNPN + ', Error: ' + e.getMessage(), 
+                        e.getStackTraceString(), null);
+            
+            // Commit logs before throwing the exception to ensure they're saved
+            Logger.commitAsync();
+            
+            throw new EntityInfoDMLException(e.getMessage() + '\n' + JSON.serialize(e.getStackTraceString()));
+        }
+    }
+
+    public class EntityInfoDMLException extends Exception {}
+
+    public class EntityInfoAPIException extends Exception {} 
+}

@@ -1,0 +1,107 @@
+/*
+*********************************************************
+Apex Class Name    : MockHelper
+Created Date       : 2025-10-23
+@description       : Helper class for creating mock data in tests without DML
+@author            : Stefan Nidzovic
+Modification Log:
+Ver   Date         Author                               Modification
+1.0   2025-10-23   Stefan Nidzovic                     Initial Version
+*********************************************************
+*/
+@isTest
+public class MockHelper {
+
+    private static Integer counter = 1;
+
+    /*********************************************************
+    @Method Name    : generateId
+    @description    : Generates a fake Salesforce ID for testing
+    @param          : sObjectType - The SObject type to generate ID for
+    @return         : Id - A fake but valid Salesforce ID
+    *********************************************************/
+    public static Id generateId(Schema.SObjectType sObjectType) {
+        String keyPrefix = sObjectType.getDescribe().getKeyPrefix();
+        String fakeId = keyPrefix + '0'.repeat(12 - String.valueOf(counter).length()) + counter;
+        counter++;
+        return Id.valueOf(fakeId);
+    }
+
+    /*********************************************************
+    @Method Name    : resetCounter
+    @description    : Resets the ID counter for tests
+    *********************************************************/
+    public static void resetCounter() {
+        counter = 1;
+    }
+
+    /*********************************************************
+    @Method Name    : createMockAccount
+    @description    : Creates a mock Account with optional Producer relationship
+    @param          : name - Account name
+    @param          : npn - NPN value
+    @param          : producerId - Producer ID (optional)
+    @return         : Account - Mock account with fields set
+    *********************************************************/
+    public static Account createMockAccount(String name, String npn, Id producerId) {
+        Account acc = new Account();
+        acc.Id = generateId(Account.SObjectType);
+        acc.Name = name;
+        acc.ht_NPN__c = npn;
+        acc.ht_Producer__c = producerId;
+        return acc;
+    }
+
+    /*********************************************************
+    @Method Name    : createMockContact
+    @description    : Creates a mock Contact with optional Producer relationship
+    @param          : firstName - Contact first name
+    @param          : lastName - Contact last name
+    @param          : npn - NPN value
+    @param          : producerId - Producer ID (optional)
+    @return         : Contact - Mock contact with fields set
+    *********************************************************/
+    public static Contact createMockContact(String firstName, String lastName, String npn, Id producerId) {
+        Contact con = new Contact();
+        con.Id = generateId(Contact.SObjectType);
+        con.FirstName = firstName;
+        con.LastName = lastName;
+        con.ht_NPN__c = npn;
+        con.ht_Producer__c = producerId;
+        return con;
+    }
+
+    /*********************************************************
+    @Method Name    : createMockLead
+    @description    : Creates a mock Lead with optional Producer relationship
+    @param          : firstName - Lead first name
+    @param          : lastName - Lead last name
+    @param          : npn - NPN value
+    @param          : producerId - Producer ID (optional)
+    @return         : Lead - Mock lead with fields set
+    *********************************************************/
+    public static Lead createMockLead(String firstName, String lastName, String npn, Id producerId) {
+        Lead ld = new Lead();
+        ld.Id = generateId(Lead.SObjectType);
+        ld.FirstName = firstName;
+        ld.LastName = lastName;
+        ld.Company = 'Test Company';
+        ld.ht_NPN__c = npn;
+        ld.ht_Producer__c = producerId;
+        return ld;
+    }
+
+    /*********************************************************
+    @Method Name    : createMockProducer
+    @description    : Creates a mock Producer with NPN
+    @param          : npn - NPN value
+    @return         : ht_Producer__c - Mock producer with fields set
+    *********************************************************/
+    public static ht_Producer__c createMockProducer(String npn) {
+        ht_Producer__c prod = new ht_Producer__c();
+        prod.Id = generateId(ht_Producer__c.SObjectType);
+        prod.ht_NPN__c = npn;
+        // Name is an auto-number field, cannot be set directly
+        return prod;
+    }
+}

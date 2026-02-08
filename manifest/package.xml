@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <!-- API Version -->
+    <version>63.0</version>
+
+    <!-- Apex Classes (excluding test classes) -->
+    <types>
+        <members>AccountSelector</members>
+        <members>AccountTriggerHandler</members>
+        <members>AddNPNToSubscription</members>
+        <members>AddNPNToSubscriptionDTO</members>
+        <members>BaseApiInvoker</members>
+        <members>BaseTriggerHandler</members>
+        <members>CarrierAppointmentSelector</members>
+        <members>CarrierAppointmentTriggerHandler</members>
+        <members>ContactSelector</members>
+        <members>ContactTriggerHandler</members>
+        <members>CreateSubscription</members>
+        <members>CreateSubscriptionQueueable</members>
+        <members>DMLExecutor</members>
+        <members>DateUtils</members>
+        <members>DeleteLogsBatchable</members>
+        <members>DeleteLogsScheduleable</members>
+        <members>EntityInfoApiController</members>
+        <members>EntityInfoConstants</members>
+        <members>EntityInfoDTO</members>
+        <members>ProcessPDBAlertReportService</members>
+        <members>LeadSelector</members>
+        <members>LeadTriggerHandler</members>
+        <members>LicenseSelector</members>
+        <members>LicenseTriggerHandler</members>
+        <members>LicensingReportDTO</members>
+        <members>LineOfAuthoritySelector</members>
+        <members>LineOfAuthorityService</members>
+        <members>ListUtils</members>
+        <members>LogTriggerHandler</members>
+        <members>Logger</members>
+        <members>LoggerBatch</members>
+        <members>MetadataTypeSelector</members>
+        <members>NIPREnums</members>
+        <members>PDBAlertReportSchedulable</members>
+        <members>PDBAlertResponseConstants</members>
+        <members>ProcessEntityInfoApiService</members>
+        <members>ProducerAddressSelector</members>
+        <members>ProducerAssignmentService</members>
+        <members>ProducerCommunicationSelector</members>
+        <members>ProducerSelector</members>
+        <members>ProducerTriggerHandler</members>
+        <members>RecordTypeSelector</members>
+        <members>RegexUtils</members>
+        <members>RemoveNPNFromSubscription</members>
+        <members>RemoveNPNFromSubscriptionDTO</members>
+        <members>RemoveNPNFromSubscriptionQueueable</members>
+        <members>RetrieveEntityInfoApiData</members>
+        <members>RetrievePDBSpecificReportData</members>
+        <members>RunEntityInfoReportBatchable</members>
+        <members>RunPDBAlert</members>
+        <members>RunPDBAlertReportBatchable</members>
+        <members>StringUtils</members>
+        <members>SubscriptionQueueable</members>
+        <members>SubscriptionSelector</members>
+        <members>SubscriptionService</members>
+        <members>TriggerDispatcher</members>
+        <members>XMLUtils</members>
+        <name>ApexClass</name>
+    </types>
+
+    <!-- Apex Triggers -->
+    <types>
+        <members>AccountTrigger</members>
+        <members>CarrierAppointmentTrigger</members>
+        <members>ContactTrigger</members>
+        <members>LeadTrigger</members>
+        <members>LicenseTrigger</members>
+        <members>LogTrigger</members>
+        <members>ProducerTrigger</members>
+        <name>ApexTrigger</name>
+    </types>
+
+    <!-- Custom Objects -->
+    <types>
+        <members>ht_CarrierAppointment__c</members>
+        <members>ht_Carrier__c</members>
+        <members>ht_License__c</members>
+        <members>ht_LineOfAuthority__c</members>
+        <members>ht_Log__e</members>
+        <members>ht_Logger__c</members>
+        <members>ht_NIPRLogger__mdt</members>
+        <members>ht_NIPRTestXMLResponse__mdt</members>
+        <members>ht_NIPR_Subsciption_NPN_Count__mdt</members>
+        <members>ht_NIPR_Subscription_Email__mdt</members>
+        <members>ht_ProducerAddress__c</members>
+        <members>ht_ProducerCommunication__c</members>
+        <members>ht_Producer__c</members>
+        <members>ht_Subscription__c</members>
+        <name>CustomObject</name>
+    </types>
+
+    <!-- Custom Fields on Standard Objects -->
+    <types>
+        <members>Account.ht_NPNStatus__c</members>
+        <members>Account.ht_NPNSyncError__c</members>
+        <members>Account.ht_NPN__c</members>
+        <members>Account.ht_Producer__c</members>
+        <members>Contact.ht_NPNStatus__c</members>
+        <members>Contact.ht_NPNSyncError__c</members>
+        <members>Contact.ht_NPN__c</members>
+        <members>Contact.ht_Producer__c</members>
+        <members>Lead.NPN_Status__c</members>
+        <members>Lead.ht_NPNSyncError__c</members>
+        <members>Lead.ht_NPN__c</members>
+        <members>Lead.ht_Producer__c</members>
+        <name>CustomField</name>
+    </types>
+
+    <!-- Lightning Web Components -->
+    <types>
+        <members>entityInfoAPISyncButton</members>
+        <members>utils</members>
+        <name>LightningComponentBundle</name>
+    </types>
+
+    <!-- Permission Sets -->
+    <types>
+        <members>ht_NIPR_API_Callout</members>
+        <members>HT_Manage_Producer</members>
+        <name>PermissionSet</name>
+    </types>
+
+    <!-- FlexiPages (Lightning Record Pages) -->
+    <types>
+        <members>NIPR_Producer_Communication_Record_Page_Read_Only</members>
+        <members>NIPR_Carrier_Record_Page_Read_Only</members>
+        <members>NIPR_Producer_Address_Record_Page_Read_Only</members>
+        <members>NIPR_Producer_Record_Page_Read_Only</members>
+        <members>NIPR_License_Record_Page_Read_Only</members>
+        <members>NIPR_Line_of_Authority_Record_Page_Read_Only</members>
+        <members>NIPR_Carrier_Appointment_Record_Page_Read_Only</members>
+        <members>NIPR_Insurance_Product_LOA_Mapping_Record_Page</members>
+        <members>NIPR_Logger_Record_Page</members>
+        <members>NIPR_Console_UtilityBar</members>
+        <members>NIPR_License_Insurance_Product_Record_Page_Read_Only</members>
+        <members>NIPR_Subscription_Record_Page1</members>
+        <members>NIPR_Insurance_Product_Record_Page_Read_Only</members>
+        <members>NIPR_LOA_Insurance_Product_Mapping_Record_Page_Read_Only</members>
+        <name>FlexiPage</name>
+    </types>
+
+    <!-- Quick Actions -->
+    <types>
+        <members>ht_Producer__c.ht_Force_NPN_Sync</members>
+        <name>QuickAction</name>
+    </types>
+
+    <!-- Named Credentials -->
+    <types>
+        <members>NIPR_EntityInfo_API</members>
+        <members>NIPR_API</members>
+        <name>NamedCredential</name>
+    </types>
+
+    <!-- External Credentials -->
+    <types>
+        <members>NIPR_API</members>
+        <name>ExternalCredential</name>
+    </types>
+</Package>

@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>NIPR_Initial_Setup_Guide</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+</head>
+<body>
+<nav id="TOC" role="doc-toc">
+<ul>
+<li><a href="#nipr-integration---initial-setup-guide"
+id="toc-nipr-integration---initial-setup-guide">NIPR Integration -
+Initial Setup Guide</a>
+<ul>
+<li><a href="#table-of-contents" id="toc-table-of-contents">Table of
+Contents</a></li>
+<li><a href="#prerequisites"
+id="toc-prerequisites">Prerequisites</a></li>
+<li><a href="#step-1-install-nipr-package"
+id="toc-step-1-install-nipr-package">Step 1: Install NIPR Package</a>
+<ul>
+<li><a href="#get-latest-package-version-from-hipten"
+id="toc-get-latest-package-version-from-hipten">1.1 Get Latest Package
+Version from Hipten</a></li>
+<li><a href="#install-package-in-client-org"
+id="toc-install-package-in-client-org">1.2 Install Package in Client
+Org</a></li>
+<li><a href="#alternative-install-via-salesforce-ui"
+id="toc-alternative-install-via-salesforce-ui">1.3 Alternative: Install
+via Salesforce UI</a></li>
+</ul></li>
+<li><a href="#step-2-assign-permission-set-groups"
+id="toc-step-2-assign-permission-set-groups">Step 2: Assign Permission
+Set Groups</a>
+<ul>
+<li><a href="#for-standard-users-read-only-access"
+id="toc-for-standard-users-read-only-access">2.1 For Standard Users
+(Read-Only Access)</a></li>
+<li><a href="#for-admin-users-full-access"
+id="toc-for-admin-users-full-access">2.2 For Admin Users (Full
+Access)</a></li>
+</ul></li>
+<li><a href="#step-3-configure-page-layouts"
+id="toc-step-3-configure-page-layouts">Step 3: Configure Page
+Layouts</a>
+<ul>
+<li><a href="#account-page-layout-configuration"
+id="toc-account-page-layout-configuration">3.1 Account Page Layout
+Configuration</a></li>
+<li><a href="#contact-page-layout-configuration"
+id="toc-contact-page-layout-configuration">3.2 Contact Page Layout
+Configuration</a></li>
+<li><a href="#lead-page-layout-configuration"
+id="toc-lead-page-layout-configuration">3.3 Lead Page Layout
+Configuration</a></li>
+<li><a href="#field-level-security" id="toc-field-level-security">3.4
+Field-Level Security</a></li>
+</ul></li>
+<li><a href="#step-4-configure-custom-metadata---subscription-email"
+id="toc-step-4-configure-custom-metadata---subscription-email">Step 4:
+Configure Custom Metadata - Subscription Email</a>
+<ul>
+<li><a href="#navigate-to-custom-metadata-type"
+id="toc-navigate-to-custom-metadata-type">3.1 Navigate to Custom
+Metadata Type</a></li>
+<li><a href="#create-or-edit-email-record"
+id="toc-create-or-edit-email-record">3.2 Create or Edit Email
+Record</a></li>
+</ul></li>
+<li><a href="#step-4-share-nipr-reports-folder"
+id="toc-step-4-share-nipr-reports-folder">Step 4: Share NIPR Reports
+Folder</a>
+<ul>
+<li><a href="#navigate-to-reports" id="toc-navigate-to-reports">4.1
+Navigate to Reports</a></li>
+<li><a href="#share-with-users-or-roles"
+id="toc-share-with-users-or-roles">4.2 Share with Users or
+Roles</a></li>
+</ul></li>
+<li><a href="#step-5-configure-named-credentials"
+id="toc-step-5-configure-named-credentials">Step 5: Configure Named
+Credentials</a>
+<ul>
+<li><a href="#test-credentials-with-postman-critical-step"
+id="toc-test-credentials-with-postman-critical-step">5.1 Test
+Credentials with Postman (CRITICAL STEP)</a></li>
+<li><a href="#uat-environment-configuration"
+id="toc-uat-environment-configuration">5.2 UAT Environment
+Configuration</a></li>
+<li><a href="#production-environment-configuration"
+id="toc-production-environment-configuration">5.3 Production Environment
+Configuration</a></li>
+</ul></li>
+<li><a href="#step-6-test-nipr-integration"
+id="toc-step-6-test-nipr-integration">Step 6: Test NIPR Integration</a>
+<ul>
+<li><a href="#create-test-producer-record"
+id="toc-create-test-producer-record">6.1 Create Test Producer
+Record</a></li>
+<li><a href="#verify-integration-attempt"
+id="toc-verify-integration-attempt">6.2 Verify Integration
+Attempt</a></li>
+</ul></li>
+<li><a href="#step-7-schedule-automated-jobs"
+id="toc-step-7-schedule-automated-jobs">Step 7: Schedule Automated
+Jobs</a>
+<ul>
+<li><a href="#schedule-pdb-alerts-daily-report"
+id="toc-schedule-pdb-alerts-daily-report">7.1 Schedule PDB Alerts Daily
+Report</a></li>
+<li><a href="#schedule-log-deletion-job"
+id="toc-schedule-log-deletion-job">7.2 Schedule Log Deletion
+Job</a></li>
+<li><a href="#verify-scheduled-jobs" id="toc-verify-scheduled-jobs">7.3
+Verify Scheduled Jobs</a></li>
+</ul></li>
+<li><a href="#troubleshooting"
+id="toc-troubleshooting">Troubleshooting</a>
+<ul>
+<li><a href="#issue-package-installation-fails"
+id="toc-issue-package-installation-fails">Issue: Package Installation
+Fails</a></li>
+<li><a href="#issue-named-credential-authentication-fails"
+id="toc-issue-named-credential-authentication-fails">Issue: Named
+Credential Authentication Fails</a></li>
+<li><a href="#issue-users-cannot-see-nipr-data"
+id="toc-issue-users-cannot-see-nipr-data">Issue: Users Cannot See NIPR
+Data</a></li>
+<li><a href="#issue-pdb-alerts-not-received"
+id="toc-issue-pdb-alerts-not-received">Issue: PDB Alerts Not
+Received</a></li>
+<li><a href="#issue-logs-not-being-deleted"
+id="toc-issue-logs-not-being-deleted">Issue: Logs Not Being
+Deleted</a></li>
+</ul></li>
+<li><a href="#support" id="toc-support">Support</a></li>
+</ul></li>
+</ul>
+</nav>
+<h1 id="nipr-integration---initial-setup-guide">NIPR Integration -
+Initial Setup Guide</h1>
+<p><strong>Version</strong>: 1.0 <strong>Last Updated</strong>:
+2026-01-20 <strong>Package Name</strong>: NIPR Integration
+<strong>Package Namespace</strong>: <code>niprsync</code></p>
+<hr />
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol type="1">
+<li><a href="#prerequisites">Prerequisites</a></li>
+<li><a href="#step-1-install-nipr-package">Step 1: Install NIPR
+Package</a></li>
+<li><a href="#step-2-assign-permission-set-groups">Step 2: Assign
+Permission Set Groups</a></li>
+<li><a href="#step-3-configure-page-layouts">Step 3: Configure Page
+Layouts</a></li>
+<li><a
+href="#step-4-configure-custom-metadata---subscription-email">Step 4:
+Configure Custom Metadata - Subscription Email</a></li>
+<li><a href="#step-5-share-nipr-reports-folder">Step 5: Share NIPR
+Reports Folder</a></li>
+<li><a href="#step-6-configure-named-credentials">Step 6: Configure
+Named Credentials</a></li>
+<li><a href="#step-7-test-nipr-integration">Step 7: Test NIPR
+Integration</a></li>
+<li><a href="#step-8-schedule-automated-jobs">Step 8: Schedule Automated
+Jobs</a></li>
+<li><a href="#troubleshooting">Troubleshooting</a></li>
+</ol>
+<hr />
+<h2 id="prerequisites">Prerequisites</h2>
+<p>Before beginning the installation, ensure you have:</p>
+<ul>
+<li>✅ System Administrator access to the target Salesforce org</li>
+<li>✅ NIPR API credentials (username and password)
+<ul>
+<li><strong>UAT Environment</strong>: Credentials available in
+LastPass</li>
+<li><strong>Production Environment</strong>: Client-specific credentials
+obtained from NIPR</li>
+</ul></li>
+<li>✅ Postman collection from the NIPR repository (for credential
+testing)</li>
+<li>✅ Client approval for Production environment configuration</li>
+</ul>
+<hr />
+<h2 id="step-1-install-nipr-package">Step 1: Install NIPR Package</h2>
+<h3 id="get-latest-package-version-from-hipten">1.1 Get Latest Package
+Version from Hipten</h3>
+<p>To get the latest package version, contact your Hipten representative
+or run the following command from the Hipten Dev Hub:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Authenticate to Hipten Dev Hub</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">sf</span> org login web <span class="at">--alias</span> <span class="st">&quot;HIPTEN DEV HUB&quot;</span> <span class="at">--set-default-dev-hub</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># List all released package versions</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">sf</span> package version list <span class="at">--packages</span> <span class="st">&quot;NIPR Integration&quot;</span> <span class="at">--target-dev-hub</span> <span class="st">&quot;HIPTEN DEV HUB&quot;</span></span></code></pre></div>
+<p>Look for the latest version with <code>Released = true</code>. The
+current latest version is:</p>
+<p><strong>Package Version</strong>: 0.7.0-1 <strong>Subscriber Package
+Version ID</strong>: <code>04tPB000000At1dYAC</code></p>
+<h3 id="install-package-in-client-org">1.2 Install Package in Client
+Org</h3>
+<p>Install the package in the client’s Salesforce org:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Authenticate to client org</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">sf</span> org login web <span class="at">--alias</span> <span class="st">&quot;Client Org Name&quot;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Install the package</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ex">sf</span> package install <span class="dt">\</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">--package</span> <span class="st">&quot;04tPB000000At1dYAC&quot;</span> <span class="dt">\</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">--target-org</span> <span class="st">&quot;Client Org Name&quot;</span> <span class="dt">\</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">--wait</span> 20 <span class="dt">\</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">--upgrade-type</span> Mixed</span></code></pre></div>
+<p><strong>Expected Output</strong>: Installation will take 5-15
+minutes. You will see <code>Install status: SUCCESS</code> when
+complete.</p>
+<h3 id="alternative-install-via-salesforce-ui">1.3 Alternative: Install
+via Salesforce UI</h3>
+<ol type="1">
+<li><p>Log into the client org as System Administrator</p></li>
+<li><p>Navigate to the package installation URL:</p>
+<pre><code>https://login.salesforce.com/packaging/installPackage.apexp?p0=04tPB000000At1dYAC</code></pre></li>
+<li><p>Click <strong>Install for All Users</strong></p></li>
+<li><p>Click <strong>Install</strong></p></li>
+<li><p>Wait for installation to complete (you’ll receive an email
+notification)</p></li>
+</ol>
+<hr />
+<h2 id="step-2-assign-permission-set-groups">Step 2: Assign Permission
+Set Groups</h2>
+<p>After package installation, assign the appropriate Permission Set
+Groups to users.</p>
+<h3 id="for-standard-users-read-only-access">2.1 For Standard Users
+(Read-Only Access)</h3>
+<p><strong>Permission Set Group</strong>:
+<code>NIPR Read Only User</code> <strong>API Name</strong>:
+<code>niprsync__ht_NIPR_Read_Only_User</code></p>
+<p><strong>Included Permissions</strong>: - View NIPR data (Producers,
+Licenses, Appointments, etc.) - API callout permissions for NIPR
+integration</p>
+<p><strong>Assignment Steps</strong>: 1. Navigate to
+<strong>Setup</strong> → <strong>Users</strong> → <strong>Permission Set
+Groups</strong> 2. Search for <strong>NIPR Read Only User</strong> 3.
+Click <strong>Manage Assignments</strong> 4. Click <strong>Add
+Assignments</strong> 5. Select all standard users who need read-only
+access to NIPR data 6. Click <strong>Assign</strong></p>
+<h3 id="for-admin-users-full-access">2.2 For Admin Users (Full
+Access)</h3>
+<p><strong>Permission Set Group</strong>: <code>NIPR Admin User</code>
+<strong>API Name</strong>: <code>niprsync__ht_NIPR_Admin_User</code></p>
+<p><strong>Included Permissions</strong>: - Full administrative access
+to NIPR objects - SSN field visibility - Manage Producer records - API
+callout permissions - Admin-level access to all NIPR features</p>
+<p><strong>Assignment Steps</strong>: 1. Navigate to
+<strong>Setup</strong> → <strong>Users</strong> → <strong>Permission Set
+Groups</strong> 2. Search for <strong>NIPR Admin User</strong> 3. Click
+<strong>Manage Assignments</strong> 4. Click <strong>Add
+Assignments</strong> 5. Select all admin users who need full NIPR access
+6. Click <strong>Assign</strong></p>
+<hr />
+<h2 id="step-3-configure-page-layouts">Step 3: Configure Page
+Layouts</h2>
+<p><strong>CRITICAL</strong>: The NIPR package adds custom fields to
+standard objects (Account, Contact, Lead) but <strong>cannot modify your
+org’s page layouts</strong>. You must manually add NIPR fields to your
+page layouts for users to see and edit them.</p>
+<h3 id="account-page-layout-configuration">3.1 Account Page Layout
+Configuration</h3>
+<p>Add the following NIPR fields to your Account page layouts:</p>
+<p><strong>NIPR Section</strong> (create a new section on the layout): -
+<strong>NPN</strong> (<code>niprsync__ht_NPN__c</code>) - National
+Producer Number - <strong>Last NIPR Sync</strong>
+(<code>niprsync__ht_LastNIPRSync__c</code>) - Last sync timestamp -
+<strong>NIPR Sync Status</strong>
+(<code>niprsync__ht_NIPRSyncStatus__c</code>) - Current sync status -
+<strong>Exclude Carrier Appointments</strong>
+(<code>niprsync__ht_ExcludeCarrierAppointments__c</code>) - Checkbox to
+exclude large carrier data</p>
+<p><strong>Steps</strong>: 1. Navigate to <strong>Setup</strong> →
+<strong>Object Manager</strong> → <strong>Account</strong> 2. Click
+<strong>Page Layouts</strong> 3. Select the page layout(s) used by your
+users (e.g., “Account Layout”) 4. Click <strong>Edit</strong> 5. Create
+a new section called <strong>NIPR Information</strong> 6. Drag and drop
+the NIPR fields listed above into the section 7. Click
+<strong>Save</strong> 8. Repeat for all Account page layouts in use</p>
+<h3 id="contact-page-layout-configuration">3.2 Contact Page Layout
+Configuration</h3>
+<p>Add the following NIPR fields to your Contact page layouts:</p>
+<p><strong>NIPR Section</strong>: - <strong>NPN</strong>
+(<code>niprsync__ht_NPN__c</code>) - National Producer Number -
+<strong>First Name</strong> (<code>niprsync__ht_FirstName__c</code>) -
+Producer first name from NIPR - <strong>Last Name</strong>
+(<code>niprsync__ht_LastName__c</code>) - Producer last name from NIPR -
+<strong>Middle Name</strong> (<code>niprsync__ht_MiddleName__c</code>) -
+Producer middle name from NIPR - <strong>Last NIPR Sync</strong>
+(<code>niprsync__ht_LastNIPRSync__c</code>) - Last sync timestamp -
+<strong>NIPR Sync Status</strong>
+(<code>niprsync__ht_NIPRSyncStatus__c</code>) - Current sync status</p>
+<p><strong>Steps</strong>: 1. Navigate to <strong>Setup</strong> →
+<strong>Object Manager</strong> → <strong>Contact</strong> 2. Click
+<strong>Page Layouts</strong> 3. Select the page layout(s) used by your
+users 4. Click <strong>Edit</strong> 5. Create a new section called
+<strong>NIPR Information</strong> 6. Drag and drop the NIPR fields
+listed above into the section 7. Click <strong>Save</strong> 8. Repeat
+for all Contact page layouts in use</p>
+<h3 id="lead-page-layout-configuration">3.3 Lead Page Layout
+Configuration</h3>
+<p>Add the following NIPR fields to your Lead page layouts:</p>
+<p><strong>NIPR Section</strong>: - <strong>NPN</strong>
+(<code>niprsync__ht_NPN__c</code>) - National Producer Number -
+<strong>Last NIPR Sync</strong>
+(<code>niprsync__ht_LastNIPRSync__c</code>) - Last sync timestamp -
+<strong>NIPR Sync Status</strong>
+(<code>niprsync__ht_NIPRSyncStatus__c</code>) - Current sync status</p>
+<p><strong>Steps</strong>: 1. Navigate to <strong>Setup</strong> →
+<strong>Object Manager</strong> → <strong>Lead</strong> 2. Click
+<strong>Page Layouts</strong> 3. Select the page layout(s) used by your
+users 4. Click <strong>Edit</strong> 5. Create a new section called
+<strong>NIPR Information</strong> 6. Drag and drop the NIPR fields
+listed above into the section 7. Click <strong>Save</strong> 8. Repeat
+for all Lead page layouts in use</p>
+<h3 id="field-level-security">3.4 Field-Level Security</h3>
+<p><strong>IMPORTANT</strong>: The Permission Set Groups assigned in
+Step 2 grant users <strong>field-level access</strong> to NIPR fields.
+However, users also need:</p>
+<ul>
+<li><strong>Object-level permissions</strong> (Create/Read/Edit on
+Account, Contact, Lead) - typically granted by their Profile</li>
+<li><strong>Page layout visibility</strong> (completed in steps 3.1-3.3
+above)</li>
+</ul>
+<p>If users cannot see or edit NIPR fields after adding them to layouts,
+verify: 1. ✅ Permission Set Groups are assigned (Step 2) 2. ✅ User’s
+Profile grants Create/Edit access to Account, Contact, Lead objects 3.
+✅ NIPR fields are added to the correct page layouts (steps 3.1-3.3) 4.
+✅ User is assigned the correct page layout via their Profile or Record
+Type</p>
+<hr />
+<h2 id="step-4-configure-custom-metadata---subscription-email">Step 4:
+Configure Custom Metadata - Subscription Email</h2>
+<p>Configure the email address where PDB Alert notifications should be
+sent.</p>
+<h3 id="navigate-to-custom-metadata-type">3.1 Navigate to Custom
+Metadata Type</h3>
+<ol type="1">
+<li>Navigate to <strong>Setup</strong> → <strong>Custom Metadata
+Types</strong></li>
+<li>Search for <strong>NIPR Subscription Email</strong></li>
+<li>Click <strong>Manage Records</strong></li>
+</ol>
+<h3 id="create-or-edit-email-record">3.2 Create or Edit Email
+Record</h3>
+<p>If a record already exists: 1. Click <strong>Edit</strong> next to
+the existing record 2. Update the <strong>Email</strong> field
+(<code>niprsync__ht_Email__c</code>) with the client’s desired email
+address 3. Click <strong>Save</strong></p>
+<p>If no record exists: 1. Click <strong>New</strong> 2. Enter a
+<strong>Label</strong> (e.g., “Client PDB Alerts Email”) 3. The
+<strong>NIPR Subscription Email Name</strong> field will auto-populate
+4. In the <strong>Email</strong> field
+(<code>niprsync__ht_Email__c</code>), enter the client’s email address
+for PDB alert notifications 5. Click <strong>Save</strong></p>
+<p><strong>Example</strong>: - <strong>Label</strong>: Client PDB Alerts
+Email - <strong>Email</strong>:
+<code>nipr-alerts@clientdomain.com</code></p>
+<hr />
+<h2 id="step-4-share-nipr-reports-folder">Step 4: Share NIPR Reports
+Folder</h2>
+<p>The NIPR package includes a <strong>NIPR Reports</strong> folder with
+pre-built reports. Share this folder with users who need access.</p>
+<h3 id="navigate-to-reports">4.1 Navigate to Reports</h3>
+<ol type="1">
+<li>Go to the <strong>Reports</strong> tab</li>
+<li>Search for the folder <strong>NIPR Reports</strong></li>
+<li>Click the dropdown arrow next to the folder name</li>
+<li>Select <strong>Share</strong></li>
+</ol>
+<h3 id="share-with-users-or-roles">4.2 Share with Users or Roles</h3>
+<ol type="1">
+<li>In the <strong>Share with Users or Roles</strong> section, click
+<strong>Add</strong></li>
+<li>Select the users, roles, or public groups that should have
+access</li>
+<li>Choose the access level:
+<ul>
+<li><strong>Viewer</strong>: Can view and run reports</li>
+<li><strong>Editor</strong>: Can view, run, and edit reports</li>
+</ul></li>
+<li>Click <strong>Share</strong></li>
+</ol>
+<p><strong>Recommended</strong>: Share with all users who have the
+<strong>NIPR Read Only User</strong> or <strong>NIPR Admin User</strong>
+permission set groups.</p>
+<hr />
+<h2 id="step-5-configure-named-credentials">Step 5: Configure Named
+Credentials</h2>
+<p>Configure the Named Credentials to connect to NIPR’s APIs.</p>
+<h3 id="test-credentials-with-postman-critical-step">5.1 Test
+Credentials with Postman (CRITICAL STEP)</h3>
+<p><strong>⚠️ WARNING</strong>: This step is billable by NIPR. Only test
+the PDB Alerts API endpoint.</p>
+<p>Before configuring Named Credentials in Salesforce, test the
+credentials using the Postman collection found in the NIPR
+repository:</p>
+<ol type="1">
+<li>Open the Postman collection from the NIPR repository</li>
+<li>Configure the NIPR credentials (username and password)</li>
+<li><strong>ONLY</strong> test the <strong>PDB Alerts API</strong>
+endpoint</li>
+<li>Expected response: Error indicating no subscriptions (confirms
+credentials are valid)</li>
+<li><strong>DO NOT</strong> test other endpoints to avoid unnecessary
+charges</li>
+</ol>
+<p><strong>For Production Environment</strong>: Obtain explicit client
+approval before proceeding with credential configuration.</p>
+<hr />
+<h3 id="uat-environment-configuration">5.2 UAT Environment
+Configuration</h3>
+<p><strong>For UAT/Sandbox orgs</strong>, use the beta NIPR environment
+credentials.</p>
+<h4 id="configure-external-credential">5.2.1 Configure External
+Credential</h4>
+<ol type="1">
+<li>Navigate to <strong>Setup</strong> → <strong>Named
+Credentials</strong></li>
+<li>Click on the <strong>External Credentials</strong> tab</li>
+<li>Find <strong>NIPR API</strong>
+(<code>niprsync__NIPR_API</code>)</li>
+<li>Click <strong>Edit</strong> (or click the dropdown arrow →
+<strong>Edit</strong>)</li>
+<li>Scroll to <strong>Principals</strong> section</li>
+<li>Click <strong>Edit</strong> next to <strong>NIPR Basic
+Auth</strong></li>
+<li>Enter the credentials:
+<ul>
+<li><strong>Username</strong>: (Found in LastPass - UAT
+credentials)</li>
+<li><strong>Password</strong>: (Found in LastPass - UAT
+credentials)</li>
+</ul></li>
+<li>Click <strong>Save</strong></li>
+</ol>
+<h4 id="verify-named-credentials-urls-uat">5.2.2 Verify Named
+Credentials URLs (UAT)</h4>
+<p>For UAT environment, the Named Credentials should already have the
+correct <code>.beta</code> URLs:</p>
+<p><strong>Named Credential: NIPR API</strong> - <strong>Label</strong>:
+NIPR API - <strong>API Name</strong>: <code>niprsync__NIPR_API</code> -
+<strong>URL</strong>:
+<code>https://pdb-alerts-industry-services.api.beta.nipr.com</code> - ✅
+No changes needed for UAT</p>
+<p><strong>Named Credential: NIPR Entity Info API</strong> -
+<strong>Label</strong>: NIPR Entity Info API - <strong>API
+Name</strong>: <code>niprsync__NIPR_EntityInfo_API</code> -
+<strong>URL</strong>:
+<code>https://pdb-xml-reports.api.beta.nipr.com/pdb-xml-reports</code> -
+✅ No changes needed for UAT</p>
+<hr />
+<h3 id="production-environment-configuration">5.3 Production Environment
+Configuration</h3>
+<p><strong>🚨 CRITICAL WARNING</strong>: Production environment
+configuration should only be done: - ✅ After successful UAT testing -
+✅ With explicit client approval - ✅ With production credentials from
+the client - ✅ After testing credentials via Postman</p>
+<p><strong>⚠️ All NIPR API calls in production are billable. Configure
+with high caution.</strong></p>
+<h4 id="configure-external-credential-production">5.3.1 Configure
+External Credential (Production)</h4>
+<ol type="1">
+<li>Navigate to <strong>Setup</strong> → <strong>Named
+Credentials</strong></li>
+<li>Click on the <strong>External Credentials</strong> tab</li>
+<li>Find <strong>NIPR API</strong>
+(<code>niprsync__NIPR_API</code>)</li>
+<li>Click <strong>Edit</strong></li>
+<li>Scroll to <strong>Principals</strong> section</li>
+<li>Click <strong>Edit</strong> next to <strong>NIPR Basic
+Auth</strong></li>
+<li>Enter the <strong>production</strong> credentials:
+<ul>
+<li><strong>Username</strong>: (Client-specific production username from
+NIPR)</li>
+<li><strong>Password</strong>: (Client-specific production password from
+NIPR)</li>
+</ul></li>
+<li>Click <strong>Save</strong></li>
+</ol>
+<h4 id="update-named-credential-urls-production">5.3.2 Update Named
+Credential URLs (Production)</h4>
+<p><strong>⚠️ CRITICAL</strong>: Remove <code>.beta</code> from both
+Named Credential URLs.</p>
+<p><strong>Step 1: Update NIPR API Named Credential</strong></p>
+<ol type="1">
+<li>Navigate to <strong>Setup</strong> → <strong>Named
+Credentials</strong></li>
+<li>Click on the <strong>Named Credentials</strong> tab</li>
+<li>Find <strong>NIPR API</strong>
+(<code>niprsync__NIPR_API</code>)</li>
+<li>Click <strong>Edit</strong></li>
+<li>In the <strong>URL</strong> field, change:
+<ul>
+<li><strong>FROM</strong>:
+<code>https://pdb-alerts-industry-services.api.beta.nipr.com</code></li>
+<li><strong>TO</strong>:
+<code>https://pdb-alerts-industry-services.api.nipr.com</code></li>
+</ul></li>
+<li>Click <strong>Save</strong></li>
+</ol>
+<p><strong>Step 2: Update NIPR Entity Info API Named
+Credential</strong></p>
+<ol type="1">
+<li>Find <strong>NIPR Entity Info API</strong>
+(<code>niprsync__NIPR_EntityInfo_API</code>)</li>
+<li>Click <strong>Edit</strong></li>
+<li>In the <strong>URL</strong> field, change:
+<ul>
+<li><strong>FROM</strong>:
+<code>https://pdb-xml-reports.api.beta.nipr.com/pdb-xml-reports</code></li>
+<li><strong>TO</strong>:
+<code>https://pdb-xml-reports.api.nipr.com/pdb-xml-reports</code></li>
+</ul></li>
+<li>Click <strong>Save</strong></li>
+</ol>
+<hr />
+<h2 id="step-6-test-nipr-integration">Step 6: Test NIPR Integration</h2>
+<p>Test the NIPR integration by manually creating a Producer record.</p>
+<h3 id="create-test-producer-record">6.1 Create Test Producer
+Record</h3>
+<p><strong>⚠️ Use a valid but failing NPN for testing
+purposes.</strong></p>
+<p><strong>Test NPN</strong>: <code>1234567890</code> (This will fail
+the integration, which is expected for testing)</p>
+<p><strong>Steps</strong>:</p>
+<ol type="1">
+<li>Log in as a <strong>standard user</strong> (any user with the
+<strong>NIPR Read Only User</strong> or <strong>NIPR Admin User</strong>
+permission set group)</li>
+<li>Navigate to the <strong>Producers</strong> tab</li>
+<li>Click <strong>New</strong></li>
+<li>Fill in the following fields:
+<ul>
+<li><strong>Producer Name</strong>: Test Producer</li>
+<li><strong>NPN</strong> (<code>niprsync__ht_NPN__c</code>):
+<code>1234567890</code></li>
+<li><strong>First Name</strong>
+(<code>niprsync__ht_FirstName__c</code>): Test</li>
+<li><strong>Last Name</strong> (<code>niprsync__ht_LastName__c</code>):
+Producer</li>
+</ul></li>
+<li>Click <strong>Save</strong></li>
+</ol>
+<h3 id="verify-integration-attempt">6.2 Verify Integration Attempt</h3>
+<p>After saving, the integration will attempt to retrieve data from
+NIPR. Since this is a test NPN, the integration should fail (which
+confirms the integration is working).</p>
+<p><strong>Verification Steps</strong>:</p>
+<ol type="1">
+<li>Navigate to the <strong>Logger</strong> tab
+(<code>niprsync__ht_Logger__c</code>)</li>
+<li>Search for recent logs related to the NPN
+<code>1234567890</code></li>
+<li>You should see a log entry indicating the NIPR API was called</li>
+<li>The log should show an error (expected for a test NPN)</li>
+</ol>
+<p><strong>Expected Log Entry</strong>: - <strong>Log Level</strong>:
+ERROR or WARNING - <strong>Message</strong>: Contains reference to NPN
+<code>1234567890</code> and NIPR API call - <strong>Class Name</strong>:
+Should reference NIPR callout classes</p>
+<p>If you see log entries, the integration is working correctly.</p>
+<hr />
+<h2 id="step-7-schedule-automated-jobs">Step 7: Schedule Automated
+Jobs</h2>
+<p>Schedule the automated jobs for PDB Alerts and log cleanup.</p>
+<h3 id="schedule-pdb-alerts-daily-report">7.1 Schedule PDB Alerts Daily
+Report</h3>
+<p>This job retrieves daily PDB alerts from NIPR and updates Producer
+records.</p>
+<p><strong>Schedule Timing</strong>: Daily at 11 AM Central Time</p>
+<p><strong>Steps</strong>:</p>
+<ol type="1">
+<li><p>Navigate to <strong>Setup</strong> → <strong>Apex
+Classes</strong></p></li>
+<li><p>Search for <strong>PDBAlertReportSchedulable</strong>
+(<code>niprsync__PDBAlertReportSchedulable</code>)</p></li>
+<li><p>Open the <strong>Developer Console</strong> (Setup → Developer
+Console)</p></li>
+<li><p>Click <strong>Debug</strong> → <strong>Open Execute Anonymous
+Window</strong></p></li>
+<li><p>Paste the following code:</p>
+<pre class="apex"><code>Id jobId = niprsync.PDBAlertReportSchedulable.scheduleDaily();
+System.debug(&#39;Scheduled Job ID: &#39; + jobId);</code></pre></li>
+<li><p>Click <strong>Execute</strong></p></li>
+<li><p>Check the debug log to verify the job was scheduled</p></li>
+<li><p>Navigate to <strong>Setup</strong> → <strong>Scheduled
+Jobs</strong> to confirm the job appears in the list</p></li>
+</ol>
+<p><strong>Job Name</strong>:
+<code>NIPR PDB Alerts Daily Report - 11 AM CT</code></p>
+<h3 id="schedule-log-deletion-job">7.2 Schedule Log Deletion Job</h3>
+<p>This job automatically deletes old Logger records to keep the org
+clean.</p>
+<p><strong>Schedule Timing</strong>: Twice monthly (1st and 15th of each
+month at 2:00 AM)</p>
+<p><strong>Steps</strong>:</p>
+<ol type="1">
+<li><p>Open the <strong>Developer Console</strong></p></li>
+<li><p>Click <strong>Debug</strong> → <strong>Open Execute Anonymous
+Window</strong></p></li>
+<li><p>Paste the following code:</p>
+<pre class="apex"><code>Id jobId = niprsync.DeleteLogsScheduleable.scheduleTwiceMonthly();
+System.debug(&#39;Scheduled Job ID: &#39; + jobId);</code></pre></li>
+<li><p>Click <strong>Execute</strong></p></li>
+<li><p>Check the debug log to verify the job was scheduled</p></li>
+<li><p>Navigate to <strong>Setup</strong> → <strong>Scheduled
+Jobs</strong> to confirm the job appears in the list</p></li>
+</ol>
+<p><strong>Job Name</strong>:
+<code>DeleteLogsScheduleable_1stAnd15th</code></p>
+<h3 id="verify-scheduled-jobs">7.3 Verify Scheduled Jobs</h3>
+<ol type="1">
+<li>Navigate to <strong>Setup</strong> → <strong>Scheduled
+Jobs</strong></li>
+<li>Confirm both jobs appear in the list:
+<ul>
+<li>✅ <code>NIPR PDB Alerts Daily Report - 11 AM CT</code></li>
+<li>✅ <code>DeleteLogsScheduleable_1stAnd15th</code></li>
+</ul></li>
+<li>Verify the <strong>Next Scheduled Run</strong> dates are
+correct</li>
+</ol>
+<hr />
+<h2 id="troubleshooting">Troubleshooting</h2>
+<h3 id="issue-package-installation-fails">Issue: Package Installation
+Fails</h3>
+<p><strong>Symptoms</strong>: Package installation fails with error
+message</p>
+<p><strong>Solutions</strong>: - Ensure you have System Administrator
+access - Check that the org has sufficient storage space - Verify the
+package version ID is correct - Try installing with
+<code>--upgrade-type Mixed</code> flag</p>
+<h3 id="issue-named-credential-authentication-fails">Issue: Named
+Credential Authentication Fails</h3>
+<p><strong>Symptoms</strong>: NIPR API calls fail with authentication
+errors</p>
+<p><strong>Solutions</strong>: 1. Verify credentials in LastPass (UAT)
+or from client (Production) 2. Test credentials using Postman before
+configuring in Salesforce 3. Ensure the correct environment URLs are
+configured (beta vs production) 4. Check that the External Credential
+Principal is configured correctly</p>
+<h3 id="issue-users-cannot-see-nipr-data">Issue: Users Cannot See NIPR
+Data</h3>
+<p><strong>Symptoms</strong>: Users get “Insufficient Privileges”
+errors</p>
+<p><strong>Solutions</strong>: 1. Verify the user has been assigned the
+appropriate Permission Set Group 2. Check that the Permission Set Group
+is Active 3. Ensure the user’s profile has access to the NIPR tabs 4.
+Log out and log back in to refresh permissions</p>
+<h3 id="issue-pdb-alerts-not-received">Issue: PDB Alerts Not
+Received</h3>
+<p><strong>Symptoms</strong>: Email notifications for PDB alerts are not
+being received</p>
+<p><strong>Solutions</strong>: 1. Verify the email address in the
+<strong>NIPR Subscription Email</strong> custom metadata type 2. Check
+the scheduled job is active (<strong>Setup</strong> → <strong>Scheduled
+Jobs</strong>) 3. Review <strong>Logger</strong> records for any errors
+during PDB alert processing 4. Verify NIPR subscriptions exist and are
+active</p>
+<h3 id="issue-logs-not-being-deleted">Issue: Logs Not Being Deleted</h3>
+<p><strong>Symptoms</strong>: Old Logger records are not being
+deleted</p>
+<p><strong>Solutions</strong>: 1. Verify the
+<strong>DeleteLogsScheduleable</strong> job is scheduled
+(<strong>Setup</strong> → <strong>Scheduled Jobs</strong>) 2. Check the
+job is not in a failed state 3. Review <strong>Logger</strong> records
+for any errors during log deletion 4. Manually run the job from
+Developer Console to test:
+<code>apex    Database.executeBatch(new niprsync.DeleteLogsBatchable(), 2000);</code></p>
+<hr />
+<h2 id="support">Support</h2>
+<p>For technical support or questions:</p>
+<ul>
+<li><strong>Package Issues</strong>: Contact Hipten Support at
+support@hipten.com</li>
+<li><strong>NIPR API Issues</strong>: Contact NIPR Support</li>
+<li><strong>Installation Questions</strong>: Contact your Salesforce
+Administrator</li>
+</ul>
+<hr />
+<p><strong>Document Version</strong>: 1.0 <strong>Last Updated</strong>:
+2026-01-20 <strong>Maintained By</strong>: Hipten Development Team</p>
+</body>
+</html>

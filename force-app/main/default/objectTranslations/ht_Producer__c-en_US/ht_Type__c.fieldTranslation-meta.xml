@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <label><!-- Type --></label>
+    <name>ht_Type__c</name>
+    <picklistValues>
+        <masterLabel>Agency</masterLabel>
+        <translation><!-- Agency --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Agent</masterLabel>
+        <translation><!-- Agent --></translation>
+    </picklistValues>
+</CustomFieldTranslation>

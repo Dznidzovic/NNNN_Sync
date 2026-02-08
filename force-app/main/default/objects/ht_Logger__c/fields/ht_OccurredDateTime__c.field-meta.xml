@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ht_OccurredDateTime__c</fullName>
+    <inlineHelpText>Timestamp of when the log was recorded.</inlineHelpText>
+    <label>Occurred Date/Time</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>DateTime</type>
+</CustomField>

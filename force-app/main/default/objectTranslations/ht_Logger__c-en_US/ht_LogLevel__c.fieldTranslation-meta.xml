@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <help><!-- Defines the severity of the log: Info, Debug, Warning, Error. --></help>
+    <label><!-- Log Level --></label>
+    <name>ht_LogLevel__c</name>
+    <picklistValues>
+        <masterLabel>Debug</masterLabel>
+        <translation><!-- Debug --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Error</masterLabel>
+        <translation><!-- Error --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Info</masterLabel>
+        <translation><!-- Info --></translation>
+    </picklistValues>
+    <picklistValues>
+        <masterLabel>Warning</masterLabel>
+        <translation><!-- Warning --></translation>
+    </picklistValues>
+</CustomFieldTranslation>

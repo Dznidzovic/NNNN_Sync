@@ -1,0 +1,29 @@
+{
+  "packageDirectories": [
+    {
+      "versionName": "ver 0.8",
+      "versionNumber": "0.8.0.NEXT",
+      "path": "force-app",
+      "default": true,
+      "package": "NIPR Integration",
+      "versionDescription": "NIPR Integration Package for managing insurance agent licensing and carrier appointments",
+      "ancestorId": "04tPB000000At3FYAS"
+    }
+  ],
+  "name": "Hipten",
+  "namespace": "niprsync",
+  "sfdcLoginUrl": "https://login.salesforce.com",
+  "sourceApiVersion": "63.0",
+  "packageAliases": {
+    "NIPR Integration": "0HoPB00000001P70AI",
+    "NIPR Integration@0.1.0-1": "04tPB000000ArSrYAK",
+    "NIPR Integration@0.2.0-1": "04tPB000000ArUTYA0",
+    "NIPR Integration@0.2.0-2": "04tPB000000ArW5YAK",
+    "NIPR Integration@0.3.0-1": "04tPB000000ArXhYAK",
+    "NIPR Integration@0.4.0-1": "04tPB000000ArZJYA0",
+    "NIPR Integration@0.5.0-2": "04tPB000000AsNJYA0",
+    "NIPR Integration@0.6.0-1": "04tPB000000AsOvYAK",
+    "NIPR Integration@0.7.0-1": "04tPB000000At1dYAC",
+    "NIPR Integration@0.8.0-1": "04tPB000000At3FYAS"
+  }
+}

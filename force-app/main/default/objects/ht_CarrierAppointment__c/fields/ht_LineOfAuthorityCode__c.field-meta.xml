@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ht_LineOfAuthorityCode__c</fullName>
+    <description>Line of Authority Code for this carrier appointment. Previously stored in separate LOA record, now directly on appointment.</description>
+    <externalId>false</externalId>
+    <label>Line of Authority Code</label>
+    <length>50</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

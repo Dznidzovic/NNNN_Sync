@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ht_LOAMapping__c</fullName>
+    <label>LOA Mapping</label>
+    <referenceTo>ht_LOA_Insurance_Product_Mapping__c</referenceTo>
+    <relationshipLabel>LOA Mapping Insurance Products</relationshipLabel>
+    <relationshipName>LOA_Mapping_Insurance_Products</relationshipName>
+    <relationshipOrder>0</relationshipOrder>
+    <reparentableMasterDetail>false</reparentableMasterDetail>
+    <trackTrending>false</trackTrending>
+    <type>MasterDetail</type>
+    <writeRequiresMasterRead>false</writeRequiresMasterRead>
+</CustomField>

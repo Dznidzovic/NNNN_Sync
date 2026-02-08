@@ -1,0 +1,1665 @@
+/**
+ *********************************************************
+ * Apex Class Name    : ProcessPDBAlertReportService
+ * Created Date       : 03-19-2025
+ * @description       : Handles importing NIPR Licensing Report data into Salesforce.
+ *                      This class processes the NIPR PDB Alerts API Response which is deserialized into LicensingReportDTO class and maps that data into Salesforce objects
+ * @author            : Stefan Nidzovic
+ * Modification Log:
+ * Ver   Date         Author                   Modification
+ * 1.0   03-19-2025   Stefan Nidzovic          Initial Version
+ * 1.1   12-25-2025   Stefan Nidzovic          Renamed from ImportNIPRDataToSalesforceService
+ *********************************************************
+ **/
+public with sharing class ProcessPDBAlertReportService {
+    // Apex Object containing all the data returned by NIPR API and deserialized to LicensingReportDTO class
+    LicensingReportDTO.LicensingReport licensingReport;
+    // Store values in a map that will be used to easily retreive specific address for corresponding producer
+    private Map<String, LicensingReportDTO.Address> niprAddressesByKeys;
+    // Store values in a a map that will be used if License records from NIPR have an existing NPN__c value in Salesforce database
+    private Map<String, String> producerIdsByNpns = new Map<String, String>();
+    // Store values in a map that will be used to easily retrieve existing Licenses by Producer NPN
+    private Map<String, List<ht_License__c>> existingLicensesByProducer = new Map<String, List<ht_License__c>>();
+    // Store values in a map that will be used to easily retrieve existing Carrier Appointments by Producer NPN
+    private Map<String, List<ht_CarrierAppointment__c>> existingCarrierAppointmentsByProducer = new Map<String, List<ht_CarrierAppointment__c>>();
+    // Store values in a map that will be used to easily retrieve existing LOA by a License Number
+    private Map<String, List<ht_LineOfAuthority__c>> existingLOAByLicense = new Map<String, List<ht_LineOfAuthority__c>>();
+    // Store main nipr entity Identifier (Agencies can have multiple identifiers but NPN is main one) by Refs (Keys) from PDB Alert
+    private Map<String, String> identifiersByKeyReferences = new Map<String, String>();
+    // Stores new or updated producer (agent) records before DML operation.
+    private List<ht_Producer__c> producers = new List<ht_Producer__c>();
+    // Stores new or updated producer communication records (Phone, Email).
+    private List<ht_ProducerCommunication__c> producerCommunications = new List<ht_ProducerCommunication__c>();
+    // Stores new or updated producer to be upserted to Salesforce
+    private List<ht_ProducerAddress__c> producerAddresses = new List<ht_ProducerAddress__c>();
+    // Stores new or updated carriers to be upserted to Salesforce
+    private List<ht_Carrier__c> carriers = new List<ht_Carrier__c>();
+    // Stores new or updated licenses to be upserted to Salesforce
+    private List<ht_License__c> licenses = new List<ht_License__c>();
+    // Stores new or updated Lines Of Authority to be upserted to Salesforce
+    private List<ht_LineOfAuthority__c> linesOfAuthority = new List<ht_LineOfAuthority__c>();
+    // Stores new or updated Carrier Appointments to be upserted to Salesforce
+    private List<ht_CarrierAppointment__c> carrierAppointments = new List<ht_CarrierAppointment__c>();
+    // Stores new or updated Lines Of Authority attached to Carrier Appointments to be upserted to SF
+    // Stores IDs of producer communication records that need to be deleted.
+    private Set<Id> producerCommunicationIdsForDeletion = new Set<Id>();
+    // Stores IDs of producerAddress records that need to be deleted.
+    private Set<Id> producerAddressIdsForDeletion = new Set<Id>();
+    // Stores IDs of Producer License records that need to be deleted;
+    private Set<Id> licenseIdsForDeletion = new Set<Id>();
+    // Stores IDs of Lines Of Authority records that need to be deleted;
+    private Set<Id> licenseLineOfAuthorityIdsForDeletion = new Set<Id>();
+    // Stores IDs of Carrier Appointment records that need to be deleted;
+    private Set<Id> carrierAppointmentIdsForDeletion = new Set<Id>();
+    // Stores Ids of all objects to be deleted in one Set
+    private Set<Id> allIdsToDelete = new Set<Id>();
+    // Stores IDs of LineOfAuthority attached to Carrier Appointment records that need to be deleted;
+
+    // private property used for logging purposes
+    private String CLASS_NAME = 'ProcessPDBAlertReportService';
+
+    /**
+     *********************************************************
+     * @methodName      : importData
+     * @description     : Calls the external API to retrieve the NIPR licensing report,
+     *                    processes producers and communication data, and updates data in Salesforce.
+     * @param reportDate : The report date of the NIPR data being fetched(Represents data on that given day)
+     * @param subscriptionName : The subscription used to retrieve the NIPR data(Subscription holds the npns which data is retreived for)
+     *********************************************************
+     **/
+    public void importData(String reportDate, string subscriptionName) {
+        // Used for Logging purposes
+        String methodName = 'ImportData';
+
+        // Generate correlation ID for this PDB Alert import transaction
+        String correlationId = CorrelationIdUtils.generateCorrelationId('PDB-' + subscriptionName);
+
+        // Log start of import process with searchable subscription name and correlation ID
+        Logger.info(CLASS_NAME, methodName, CorrelationIdUtils.formatLogMessage('PDB Alert Import - ' + subscriptionName),
+        'CorrelationId: ' + correlationId + ' | Subscription: ' + subscriptionName + ' | Date: ' + reportDate, null);
+
+        RetrievePDBSpecificReportData reportCallout = new RetrievePDBSpecificReportData();
+        LicensingReportDTO reportData = reportCallout.retrieveData(reportDate, subscriptionName);
+
+        if (!reportData.isSuccess) {
+            if (reportData.errorType == NIPREnums.PDBAlertError.UNKOWN_ISSUE) {
+                Logger.errorWithCritical(CLASS_NAME, methodName,
+                    CorrelationIdUtils.formatLogMessage('PDB Alert API Error - ' + subscriptionName),
+                    'CorrelationId: ' + CorrelationIdUtils.getCurrentCorrelationId() +
+                    ' | Subscription: ' + subscriptionName + ' | Error: ' + reportData.errorType + ' | ' + reportData.errorMessage,
+                    null,
+                    true);
+            } else {
+                Logger.error(CLASS_NAME, methodName,
+                CorrelationIdUtils.formatLogMessage('PDB Alert Error - ' + subscriptionName + ' - ' + reportData.errorType),
+                'CorrelationId: ' + CorrelationIdUtils.getCurrentCorrelationId() +
+                ' | Subscription: ' + subscriptionName + ' | Error: ' + reportData.errorMessage,
+                null);
+            }
+
+            throw new PDBAlertReportException(reportData.errorType.toString() + ': ' + reportData.errorMessage);
+        }
+
+        try {
+            licensingReport = reportData?.licensingReportProcessResult?.licensingReport;
+
+            // Store values in a map where key is NIPR key identifier for Address details, we use this key to match producer to an address
+            niprAddressesByKeys = getNiprAddressesByAddressKey(licensingReport?.addressList);
+
+            // Process producers - agents and agencies
+            if (!licensingReport?.producerList?.isEmpty()) {
+                processProducers(licensingReport.producerList);
+            }
+
+            // Process carriers
+            if (!licensingReport?.carrierList?.isEmpty()) {
+                processCarriers(licensingReport.carrierList);
+            }
+
+            // Process jurisdiction reports - maps data about Licenses, LOA and Carrier appointments
+            if (!licensingReport?.jurisdictionReportList?.isEmpty()) {
+                processJurisdictionReports(
+                    licensingReport.jurisdictionReportList,
+                    licensingReport.eligibleRecordsForDeletion
+                );
+            }
+
+            // Delete/Upsert all the records
+            syncNIPRDataWithSalesforce();
+
+            // Log heap and CPU usage
+            // Log completion with subscription context for searchability
+            Logger.info(CLASS_NAME, methodName, CorrelationIdUtils.formatLogMessage('PDB Alert Complete - ' + subscriptionName),
+                'CorrelationId: ' + CorrelationIdUtils.getCurrentCorrelationId() +
+                ' | Subscription: ' + subscriptionName + ' | Producers: ' + producers.size() +
+                ' | Licenses: ' + licenses.size() + ' | Appointments: ' + carrierAppointments.size(),
+                null);
+
+            Logger.commitAsync();
+        } catch (Exception e) {
+            Logger.errorWithCritical(CLASS_NAME, methodName,
+                    CorrelationIdUtils.formatLogMessage('PDB Alert Processing Error - ' + subscriptionName),
+                    'CorrelationId: ' + CorrelationIdUtils.getCurrentCorrelationId() +
+                    ' | Error Type: ' + NIPREnums.EntityInfoError.UNKOWN_ISSUE + ' | Error Message: ' + e.getMessage(),
+                    e.getStackTraceString(),
+                    true);
+            
+            Logger.commitAsync();
+
+            throw new PDBAlertReportException('UNKNOWN_ISSUE' + ': ' + e.getMessage());
+        }
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : processProducers
+     * @description     : Processes a list of NIPR producers, retrieves existing related data 
+     *                    (communications, addresses, licenses, and carrier appointments),
+     *                    and maps each producer into a Salesforce ht_Producer__c record.
+     * @param niprProducers : List of NIPR producer DTOs to process.
+     *********************************************************     
+     */
+    private void processProducers(List<LicensingReportDTO.NIPREntity> niprProducers) {
+        Set<String> producerNpns = new Set<String>();
+
+        // Collects unique producer NPNs (National Producer Numbers).
+        for (LicensingReportDTO.NIPREntity niprProducer : niprProducers) {
+            // Put producer
+            setNIPREntityIdentifierByReferenceKey(niprProducer);
+
+            String producerNPN = niprProducer.mainIdentifier;
+            producerNpns.add(producerNPN);
+        }
+
+        // Fetch existing producer communication records by producer NPN we will later on need when deciding which licenses we need to delete
+        Map<String, List<ht_ProducerCommunication__c>> existingProducerCommsByProducer = getProducerCommunicationsByProducer(producerNpns);
+
+        // Fetch existing producer communication records from Salesforce we will later on need when deciding which licenses we need to delete
+        Map<String, List<ht_ProducerAddress__c>> existingProducerAddressesByProducer = getProducerAddressesByProducer(producerNpns);
+
+        // Go through each producr and do all the necessary data mapping from DTOs to Salesforce objects in order to import data into Salesforce
+        for (LicensingReportDTO.NIPREntity niprProducer : niprProducers) {
+            String extIdentifier = niprProducer.mainIdentifier;
+
+            ht_Producer__c producerToUpsert = processProducer(niprProducer, existingProducerCommsByProducer.get(extIdentifier), existingProducerAddressesByProducer.get(extIdentifier));
+            
+            if (producerToUpsert != null) {
+                producers.add(producerToUpsert);
+            }
+        }
+    }
+
+    /**
+     ******************************************************B***
+     * @methodName      : processCarriers
+     * @description     : Processes a list of NIPR carriers and maps them into Salesforce 
+     *                    ht_Carrier__c records.
+     * @param niprCarriers : List of NIPR carrier DTOs to process.
+     *********************************************************
+     */
+    private void processCarriers(List<LicensingReportDTO.Organization> niprCarriers) {
+        for (LicensingReportDTO.Organization niprCarrier : niprCarriers) {
+            // Set entry of carrier CoCode by all nipr key references for that CoCode
+            setNIPREntityIdentifierByReferenceKeyForCarriers(niprCarrier);
+
+            ht_Carrier__c carrier = processCarrier(niprCarrier);
+
+            if (carrier != null) {
+                carriers.add(carrier);
+            }
+        }
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : processJurisdictionReports
+     * @description     : Processes all jurisdiction reports, builds licenses, LOAs, and carrier
+     *                    appointments, and determines which records need to be deleted based on differences.
+     *                    Uses eligible deletion maps to only query records for producer+state combinations
+     *                    that have data in the NIPR payload.
+     * @param jurisdictionReports : List of jurisdiction report DTOs from NIPR.
+     * @param eligibleRecords : Maps of producer+state combinations that have data in payload.
+     *********************************************************
+     */
+    private void processJurisdictionReports(
+        List<LicensingReportDTO.JurisdictionReport> jurisdictionReports,
+        LicensingReportDTO.EligibleRecordsForDeletion eligibleRecords
+    ) {
+        System.debug(eligibleRecords);
+        // Query licenses and carrier appointments only for producer+state combinations that have data in the payload
+        existingLicensesByProducer = getEligibleLicensesForDeletionByProducersAndStates(eligibleRecords.eligibleLicenses);
+        existingCarrierAppointmentsByProducer = getEligibleCarrierAppointmentsForDeletionByProducersAndStates(eligibleRecords.eligibleCarrierAppointments);
+
+        System.debug('existingCarrierAppointmentsByProducer');
+        for (List<ht_CarrierAppointment__c> ca : existingCarrierAppointmentsByProducer.values()) {
+            System.debug(ca);
+        }
+
+        for (LicensingReportDTO.JurisdictionReport jurisdictionReport : jurisdictionReports) {
+            // Process individual Jurisdiction Report
+            processJurisdictionReport(jurisdictionReport);
+        }
+
+        // Get license Unique Identifiers(External Id for licenses) out of all licenses processed in the report so we can later on group LOA by license number so we can find out which LOA to delete
+        Set<String> licenseUniqueIdentifiers = new Set<String>();
+
+        for (ht_License__c lic : licenses) {
+            licenseUniqueIdentifiers.add(lic.ht_UniqueIdentifier__c);
+        }
+
+        // Get LOA by License Numbers map
+        Map<String, List<ht_LineOfAuthority__c>> existingLOAByLicense = getLOAByUniqueIdentifier(licenseUniqueIdentifiers);
+
+        // Get Ids of Licenses that are not in the report anymore
+        licenseIdsForDeletion = getRecordIdsForDeletion(existingLicensesByProducer, licenses, 'ht_Producer__r.ht_NPN__c', 'ht_UniqueIdentifier__c');
+
+        // Get Ids of Carrier Appointments that are not in the report anymore
+        carrierAppointmentIdsForDeletion = getRecordIdsForDeletion(existingCarrierAppointmentsByProducer, carrierAppointments, 'ht_Producer__r.ht_NPN__c', 'ht_UniqueIdentifier__c');
+
+        // Get Ids of LOA that are not in the report anymore
+        licenseLineOfAuthorityIdsForDeletion = getRecordIdsForDeletion(existingLOAByLicense, linesOfAuthority, 'ht_License__r.ht_UniqueIdentifier__c', 'ht_UniqueIdentifier__c');
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : processProducer
+     * @description     : Processes a single NIPR producer entity (either a Person or Organization),
+     *                    maps it into a `ht_Producer__c` Salesforce record, and also prepares related
+     *                    communication and address records. Also identifies which of the existing
+     *                    records should be deleted based on what's missing from the current API response.
+     * @param niprProducer : The producer entity to process (can be a Person or Organization).
+     * @param existingProdComms : Previously existing communication records for the producer.
+     * @param existingProdAddr  : Previously existing address records for the producer.
+     * @return          : A new or updated `ht_Producer__c` record for upsert.
+     *********************************************************
+     */
+    private ht_Producer__c processProducer(LicensingReportDTO.NIPREntity niprProducer, List<ht_ProducerCommunication__c> existingProdComms, List<ht_ProducerAddress__c> existingProdAddr) {
+        ht_Producer__c producer;
+
+        if (niprProducer instanceOf LicensingReportDTO.Person) {
+            LicensingReportDTO.Person agentProducer = (LicensingReportDTO.Person) niprProducer;
+
+            producer = createProducerRecord(agentProducer);
+
+            // Process person communication record from nipr (Every person has at most one person and one business communication record)
+            processProducerCommunication(agentProducer.personCommunication, agentProducer.mainIdentifier);
+            // Process Business communication record from nipr (Every person at most one person and one business communication record)
+            processProducerCommunication(agentProducer.businessCommunication, agentProducer.mainIdentifier);
+        } else {
+            LicensingReportDTO.Organization agencyProducer = (LicensingReportDTO.Organization) niprProducer;
+
+            producer = createProducerRecord(agencyProducer);
+
+            // Process person communication record from nipr (Every person has at most one person and one business communication record)
+            processProducerCommunication(agencyProducer.organizationCommunication, agencyProducer.mainIdentifier);
+        }
+        
+        // Get all existing Producer Communication record Ids for deletion
+        producerCommunicationIdsForDeletion.addAll(getRecordIdsForDeletion(existingProdComms, producerCommunications, 'ht_UniqueIdentifier__c'));
+
+        // Get all existing Producer Adress record Ids for deletion
+        producerAddressIdsForDeletion.addAll(getRecordIdsForDeletion(existingProdAddr, producerAddresses, 'ht_UniqueIdentifier__c'));
+
+        return producer;
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : processCarrier
+     * @description     : Converts a NIPR Organization record representing a carrier into a
+     *                    `ht_Carrier__c` Salesforce record.
+     * @param niprCarrier : NIPR Organization DTO representing the carrier.
+     * @return           : A new or updated `ht_Carrier__c` record.
+     *********************************************************
+     */
+    private ht_Carrier__c processCarrier(LicensingReportDTO.Organization niprCarrier) {
+        ht_Carrier__c carrier = createCarrierRecord(niprCarrier);
+
+        return carrier;
+    }
+
+    /**
+     * @methodName      : processProducerCommunication
+     * @description     : Processes the communication section of a producer record (person, business, or organization).
+     *                    Converts phone and email DTOs into `ht_ProducerCommunication__c` records, and address DTOs
+     *                    into `ht_ProducerAddress__c` records, appending them to respective instance lists.
+     * @param comms     : The communication DTO (can be Person, Business, or Organization).
+     * @param producerExtId : External NPN identifier used to relate communications to the producer.
+     */
+    private void processProducerCommunication(LicensingReportDTO.ProducerCommunication comms, String producerExtId) {
+        Set<String> emailAndPhoneUniqueIds = new Set<String>();
+
+        // Process all NIPR Phones into Producer Communication Records
+        producerCommunications.addAll(processProducerPhoneRecords(comms?.telephoneList, producerExtId));
+        // Process all NIPR Emails into Producer Communication Records
+        producerCommunications.addAll(processProducerEmailRecords(comms?.emailList, producerExtId));
+
+        // Process NIPR Address records belonging to this Producer Communication
+        producerAddresses.addAll(processProducerAddressRecords(comms, producerExtId));
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : processProducerAddressRecords
+     * @description     : Extracts and processes address records from the communication DTO.
+     *                    Depending on the type of communication (Person, Business, or Organization),
+     *                    it maps residential, mailing, physical, and principal addresses into Salesforce.
+     * @param comms     : Communication object (Person, Business, or Organization) with address references.
+     * @param producerExtId : NPN identifier of the producer.
+     * @return          : List of `ht_ProducerAddress__c` records to be created or upserted.
+     *********************************************************
+     */
+    private List<ht_ProducerAddress__c> processProducerAddressRecords(LicensingReportDTO.ProducerCommunication comms, String producerExtId) {
+        Set<String> addressUniqueIds = new Set<String>();
+        List<ht_ProducerAddress__c> prodAddresses = new List<ht_ProducerAddress__c>();
+
+        ht_ProducerAddress__c mailingProducerAddress = processProducerAddress(comms?.mailingAddress, producerExtId, 'Mailing');
+        if (mailingProducerAddress != null) {
+            prodAddresses.add(mailingProducerAddress);
+        }
+
+        if (comms instanceOf LicensingReportDTO.PersonCommunication) {
+            LicensingReportDTO.PersonCommunication personComms = (LicensingReportDTO.PersonCommunication) comms;
+            ht_ProducerAddress__c residentialProducerAddress = processProducerAddress(personComms?.residentialAddress, producerExtId, 'Residential');
+            
+            if (residentialProducerAddress != null) {
+                prodAddresses.add(residentialProducerAddress);
+            }
+            
+        } else if (comms instanceOf LicensingReportDTO.BusinessCommunication) {
+            LicensingReportDTO.BusinessCommunication businessComms = (LicensingReportDTO.BusinessCommunication) comms;
+            ht_ProducerAddress__c physicalProducerAddress = processProducerAddress(businessComms?.physicalAddress, producerExtId, 'Physical');
+
+            if (physicalProducerAddress != null) {
+                prodAddresses.add(physicalProducerAddress);
+            }
+
+        } else if (comms instanceOf LicensingReportDTO.OrganizationCommunication) {
+            LicensingReportDTO.OrganizationCommunication orgComms = (LicensingReportDTO.OrganizationCommunication) comms;
+            ht_ProducerAddress__c physicalProducerAddress = processProducerAddress(orgComms?.physicalAddress, producerExtId, 'Physical');
+            ht_ProducerAddress__c principalProducerAddress = processProducerAddress(orgComms?.principalAddress, producerExtId, 'Principal');
+
+            if (physicalProducerAddress != null) {
+                prodAddresses.add(physicalProducerAddress);
+            }
+
+            if (principalProducerAddress != null) {
+                prodAddresses.add(principalProducerAddress);
+            }
+        }
+
+        return prodAddresses;
+        
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : processProducerPhoneRecords
+     * @description     : Converts a list of telephone DTOs into Salesforce `ht_ProducerCommunication__c` records
+     *                    of type phone, assigning them to the specified producer.
+     * @param telephoneList : List of telephone DTOs from NIPR.
+     * @param producerExtId : NPN identifier of the producer.
+     * @return           : List of new phone communication records.
+     *********************************************************
+     */
+    private List<ht_ProducerCommunication__c> processProducerPhoneRecords(List<LicensingReportDTO.Telephone> telephoneList, String producerExtId) {
+        List<ht_ProducerCommunication__c> producerPhones = new List<ht_ProducerCommunication__c>();
+
+        // Process phone records and store them in a map to track uniqueness.
+        if (telephoneList != null && !telephoneList.isEmpty()) {
+            for (LicensingReportDTO.Telephone phone : telephoneList) {
+                String formattedPhoneNumber = StringUtils.formatNIPRPDBAlertNumber(phone?.phoneNumber);
+                
+                String phoneKey = formattedPhoneNumber + (phone.typeCode != null ? phone.typeCode : '') + producerExtId;
+
+                ht_ProducerCommunication__c phoneProducerCommunication = createPhoneCommunicationRecord(phoneKey, phone);
+
+                phoneProducerCommunication.ht_Producer__r = new ht_Producer__c (
+                    ht_NPN__c = producerExtId
+                );
+                
+                producerPhones.add(phoneProducerCommunication);
+            }
+        }
+
+        return producerPhones;
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : processProducerEmailRecords
+     * @description     : Converts a list of email DTOs into Salesforce `ht_ProducerCommunication__c` records
+     *                    of type email, assigning them to the specified producer.
+     * @param emailList     : List of email DTOs from NIPR.
+     * @param producerExtId : NPN identifier of the producer.
+     * @return              : List of new email communication records.
+     *********************************************************
+     */
+    private List<ht_ProducerCommunication__c> processProducerEmailRecords(List<LicensingReportDTO.Email> emailList, String producerExtId) {
+        List<ht_ProducerCommunication__c> producerEmails = new List<ht_ProducerCommunication__c>();
+
+        // Process email records and store them in a map to track uniqueness.
+        if (emailList != null && !emailList.isEmpty()) {
+            for (LicensingReportDTO.Email email : emailList) {
+                String emailKey = email.emailAddress + (email.typeCode != null ? email.typeCode : '') + producerExtId;
+
+                ht_ProducerCommunication__c emailProducerCommunication = createEmailCommunicationRecord(emailKey, email);
+
+                if (emailProducerCommunication != null) {
+                    emailProducerCommunication.ht_Producer__r = new ht_Producer__c (
+                    ht_NPN__c = producerExtId
+                );
+
+                    producerEmails.add(emailProducerCommunication);
+                }
+            }
+        }
+
+        return producerEmails;
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : processProducerAddress
+     * @description     : Maps a single EntityAddress DTO (reference + asOfDate) to a
+     *                    `ht_ProducerAddress__c` Salesforce record using the global address map.
+     * @param address        : The EntityAddress DTO with reference key and asOfDate.
+     * @param producerExtId  : NPN identifier of the producer.
+     * @param addressType    : Type of address (Mailing, Residential, Physical, Principal).
+     * @return               : Populated producer address record.
+     *********************************************************
+     */
+    private ht_ProducerAddress__c processProducerAddress(LicensingReportDTO.EntityAddress address, String producerExtId, String addressType) {
+        ht_ProducerAddress__c producerAddress;
+        ht_Producer__c producerForExtId =  new ht_Producer__c(
+                ht_NPN__c = producerExtId
+        );
+
+        if (address != null) {
+
+            producerAddress = createProducerAddressRecord(address);
+
+            producerAddress.ht_Producer__r = producerForExtId;
+            producerAddress.ht_UniqueIdentifier__c = address.addressReferences + addressType + producerExtId;
+            producerAddress.ht_AddressType__c = addressType;
+        }
+
+        return producerAddress;
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : processJurisdictionReport
+     * @description     : Processes a single jurisdiction report by iterating through all
+     *                    contained items and handling licenses and appointments tied to the
+     *                    associated producer or carrier references.
+     * @param jurisdictionReport : DTO object representing a single jurisdiction report.
+     *********************************************************
+     */
+    private void processJurisdictionReport(LicensingReportDTO.JurisdictionReport jurisdictionReport) {
+        if (jurisdictionReport?.jurisdictionReportItemList != null) {
+            for (LicensingReportDTO.JurisdictionReportItem item : jurisdictionReport.jurisdictionReportItemList) {
+                processJurisdictionReportItem(item, jurisdictionReport.personReference, jurisdictionReport.organizationReference);
+            }
+        }
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : processJurisdictionReportItem
+     * @description     : Processes a single jurisdiction report item, extracting both
+     *                    licenses and carrier appointments related to the given producer or agency.
+     * @param item               : Jurisdiction report item DTO.
+     * @param personReference    : NIPR reference key for the individual producer.
+     * @param organizationReference : NIPR reference key for the organization.
+     *********************************************************
+     */
+    private void processJurisdictionReportItem(LicensingReportDTO.JurisdictionReportItem item, String personReference, String organizationReference) {
+       processLicenses(item, personReference, organizationReference);
+       processCarrierAppointments(item, personReference, OrganizationReference);
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : processLicenses
+     * @description     : Creates and stores license records for a given jurisdiction report item.
+     *                    Maps licenses to their respective producers using references.
+     * @param item                : Jurisdiction report item containing license data.
+     * @param personReference     : Reference to the person producer (if applicable).
+     * @param organizationReference : Reference to the organization producer (if applicable).
+     *********************************************************
+     */
+    private void processLicenses(LicensingReportDTO.JurisdictionReportItem item, String personReference, String organizationReference) {
+        List<ht_License__c> processedLicenses = new List<ht_License__c>();
+        
+        if (item == null || item.licensee == null) {
+            return;
+        }
+
+        if (!item.licensee.insuranceLicenses.isEmpty()) {
+            for (LicensingReportDTO.InsuranceLicense insuranceLicense : item.licensee.insuranceLicenses) {
+                Set<String> licenseUniqueIdentifiers = new Set<String>();
+
+                // Create License record with basic info from InsuranceLicense node
+                // This record will be cloned becaause there is a possibility of multiple License records creation base on how many Licensees it refers to
+                ht_License__c baseLicense = createLicenseRecord(insuranceLicense);
+
+
+                String licenseUniqueId = baseLicense.ht_LicenseNumber__c + StringUtils.safeParseNullString(baseLicense.ht_StateOrProvinceCode__c) + StringUtils.safeParseNullString(baseLicense.ht_LicenseClassCode__c);
+
+                baseLicense.ht_UniqueIdentifier__c = licenseUniqueId;
+
+                if (baseLicense == null) {
+                    return;
+                }
+
+                List<String> licenseeRefs = item?.licensee?.licenseeReference;
+
+                // Each InsuranceLicense record in the API response matches to a Licensee by either a LicenseeRefs list of references or Person/Organization node provided as the top level element in Juristiction Report Item Node
+                if (licenseeRefs == null || licenseeRefs.isEmpty()) {
+                    // Fall back to person/organization reference
+                    if (personReference != null) {
+                        ht_License__c clonedLicense = cloneLicenseWithProducer(baseLicense, personReference);
+
+                        if (clonedLicense.ht_Producer__r.ht_NPN__c != null) {
+                            processedLicenses.add(clonedLicense);
+                            // Add the License number to the global list as we need it later on to determine which licenses to delete
+                            licenseUniqueIdentifiers.add(clonedLicense.ht_UniqueIdentifier__c);
+                        }
+                    }
+                    if (organizationReference != null) {
+                        ht_License__c clonedLicense = cloneLicenseWithProducer(baseLicense, organizationReference);
+
+                        if (clonedLicense.ht_Producer__r.ht_NPN__c != null) {
+                            processedLicenses.add(clonedLicense);
+
+                            // Add the License number to the global list as we need it later on to determine which licenses to delete
+                            licenseUniqueIdentifiers.add(clonedLicense.ht_UniqueIdentifier__c);
+                        }
+                    }
+                } else {
+                    for (String licenseeRef : licenseeRefs) {
+                        ht_License__c clonedLicense = cloneLicenseWithProducer(baseLicense, licenseeRef);
+
+                        if (clonedLicense.ht_Producer__r.ht_NPN__c != null) {
+                            processedLicenses.add(clonedLicense);
+
+                            // Add the License number to the global list as we need it later on to determine which licenses to delete
+                            licenseUniqueIdentifiers.add(clonedLicense.ht_UniqueIdentifier__c);
+                        }
+                    }
+                }
+
+                if (!licenseUniqueIdentifiers.isEmpty()) {
+                    linesOfAuthority.addAll(createLineOfAuthorityRecords(insuranceLicense, licenseUniqueIdentifiers));
+                }
+            }
+        }
+
+        licenses.addAll(processedLicenses);
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : processCarrierAppointments
+     * @description     : Creates and stores carrier appointment records for the jurisdiction report item.
+     *                    Assigns appointments to producers and carriers based on references.
+     * @param item               : Jurisdiction report item containing appointment data.
+     * @param personReference    : NIPR person reference key.
+     * @param organizationReference : NIPR organization reference key.
+     *********************************************************
+     */
+    private void processCarrierAppointments(LicensingReportDTO.JurisdictionReportItem item, String personReference, String organizationReference) {
+        List<ht_CarrierAppointment__c> carrierApps = new List<ht_CarrierAppointment__c>();
+        List<LicensingReportDTO.InsuranceAppointment> appointments = item?.licensee?.insuranceAppointments;
+
+        if (appointments != null && !appointments.isEmpty()) {
+            for (LicensingReportDTO.InsuranceAppointment niprApp : appointments) {
+
+                // Create carrier appointment record with basic info found in the InsuranceAppointment DTO class
+                ht_CarrierAppointment__c app = createCarrierAppointment(niprApp);
+
+                if (app != null) {
+                    // Get producer(agent/agency) npn so we can match it to producer parent record. Uses nipr key(reference) stored in the map to retrieve the producer NPN
+                    String producerNpn = identifiersByKeyReferences.get(niprApp.licenseeReferences);
+                    // Get the combination of carrier CoCode and FEIN because carrier unique id will always be that
+                    List<String> coCodeAndFein = identifiersByKeyReferences.get(niprApp.insurerReferences).split('-');
+  
+                    // Get carrier appointment CoCode so we can match it to Carrier parent record. Uses nipr key(reference) stored in the map to retrieve the Carrier CoCode
+                    String carrierCoCode = coCodeAndFein[0];
+                    // Get carrier FEIN to construct unique id
+                    String carrierFein = coCodeAndFein.size() > 1 ? coCodeAndFein[1] : '';
+
+                    String carrierUniqueIdentifier = StringUtils.safeParseNullString(carrierCoCode + StringUtils.safeParseNullString(carrierFein));
+
+                    // Construct a unique identifier (external id) for a carrier appointment record. This data is not unique enough and child LOA data will also be used later on in the code
+                    String carrierAppIdentifier = producerNpn + carrierUniqueIdentifier + app.ht_StateOrProvinceCode__c + app.ht_StatusCode__c;
+
+                    app.ht_UniqueIdentifier__c = carrierAppIdentifier;
+
+                    // Use indexing to match carrier appointment record to parent producer and carrier records without having to know their Ids
+                    app.ht_Producer__r = new ht_Producer__c(
+                        ht_NPN__c = producerNpn
+                    );
+
+                    app.ht_Carrier__r = new ht_Carrier__c(
+                        ht_UniqueIdentifier__c = carrierUniqueIdentifier
+                    );
+
+                    // Do not create CarrierAppointment records if NPN or carrier unique identifier are not found since we can not insert carrier appointment record into the database without it
+                    if (app.ht_Producer__r.ht_NPN__c != null && app.ht_Carrier__r.ht_UniqueIdentifier__c != null) {
+
+                        List<LicensingReportDTO.LineOfAuthority> niprCPLOAList = niprApp.linesOfAuthority;
+
+                        // Populate LOA fields directly on carrier appointment using FIRST LOA only
+                        if (niprCPLOAList != null && !niprCPLOAList.isEmpty()) {
+                            // Take only the first LOA from the list
+                            LicensingReportDTO.LineOfAuthority firstLoa = niprCPLOAList[0];
+
+                            // Set LOA fields directly on carrier appointment
+                            app.ht_LineOfAuthorityCode__c = StringUtils.truncateField(firstLoa.lineOfAuthorityCode, 50);
+                            app.ht_LineOfAuthorityDescription__c = StringUtils.truncateField(firstLoa.lineOfAuthorityDescription, 255);
+                            app.ht_RenewalDate__c = DateUtils.safeParseDateFromString(firstLoa.renewalDate);
+
+                            // Construct LOA unique identifier component
+                            String loaUniqueId = producerNpn + carrierAppIdentifier + StringUtils.safeParseFromDate(app.ht_RenewalDate__c) + StringUtils.safeParseNullString(app.ht_LineOfAuthorityCode__c);
+
+                            // Update carrier appointment unique identifier to include LOA info
+                            carrierAppIdentifier += loaUniqueId;
+                        }
+
+                        app.ht_UniqueIdentifier__c = carrierAppIdentifier;
+
+                        carrierApps.add(app);
+                    }
+                }
+            }
+        }
+
+        carrierAppointments.addAll(carrierApps);
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : createProducerRecord
+     * @description     : Creates a new producer (Agent) record from NIPR API response.
+     * @param niprAgent : The agent data received from NIPR API.
+     * @return          : A populated ht_Producer__c record.
+     *********************************************************
+     */
+    private ht_Producer__c createProducerRecord(LicensingReportDTO.Person niprAgent) {
+        ht_Producer__c agent = new ht_Producer__c();
+
+        agent.ht_NPN__c = niprAgent.mainIdentifier;
+        agent.ht_Type__c = 'Agent';
+
+        // This will only occur when the person node in NIPR holds no actual info and we flag it as isExisting = true
+        // NIPR uses these nodes to only match child records(Licenses for example) to the person record and we do not want to empty out the data in SF if we continue the mapping
+        if (niprAgent.isExisting) {
+            return agent;
+        }
+
+        agent.ht_BirthDate__c = DateUtils.safeParseDateFromString(niprAgent.birthDate);
+
+        LicensingReportDTO.PersonName agentName = niprAgent?.personName;
+
+        if (agentName != null) {
+            agent.ht_NameTypeCode__c = agentName.typeCode;
+            agent.ht_NameSuffix__c = agentName.nameSuffix;
+            agent.ht_FullName__c = StringUtils.truncateField(agentName.fullName, 255);
+            agent.ht_SurName__c = agentName.surName;
+            agent.ht_MiddleName__c = agentName.middleName;
+            agent.ht_GivenName__c = agentName.givenName;
+            agent.ht_OtherGivenName__c = agentName.otherGivenName;
+        }
+    
+        agent.ht_NPNStatus__c = 'Active';
+        agent.ht_LastNIPRSync__c = Datetime.now();
+
+        return agent;
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : createProducerRecord
+     * @description     : Creates a new producer (Agency) record from NIPR API response.
+     * @param niprAgency : The agent data received from NIPR API.
+     * @return          : A populated ht_Producer__c record.
+     *********************************************************
+     **/
+    private ht_Producer__c createProducerRecord(LicensingReportDTO.Organization niprAgency) {
+        ht_Producer__c agency = new ht_Producer__c();
+
+        agency.ht_NPN__c = niprAgency.mainIdentifier;
+        agency.ht_Type__c = 'Agency';
+
+        // This will only occur when the Organization node in NIPR holds no actual info and we flag it as isExisting = true
+        // NIPR uses these nodes to only match child records(Licenses for example) to the person record and we do not want to empty out the data in SF if we continue the mapping
+        if (niprAgency.isExisting) {
+            return agency;
+        }
+
+        String feinId;
+        String branchId;
+
+        for (LicensingReportDTO.ExternalIdentifier identifier : niprAgency.externalIdentifierList) {
+            if (identifier.typeCode == 'FEINId') {
+                feinId = identifier.Id;
+            } else if (identifier.typeCode == 'BranchID') {
+                branchId = identifier.id;
+            }
+        }
+
+        agency.ht_FEIN__c = StringUtils.truncateField(feinId, 9);
+        agency.ht_BranchId__c = branchId;
+
+        LicensingReportDTO.OrganizationName agencyName = niprAgency.organizationNameList[0];
+
+        if (agencyName != null) {
+            agency.ht_NameTypeCode__c = agencyName.typeCode;
+            agency.ht_FullName__c = StringUtils.truncateField(agencyName.fullName, 255);
+        }
+    
+        agency.ht_NPNStatus__c = 'Active';
+        agency.ht_LastNIPRSync__c = Datetime.now();
+
+        return agency;
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : createCarrierRecord
+     * @description     : Converts a NIPR Organization record into a Carrier record in Salesforce.
+     *                    Maps key identity fields like CoCode and Name.
+     * @param niprCarrier : The DTO Organization object representing the carrier.
+     * @return           : A populated ht_Carrier__c record.
+     *********************************************************
+     */
+    private ht_Carrier__c createCarrierRecord(LicensingReportDTO.Organization niprCarrier) {
+        ht_Carrier__c carrier = new ht_Carrier__c();
+
+        carrier.ht_CoCode__c = niprCarrier.mainIdentifier;
+
+        for (LicensingReportDTO.ExternalIdentifier identifier : niprCarrier.externalIdentifierList) {
+            if (identifier.typeCode == 'FEINId') {
+                carrier.ht_FEIN__c = StringUtils.truncateField(identifier.Id, 9);
+            } 
+        }
+
+        carrier.ht_UniqueIdentifier__c = StringUtils.safeParseNullString(carrier.ht_CoCode__c) + StringUtils.safeParseNullString(carrier.ht_FEIN__c);
+
+        // This will only occur when the carrier node in NIPR holds no actual info and we flag it as isExisting = true
+        // NIPR uses these nodes to only match child records(Licenses for example) to the person record and we do not want to empty out the data in SF if we continue the mapping
+        if (niprCarrier.isExisting) {
+            return carrier;
+        }
+
+        LicensingReportDTO.OrganizationName carrierName = niprCarrier.organizationNameList[0];
+        carrier.ht_FullName__c = StringUtils.truncateField(carrierName.fullName, 255);
+        carrier.Name = StringUtils.truncateField(carrierName.fullName, 80);
+
+        return carrier;
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : createProducerAddress
+     * @description     : Creates a Producer Address record based on provided producer Address object(only reference and as of date) and based on global map of all address info
+     * @param niprProducerAddress : Unique identifier for the phone record.
+     * @return      : A new ht_ProducerAddress__c record.
+     *********************************************************
+     **/
+    private ht_ProducerAddress__c createProducerAddressRecord(LicensingReportDTO.EntityAddress niprProducerAddress) {
+        ht_ProducerAddress__c producerAddress = new ht_ProducerAddress__c();
+
+        if (niprProducerAddress != null) {
+            LicensingReportDTO.Address niprAddress = niprAddressesByKeys.get(niprProducerAddress.addressReferences);
+
+            if (niprAddress != null) {
+                producerAddress.ht_AsOfDate__c = DateUtils.safeParseDateFromString(niprProducerAddress.asOfDate);
+                producerAddress.ht_AddressLineOne__c = niprAddress.lineOne;
+                producerAddress.ht_AddressLineTwo__c = niprAddress.lineTwo;
+                producerAddress.ht_AddressLineThree__c = niprAddress.lineThree;
+                producerAddress.ht_City__c = niprAddress.cityName;
+                producerAddress.ht_CountryCode__c = niprAddress.countryCode;
+                producerAddress.ht_PostalCode__c = niprAddress.postalCode;
+                producerAddress.ht_State__c = niprAddress.stateOrProvinceCode;
+            }
+        }
+
+        return producerAddress;
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : createPhoneCommunicationRecord
+     * @description     : Creates a communication record for a phone number.
+     * @param key : Unique identifier for the phone record.
+     * @param phone : The phone details from the API response.
+     * @return      : A new ht_ProducerCommunication__c record.
+     *********************************************************
+     **/
+    private ht_ProducerCommunication__c createPhoneCommunicationRecord(String key, LicensingReportDTO.Telephone phone) {
+        ht_ProducerCommunication__c prodComm = new ht_ProducerCommunication__c();
+
+        prodComm.ht_UniqueIdentifier__c = key;
+        prodComm.ht_PhoneType__c = phone.typeCode;
+        prodComm.ht_PhoneNumber__c = StringUtils.formatNIPRPDBAlertNumber(phone?.phoneNumber);
+
+        return prodComm;
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : createEmailCommunicationRecord
+     * @description     : Creates a communication record for an email.
+     * @param key : Unique identifier for the email record.
+     * @param email : The email details from the API response.
+     * @return      : A new ht_ProducerCommunication__c record.
+     *********************************************************
+     **/
+    private ht_ProducerCommunication__c createEmailCommunicationRecord(String key, LicensingReportDTO.Email email) {
+        if(!StringUtils.isValidEmail(email.emailAddress)) {
+            return null;
+        }
+
+        ht_ProducerCommunication__c prodComm = new ht_ProducerCommunication__c();
+
+        prodComm.ht_UniqueIdentifier__c = key;
+        prodComm.ht_EmailType__c = email.typeCode;
+        prodComm.ht_EmailAddress__c = email.emailAddress;
+
+        return prodComm;
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : cloneLicenseWithProducer
+     * @description     : Creates a deep copy of a base license and assigns the producer reference to it.
+     * @param baseLicense : The license to clone.
+     * @param licenseeRef : Producer reference key used to link the license to the producer.
+     * @return            : Cloned license with producer relationship assigned.
+     *********************************************************
+     */
+    private ht_License__c cloneLicenseWithProducer(ht_License__c baseLicense, String licenseeRef) {
+        ht_License__c cloned = baseLicense.clone(false, true, false, false);
+        String producerNPN;
+
+        cloned.ht_Producer__r = new ht_Producer__c(
+            ht_NPN__c = identifiersByKeyReferences.get(licenseeRef)
+        );
+
+        return cloned;
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : createLicenseRecord
+     * @description     : Constructs a License record from a NIPR InsuranceLicense DTO, 
+     *                    including metadata and Continuing Education (CE) details if present.
+     * @param insuranceLicense : The InsuranceLicense DTO from the NIPR API response.
+     * @return          : A populated ht_License__c record, or null if input is invalid.
+     *********************************************************
+     */
+    private ht_License__c createLicenseRecord(LicensingReportDTO.InsuranceLicense insuranceLicense){
+        ht_License__c license;      
+
+        LicensingReportDTO.License niprLicense = insuranceLicense?.license;
+        LicensingReportDTO.ContinuingEducation niprCE = niprLicense?.continuingEducation;
+
+        List<LicensingReportDTO.LineOfAuthority> niprLOAs = insuranceLicense?.lineOfAuthorityList;
+
+        if (insuranceLicense != null) {
+            license = new ht_License__c();
+
+            license.ht_ResidentLicenseIndicator__c = insuranceLicense.residentLicenseIndicator == null ? false : insuranceLicense.residentLicenseIndicator;
+            license.ht_QualifyingInsuranceLicenseIndicator__c = insuranceLicense.qualifyingInsuranceLicenseIndicator == null ? false: insuranceLicense.qualifyingInsuranceLicenseIndicator;
+            license.ht_TypeCode__c = insuranceLicense.typeCode;
+
+            if (niprLicense != null) {
+                license.ht_LicenseNumber__c = niprLicense.licenseNumberId;
+
+                license.ht_StartDate__c = DateUtils.safeParseDateFromString(niprLicense.startDate);
+                license.ht_EndDate__c = DateUtils.safeParseDateFromString(niprLicense.endDate);
+                license.ht_StatusCode__c = niprLicense.statusCode;
+                license.ht_StatusDescription__c = StringUtils.truncateField(niprLicense.statusDescription, 255);
+                license.ht_IssueDate__c = DateUtils.safeParseDateFromString(niprLicense.issueDate);
+                license.ht_LicenseClassCode__c = niprLicense.licenseClassCode;
+                license.ht_LicenseClassDescription__c = StringUtils.truncateField(niprLicense.licenseClassDescription, 255);
+                license.ht_StateOrProvinceCode__c = niprLicense.stateOrProvinceCode;
+                license.ht_StateOrProvinceName__c = niprLicense.stateOrProvinceName;
+                license.ht_AsOfDate__c = DateUtils.safeParseDateFromString(niprLicense.asOfDate);
+
+                if (niprCE != null) {
+                    license.ht_CEStateOrProvince_Code__c = niprCE.stateOrProvinceCode;
+                    license.ht_CEStatusDescription__c = StringUtils.truncateField(niprCE.statusDescription, 255);
+                    license.ht_CEStartDate__c = DateUtils.safeParseDateFromString(niprCE.startDate);
+                    license.ht_CEEndDate__c = DateUtils.safeParseDateFromString(niprCE.endDate);
+                    license.ht_PeriodDuration__c = !String.isBlank(niprCE.periodDuration) ? Integer.valueOf(niprCE.periodDuration) : null;
+                    license.ht_CEUnitsRequiredMeasure__c = niprCE.unitsRequiredMeasure;
+                }
+
+            }
+        }
+        
+        return license;
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : createLineOfAuthorityRecords
+     * @description     : Creates a list of Line of Authority records from a license,
+     *                    assigning each to a corresponding license number.
+     * @param insuranceLicense : License DTO with LOAs.
+     * @param licenseUniqueIdentifiers   : License numbers to which LOAs belong.
+     * @return                : List of `ht_LineOfAuthority__c` records.
+     *********************************************************
+     */
+private List<ht_LineOfAuthority__c> createLineOfAuthorityRecords(LicensingReportDTO.InsuranceLicense insuranceLicense, Set<String> licenseUniqueIdentifiers) {
+        List<ht_LineOfAuthority__c> lineOfAuthorityRecords = new List<ht_LineOfAuthority__c>();
+        List<LicensingReportDTO.LineOfAuthority> niprLOAList = insuranceLicense?.lineOfAuthorityList;
+        
+        if (niprLOAList != null && !niprLOAList.isEmpty()) {
+            for (LicensingReportDTO.LineOfAuthority niprLOA : niprLOAList) {
+                for (String licenseUniqueId : licenseUniqueIdentifiers) {
+                    ht_LineOfAuthority__c loa = createLineOfAuthority(niprLOA, licenseUniqueId);
+
+                    if (loa != null) {
+                        lineOfAuthorityRecords.add(loa);
+                    }
+                }
+            }
+        }
+
+        return lineOfAuthorityRecords;
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : createLineOfAuthority
+     * @description     : Creates a `ht_LineOfAuthority__c` record and assigns it to a license.
+     *                    Includes full metadata and CE section if present.
+     * @param niprLOA       : Line of Authority DTO from NIPR.
+     * @param licenseUniqueIdentifier : License UniqueIdentifier this LOA is related to.
+     * @return              : A populated Line of Authority record.
+     *********************************************************
+     */
+    private ht_LineOfAuthority__c createLineOfAuthority(LicensingReportDTO.LineOfAuthority niprLOA, String licenseUniqueIdentifier) {
+        ht_LineOfAuthority__c loa;
+
+        if (niprLOA != null) {
+            loa = new ht_LineOfAuthority__c();
+            
+            loa.ht_UniqueIdentifier__c = niprLOA.lineOfAuthorityCode + niprLOA.stateOrProvinceCode + StringUtils.safeParseNullString(niprLOA.issueDate) + licenseUniqueIdentifier;
+            loa.ht_License__r = new ht_License__c(ht_UniqueIdentifier__c = licenseUniqueIdentifier);
+
+            loa.ht_IssueDate__c = DateUtils.safeParseDateFromString(niprLOA.issueDate);
+            loa.ht_RenewalDate__c = DateUtils.safeParseDateFromString(niprLOA.renewalDate);
+            loa.ht_StateOrProvinceCode__c = niprLOA.stateOrProvinceCode;
+            loa.ht_StateOrProvinceName__c = niprLOA.stateOrProvinceName;
+            loa.ht_LineOfAuthorityCode__c = niprLOA.lineOfAuthorityCode;
+            loa.ht_LineOfAuthorityDescription__c = StringUtils.truncateField(niprLOA.lineOfAuthorityDescription, 255);
+            loa.ht_StatusCode__c = niprLOA.statusCode;
+            loa.ht_StatusDescription__c = niprLOA.statusDescription;
+            loa.ht_StatusReasonDescription__c = StringUTils.truncateField(niprLOA.statusReasonDescription, 255);
+            loa.ht_StatusReasonCode__c = niprLOA.statusReasonCode;
+            loa.ht_StartDate__c = DateUtils.safeParseDateFromString(niprLOA.startDate);
+
+            if (niprLOA.continuingEducation != null) {
+                loa.ht_CEStateOrProvinceCode__c = niprLOA.continuingEducation.stateOrProvinceCode;
+                loa.ht_CEStatusCode__c = niprLOA.continuingEducation.statusCode;
+                loa.ht_CEStatusDescription__c = StringUtils.truncateField(niprLOA.continuingEducation.statusDescription, 255);
+                loa.ht_CEEndDate__c = DateUtils.safeParseDateFromString(niprLOA.continuingEducation.endDate);
+                loa.ht_CEUnitsRequiredMeasure__c = niprLOA.continuingEducation.unitsRequiredMeasure;
+                loa.ht_CEUnitsRemainingMeasure__c = niprLOA.continuingEducation.unitsRemainingMeasure;
+                loa.ht_CEAsOfDate__c = DateUtils.safeParseDateFromString(niprLOA.continuingEducation.asOfDate);
+            }
+        }
+
+        return loa;
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : createLineOfAuthority
+     * @description     : Creates a simplified Line of Authority record used for
+     *                    carrier appointments (LOA attached to a carrier appointment).
+     * @param niprLOA   : Line of Authority DTO from NIPR.
+     * @return          : A partial `ht_LineOfAuthority__c` record (used internally).
+     *********************************************************
+     */
+
+    /**
+     *********************************************************
+     * @methodName      : createCarrierAppointment
+     * @description     : Creates a `ht_CarrierAppointment__c` record from a NIPR InsuranceAppointment DTO.
+     *                    Maps key fields including status, state, dates, and reason codes.
+     * @param niprAppointment : DTO object representing a carrier appointment.
+     * @return                : A populated ht_CarrierAppointment__c record.
+     *********************************************************
+     */
+    private ht_CarrierAppointment__c createCarrierAppointment(LicensingReportDTO.InsuranceAppointment niprAppointment) {
+        ht_CarrierAppointment__c carrierApp;
+
+        if (niprAppointment != null) {
+            carrierApp = new ht_CarrierAppointment__c();
+
+            carrierApp.ht_StateOrProvinceCode__c = niprAppointment.stateOrProvinceCode;
+            carrierApp.ht_StatusCode__c = niprAppointment.statusCode;
+            carrierApp.ht_StatusDescription__c = StringUtils.truncateField(niprAppointment.statusDescription, 255);
+            carrierApp.ht_StatusReasonCode__c = niprAppointment.statusReasonCode;
+            carrierApp.ht_StatusReasonDescription__c = StringUtils.truncateField(niprAppointment.statusReasonDescription, 255);
+            carrierApp.ht_AppointmentEffectiveDate__c = DateUtils.safeParseDateFromString(niprAppointment.appointmentEffectiveDate);
+            carrierApp.ht_TerminationEffectiveDate__c = DateUtils.safeParseDateFromString(niprAppointment.terminationEffectiveDate);
+            carrierapp.ht_AsOfDate__c = DateUtils.safeParseDateFromString(niprAppointment.asOfDate);
+        }
+
+        return carrierApp;
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : getRecordIdsForDeletion
+     * @description     : Given two lists of SObjects (existing and new), this method returns a set of Ids
+     *                    for records in the existing list whose unique field values do not exist in the new list.
+     * @param existingRecords   : List of existing records (from DB).
+     * @param newRecords        : List of new records (from API).
+     * @param uniqueFieldApiName : API name of the unique string field used to compare (e.g. 'ht_UniqueIdentifier__c').
+     * @return                  : Set of Ids to delete from existing records.
+     *********************************************************
+     */
+    private Set<Id> getRecordIdsForDeletion(List<SObject> existingRecords, List<SObject> newRecords, String uniqueFieldApiName) {
+        Set<String> newUniqueIdentifiers = new Set<String>();
+        Set<Id> recordIdsForDeletion = new Set<Id>();
+
+        if ((existingRecords == null || existingRecords.isEmpty()) || String.isBlank(uniqueFieldApiName)) {
+            return recordIdsForDeletion;
+        }
+
+        for (SObject record : newRecords) {
+            String val = String.valueOf(record.get(uniqueFieldApiName));
+
+            if (val != null) {
+                newUniqueIdentifiers.add(val);
+            }
+        }
+
+        for (SObject record : existingRecords) {
+            String val = String.valueOf(record.get(uniqueFieldApiName));
+
+            if (val != null && !newUniqueIdentifiers.contains(val)) {
+                recordIdsForDeletion.add(record.Id);
+            }
+        }
+
+        return recordIdsForDeletion;
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : getRecordIdsForDeletion
+     * @description     : Dynamically compares existing SObjects grouped by a key (like NPN or License Number)
+     *                    with new records and identifies which existing ones should be deleted based on unique identifiers.
+     * @param existingGroupedRecords : Map of existing SObjects grouped by a common key (e.g., NPN, License Number).
+     * @param newRecords             : Flat list of new SObjects from API.
+     * @param relationshipFieldPath : Dot notation path to reach the grouping key (e.g., 'ht_Producer__r.ht_NPN__c').
+     * @param uniqueFieldApiName    : Field to compare uniqueness on (e.g., 'ht_UniqueIdentifier__c').
+     * @return                      : Set of Ids to delete from existing records.
+     **********************************************************
+     */
+    private Set<Id> getRecordIdsForDeletion(Map<String, List<SObject>> existingGroupedRecords, List<SObject> newRecords, String relationshipFieldPath, String uniqueFieldApiName) {
+        Map<String, Set<String>> newValuesByGroup = new Map<String, Set<String>>();
+        Set<Id> recordIdsForDeletion = new Set<Id>();
+
+        if (String.isBlank(relationshipFieldPath)) {
+            return recordIdsForDeletion;
+        }
+
+        List<String> fieldPathParts = relationshipFieldPath.split('\\.');
+
+        // Loop through new records and set a map which for each parent external id (Eg. lciense number, producer npn etc...) holds the external Ids of all the records attached to that parent record
+        for (SObject newRec : newRecords) {
+            SObject parentObject = newRec.getSObject(fieldPathParts[0]);
+
+            if (parentObject != null) {
+                String groupKey = String.valueOf(parentObject.get(fieldPathParts[1]));
+                String uniqueVal = String.valueOf(newRec.get(uniqueFieldApiName));
+
+                if (!newValuesByGroup.containsKey(groupKey)) {
+                    newValuesByGroup.put(groupKey, new Set<String>());
+                }
+                
+                newValuesByGroup.get(groupKey).add(uniqueVal);
+            }
+        }   
+
+        // Loop through existing records by parent external id (Eg. LOA by License number) and make sure to compare only the 2 sets of child records that belong to the same parent
+        // Records not found in new records should be deleted since they are not there any more
+        for (String groupKey : existingGroupedRecords.keySet()) {
+            List<SObject> existingRecords = existingGroupedRecords.get(groupKey);
+            Set<String> newIdentifiers = newValuesByGroup.get(groupKey);
+
+            for (SObject record : existingRecords) {
+                String existingVal = String.valueOf(record.get(uniqueFieldApiName));
+
+                if (String.isNotBlank(existingVal) && (newIdentifiers == null || !newIdentifiers.contains(existingVal))) {
+                    recordIdsForDeletion.add(record.Id);
+                }
+            }
+        }
+
+        return recordIdsForDeletion;
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : getProducerCommunicationsByProducer
+     * @description     : Retrieves existing producer communications from Salesforce.
+     * @param producerNpns : Set of NPNs for which existing communications are fetched.
+     * @return          : Map of existing producer communications grouped by NPN.
+     *********************************************************
+     **/
+    private Map<String, List<ht_ProducerCommunication__c>> getProducerCommunicationsByProducer(Set<String> producerNpns) {
+        Map<String, List<ht_ProducerCommunication__c>> existingProducerCommsByProducer = new Map<String, List<ht_ProducerCommunication__c>>();
+
+        ProducerCommunicationSelector prodCommSelector = new ProducerCommunicationSelector();
+        List<ht_ProducerCommunication__c> existingProducerComms = prodCommSelector.getProducerCommsByProducerNPNs(producerNpns);
+
+        for (ht_ProducerCommunication__c producerComm : existingProducerComms) {
+            if (existingProducerCommsByProducer.containsKey(producerComm.ht_Producer__r.ht_NPN__c)) {
+                existingProducerCommsByProducer.get(producerComm.ht_Producer__r.ht_NPN__c).add(producerComm);
+
+                continue;
+            }
+
+            existingProducerCommsByProducer.put(producerComm.ht_Producer__r.ht_NPN__c, new List<ht_ProducerCommunication__c> { producerComm });
+        }
+
+        return existingProducerCommsByProducer;
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : getProducerAddressesByProducer
+     * @description     : Retrieves existing producer addresses from Salesforce.
+     * @param producerNpns : Set of NPNs for which existing addresses are fetched.
+     * @return          : Map of existing producer addresses grouped by NPN.
+     *********************************************************
+     **/
+    private Map<String, List<ht_ProducerAddress__c>> getProducerAddressesByProducer(Set<String> producerNpns) {
+        Map<String, List<ht_ProducerAddress__c>> existingProducerAddressesByProducer = new Map<String, List<ht_ProducerAddress__c>>();
+
+        ProducerAddressSelector prodAddressSelector = new ProducerAddressSelector();
+        List<ht_ProducerAddress__c> existingProducerAddresses = prodAddressSelector.getProducerAddressByProducerNPNs(producerNpns);
+
+        for (ht_ProducerAddress__c producerAddr : existingProducerAddresses) {
+            if (existingProducerAddressesByProducer.containsKey(producerAddr.ht_Producer__r.ht_NPN__c)) {
+                existingProducerAddressesByProducer.get(producerAddr.ht_Producer__r.ht_NPN__c).add(producerAddr);
+
+                continue;
+            }
+
+            existingProducerAddressesByProducer.put(producerAddr.ht_Producer__r.ht_NPN__c, new List<ht_ProducerAddress__c> { producerAddr });
+        }
+
+        return existingProducerAddressesByProducer;
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : getLicensesByProducer
+     * @description     : Retrieves existing licenses from Salesforce grouped by producer NPN.
+     * @param producerNpns : Set of producer NPNs.
+     * @return           : Map of license records grouped by NPN.
+     *********************************************************
+     */
+    private Map<String, List<ht_License__c>> getLicensesByProducer(Set<String> producerNpns) {
+        Map<String, List<ht_License__c>> existingLicensesByProducer = new Map<String, List<ht_License__c>>();
+
+        LicenseSelector licenseSelector = new LicenseSelector();
+        List<ht_License__c> existingLicenses = licenseSelector.getLicensesByProducerNpn(producerNpns);
+
+        for (ht_License__c license : existingLicenses) {
+            if (existingLicensesByProducer.containsKey(license.ht_Producer__r.ht_NPN__c)) {
+                existingLicensesByProducer.get(license.ht_Producer__r.ht_NPN__c).add(license);
+
+                continue;
+            }
+
+            existingLicensesByProducer.put(license.ht_Producer__r.ht_NPN__c, new List<ht_License__c> { license });
+        }
+
+        return existingLicensesByProducer;
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : getCarrierAppointmentsByProducer
+     * @description     : Retrieves existing carrier appointments from Salesforce grouped by producer NPN.
+     * @param producerNpns : Set of producer NPNs.
+     * @return           : Map of carrier appointments grouped by NPN.
+     *********************************************************
+     */
+    private Map<String, List<ht_CarrierAppointment__c>> getCarrierAppointmentsByProducer(Set<String> producerNpns) {
+        Map<String, List<ht_CarrierAppointment__c>> existingCarrierApoointmentsByProducer = new Map<String, List<ht_CarrierAppointment__c>>();
+
+        CarrierAppointmentSelector carrierAppSelector = new CarrierAppointmentSelector();
+        List<ht_CarrierAppointment__c> existingCarrierApoointments = carrierAppSelector.getCarrierAppointmentsByProducerNpn(producerNpns);
+
+        for (ht_CarrierAppointment__c carApp : existingCarrierApoointments) {
+            if (existingCarrierApoointmentsByProducer.containsKey(carApp.ht_Producer__r.ht_NPN__c)) {
+                existingCarrierApoointmentsByProducer.get(carApp.ht_Producer__r.ht_NPN__c).add(carApp);
+
+                continue;
+            }
+
+            existingCarrierApoointmentsByProducer.put(carApp.ht_Producer__r.ht_NPN__c, new List<ht_CarrierAppointment__c> { carApp });
+        }
+
+        return existingCarrierApoointmentsByProducer;
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : getLOAByUniqueIdentifier
+     * @description     : Retrieves existing Lines of Authority from Salesforce based on license numbers.
+     * @param licenseUniqueIdentifiers : Set of external license numbers.
+     * @return          : Map of existing LOAs grouped by license number.
+     *********************************************************
+     */
+    private Map<String, List<ht_LineOfAuthority__c>> getLOAByUniqueIdentifier(Set<String> licenseUniqueIdentifiers) {
+        Map<String, List<ht_LineOfAuthority__c>> existingLOAByLicNum = new Map<String, List<ht_LineOfAuthority__c>>();
+
+        LineOfAuthoritySelector LOASelector = new LineOfAuthoritySelector();
+        List<ht_LineOfAuthority__c> existingLOA = LOASelector.getLOAByUniqueIdentifier(licenseUniqueIdentifiers);
+
+        for (ht_LineOfAuthority__c loa : existingLOA) {
+            if (existingLOAByLicNum.containsKey(loa.ht_License__r.ht_UniqueIdentifier__c)) {
+                existingLOAByLicNum.get(loa.ht_License__r.ht_UniqueIdentifier__c).add(loa);
+
+                continue;
+            }
+
+            existingLOAByLicNum.put(loa.ht_License__r.ht_UniqueIdentifier__c, new List<ht_LineOfAuthority__c> { loa });
+        }
+
+        return existingLOAByLicNum;
+        
+    }
+
+
+    /**
+     *********************************************************
+     * @methodName      : getNiprAddressesByAddressKey
+     * @description     : Creates a map out of Nipr addresses and their address keys
+     * @param niprAddresses : List of DTO classes representing NIPR Address
+     * @return niprAddresses: Map of existing producer addresses grouped by their address keys
+     *********************************************************
+     **/
+    private Map<String, LicensingReportDTO.Address> getNiprAddressesByAddressKey(List<LicensingReportDTO.Address> niprAddresses) {
+        Map<String, LicensingReportDTO.Address> addressesByAddressKey = new Map<String, LicensingReportDTO.Address>();
+
+        if (niprAddresses == null || niprAddresses.isEmpty()) {
+            return addressesByAddressKey;
+        }
+
+        for (LicensingReportDTO.Address address : niprAddresses) {
+            addressesByAddressKey.put(address.key, address);
+        }
+
+        return addressesByAddressKey;
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : setNIPREntityIdentifierByReferenceKey
+     * @description     : Sets a map entry of NIPR reference keys to Person/Organization NPNs and Organization CoCodes for quick lookup.
+     *                  : This method stores all unique identifiers(external ids) for all agents/agencies and carriers by their nipr reference keys
+     * @return          : Map of reference keys to agent/agency NPNs/carrier CoCodes
+     *********************************************************
+     */
+    private void setNIPREntityIdentifierByReferenceKey(LicensingReportDTO.NIPREntity niprEntity) {
+        for (String key : niprEntity.combinedKeys) {
+            identifiersByKeyReferences.put(key, niprEntity.mainIdentifier);
+        }
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : setNIPREntityIdentifierByReferenceKeyForCarriers
+     * @description     : Sets a map entry of NIPR reference keys Carrier CoCode + Fein combination for quick lookup.
+     *                  : This method stores all unique identifiers(external ids) for all carriers by their nipr reference keys
+     * @return          : Map of reference keys carrier CoCodes
+     *********************************************************
+     */
+    private void setNIPREntityIdentifierByReferenceKeyForCarriers(LicensingReportDTO.Organization niprEntity) {
+        for (String key : niprEntity.combinedKeys) {
+            String mainIdentifier = '';
+            String coCode = '';
+            String feinId = '';
+
+            for (LicensingReportDTO.ExternalIdentifier extId : niprEntity.externalIdentifierList) {
+                if (extId.typeCode == 'NAICInsurerCode') {
+                    coCode = extId.id;
+                } else if (extId.typeCode == 'FEINId') {
+                    feinId = extId.id;
+                }
+            }
+            
+            mainIdentifier += coCode + '-' + feinId;
+
+            identifiersByKeyReferences.put(key, mainIdentifier);
+        }
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : getEligibleLicensesForDeletionByProducersAndStates
+     * @description     : Wrapper method that queries licenses for producer+state combinations
+     *                    that have license data in the NIPR payload. Only these licenses are
+     *                    eligible for deletion via delta comparison.
+     * @param eligibleLicensesMap : Map of producer key reference -> states with license data.
+     * @return          : Map of licenses grouped by producer NPN, filtered to eligible pairs only.
+     *********************************************************
+     */
+    private Map<String, List<ht_License__c>> getEligibleLicensesForDeletionByProducersAndStates(
+        Map<String, Set<String>> eligibleLicensesMap
+    ) {
+        return getEligibleRecordsForDeletionByProducersAndStates(
+            eligibleLicensesMap,
+            'License'
+        );
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : getEligibleCarrierAppointmentsForDeletionByProducersAndStates
+     * @description     : Wrapper method that queries carrier appointments for producer+state combinations
+     *                    that have appointment data in the NIPR payload. Only these appointments are
+     *                    eligible for deletion via delta comparison.
+     * @param eligibleAppointmentsMap : Map of producer key reference -> states with appointment data.
+     * @return          : Map of carrier appointments grouped by producer NPN, filtered to eligible pairs only.
+     *********************************************************
+     */
+    private Map<String, List<ht_CarrierAppointment__c>> getEligibleCarrierAppointmentsForDeletionByProducersAndStates(
+        Map<String, Set<String>> eligibleAppointmentsMap
+    ) {
+        return getEligibleRecordsForDeletionByProducersAndStates(
+            eligibleAppointmentsMap,
+            'CarrierAppointment'
+        );
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : getEligibleRecordsForDeletionByProducersAndStates
+     * @description     : Generic method that queries licenses or carrier appointments for specific
+     *                    producer+state combinations, then filters results to only include records
+     *                    where the producer+state pair is eligible (has data in NIPR payload).
+     *                    This prevents deletion of records when NIPR payload contains no data for that state.
+     * @param eligibleRecordsMap : Map of producer key reference -> states that have data in payload.
+     * @param recordType : Type of record to query ('License' or 'CarrierAppointment').
+     * @return          : Map of records grouped by producer NPN, filtered to eligible pairs only.
+     *********************************************************
+     */
+    private Map<String, List<SObject>> getEligibleRecordsForDeletionByProducersAndStates(
+        Map<String, Set<String>> eligibleRecordsMap,
+        String recordType
+    ) {
+        // Build sets of NPNs and states from eligible records map
+        Set<String> producerNpns = new Set<String>();
+        Set<String> states = new Set<String>();
+
+        for (String producerKeyRef : eligibleRecordsMap.keySet()) {
+            String npn = identifiersByKeyReferences.get(producerKeyRef);
+
+            if (npn != null) {
+                producerNpns.add(npn);
+                states.addAll(eligibleRecordsMap.get(producerKeyRef));
+            }
+        }
+
+        // If no eligible records, return empty map
+        if (producerNpns.isEmpty() || states.isEmpty()) {
+            return new Map<String, List<SObject>>();
+        }
+
+        // Query all records for these producer+state combinations
+        List<SObject> queriedRecords;
+        if (recordType == 'License') {
+            LicenseSelector licenseSelector = new LicenseSelector();
+            queriedRecords = licenseSelector.getLicensesByProducerNpnAndStates(producerNpns, states);
+        } else if (recordType == 'CarrierAppointment') {
+            CarrierAppointmentSelector carrierAppSelector = new CarrierAppointmentSelector();
+            queriedRecords = carrierAppSelector.getCarrierAppointmentsByProducerNpnAndStates(producerNpns, states);
+        } else {
+            return new Map<String, List<SObject>>();
+        }
+
+
+        // Filter queried records to only include those in eligible producer+state pairs
+        List<SObject> filteredRecords = filterRecordsByEligiblePairs(queriedRecords, eligibleRecordsMap);
+
+        // Group filtered records by producer NPN
+        Map<String, List<SObject>> recordsByProducer = new Map<String, List<SObject>>();
+        for (SObject record : filteredRecords) {
+            SObject producerRelation = record.getSObject('ht_Producer__r');
+            String npn = String.valueOf(producerRelation.get('ht_NPN__c'));
+
+            if (!recordsByProducer.containsKey(npn)) {
+                recordsByProducer.put(npn, new List<SObject>());
+            }
+            recordsByProducer.get(npn).add(record);
+        }
+
+
+        return recordsByProducer;
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : filterRecordsByEligiblePairs
+     * @description     : Filters a list of queried records to only include those where the
+     *                    producer+state combination exists in the eligible map.
+     * @param queriedRecords : All records queried from database.
+     * @param eligibleRecordsMap : Map of producer key reference -> eligible states.
+     * @return          : Filtered list of records.
+     *********************************************************
+     */
+    private List<SObject> filterRecordsByEligiblePairs(
+        List<SObject> queriedRecords,
+        Map<String, Set<String>> eligibleRecordsMap
+    ) {
+        List<SObject> filteredRecords = new List<SObject>();
+
+        for (SObject record : queriedRecords) {
+            if (isRecordEligible(record, eligibleRecordsMap)) {
+                filteredRecords.add(record);
+            }
+        }
+
+        return filteredRecords;
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : isRecordEligible
+     * @description     : Checks if a specific record's producer+state combination exists
+     *                    in the eligible map (meaning it has data in NIPR payload).
+     *                    Uses O(1) map lookups instead of looping.
+     * @param record : The record to check.
+     * @param eligibleRecordsMap : Map of producer key reference -> eligible states.
+     * @return          : True if record is eligible for deletion logic, false otherwise.
+     *********************************************************
+     */
+    private Boolean isRecordEligible(
+        SObject record,
+        Map<String, Set<String>> eligibleRecordsMap
+    ) {
+
+        SObject producerRelation = record.getSObject('ht_Producer__r');
+        String npn = String.valueOf(producerRelation.get('ht_NPN__c'));
+        String state = String.valueOf(record.get('ht_StateOrProvinceCode__c'));
+
+        // Find the producer key reference for this NPN - O(1) lookup
+        String producerKeyRef = null;
+        for (String keyRef : identifiersByKeyReferences.keySet()) {
+            if (identifiersByKeyReferences.get(keyRef) == npn) {
+                producerKeyRef = keyRef;
+                break;
+            }
+        }
+
+        if (producerKeyRef == null) {
+            return false;
+        }
+
+        // O(1) map lookup + O(1) Set.contains() check
+        Set<String> eligibleStates = eligibleRecordsMap.get(producerKeyRef);
+        return eligibleStates != null && eligibleStates.contains(state);
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : syncNIPRDataWithSalesforce
+     * @description     : Handles all the DML operations in a single location. Deletes old records,
+     *                      upserts new or updated producers, licenses, appointments, LOAs, etc.
+     *                      Logs CPU and heap usage for debug purposes. Uses DMLExecutor queueable
+     *                      to safely handle large record volumes via batched and chained execution.
+     *********************************************************
+     */
+    private void syncNIPRDataWithSalesforce() {
+        String methodName = 'syncNIPRDataWithSalesforce';
+    
+        // Deduplicate all upsert lists by their unique external ID field(For edge cases, when NIPR sends the same address twice for the same agent for example)
+
+        ListUtils.deduplicateByField(producers, 'ht_NPN__c');
+        ListUtils.deduplicateByField(producerCommunications, 'ht_UniqueIdentifier__c');
+        ListUtils.deduplicateByField(producerAddresses, 'ht_UniqueIdentifier__c');
+        ListUtils.deduplicateByField(carriers, 'ht_UniqueIdentifier__c');
+        ListUtils.deduplicateByField(licenses, 'ht_UniqueIdentifier__c');
+        ListUtils.deduplicateByField(linesOfAuthority, 'ht_UniqueIdentifier__c');
+        ListUtils.deduplicateByField(carrierAppointments, 'ht_UniqueIdentifier__c');
+
+        // Log after deduplication
+        String upsertDetails =
+            'Producers: ' + producers.size() + '\n' +
+            'Producer Communications: ' + producerCommunications.size() + '\n' +
+            'Producer Addresses: ' + producerAddresses.size() + '\n' +
+            'Carriers: ' + carriers.size() + '\n' +
+            'Licenses: ' + licenses.size() + '\n' +
+            'License LOAs: ' + linesOfAuthority.size() + '\n' +
+            'Carrier Appointments: ' + carrierAppointments.size();
+    
+        Logger.info(CLASS_NAME, methodName, CorrelationIdUtils.formatLogMessage('Records prepared for upsert'),
+            'CorrelationId: ' + CorrelationIdUtils.getCurrentCorrelationId() + ' | ' + upsertDetails, null);
+
+        // Chained DML upserts
+        DMLExecutor carrierAppointmentUpsert = new DMLExecutor(
+            carrierAppointments,
+            ht_CarrierAppointment__c.ht_UniqueIdentifier__c,
+            null,
+            CLASS_NAME
+        );
+    
+        DMLExecutor loaUpsert = new DMLExecutor(
+            linesOfAuthority,
+            ht_LineOfAuthority__c.ht_UniqueIdentifier__c,
+            carrierAppointmentUpsert,
+            CLASS_NAME
+        );
+    
+        DMLExecutor licenseUpsert = new DMLExecutor(
+            licenses,
+            ht_License__c.ht_UniqueIdentifier__c,
+            loaUpsert,
+            CLASS_NAME
+        );
+    
+        DMLExecutor carrierUpsert = new DMLExecutor(
+            carriers,
+            ht_Carrier__c.ht_UniqueIdentifier__c,
+            licenseUpsert,
+            CLASS_NAME
+        );
+    
+        DMLExecutor producerAddrUpsert = new DMLExecutor(
+            producerAddresses,
+            ht_ProducerAddress__c.ht_UniqueIdentifier__c,
+            carrierUpsert,
+            CLASS_NAME
+        );
+    
+        DMLExecutor producerCommsUpsert = new DMLExecutor(
+            producerCommunications,
+            ht_ProducerCommunication__c.ht_UniqueIdentifier__c,
+            producerAddrUpsert,
+            CLASS_NAME
+        );
+    
+        DMLExecutor producerUpsert = new DMLExecutor(
+            producers,
+            ht_Producer__c.ht_NPN__c,
+            producerCommsUpsert,
+            CLASS_NAME
+        );
+
+        // Consolidate record counts in a single detailed log
+        String deletionDetails =
+            'Producer Communications: ' + producerCommunicationIdsForDeletion.size() + '\n' +
+            'Producer Addresses: ' + producerAddressIdsForDeletion.size() + '\n' +
+            'Licenses: ' + licenseIdsForDeletion.size() + '\n' +
+            'License LOAs: ' + licenseLineOfAuthorityIdsForDeletion.size() + '\n' +
+            'Carrier Appointments: ' + carrierAppointmentIdsForDeletion.size();
+    
+        Logger.info(CLASS_NAME, methodName, CorrelationIdUtils.formatLogMessage('Records identified for deletion'),
+            'CorrelationId: ' + CorrelationIdUtils.getCurrentCorrelationId() + ' | ' + deletionDetails, null);
+
+        // Start the tail as the upsert head; deletes will chain *before* this
+        Queueable tail = producerUpsert;
+
+        tail = new DMLExecutor(new List<Id>(carrierAppointmentIdsForDeletion), tail, CLASS_NAME);
+        tail = new DMLExecutor(new List<Id>(licenseIdsForDeletion), tail, CLASS_NAME);
+        tail = new DMLExecutor(new List<Id>(licenseLineOfAuthorityIdsForDeletion), tail, CLASS_NAME);
+        tail = new DMLExecutor(new List<Id>(producerAddressIdsForDeletion), tail, CLASS_NAME);
+        tail = new DMLExecutor(new List<Id>(producerCommunicationIdsForDeletion), tail, CLASS_NAME);
+
+        Logger.info(CLASS_NAME, methodName, CorrelationIdUtils.formatLogMessage('Completed synchronous DML operations for test'),
+        'CorrelationId: ' + CorrelationIdUtils.getCurrentCorrelationId() +
+        ' | Heap Size: ' + Limits.getHeapSize() + ' bytes | CPU Usage: ' + Limits.getCpuTime() + ' ms', null);
+
+        if (!Test.isRunningTest()) {
+            Logger.info(CLASS_NAME, methodName, CorrelationIdUtils.formatLogMessage('Starting chained DML operations'),
+                'CorrelationId: ' + CorrelationIdUtils.getCurrentCorrelationId() +
+                ' | First operation: Delete ' + allIdsToDelete.size() + ' records', null);
+
+            AsyncOptions asyncOptions = new AsyncOptions();
+            asyncOptions.MaximumQueueableStackDepth = 50;
+    
+            System.enqueueJob(tail, asyncOptions);
+            
+            return;
+        }
+    
+        importDataForApexTest();
+    }
+
+    // Private method that does DML synchronously so we can test our records
+    private void importDataForApexTest() {
+        Database.delete(new List<Id>(producerCommunicationIdsForDeletion));
+        Database.delete(new List<Id>(producerAddressIdsForDeletion));
+        Database.delete(new List<Id>(licenseLineOfAuthorityIdsForDeletion));
+        Database.delete(new List<Id>(licenseIdsForDeletion));
+        Database.delete(new List<Id>(carrierAppointmentIdsForDeletion));
+
+        Database.upsert(producers, ht_Producer__c.ht_NPN__c, true);
+        Database.upsert(producerCommunications, ht_ProducerCommunication__c.ht_UniqueIdentifier__c, true);
+        Database.upsert(producerAddresses, ht_ProducerAddress__c.ht_UniqueIdentifier__c, true);
+        Database.upsert(carriers, ht_Carrier__c.ht_CoCode__c, true);
+        Database.upsert(licenses, ht_License__c.ht_UniqueIdentifier__c, true);
+        Database.upsert(linesOfAuthority, ht_LineOfAuthority__c.ht_UniqueIdentifier__c, true);
+        Database.upsert(carrierAppointments, ht_CarrierAppointment__c.ht_UniqueIdentifier__c, true);
+    }
+
+    public class PDBAlertReportException extends Exception {} 
+}

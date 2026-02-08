@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSetGroup xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Read-only access to NIPR data with API callout permissions</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>NIPR Read Only User</label>
+    <permissionSets>niprsync__NIPR_View_NIPR_Data</permissionSets>
+    <permissionSets>niprsync__ht_NIPR_API_Callout</permissionSets>
+    <status>Updated</status>
+</PermissionSetGroup>

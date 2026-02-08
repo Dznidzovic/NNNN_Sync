@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ht_NPNStatus__c</fullName>
+    <externalId>false</externalId>
+    <formula>IF(
+    ISBLANK(ht_NPN__c) || ISBLANK(ht_Producer__c),
+    &quot;&quot;,
+
+    IF(
+        ISBLANK(TEXT(ht_Producer__r.ht_NPNStatus__c)),
+        &quot;🔘 Not Synced&quot;,
+
+        CASE(
+            TEXT(ht_Producer__r.ht_NPNStatus__c),
+            &quot;Processing&quot;, &quot;🟠 Processing&quot;,
+            &quot;Invalid NPN&quot;, &quot;🔴 Invalid NPN&quot;,
+            &quot;Sync Disabled&quot;, &quot;⛔ Sync Disabled&quot;,
+            &quot;Active&quot;,
+                IF(
+                    ISPICKVAL(ht_Producer__r.ht_Type__c, &apos;Agency&apos;),
+                    &quot;🟢 Active&quot;,
+                    &quot;🔴 Error&quot;
+                ),
+            &quot;🔴 Error&quot;
+        )
+    )
+)</formula>
+    <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+    <label>NPN Status</label>
+    <required>false</required>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

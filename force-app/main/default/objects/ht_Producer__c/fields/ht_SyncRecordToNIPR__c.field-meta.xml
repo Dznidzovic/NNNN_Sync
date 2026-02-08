@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ht_SyncRecordToNIPR__c</fullName>
+    <label>Sync Record To NIPR</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>On</fullName>
+                <default>true</default>
+                <label>On</label>
+            </value>
+            <value>
+                <fullName>Off</fullName>
+                <default>false</default>
+                <label>Off</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

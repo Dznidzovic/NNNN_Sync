@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ht_ExcludeCarrierAppointments__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>Indicates whether this subscription excludes carrier appointments. Subscriptions with this flag set to true will only receive licensing alerts from NIPR and will only contain producers with the Exclude Carrier Appointments flag enabled.</description>
+    <label>Exclude Carrier Appointments</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>
