@@ -161,6 +161,29 @@ The codebase follows a strict layered architecture:
 
 **Status**: Planning Complete | Implementation Pending
 
+### ⚠️ CRITICAL: Repository-Only Refactoring Workflow
+
+**ALL CHANGES HAPPEN EXCLUSIVELY IN THE REPOSITORY - NOT IN SALESFORCE ORG**
+
+**Workflow**:
+1. ✅ Make ALL metadata/code changes in local repository
+2. ✅ Update all references as we go (step-by-step)
+3. ✅ Test locally that all files are consistent
+4. ✅ Commit changes incrementally to git
+5. ✅ ONLY THEN deploy everything to fresh new org
+
+**Deployment Strategy**:
+- Do NOT deploy to NIPR DEV org during refactoring
+- Refactor the entire repo first
+- Deploy ALL changes at once to a fresh org when complete
+- This ensures clean state without dealing with org-level constraints
+
+**Step-by-Step Execution**:
+- User directs each change
+- Claude performs ONLY what user requests
+- After each critical change, we update all references together
+- This prevents forgetting to update related files
+
 ### Change 1: Many-to-Many Relationships
 
 #### Current State (Before Refactoring)
@@ -257,6 +280,51 @@ Fields:
 - ✅ Improved performance
 - ✅ Easier configuration management
 - ✅ Cleaner UI/UX for admins
+
+---
+
+### Change 4: Object Renaming (Phase 2.5)
+
+**Purpose**: Rename core objects for better clarity and flexibility
+
+**Objects to Rename**:
+1. **Producer → Entity**: `d4c_Producer__c` → `d4c_Entity__c` (Label: "NIPR Entity")
+2. **ProducerAddress → NIPR_Address**: `d4c_ProducerAddress__c` → `d4c_NIPR_Address__c` (Label: "NIPR Address")
+3. **ProducerCommunication → NIPR_Communication**: `d4c_ProducerCommunication__c` → `d4c_NIPR_Communication__c` (Label: "NIPR Communication")
+4. **Logger → Log**: `d4c_Logger__c` → `d4c_Log__c` (Label: "NIPR Log")
+
+**Reason**: "Entity" is more flexible for future expansion (carriers, MGAs), and "Log" is clearer than "Logger"
+
+**Impact**:
+- 72+ Apex classes need updates
+- All layouts, permission sets, tabs, translations
+- Test classes
+- Triggers
+
+---
+
+### Change 5: Named Credentials Renaming
+
+**Purpose**: Update named credential labels for better clarity
+
+**Named Credential 1**: NIPR Entity Info API
+- **API Name**: `NIPR_EntityInfo_API` (NO CHANGE)
+- **Label**: "NIPR Entity Info API" ✅ (already correct)
+- **External Credential**: `NIPR_API` (NO CHANGE)
+- **Used in**: `RetrieveEntityInfoApiData.cls`
+
+**Named Credential 2**: NIPR PDB Alerts API
+- **API Name**: `NIPR_API` (NO CHANGE)
+- **Current Label**: "NIPR API" ❌
+- **New Label**: "NIPR PDB Alerts API" ✅
+- **External Credential**: `NIPR_API` (NO CHANGE)
+- **Used in**: `CreateSubscription.cls`, `AddNPNToSubscription.cls`, `RetrievePDBSpecificReportData.cls`, `RemoveNPNFromSubscription.cls`
+
+**Important**: Only the **label** changes, not the API name. **No code changes required** since code references the API name which remains `NIPR_API`.
+
+**File to Update**:
+- `force-app/main/default/namedCredentials/NIPR_API.namedCredential-meta.xml`
+  - Change `<label>` from "NIPR API" to "NIPR PDB Alerts API"
 
 ---
 
