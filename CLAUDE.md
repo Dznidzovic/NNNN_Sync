@@ -155,6 +155,139 @@ The codebase follows a strict layered architecture:
 
 **External ID Strategy**: All NIPR objects use external IDs (e.g., ht_NPN__c) for upserts. This enables idempotent operations and simplifies data synchronization.
 
+---
+
+## 🔄 Data Model Refactoring (Phase 1 - Updated 2026-02-09)
+
+**Status**: Planning Complete | Implementation Pending
+
+### Change 1: Many-to-Many Relationships
+
+#### Current State (Before Refactoring)
+- `ht_ProducerAddress__c` - Master-Detail to Producer (non-reparentable)
+- `ht_ProducerCommunication__c` - Master-Detail to Producer (reparentable)
+- Each address/communication belongs to exactly ONE producer
+
+#### Target State (After Refactoring)
+- `ht_ProducerAddress__c` - **Standalone object** (no parent relationship)
+- `ht_ProducerCommunication__c` - **Standalone object** (no parent relationship)
+
+**NEW Junction Objects** (2):
+1. **`ht_Producer_Address_Junction__c`**
+   - Master-Detail to `ht_Producer__c`
+   - Master-Detail to `ht_ProducerAddress__c`
+   - External ID: `ht_UniqueIdentifier__c` (Producer NPN + Address UniqueIdentifier)
+   - Enables many-to-many: One address shared by multiple producers
+
+2. **`ht_Producer_Communication_Junction__c`**
+   - Master-Detail to `ht_Producer__c`
+   - Master-Detail to `ht_ProducerCommunication__c`
+   - External ID: `ht_UniqueIdentifier__c` (Producer NPN + Communication UniqueIdentifier)
+   - Enables many-to-many: One communication shared by multiple producers
+
+**Benefits**:
+- ✅ Reduces database clutter (no duplicate addresses/communications)
+- ✅ Natural deduplication via External IDs
+- ✅ **Future-ready**: Same pattern will be used for Carrier → Address and Carrier → Communication when carrier sync is added
+
+**⚠️ Note**: Carrier junctions will be implemented in future phase when carrier sync code is added.
+
+---
+
+### Change 2: Remove LOA Mapping Objects
+
+The following 4 objects are being **completely removed** from the product:
+
+#### Objects to DELETE
+1. ❌ `ht_LOA_Insurance_Product_Mapping__c` - LOA mapping configuration
+2. ❌ `ht_Insurance_Product_LOA_Mapping__c` - Junction (LOA mapping to products)
+3. ❌ `ht_Insurance_Product__c` - Insurance product reference data
+4. ❌ `ht_License_Insurance_Product__c` - Junction (license to products)
+
+#### Objects to MODIFY
+**`ht_LineOfAuthority__c`** - KEEP this object (it's NIPR data)
+- Remove field: `ht_LOAMapping__c` (Lookup to deleted mapping object)
+- Remove field: `ht_IsProductMatched__c` (Boolean)
+- All other fields remain
+
+**`ht_License__c`** - Remove calculated fields:
+- Remove: `ht_NumberOfProductMatchedLOAs__c`
+- Remove: `ht_NumberOfProductNotMatchedLOAs__c`
+- Remove: `ht_AllLOAsMatchedToProduct__c`
+- Remove: `ht_License_Products__c` (LongTextArea)
+
+#### Permission Sets to Update
+- **NIPR_View_NIPR_Data** - Remove read access to 4 deleted objects
+- **ht_NIPR_Admin_Access** - Remove full CRUD access to 4 deleted objects
+
+**Reason for Removal**: Simplifying the product by removing LOA-to-product mapping feature entirely.
+
+---
+
+### Change 3: Consolidate Custom Metadata Types
+
+#### Current State (5 metadata types)
+1. `ht_NIPRLogger__mdt` - Debug logging control
+2. `ht_NIPRTestXMLResponse__mdt` - Test XML for debugging
+3. `ht_NIPR_Subsciption_NPN_Count__mdt` - Max NPNs per subscription
+4. `ht_NIPR_Subscription_Email__mdt` - Subscription email
+5. `ht_Trigger_Dispatcher_Settings__mdt` - Trigger enable/disable (KEEP)
+
+#### Target State (2 metadata types)
+
+**NEW**: `ht_NIPR_Sync_Settings__mdt` - Single consolidated settings object
+
+Fields:
+- `ht_EnableDebugging__c` (Checkbox) - From NIPRLogger
+- `ht_MaxNPNCountPerSubscription__c` (Number) - From NIPR_Subsciption_NPN_Count
+- `ht_SubscriptionEmail__c` (Email) - From NIPR_Subscription_Email
+- `ht_TestXMLActive__c` (Checkbox) - From NIPRTestXMLResponse
+- `ht_TestXMLData__c` (LongTextArea) - From NIPRTestXMLResponse
+
+**KEEP**: `ht_Trigger_Dispatcher_Settings__mdt` - Separate (framework-level config)
+
+#### Metadata Types to DELETE
+- ❌ `ht_NIPRLogger__mdt`
+- ❌ `ht_NIPRTestXMLResponse__mdt`
+- ❌ `ht_NIPR_Subsciption_NPN_Count__mdt`
+- ❌ `ht_NIPR_Subscription_Email__mdt`
+
+**Benefits**:
+- ✅ Single metadata query instead of 4 separate queries
+- ✅ Improved performance
+- ✅ Easier configuration management
+- ✅ Cleaner UI/UX for admins
+
+---
+
+### Implementation Status
+
+**Phase 1 - Metadata Changes**:
+- [ ] Create junction objects (Producer → Address, Producer → Communication)
+- [ ] Remove Master-Detail fields from ProducerAddress/Communication
+- [ ] Delete 4 LOA mapping objects
+- [ ] Remove fields from LineOfAuthority and License
+- [ ] Update 2 permission sets
+- [ ] Create consolidated NIPR_Sync_Settings__mdt
+- [ ] Delete 4 old metadata types
+- [ ] Update layouts and flexipages
+
+**Phase 2 - Naming Conventions** (Next):
+- Rename objects to follow consistent conventions
+- Rename fields to follow consistent conventions
+- Update all metadata references
+
+**Phase 3 - Code Refactoring** (Future):
+- Remove code referencing deleted LOA mapping objects
+- Update code to use new junction objects
+- Update MetadataTypeSelector for consolidated settings
+- Update service classes
+- Update test classes
+
+**Detailed plan**: See `/Users/stefannidzovic/.claude/plans/logical-mapping-tarjan.md`
+
+---
+
 ### Key Business Flows
 
 **Producer Import Flow**:
