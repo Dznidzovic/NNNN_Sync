@@ -35,8 +35,8 @@ public without sharing class Logger {
         get {
             if (enableSystemDebug == null) {
                 try {
-                    d4c_NIPRLogger__mdt loggerConfig = metadataSelector.getLoggerConfig();
-                    enableSystemDebug = loggerConfig.d4c_EnableDebugging__c;
+                    d4c_NIPR_Sync_Settings__mdt settings = metadataSelector.getNIPRSyncSettings();
+                    enableSystemDebug = settings.d4c_EnableDebugging__c;
                 } catch (Exception ex) {
                     // If metadata query fails, default to true for safety
                     enableSystemDebug = true;

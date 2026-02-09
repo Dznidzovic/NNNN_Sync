@@ -244,7 +244,7 @@ public virtual with sharing class SubscriptionService {
      *********************************************************
      **/
     private void loadMaxProducersPerSubscription() {
-        Decimal maxCount = mtdSelector.getNIPRNPNSubMaxCount()?.d4c_MAX_NPN_Count__c;
+        Decimal maxCount = mtdSelector.getNIPRSyncSettings()?.d4c_MaxNPNCountPerSubscription__c;
         if (!Test.isRunningTest()) {
             MAX_PRODUCERS_PER_SUBSCRIPTION = maxCount != null ? Integer.valueOf(maxCount) : MAX_PRODUCERS_PER_SUBSCRIPTION;
         }

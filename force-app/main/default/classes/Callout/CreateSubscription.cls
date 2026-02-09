@@ -22,8 +22,8 @@ public with sharing class CreateSubscription {
     private final MetadataTypeSelector mtdSelector = new MetadataTypeSelector();
 
     public CreateSubscription() {
-        d4c_NIPR_Subscription_Email__mdt subEmail = mtdSelector.getNIPRSubscriptionEmail();
-        SUBSCRIPTION_EMAIL = subEmail?.d4c_Email__c != null ? subEmail.d4c_Email__c : SUBSCRIPTION_EMAIL;
+        d4c_NIPR_Sync_Settings__mdt settings = mtdSelector.getNIPRSyncSettings();
+        SUBSCRIPTION_EMAIL = settings?.d4c_SubscriptionEmail__c != null ? settings.d4c_SubscriptionEmail__c : SUBSCRIPTION_EMAIL;
     }
 
     /**

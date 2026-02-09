@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>NIPR Global Settings</label>
+    <protected>false</protected>
+    <values>
+        <field>d4c_EnableDebugging__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>d4c_MaxNPNCountPerSubscription__c</field>
+        <value xsi:type="xsd:double">350.0</value>
+    </values>
+    <values>
+        <field>d4c_SubscriptionEmail__c</field>
+        <value xsi:type="xsd:string">stefan.nidzovic@hipten.com</value>
+    </values>
+    <values>
+        <field>d4c_TestXMLActive__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>d4c_TestXMLData__c</field>
+        <value xsi:type="xsd:string">----- DO NOT ACTIVATE ----
+
+Used only for debugging purposes without invoking the integration during Daily PDB Alert sync</value>
+    </values>
+</CustomMetadata>

@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>d4c_Active__c</fullName>
+    <fullName>d4c_TestXMLActive__c</fullName>
     <defaultValue>false</defaultValue>
+    <description>Use test XML data instead of real API calls (debugging only)</description>
     <fieldManageability>SubscriberControlled</fieldManageability>
-    <label>Active</label>
+    <label>Test XML Active</label>
     <type>Checkbox</type>
 </CustomField>

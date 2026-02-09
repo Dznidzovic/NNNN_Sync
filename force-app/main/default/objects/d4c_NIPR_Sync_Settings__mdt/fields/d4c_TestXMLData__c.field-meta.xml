@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>d4c_XMLData__c</fullName>
+    <fullName>d4c_TestXMLData__c</fullName>
+    <description>Test XML response data for PDB Alerts (debugging only)</description>
     <fieldManageability>SubscriberControlled</fieldManageability>
-    <label>XML Data</label>
+    <label>Test XML Data</label>
     <length>131072</length>
     <type>LongTextArea</type>
     <visibleLines>3</visibleLines>

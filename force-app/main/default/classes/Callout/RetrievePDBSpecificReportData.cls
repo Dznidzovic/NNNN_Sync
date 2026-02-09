@@ -35,11 +35,11 @@ public class RetrievePDBSpecificReportData {
         
         try {
             String responseBody;
-            d4c_NIPRTestXMLResponse__mdt testRepsponse = getNIPRTextXMLResponse(); 
+            d4c_NIPR_Sync_Settings__mdt settings = getNIPRSyncSettings();
 
-            if (testRepsponse?.d4c_Active__c && !Test.isRunningTest()) {
-                responseBody = testRepsponse.d4c_XMLData__c;
-                Logger.debug(CLASS_NAME, methodName, 'Using test XML response data', 
+            if (settings?.d4c_TestXMLActive__c && !Test.isRunningTest()) {
+                responseBody = settings.d4c_TestXMLData__c;
+                Logger.debug(CLASS_NAME, methodName, 'Using test XML response data',
                         'Test XML response is active', null);
             } else {
                 // Build the SOAP request body using DOM
@@ -1305,7 +1305,8 @@ public class RetrievePDBSpecificReportData {
         return appointment;
     }
     
-    private d4c_NIPRTestXMLResponse__mdt getNIPRTextXMLResponse() {
-        return [SELECT d4c_Active__c, d4c_XMLData__c FROM d4c_NIPRTestXMLResponse__mdt WHERE DeveloperName LIKE '%NIPR_PDB_Specific_Alert_Response'];
+    private d4c_NIPR_Sync_Settings__mdt getNIPRSyncSettings() {
+        MetadataTypeSelector mtdSelector = new MetadataTypeSelector();
+        return mtdSelector.getNIPRSyncSettings();
     }
 }
