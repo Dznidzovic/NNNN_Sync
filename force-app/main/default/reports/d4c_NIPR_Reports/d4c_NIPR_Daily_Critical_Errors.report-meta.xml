@@ -1,40 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Report xmlns="http://soap.sforce.com/2006/04/metadata">
     <columns>
-        <field>d4c_Logger__c$Name</field>
+        <field>d4c_Log__c$Name</field>
     </columns>
     <columns>
-        <field>d4c_Logger__c$CreatedDate</field>
+        <field>d4c_Log__c$CreatedDate</field>
     </columns>
     <columns>
-        <field>d4c_Logger__c$d4c_LogLevel__c</field>
+        <field>d4c_Log__c$d4c_LogLevel__c</field>
     </columns>
     <columns>
         <aggregateTypes>Sum</aggregateTypes>
-        <field>d4c_Logger__c$d4c_Critical__c</field>
+        <field>d4c_Log__c$d4c_Critical__c</field>
     </columns>
     <columns>
-        <field>d4c_Logger__c$d4c_Message__c</field>
+        <field>d4c_Log__c$d4c_Message__c</field>
     </columns>
     <columns>
-        <field>d4c_Logger__c$d4c_StackTrace__c</field>
+        <field>d4c_Log__c$d4c_StackTrace__c</field>
     </columns>
     <columns>
-        <field>d4c_Logger__c$d4c_Source__c</field>
+        <field>d4c_Log__c$d4c_Source__c</field>
     </columns>
     <columns>
-        <field>d4c_Logger__c$d4c_SourceName__c</field>
+        <field>d4c_Log__c$d4c_SourceName__c</field>
     </columns>
     <columns>
-        <field>d4c_Logger__c$d4c_SourceMethod__c</field>
+        <field>d4c_Log__c$d4c_SourceMethod__c</field>
     </columns>
     <columns>
-        <field>d4c_Logger__c$d4c_TransactionId__c</field>
+        <field>d4c_Log__c$d4c_TransactionId__c</field>
     </columns>
     <description>Displays critical logs in the last 24h</description>
     <filter>
         <criteriaItems>
-            <column>d4c_Logger__c$d4c_Critical__c</column>
+            <column>d4c_Log__c$d4c_Critical__c</column>
             <columnToColumn>false</columnToColumn>
             <isUnlocked>true</isUnlocked>
             <operator>equals</operator>
@@ -47,13 +47,13 @@
         <name>co</name>
         <value>1</value>
     </params>
-    <reportType>d4c_NIPR_Loggers__c</reportType>
+    <reportType>d4c_NIPR_Logs__c</reportType>
     <scope>organization</scope>
     <showDetails>true</showDetails>
     <showGrandTotal>true</showGrandTotal>
     <showSubTotals>true</showSubTotals>
     <timeFrameFilter>
-        <dateColumn>d4c_Logger__c$CreatedDate</dateColumn>
+        <dateColumn>d4c_Log__c$CreatedDate</dateColumn>
         <interval>INTERVAL_TODAY</interval>
     </timeFrameFilter>
 </Report>

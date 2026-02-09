@@ -84,7 +84,7 @@
         <members>d4c_License__c</members>
         <members>d4c_LineOfAuthority__c</members>
         <members>d4c_Log__e</members>
-        <members>d4c_Logger__c</members>
+        <members>d4c_Log__c</members>
         <members>d4c_NIPRLogger__mdt</members>
         <members>d4c_NIPRTestXMLResponse__mdt</members>
         <members>d4c_NIPR_Subsciption_NPN_Count__mdt</members>
@@ -137,7 +137,7 @@
         <members>NIPR_Line_of_Authority_Record_Page_Read_Only</members>
         <members>NIPR_Carrier_Appointment_Record_Page_Read_Only</members>
         <members>NIPR_Insurance_Product_LOA_Mapping_Record_Page</members>
-        <members>NIPR_Logger_Record_Page</members>
+        <members>NIPR_Log_Record_Page</members>
         <members>NIPR_Console_UtilityBar</members>
         <members>NIPR_License_Insurance_Product_Record_Page_Read_Only</members>
         <members>NIPR_Subscription_Record_Page1</members>

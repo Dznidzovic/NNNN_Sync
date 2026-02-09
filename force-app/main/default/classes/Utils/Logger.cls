@@ -22,7 +22,7 @@ public without sharing class Logger {
     }
     
     // Static collection to store logs before committing
-    private static List<d4c_Logger__c> pendingLogs = new List<d4c_Logger__c>();
+    private static List<d4c_Log__c> pendingLogs = new List<d4c_Log__c>();
     
     // Transaction ID for grouping logs
     private static String transactionId;
@@ -331,7 +331,7 @@ public without sharing class Logger {
     private static void createLog(LogLevel level, String sourceName, String sourceMethod, 
                                String message, String details, String stackTrace, String relatedRecord, Boolean critical) {
         // Create log object
-        d4c_Logger__c log = new d4c_Logger__c(
+        d4c_Log__c log = new d4c_Log__c(
             d4c_LogLevel__c = level.name(),
             d4c_SourceName__c = sourceName,
             d4c_SourceMethod__c = sourceMethod,
@@ -384,15 +384,15 @@ public without sharing class Logger {
      *********************************************************
      * @methodName      : commitSync
      * @description     : Commits all pending logs synchronously in the current transaction
-     * @return          : List<d4c_Logger__c> - The committed log records with their IDs
+     * @return          : List<d4c_Log__c> - The committed log records with their IDs
      *********************************************************
      **/
-    public static List<d4c_Logger__c> commitSync() {
+    public static List<d4c_Log__c> commitSync() {
         if (pendingLogs.isEmpty()) {
-            return new List<d4c_Logger__c>();
+            return new List<d4c_Log__c>();
         }
         
-        List<d4c_Logger__c> logsToCommit = pendingLogs.clone();
+        List<d4c_Log__c> logsToCommit = pendingLogs.clone();
         pendingLogs.clear();
         
         try {
@@ -419,7 +419,7 @@ public without sharing class Logger {
             return null;
         }
         
-        List<d4c_Logger__c> logsToCommit = pendingLogs.clone();
+        List<d4c_Log__c> logsToCommit = pendingLogs.clone();
         pendingLogs.clear();
         
         try {
@@ -473,7 +473,7 @@ public without sharing class Logger {
     public static void processLogEvent(String logContent) {
         try {
             // Deserialize the JSON content back to log records
-            List<d4c_Logger__c> logsToInsert = (List<d4c_Logger__c>) JSON.deserialize(logContent, List<d4c_Logger__c>.class);
+            List<d4c_Log__c> logsToInsert = (List<d4c_Log__c>) JSON.deserialize(logContent, List<d4c_Log__c>.class);
             
             if (!logsToInsert.isEmpty()) {
                 insert logsToInsert;

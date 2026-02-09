@@ -54,7 +54,7 @@ public class Logger_Test {
         Logger.error(className, methodName, testException, relatedRecord);
         
         // Test commit methods
-        List<d4c_Logger__c> syncLogs = Logger.commitSync();
+        List<d4c_Log__c> syncLogs = Logger.commitSync();
         Id batchJobId = Logger.commitAsync();
         
         Test.stopTest();
@@ -66,7 +66,7 @@ public class Logger_Test {
     static void testLoggerFailurePaths() {
         // Test empty commit
         Test.startTest();
-        List<d4c_Logger__c> emptyLogs = Logger.commitSync();
+        List<d4c_Log__c> emptyLogs = Logger.commitSync();
         System.assertEquals(0, emptyLogs.size(), 'Should return empty list when no logs');
         
         Id emptyBatchId = Logger.commitAsync();
@@ -99,7 +99,7 @@ public class Logger_Test {
         Logger.commitSync();
         Test.stopTest();
         
-        d4c_Logger__c log = [SELECT d4c_Message__c FROM d4c_Logger__c LIMIT 1];
+        d4c_Log__c log = [SELECT d4c_Message__c FROM d4c_Log__c LIMIT 1];
         System.assert(log.d4c_Message__c.length() <= 255, 'Message should be truncated');
     }
     
@@ -117,7 +117,7 @@ public class Logger_Test {
         Test.stopTest();
 
         // Verify logs were committed
-        List<d4c_Logger__c> logs = [SELECT Id FROM d4c_Logger__c];
+        List<d4c_Log__c> logs = [SELECT Id FROM d4c_Log__c];
         System.assert(logs.size() >= 1, 'Should have at least one log after commit');
     }
 

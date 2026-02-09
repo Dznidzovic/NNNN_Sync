@@ -336,9 +336,9 @@
         <name>sidebar</name>
         <type>Region</type>
     </flexiPageRegions>
-    <masterLabel>NIPR Logger Record Page</masterLabel>
+    <masterLabel>NIPR Log Record Page</masterLabel>
     <parentFlexiPage>flexipage__default_rec_L</parentFlexiPage>
-    <sobjectType>d4c_Logger__c</sobjectType>
+    <sobjectType>d4c_Log__c</sobjectType>
     <template>
         <name>flexipage:recordHomeTemplateDesktop</name>
     </template>

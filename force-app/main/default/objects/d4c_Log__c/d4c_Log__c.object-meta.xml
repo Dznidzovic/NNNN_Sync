@@ -129,7 +129,7 @@
     <actionOverrides>
         <actionName>View</actionName>
         <comment>Action override created by Lightning App Builder during activation.</comment>
-        <content>NIPR_Logger_Record_Page</content>
+        <content>NIPR_Log_Record_Page</content>
         <formFactor>Large</formFactor>
         <skipRecordTypeSelect>false</skipRecordTypeSelect>
         <type>Flexipage</type>
@@ -137,7 +137,7 @@
     <actionOverrides>
         <actionName>View</actionName>
         <comment>Action override created by Lightning App Builder during activation.</comment>
-        <content>NIPR_Logger_Record_Page</content>
+        <content>NIPR_Log_Record_Page</content>
         <formFactor>Small</formFactor>
         <skipRecordTypeSelect>false</skipRecordTypeSelect>
         <type>Flexipage</type>
@@ -159,13 +159,13 @@
     <enableSharing>true</enableSharing>
     <enableStreamingApi>true</enableStreamingApi>
     <externalSharingModel>Private</externalSharingModel>
-    <label>NIPR Logger</label>
+    <label>NIPR Log</label>
     <nameField>
         <displayFormat>LOG-{0000}</displayFormat>
         <label>Log Name</label>
         <type>AutoNumber</type>
     </nameField>
-    <pluralLabel>NIPR Loggers</pluralLabel>
+    <pluralLabel>NIPR Logs</pluralLabel>
     <searchLayouts></searchLayouts>
     <sharingModel>ReadWrite</sharingModel>
     <visibility>Public</visibility>

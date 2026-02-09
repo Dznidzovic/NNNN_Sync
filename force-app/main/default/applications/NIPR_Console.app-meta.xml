@@ -21,7 +21,7 @@
     <tabs>d4c_CarrierAppointment__c</tabs>
     <tabs>d4c_Insurance_Product__c</tabs>
     <tabs>d4c_LOA_Insurance_Product_Mapping__c</tabs>
-    <tabs>d4c_Logger__c</tabs>
+    <tabs>d4c_Log__c</tabs>
     <uiType>Lightning</uiType>
     <utilityBar>NIPR_Console_UtilityBar</utilityBar>
     <workspaceConfig>
@@ -41,7 +41,7 @@
             <tab>d4c_License__c</tab>
         </mappings>
         <mappings>
-            <tab>d4c_Logger__c</tab>
+            <tab>d4c_Log__c</tab>
         </mappings>
         <mappings>
             <tab>d4c_Producer__c</tab>

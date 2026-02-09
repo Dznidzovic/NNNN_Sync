@@ -10,10 +10,10 @@ public class DeleteLogsBatchableTest {
     
     @testSetup
     static void setupTestData() {
-        // Insert test d4c_Logger__c records
-        List<d4c_Logger__c> logRecords = new List<d4c_Logger__c>();
+        // Insert test d4c_Log__c records
+        List<d4c_Log__c> logRecords = new List<d4c_Log__c>();
         for (Integer i = 0; i < 10; i++) {
-            d4c_Logger__c log = new d4c_Logger__c();
+            d4c_Log__c log = new d4c_Log__c();
 
             log.d4c_LogLevel__c = 'Info';
             log.d4c_Message__c = 'Test Message ' + i;
@@ -36,8 +36,8 @@ public class DeleteLogsBatchableTest {
     @isTest
     static void testDeleteLogsBatch() {
         // create data
-        Integer initialCount = [SELECT COUNT() FROM d4c_Logger__c];
-        System.assertEquals(10, initialCount, 'Initial count of d4c_Logger__c records should be 10');
+        Integer initialCount = [SELECT COUNT() FROM d4c_Log__c];
+        System.assertEquals(10, initialCount, 'Initial count of d4c_Log__c records should be 10');
 
         // execute
         Test.startTest();
@@ -45,8 +45,8 @@ public class DeleteLogsBatchableTest {
         Test.stopTest();
 
         // assert
-        Integer finalCount = [SELECT COUNT() FROM d4c_Logger__c];
-        System.assertEquals(5, finalCount, 'All d4c_Logger__c records should be deleted');
+        Integer finalCount = [SELECT COUNT() FROM d4c_Log__c];
+        System.assertEquals(5, finalCount, 'All d4c_Log__c records should be deleted');
     }
 
     @isTest

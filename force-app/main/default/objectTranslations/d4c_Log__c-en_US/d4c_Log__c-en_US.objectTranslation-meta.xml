@@ -2,14 +2,14 @@
 <CustomObjectTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
     <caseValues>
         <plural>false</plural>
-        <value>NIPR Logger</value>
+        <value>NIPR Log</value>
     </caseValues>
     <caseValues>
         <plural>true</plural>
-        <value>NIPR Loggers</value>
+        <value>NIPR Logs</value>
     </caseValues>
     <layouts>
-        <layout>NIPR Logger Layout</layout>
+        <layout>NIPR Log Layout</layout>
         <sections>
             <label><!-- Custom Links --></label>
             <section>Custom Links</section>

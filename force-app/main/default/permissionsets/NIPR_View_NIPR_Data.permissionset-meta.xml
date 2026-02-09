@@ -401,57 +401,57 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>d4c_Logger__c.d4c_Critical__c</field>
+        <field>d4c_Log__c.d4c_Critical__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>d4c_Logger__c.d4c_Details__c</field>
+        <field>d4c_Log__c.d4c_Details__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>d4c_Logger__c.d4c_LogLevel__c</field>
+        <field>d4c_Log__c.d4c_LogLevel__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>d4c_Logger__c.d4c_Message__c</field>
+        <field>d4c_Log__c.d4c_Message__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>d4c_Logger__c.d4c_OccurredDateTime__c</field>
+        <field>d4c_Log__c.d4c_OccurredDateTime__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>d4c_Logger__c.d4c_RelatedRecord__c</field>
+        <field>d4c_Log__c.d4c_RelatedRecord__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>d4c_Logger__c.d4c_SourceMethod__c</field>
+        <field>d4c_Log__c.d4c_SourceMethod__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>d4c_Logger__c.d4c_SourceName__c</field>
+        <field>d4c_Log__c.d4c_SourceName__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>d4c_Logger__c.d4c_Source__c</field>
+        <field>d4c_Log__c.d4c_Source__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>d4c_Logger__c.d4c_StackTrace__c</field>
+        <field>d4c_Log__c.d4c_StackTrace__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>d4c_Logger__c.d4c_TransactionId__c</field>
+        <field>d4c_Log__c.d4c_TransactionId__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -752,7 +752,7 @@
         <allowEdit>true</allowEdit>
         <allowRead>true</allowRead>
         <modifyAllRecords>true</modifyAllRecords>
-        <object>d4c_Logger__c</object>
+        <object>d4c_Log__c</object>
         <viewAllFields>true</viewAllFields>
         <viewAllRecords>true</viewAllRecords>
     </objectPermissions>
@@ -821,7 +821,7 @@
         <visibility>Visible</visibility>
     </tabSettings>
     <tabSettings>
-        <tab>d4c_Logger__c</tab>
+        <tab>d4c_Log__c</tab>
         <visibility>Visible</visibility>
     </tabSettings>
     <tabSettings>

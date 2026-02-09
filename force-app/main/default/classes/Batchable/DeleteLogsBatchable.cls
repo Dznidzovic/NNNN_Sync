@@ -1,7 +1,7 @@
 /*********************************************************************
 Apex Class Name    : DeleteLogsBatch
 Created Date       : 25-12-2024
-@description       : Deletes all records of the d4c_Logger__c object in Salesforce. 
+@description       : Deletes all records of the d4c_Log__c object in Salesforce. 
 
 @author            : Stefan Nidzovic
 Modification Log:
@@ -14,7 +14,7 @@ public with sharing class DeleteLogsBatchable implements Database.Batchable<SObj
     public Database.QueryLocator start(Database.BatchableContext BC) {
         DateTime twoWeeksAgo = Datetime.now().addDays(-14);
 
-        return Database.getQueryLocator('SELECT Id FROM d4c_Logger__c WHERE CreatedDate <= :twoWeeksAgo');
+        return Database.getQueryLocator('SELECT Id FROM d4c_Log__c WHERE CreatedDate <= :twoWeeksAgo');
     }
 
     // Execute method to process each batch of records
