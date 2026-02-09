@@ -3,7 +3,7 @@
     <label>MAX NPN Count</label>
     <protected>false</protected>
     <values>
-        <field>ht_MAX_NPN_Count__c</field>
+        <field>d4c_MAX_NPN_Count__c</field>
         <value xsi:type="xsd:double">350.0</value>
     </values>
 </CustomMetadata>

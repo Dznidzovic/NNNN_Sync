@@ -1,8 +1,8 @@
 /*********************************************************
  * Apex Class Name    : SubscriptionTriggerHandler
  * Created Date       : 2025-12-24
- * @description       : Trigger handler for ht_Subscription__c that increments the
- *                      custom settings counter (ht_NIPRSubscriptionDetails__c.ht_Latest_Number__c)
+ * @description       : Trigger handler for d4c_Subscription__c that increments the
+ *                      custom settings counter (d4c_NIPRSubscriptionDetails__c.d4c_Latest_Number__c)
  *                      whenever a new subscription is created
  * @author            : Stefan Nidzovic
  * Modification Log:
@@ -32,11 +32,11 @@ public with sharing class SubscriptionTriggerHandler extends BaseTriggerHandler 
         Decimal maxNumber = 0;
 
         for (SObject obj : newItems.values()) {
-            ht_Subscription__c subscription = (ht_Subscription__c) obj;
+            d4c_Subscription__c subscription = (d4c_Subscription__c) obj;
 
-            // Extract number from ht_Subscription_Name__c (format: S-XXXX)
-            if (String.isNotBlank(subscription.ht_Subscription_Name__c)) {
-                String subscriptionName = subscription.ht_Subscription_Name__c;
+            // Extract number from d4c_Subscription_Name__c (format: S-XXXX)
+            if (String.isNotBlank(subscription.d4c_Subscription_Name__c)) {
+                String subscriptionName = subscription.d4c_Subscription_Name__c;
 
                 // Parse the number from S-XXXX format
                 if (subscriptionName.startsWith('S-') && subscriptionName.length() >= 6) {
@@ -68,19 +68,19 @@ public with sharing class SubscriptionTriggerHandler extends BaseTriggerHandler 
      *********************************************************
      **/
     private void updateCustomSettingsCounter(Decimal newNumber) {
-        ht_NIPRSubscriptionDetails__c settings = ht_NIPRSubscriptionDetails__c.getOrgDefaults();
+        d4c_NIPRSubscriptionDetails__c settings = d4c_NIPRSubscriptionDetails__c.getOrgDefaults();
 
         // getOrgDefaults() returns an object with null Id if no settings exist
         if (settings == null || settings.Id == null) {
-            settings = new ht_NIPRSubscriptionDetails__c(
+            settings = new d4c_NIPRSubscriptionDetails__c(
                 SetupOwnerId = UserInfo.getOrganizationId(),
-                ht_Latest_Number__c = newNumber
+                d4c_Latest_Number__c = newNumber
             );
             insert settings;
         } else {
             // Only update if the new number is higher than current
-            if (settings.ht_Latest_Number__c == null || newNumber > settings.ht_Latest_Number__c) {
-                settings.ht_Latest_Number__c = newNumber;
+            if (settings.d4c_Latest_Number__c == null || newNumber > settings.d4c_Latest_Number__c) {
+                settings.d4c_Latest_Number__c = newNumber;
                 update settings;
             }
         }

@@ -33,7 +33,7 @@ public with sharing class InsuranceProductLOAMappingTriggerHandler extends BaseT
     @param          : newItems - List of new junction records being inserted
     *********************************************************/
     public override void beforeInsert(List<SObject> newItems) {
-        List<ht_Insurance_Product_LOA_Mapping__c> junctions = (List<ht_Insurance_Product_LOA_Mapping__c>) newItems;
+        List<d4c_Insurance_Product_LOA_Mapping__c> junctions = (List<d4c_Insurance_Product_LOA_Mapping__c>) newItems;
         uniqueIdService.populateInsProdLOAMappingUniqueId(junctions);
     }
 
@@ -43,7 +43,7 @@ public with sharing class InsuranceProductLOAMappingTriggerHandler extends BaseT
     @param          : newItems - Map of newly inserted junction records
     *********************************************************/
     public override void afterInsert(Map<Id, SObject> newItems) {
-        List<ht_Insurance_Product_LOA_Mapping__c> junctions = (List<ht_Insurance_Product_LOA_Mapping__c>) newItems.values();
+        List<d4c_Insurance_Product_LOA_Mapping__c> junctions = (List<d4c_Insurance_Product_LOA_Mapping__c>) newItems.values();
         processLoasForNewJunctions(junctions);
     }
 
@@ -53,13 +53,13 @@ public with sharing class InsuranceProductLOAMappingTriggerHandler extends BaseT
     @param          : oldItems - Map of deleted junction records
     *********************************************************/
     public override void afterDelete(Map<Id, SObject> oldItems) {
-        List<ht_Insurance_Product_LOA_Mapping__c> deletedJunctions = (List<ht_Insurance_Product_LOA_Mapping__c>) oldItems.values();
+        List<d4c_Insurance_Product_LOA_Mapping__c> deletedJunctions = (List<d4c_Insurance_Product_LOA_Mapping__c>) oldItems.values();
         handleCascadeDeleteCleanup(deletedJunctions);
     }
 
     // Captures LOAs for test verification
     @TestVisible
-    private static List<ht_LineOfAuthority__c> loasEnqueuedForBatch;
+    private static List<d4c_LineOfAuthority__c> loasEnqueuedForBatch;
 
     /*********************************************************
     @Method Name    : processLoasForNewJunctions
@@ -68,15 +68,15 @@ public with sharing class InsuranceProductLOAMappingTriggerHandler extends BaseT
                       2. LOAs already linked to the mapping - runs batch to create License-Product junctions
     @param          : junctions - List of newly inserted junction records
     *********************************************************/
-    private void processLoasForNewJunctions(List<ht_Insurance_Product_LOA_Mapping__c> junctions) {
+    private void processLoasForNewJunctions(List<d4c_Insurance_Product_LOA_Mapping__c> junctions) {
         String methodName = 'processLoasForNewJunctions';
 
         try {
             // Extract LOA Mapping IDs from new junctions
             Set<Id> loaMappingIds = new Set<Id>();
-            for (ht_Insurance_Product_LOA_Mapping__c junction : junctions) {
-                if (junction.ht_LOAMapping__c != null) {
-                    loaMappingIds.add(junction.ht_LOAMapping__c);
+            for (d4c_Insurance_Product_LOA_Mapping__c junction : junctions) {
+                if (junction.d4c_LOAMapping__c != null) {
+                    loaMappingIds.add(junction.d4c_LOAMapping__c);
                 }
             }
 
@@ -84,13 +84,13 @@ public with sharing class InsuranceProductLOAMappingTriggerHandler extends BaseT
                 return;
             }
 
-            // 1. Find and update orphan LOAs (these will get ht_LOAMapping__c set by findOrphanLoasForMappings)
+            // 1. Find and update orphan LOAs (these will get d4c_LOAMapping__c set by findOrphanLoasForMappings)
             // The update will fire the LOA trigger which handles creating License-Product junctions
-            List<ht_LineOfAuthority__c> orphanLoas = mappingService.findOrphanLoasForMappings(loaMappingIds);
+            List<d4c_LineOfAuthority__c> orphanLoas = mappingService.findOrphanLoasForMappings(loaMappingIds);
             if (!orphanLoas.isEmpty()) {
                 DMLExecutor loaUpsert = new DMLExecutor(
                     orphanLoas,
-                    ht_LineOfAuthority__c.ht_UniqueIdentifier__c,
+                    d4c_LineOfAuthority__c.d4c_UniqueIdentifier__c,
                     null,
                     CLASS_NAME
                 );
@@ -104,16 +104,16 @@ public with sharing class InsuranceProductLOAMappingTriggerHandler extends BaseT
 
             // 2. Find LOAs already linked to these mappings and run batch for them directly
             LineOfAuthoritySelector loaSelector = new LineOfAuthoritySelector();
-            List<ht_LineOfAuthority__c> existingLinkedLoas = loaSelector.getLoasByMappingIds(loaMappingIds);
+            List<d4c_LineOfAuthority__c> existingLinkedLoas = loaSelector.getLoasByMappingIds(loaMappingIds);
 
             // Exclude orphan LOAs (they were just processed above via update)
             Set<Id> orphanLoaIds = new Set<Id>();
-            for (ht_LineOfAuthority__c loa : orphanLoas) {
+            for (d4c_LineOfAuthority__c loa : orphanLoas) {
                 orphanLoaIds.add(loa.Id);
             }
 
-            List<ht_LineOfAuthority__c> loasForBatch = new List<ht_LineOfAuthority__c>();
-            for (ht_LineOfAuthority__c loa : existingLinkedLoas) {
+            List<d4c_LineOfAuthority__c> loasForBatch = new List<d4c_LineOfAuthority__c>();
+            for (d4c_LineOfAuthority__c loa : existingLinkedLoas) {
                 if (!orphanLoaIds.contains(loa.Id)) {
                     loasForBatch.add(loa);
                 }
@@ -144,7 +144,7 @@ public with sharing class InsuranceProductLOAMappingTriggerHandler extends BaseT
     @description    : Handles cleanup when junction records are deleted.
     @param          : deletedJunctions - List of deleted junction records
     *********************************************************/
-    private void handleCascadeDeleteCleanup(List<ht_Insurance_Product_LOA_Mapping__c> deletedJunctions) {
+    private void handleCascadeDeleteCleanup(List<d4c_Insurance_Product_LOA_Mapping__c> deletedJunctions) {
         String methodName = 'handleCascadeDeleteCleanup';
 
         try {
@@ -170,15 +170,15 @@ public with sharing class InsuranceProductLOAMappingTriggerHandler extends BaseT
     @description    : Deletes parent LOA Mapping records that have no remaining junctions.
     @param          : deletedJunctions - List of deleted junction records
     *********************************************************/
-    private void deleteOrphanedParentMappings(List<ht_Insurance_Product_LOA_Mapping__c> deletedJunctions) {
+    private void deleteOrphanedParentMappings(List<d4c_Insurance_Product_LOA_Mapping__c> deletedJunctions) {
         String methodName = 'deleteOrphanedParentMappings';
 
         // Collect parent LOA Mapping IDs from deleted junctions
         Set<Id> parentMappingIds = new Set<Id>();
         Set<Id> orphanedMappingIds = new Set<Id>();
-        for (ht_Insurance_Product_LOA_Mapping__c junction : deletedJunctions) {
-            if (junction.ht_LOAMapping__c != null) {
-                parentMappingIds.add(junction.ht_LOAMapping__c);
+        for (d4c_Insurance_Product_LOA_Mapping__c junction : deletedJunctions) {
+            if (junction.d4c_LOAMapping__c != null) {
+                parentMappingIds.add(junction.d4c_LOAMapping__c);
             }
         }
 
@@ -191,11 +191,11 @@ public with sharing class InsuranceProductLOAMappingTriggerHandler extends BaseT
         Map<Id, Integer> junctionCounts = junctionSelector.countJunctionsByLoaMappingIds(parentMappingIds);
 
         // Find parent mappings with zero remaining junctions
-        List<ht_LOA_Insurance_Product_Mapping__c> orphanedMappings = new List<ht_LOA_Insurance_Product_Mapping__c>();
+        List<d4c_LOA_Insurance_Product_Mapping__c> orphanedMappings = new List<d4c_LOA_Insurance_Product_Mapping__c>();
         for (Id mappingId : parentMappingIds) {
             Integer count = junctionCounts.get(mappingId);
             if (count == null || count == 0) {
-                orphanedMappings.add(new ht_LOA_Insurance_Product_Mapping__c(Id = mappingId));
+                orphanedMappings.add(new d4c_LOA_Insurance_Product_Mapping__c(Id = mappingId));
                 orphanedMappingIds.add(mappingId);
             }
         }

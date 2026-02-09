@@ -3,10 +3,10 @@
     <fullName>All</fullName>
     <columns>NAME</columns>
     <columns>CREATED_DATE</columns>
-    <columns>ht_LogLevel__c</columns>
-    <columns>ht_Critical__c</columns>
-    <columns>ht_Details__c</columns>
-    <columns>ht_Message__c</columns>
+    <columns>d4c_LogLevel__c</columns>
+    <columns>d4c_Critical__c</columns>
+    <columns>d4c_Details__c</columns>
+    <columns>d4c_Message__c</columns>
     <filterScope>Everything</filterScope>
     <label>All</label>
 </ListView>

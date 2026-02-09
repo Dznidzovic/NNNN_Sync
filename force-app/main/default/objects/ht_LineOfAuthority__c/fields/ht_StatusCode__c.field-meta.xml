@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>ht_StatusCode__c</fullName>
+    <fullName>d4c_StatusCode__c</fullName>
     <externalId>false</externalId>
     <label>Status Code</label>
     <length>25</length>

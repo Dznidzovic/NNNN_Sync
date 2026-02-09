@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
     <label><!-- Address Line Two --></label>
-    <name>ht_AddressLineTwo__c</name>
+    <name>d4c_AddressLineTwo__c</name>
 </CustomFieldTranslation>

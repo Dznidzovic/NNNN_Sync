@@ -35,10 +35,10 @@ public class RetrievePDBSpecificReportData {
         
         try {
             String responseBody;
-            ht_NIPRTestXMLResponse__mdt testRepsponse = getNIPRTextXMLResponse(); 
+            d4c_NIPRTestXMLResponse__mdt testRepsponse = getNIPRTextXMLResponse(); 
 
-            if (testRepsponse?.ht_Active__c && !Test.isRunningTest()) {
-                responseBody = testRepsponse.ht_XMLData__c;
+            if (testRepsponse?.d4c_Active__c && !Test.isRunningTest()) {
+                responseBody = testRepsponse.d4c_XMLData__c;
                 Logger.debug(CLASS_NAME, methodName, 'Using test XML response data', 
                         'Test XML response is active', null);
             } else {
@@ -1305,7 +1305,7 @@ public class RetrievePDBSpecificReportData {
         return appointment;
     }
     
-    private ht_NIPRTestXMLResponse__mdt getNIPRTextXMLResponse() {
-        return [SELECT ht_Active__c, ht_XMLData__c FROM ht_NIPRTestXMLResponse__mdt WHERE DeveloperName LIKE '%NIPR_PDB_Specific_Alert_Response'];
+    private d4c_NIPRTestXMLResponse__mdt getNIPRTextXMLResponse() {
+        return [SELECT d4c_Active__c, d4c_XMLData__c FROM d4c_NIPRTestXMLResponse__mdt WHERE DeveloperName LIKE '%NIPR_PDB_Specific_Alert_Response'];
     }
 }

@@ -2,7 +2,7 @@
  *********************************************************
  * Apex Class Name    : CarrierAppointmentSelector
  * Created Date       : 03-30-2025
- * @description       : Selector class holding all the queries used for ht_CarrierAppointment__c object
+ * @description       : Selector class holding all the queries used for d4c_CarrierAppointment__c object
  * @author            : Stefan Nidzovic
  * Modification Log:
  * Ver   Date         Author                   Modification
@@ -14,47 +14,47 @@ public with sharing class CarrierAppointmentSelector {
     /**
      * *******************************************************
      * @Method Name    : getCarrierAppointmentsByProducerNpn
-     * @description    : Returns list of ht_Carrier by ht_NPN__c of ht_Producer__C object field
+     * @description    : Returns list of d4c_Carrier by d4c_NPN__c of d4c_Producer__C object field
      * @param          : npns - Set of unique NPN values
-     * @return         : List<ht_CarrierAppointment__c> - list of Producer records
+     * @return         : List<d4c_CarrierAppointment__c> - list of Producer records
      *******************************************************
      **/
-    public List<ht_CarrierAppointment__c> getCarrierAppointmentsByProducerNpn(Set<String> npns) {
+    public List<d4c_CarrierAppointment__c> getCarrierAppointmentsByProducerNpn(Set<String> npns) {
         return [
             SELECT
                 Id,
-                ht_UniqueIdentifier__c,
-                ht_Producer__r.ht_NPN__c
+                d4c_UniqueIdentifier__c,
+                d4c_Producer__r.d4c_NPN__c
             FROM
-                ht_CarrierAppointment__c
+                d4c_CarrierAppointment__c
             WHERE
-                ht_Producer__r.ht_NPN__c IN :npns
+                d4c_Producer__r.d4c_NPN__c IN :npns
         ];
     }
 
     /**
      * *******************************************************
      * @Method Name    : getCarrierAppointmentsByProducerNpnAndStates
-     * @description    : Returns list of ht_CarrierAppointment__c by ht_NPN__c and ht_StateOrProvinceCode__c
+     * @description    : Returns list of d4c_CarrierAppointment__c by d4c_NPN__c and d4c_StateOrProvinceCode__c
      *                   Used for deletion logic to only query appointments for producer+state combinations
      *                   that have data in the NIPR payload
      * @param          : npns - Set of unique NPN values
      * @param          : states - Set of state/province codes
-     * @return         : List<ht_CarrierAppointment__c> - list of Carrier Appointment records
+     * @return         : List<d4c_CarrierAppointment__c> - list of Carrier Appointment records
      *******************************************************
      **/
-    public List<ht_CarrierAppointment__c> getCarrierAppointmentsByProducerNpnAndStates(Set<String> npns, Set<String> states) {
+    public List<d4c_CarrierAppointment__c> getCarrierAppointmentsByProducerNpnAndStates(Set<String> npns, Set<String> states) {
         return [
             SELECT
                 Id,
-                ht_UniqueIdentifier__c,
-                ht_Producer__r.ht_NPN__c,
-                ht_StateOrProvinceCode__c
+                d4c_UniqueIdentifier__c,
+                d4c_Producer__r.d4c_NPN__c,
+                d4c_StateOrProvinceCode__c
             FROM
-                ht_CarrierAppointment__c
+                d4c_CarrierAppointment__c
             WHERE
-                ht_Producer__r.ht_NPN__c IN :npns
-                AND ht_StateOrProvinceCode__c IN :states
+                d4c_Producer__r.d4c_NPN__c IN :npns
+                AND d4c_StateOrProvinceCode__c IN :states
         ];
     }
 }

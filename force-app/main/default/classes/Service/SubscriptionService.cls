@@ -22,7 +22,7 @@ public virtual with sharing class SubscriptionService {
     private final String CLASS_NAME = 'SubscriptionService';
 
     // PUBLIC PROPERTY - Set by orchestrator, used throughout service
-    public ht_Producer__c producer { get; private set; }
+    public d4c_Producer__c producer { get; private set; }
 
     // Selectors and Callouts
     private final MetadataTypeSelector mtdSelector = new MetadataTypeSelector();
@@ -42,7 +42,7 @@ public virtual with sharing class SubscriptionService {
      * @return         : void
      *********************************************************
      **/
-    public void setProducer(ht_Producer__c producer) {
+    public void setProducer(d4c_Producer__c producer) {
         this.producer = producer;
     }
 
@@ -63,8 +63,8 @@ public virtual with sharing class SubscriptionService {
             throw new SubscriptionServiceException('Producer not set in service. Call setProducer() first.');
         }
 
-        String npn = producer.ht_NPN__c;
-        Boolean excludeFlag = producer.ht_ExcludeCarrierAppointments__c;
+        String npn = producer.d4c_NPN__c;
+        Boolean excludeFlag = producer.d4c_ExcludeCarrierAppointments__c;
 
         loadMaxProducersPerSubscription();
 
@@ -94,7 +94,7 @@ public virtual with sharing class SubscriptionService {
         }
 
         // Query all producers with these NPNs
-        List<ht_Producer__c> producers = producerSelector.getProducersByNPNs(npns);
+        List<d4c_Producer__c> producers = producerSelector.getProducersByNPNs(npns);
 
         if (producers.isEmpty()) {
             Logger.warning(CLASS_NAME, methodName, 'No producers found for NPNs', 'NPNs: ' + npns, null);
@@ -103,38 +103,38 @@ public virtual with sharing class SubscriptionService {
 
         // Group NPNs by subscription for efficient API calls
         Map<Id, List<String>> subscriptionToNPNsMap = new Map<Id, List<String>>();
-        List<ht_Producer__c> producersToUpdate = new List<ht_Producer__c>();
+        List<d4c_Producer__c> producersToUpdate = new List<d4c_Producer__c>();
 
-        for (ht_Producer__c prod : producers) {
-            if (prod.ht_Subscription__c == null) {
+        for (d4c_Producer__c prod : producers) {
+            if (prod.d4c_Subscription__c == null) {
                 continue; // Skip producers without subscription
             }
 
-            if (!subscriptionToNPNsMap.containsKey(prod.ht_Subscription__c)) {
-                subscriptionToNPNsMap.put(prod.ht_Subscription__c, new List<String>());
+            if (!subscriptionToNPNsMap.containsKey(prod.d4c_Subscription__c)) {
+                subscriptionToNPNsMap.put(prod.d4c_Subscription__c, new List<String>());
             }
-            subscriptionToNPNsMap.get(prod.ht_Subscription__c).add(prod.ht_NPN__c);
+            subscriptionToNPNsMap.get(prod.d4c_Subscription__c).add(prod.d4c_NPN__c);
 
             producersToUpdate.add(prod);
         }
 
         // Step 1: Remove from NIPR (callouts) - grouped by subscription
-        List<ht_Subscription__c> subscriptions = subscriptionSelector.getSubscriptionsByIds(subscriptionToNPNsMap.keySet());
+        List<d4c_Subscription__c> subscriptions = subscriptionSelector.getSubscriptionsByIds(subscriptionToNPNsMap.keySet());
 
-        for (ht_Subscription__c sub : subscriptions) {
-            String apiSubName = sub.ht_Subscription_Name__c + '-' + UserInfo.getOrganizationId();
+        for (d4c_Subscription__c sub : subscriptions) {
+            String apiSubName = sub.d4c_Subscription_Name__c + '-' + UserInfo.getOrganizationId();
             List<String> npnsToRemove = subscriptionToNPNsMap.get(sub.Id);
 
             Boolean removeSuccess = executeRemoveNPNCallout(npnsToRemove, apiSubName);
 
             if (!removeSuccess) {
-                throw new SubscriptionServiceException('Failed to remove NPNs: ' + npnsToRemove + ' from subscription: ' + sub.ht_Subscription_Name__c);
+                throw new SubscriptionServiceException('Failed to remove NPNs: ' + npnsToRemove + ' from subscription: ' + sub.d4c_Subscription_Name__c);
             }
         }
 
         // Step 2: Clear producer subscription lookups in Salesforce (DML after callouts)
-        for (ht_Producer__c prod : producersToUpdate) {
-            prod.ht_Subscription__c = null;
+        for (d4c_Producer__c prod : producersToUpdate) {
+            prod.d4c_Subscription__c = null;
         }
 
         update producersToUpdate;
@@ -172,17 +172,17 @@ public virtual with sharing class SubscriptionService {
         }
 
         // Query subscriptions
-        List<ht_Subscription__c> subscriptions = subscriptionSelector.getSubscriptionsByIds(subscriptionToNPNsMap.keySet());
+        List<d4c_Subscription__c> subscriptions = subscriptionSelector.getSubscriptionsByIds(subscriptionToNPNsMap.keySet());
 
         // Execute remove callouts (no DML - producers already deleted)
-        for (ht_Subscription__c sub : subscriptions) {
-            String apiSubName = sub.ht_Subscription_Name__c + '-' + UserInfo.getOrganizationId();
+        for (d4c_Subscription__c sub : subscriptions) {
+            String apiSubName = sub.d4c_Subscription_Name__c + '-' + UserInfo.getOrganizationId();
             List<String> npnsToRemove = subscriptionToNPNsMap.get(sub.Id);
 
             Boolean removeSuccess = executeRemoveNPNCallout(npnsToRemove, apiSubName);
 
             if (!removeSuccess) {
-                throw new SubscriptionServiceException('Failed to remove NPNs: ' + npnsToRemove + ' from subscription: ' + sub.ht_Subscription_Name__c);
+                throw new SubscriptionServiceException('Failed to remove NPNs: ' + npnsToRemove + ' from subscription: ' + sub.d4c_Subscription_Name__c);
             }
         }
 
@@ -205,8 +205,8 @@ public virtual with sharing class SubscriptionService {
             throw new SubscriptionServiceException('Producer not set in service. Call setProducer() first.');
         }
 
-        String npn = producer.ht_NPN__c;
-        Boolean newExcludeFlag = producer.ht_ExcludeCarrierAppointments__c;
+        String npn = producer.d4c_NPN__c;
+        Boolean newExcludeFlag = producer.d4c_ExcludeCarrierAppointments__c;
 
         Logger.info(CLASS_NAME, methodName,
             'Starting resubscription to different pool',
@@ -215,12 +215,12 @@ public virtual with sharing class SubscriptionService {
         loadMaxProducersPerSubscription();
 
         // CALLOUT 1: Remove from current subscription in NIPR
-        ht_Subscription__c oldSubscription = subscriptionSelector.getSubscriptionById(producer.ht_Subscription__c);
-        String oldApiSubName = oldSubscription.ht_Subscription_Name__c + '-' + UserInfo.getOrganizationId();
+        d4c_Subscription__c oldSubscription = subscriptionSelector.getSubscriptionById(producer.d4c_Subscription__c);
+        String oldApiSubName = oldSubscription.d4c_Subscription_Name__c + '-' + UserInfo.getOrganizationId();
         Boolean removeSuccess = executeRemoveNPNCallout(new List<String>{npn}, oldApiSubName);
 
         if (!removeSuccess) {
-            throw new SubscriptionServiceException('Failed to remove NPN: ' + npn + ' from old subscription: ' + oldSubscription.ht_Subscription_Name__c + ' during resubscription');
+            throw new SubscriptionServiceException('Failed to remove NPN: ' + npn + ' from old subscription: ' + oldSubscription.d4c_Subscription_Name__c + ' during resubscription');
         }
 
         // Find or create new subscription and add NPN
@@ -244,7 +244,7 @@ public virtual with sharing class SubscriptionService {
      *********************************************************
      **/
     private void loadMaxProducersPerSubscription() {
-        Decimal maxCount = mtdSelector.getNIPRNPNSubMaxCount()?.ht_MAX_NPN_Count__c;
+        Decimal maxCount = mtdSelector.getNIPRNPNSubMaxCount()?.d4c_MAX_NPN_Count__c;
         if (!Test.isRunningTest()) {
             MAX_PRODUCERS_PER_SUBSCRIPTION = maxCount != null ? Integer.valueOf(maxCount) : MAX_PRODUCERS_PER_SUBSCRIPTION;
         }
@@ -261,7 +261,7 @@ public virtual with sharing class SubscriptionService {
      **/
     private Id findOrCreateAndAddNPN(Boolean excludeCarrierAppointments) {
         String methodName = 'findOrCreateAndAddNPN';
-        String npn = producer.ht_NPN__c;
+        String npn = producer.d4c_NPN__c;
 
         // Step 1: Find existing subscription with capacity
         SubscriptionResult subResult = findSubscriptionWithCapacity(excludeCarrierAppointments);
@@ -290,11 +290,11 @@ public virtual with sharing class SubscriptionService {
         Id subscriptionId;
 
         if (isNewSubscription) {
-            // Create subscription record in Salesforce with ht_Subscription_Name__c matching NIPR
+            // Create subscription record in Salesforce with d4c_Subscription_Name__c matching NIPR
             // The SubscriptionTriggerHandler will update the custom settings counter on afterInsert
-            ht_Subscription__c newSubscription = new ht_Subscription__c(
-                ht_Subscription_Name__c = subscriptionName,
-                ht_ExcludeCarrierAppointments__c = excludeCarrierAppointments
+            d4c_Subscription__c newSubscription = new d4c_Subscription__c(
+                d4c_Subscription_Name__c = subscriptionName,
+                d4c_ExcludeCarrierAppointments__c = excludeCarrierAppointments
             );
             insert newSubscription;
 
@@ -320,12 +320,12 @@ public virtual with sharing class SubscriptionService {
      *********************************************************
      **/
     private SubscriptionResult findSubscriptionWithCapacity(Boolean excludeCarrierAppointments) {
-        List<ht_Subscription__c> subscriptions = subscriptionSelector.getSubscriptionsWithProducersByExcludeFlag(excludeCarrierAppointments);
+        List<d4c_Subscription__c> subscriptions = subscriptionSelector.getSubscriptionsWithProducersByExcludeFlag(excludeCarrierAppointments);
 
-        for (ht_Subscription__c sub : subscriptions) {
+        for (d4c_Subscription__c sub : subscriptions) {
             Integer producerCount = sub.Producers__r != null ? sub.Producers__r.size() : 0;
             if (producerCount < MAX_PRODUCERS_PER_SUBSCRIPTION) {
-                return new SubscriptionResult(sub.Id, sub.ht_Subscription_Name__c);
+                return new SubscriptionResult(sub.Id, sub.d4c_Subscription_Name__c);
             }
         }
 
@@ -345,11 +345,11 @@ public virtual with sharing class SubscriptionService {
         String methodName = 'createNewSubscriptionInNIPR';
 
         // Get current counter value (NO DML before HTTP request!)
-        ht_NIPRSubscriptionDetails__c settings = ht_NIPRSubscriptionDetails__c.getOrgDefaults();
+        d4c_NIPRSubscriptionDetails__c settings = d4c_NIPRSubscriptionDetails__c.getOrgDefaults();
 
         Decimal currentNumber = 0;
-        if (settings != null && settings.ht_Latest_Number__c != null) {
-            currentNumber = settings.ht_Latest_Number__c;
+        if (settings != null && settings.d4c_Latest_Number__c != null) {
+            currentNumber = settings.d4c_Latest_Number__c;
         }
 
         // Calculate next number (but don't update yet!)
@@ -467,12 +467,12 @@ public virtual with sharing class SubscriptionService {
      *********************************************************
      **/
     private void updateProducerSubscription(Id subscriptionId) {
-        ht_Producer__c producerToUpdate = new ht_Producer__c(
-            ht_NPN__c = producer.ht_NPN__c,
-            ht_Subscription__c = subscriptionId
+        d4c_Producer__c producerToUpdate = new d4c_Producer__c(
+            d4c_NPN__c = producer.d4c_NPN__c,
+            d4c_Subscription__c = subscriptionId
         );
 
-        upsert producerToUpdate ht_NPN__c;
+        upsert producerToUpdate d4c_NPN__c;
     }
 
     // ==================== BULK SUBSCRIPTION METHODS ====================
@@ -505,9 +505,9 @@ public virtual with sharing class SubscriptionService {
             'Total NPNs: ' + npns.size() + ', Exclude Flag: ' + excludeCarrierAppointments, null);
 
         // Step 1: Get existing subscriptions with capacity
-        List<ht_Subscription__c> existingSubscriptions = subscriptionSelector.getSubscriptionsWithProducersByExcludeFlag(excludeCarrierAppointments);
+        List<d4c_Subscription__c> existingSubscriptions = subscriptionSelector.getSubscriptionsWithProducersByExcludeFlag(excludeCarrierAppointments);
 
-        for (ht_Subscription__c sub : existingSubscriptions) {
+        for (d4c_Subscription__c sub : existingSubscriptions) {
             if (remainingNPNs.isEmpty()) {
                 break;
             }
@@ -525,7 +525,7 @@ public virtual with sharing class SubscriptionService {
                 }
 
                 SubscriptionAllocation allocation = new SubscriptionAllocation();
-                allocation.subscriptionName = sub.ht_Subscription_Name__c;
+                allocation.subscriptionName = sub.d4c_Subscription_Name__c;
                 allocation.subscriptionId = sub.Id;
                 allocation.requiresCreation = false;
                 allocation.excludeCarrierAppointments = excludeCarrierAppointments;
@@ -535,16 +535,16 @@ public virtual with sharing class SubscriptionService {
 
                 Logger.info(CLASS_NAME, methodName,
                     'Allocated NPNs to existing subscription',
-                    'Subscription: ' + sub.ht_Subscription_Name__c + ', NPNs: ' + npnsToAllocate, null);
+                    'Subscription: ' + sub.d4c_Subscription_Name__c + ', NPNs: ' + npnsToAllocate, null);
             }
         }
 
         // Step 2: Calculate new subscriptions needed for remaining NPNs
         if (!remainingNPNs.isEmpty()) {
             // Get current counter value
-            ht_NIPRSubscriptionDetails__c settings = ht_NIPRSubscriptionDetails__c.getOrgDefaults();
-            Decimal currentNumber = (settings != null && settings.ht_Latest_Number__c != null)
-                ? settings.ht_Latest_Number__c
+            d4c_NIPRSubscriptionDetails__c settings = d4c_NIPRSubscriptionDetails__c.getOrgDefaults();
+            Decimal currentNumber = (settings != null && settings.d4c_Latest_Number__c != null)
+                ? settings.d4c_Latest_Number__c
                 : 0;
 
             while (!remainingNPNs.isEmpty()) {
@@ -621,9 +621,9 @@ public virtual with sharing class SubscriptionService {
         // Step 3: DML after all callouts succeed
         if (allocation.requiresCreation) {
             // Create subscription record in Salesforce
-            ht_Subscription__c newSubscription = new ht_Subscription__c(
-                ht_Subscription_Name__c = allocation.subscriptionName,
-                ht_ExcludeCarrierAppointments__c = allocation.excludeCarrierAppointments
+            d4c_Subscription__c newSubscription = new d4c_Subscription__c(
+                d4c_Subscription_Name__c = allocation.subscriptionName,
+                d4c_ExcludeCarrierAppointments__c = allocation.excludeCarrierAppointments
             );
             insert newSubscription;
             subscriptionId = newSubscription.Id;
@@ -634,15 +634,15 @@ public virtual with sharing class SubscriptionService {
         }
 
         // Step 4: Update producers with subscription lookup
-        List<ht_Producer__c> producersToUpdate = new List<ht_Producer__c>();
+        List<d4c_Producer__c> producersToUpdate = new List<d4c_Producer__c>();
         for (String npn : allocation.npnsToAdd) {
-            producersToUpdate.add(new ht_Producer__c(
-                ht_NPN__c = npn,
-                ht_Subscription__c = subscriptionId
+            producersToUpdate.add(new d4c_Producer__c(
+                d4c_NPN__c = npn,
+                d4c_Subscription__c = subscriptionId
             ));
         }
 
-        upsert producersToUpdate ht_NPN__c;
+        upsert producersToUpdate d4c_NPN__c;
 
         Logger.info(CLASS_NAME, methodName,
             'Updated producers with subscription',

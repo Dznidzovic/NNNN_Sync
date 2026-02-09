@@ -47,8 +47,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_FEIN__c</fieldItem>
-                <identifier>Recordht_Fein__cField</identifier>
+                <fieldItem>Record.d4c_FEIN__c</fieldItem>
+                <identifier>Recordd4c_Fein__cField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-eb86df81-b960-4610-a881-85c03cd89d90</name>
@@ -61,8 +61,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_CoCode__c</fieldItem>
-                <identifier>Recordht_CoCode_cField</identifier>
+                <fieldItem>Record.d4c_CoCode__c</fieldItem>
+                <identifier>Recordd4c_CoCode_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -119,8 +119,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_UniqueIdentifier__c</fieldItem>
-                <identifier>Recordht_UniqueIdentifier_cField</identifier>
+                <fieldItem>Record.d4c_UniqueIdentifier__c</fieldItem>
+                <identifier>Recordd4c_UniqueIdentifier_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-0b0ee1e0-d400-4638-8ac4-c57c6e1c52a1</name>
@@ -273,7 +273,7 @@
         <type>Region</type>
     </flexiPageRegions>
     <masterLabel>NIPR Carrier Record Page - Read Only</masterLabel>
-    <sobjectType>ht_Carrier__c</sobjectType>
+    <sobjectType>d4c_Carrier__c</sobjectType>
     <template>
         <name>flexipage:recordHomeTemplateDesktop</name>
         <properties>

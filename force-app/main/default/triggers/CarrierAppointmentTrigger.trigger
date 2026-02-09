@@ -9,7 +9,7 @@ Ver   Date         Author         Modification
 1.0   2025-04-09   Uros Markovic  Initial Version
 *********************************************************
 */
-trigger CarrierAppointmentTrigger on ht_CarrierAppointment__c (
+trigger CarrierAppointmentTrigger on d4c_CarrierAppointment__c (
     before insert, 
     before update, 
     before delete, 

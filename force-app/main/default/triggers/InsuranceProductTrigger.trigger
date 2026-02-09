@@ -10,7 +10,7 @@ Ver   Date         Author         Modification
 1.0   2025-12-15   Stefan         Initial Version
 *********************************************************
 */
-trigger InsuranceProductTrigger on ht_Insurance_Product__c (
+trigger InsuranceProductTrigger on d4c_Insurance_Product__c (
     before insert,
     before update,
     before delete,

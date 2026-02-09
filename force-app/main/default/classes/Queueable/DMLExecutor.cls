@@ -258,19 +258,19 @@ public class DMLExecutor implements Queueable {
             objType = upsertRecords[0].getSObjectType().getDescribe().getName();
 
             // Extract NPN context for better debugging
-            if (objType == 'ht_Producer__c') {
+            if (objType == 'd4c_Producer__c') {
                 Set<String> npns = new Set<String>();
                 for(SObject rec : upsertRecords) {
-                    ht_Producer__c prod = (ht_Producer__c)rec;
-                    if(prod.ht_NPN__c != null) npns.add(prod.ht_NPN__c);
+                    d4c_Producer__c prod = (d4c_Producer__c)rec;
+                    if(prod.d4c_NPN__c != null) npns.add(prod.d4c_NPN__c);
                 }
                 if(!npns.isEmpty()) npnContext = ' | NPNs: ' + String.join(new List<String>(npns), ', ');
-            } else if (objType == 'ht_License__c' || objType == 'ht_CarrierAppointment__c') {
+            } else if (objType == 'd4c_License__c' || objType == 'd4c_CarrierAppointment__c') {
                 Set<String> npns = new Set<String>();
                 for(SObject rec : upsertRecords) {
-                    SObject producer = rec.getSObject('ht_Producer__r');
-                    if(producer != null && producer.get('ht_NPN__c') != null) {
-                        npns.add((String)producer.get('ht_NPN__c'));
+                    SObject producer = rec.getSObject('d4c_Producer__r');
+                    if(producer != null && producer.get('d4c_NPN__c') != null) {
+                        npns.add((String)producer.get('d4c_NPN__c'));
                     }
                 }
                 if(!npns.isEmpty()) npnContext = ' | NPNs: ' + String.join(new List<String>(npns), ', ');

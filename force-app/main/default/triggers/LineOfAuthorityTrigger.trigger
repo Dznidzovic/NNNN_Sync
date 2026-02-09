@@ -10,7 +10,7 @@ Ver   Date         Author         Modification
 1.0   2025-12-13   Stefan         Initial Version
 *********************************************************
 */
-trigger LineOfAuthorityTrigger on ht_LineOfAuthority__c (
+trigger LineOfAuthorityTrigger on d4c_LineOfAuthority__c (
     before insert,
     before update,
     after insert,

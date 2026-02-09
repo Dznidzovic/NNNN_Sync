@@ -2,7 +2,7 @@
 <CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
     <help><!-- Defines the severity of the log: Info, Debug, Warning, Error. --></help>
     <label><!-- Log Level --></label>
-    <name>ht_LogLevel__c</name>
+    <name>d4c_LogLevel__c</name>
     <picklistValues>
         <masterLabel>Debug</masterLabel>
         <translation><!-- Debug --></translation>

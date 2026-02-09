@@ -16,7 +16,7 @@
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>ht_EnableDebugging__c</field>
+                <field>d4c_EnableDebugging__c</field>
             </layoutItems>
         </layoutColumns>
         <layoutColumns>

@@ -16,7 +16,7 @@
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>ht_MAX_NPN_Count__c</field>
+                <field>d4c_MAX_NPN_Count__c</field>
             </layoutItems>
         </layoutColumns>
         <layoutColumns>

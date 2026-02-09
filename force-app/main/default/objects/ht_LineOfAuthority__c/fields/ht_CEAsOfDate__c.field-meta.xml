@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>ht_CEAsOfDate__c</fullName>
+    <fullName>d4c_CEAsOfDate__c</fullName>
     <label>CE As Of Date</label>
     <required>false</required>
     <trackTrending>false</trackTrending>

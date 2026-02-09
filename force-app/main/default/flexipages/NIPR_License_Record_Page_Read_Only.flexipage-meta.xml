@@ -50,8 +50,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_LicenseNumber__c</fieldItem>
-                <identifier>Recordht_LicenseNumber_cField</identifier>
+                <fieldItem>Record.d4c_LicenseNumber__c</fieldItem>
+                <identifier>Recordd4c_LicenseNumber_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -60,8 +60,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_StateOrProvinceCode__c</fieldItem>
-                <identifier>Recordht_StateOrProvinceCode_cField</identifier>
+                <fieldItem>Record.d4c_StateOrProvinceCode__c</fieldItem>
+                <identifier>Recordd4c_StateOrProvinceCode_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -70,8 +70,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_StatusCode__c</fieldItem>
-                <identifier>Recordht_StatusCode_cField</identifier>
+                <fieldItem>Record.d4c_StatusCode__c</fieldItem>
+                <identifier>Recordd4c_StatusCode_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -80,8 +80,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_StatusDescription__c</fieldItem>
-                <identifier>Recordht_StatusDescription_cField</identifier>
+                <fieldItem>Record.d4c_StatusDescription__c</fieldItem>
+                <identifier>Recordd4c_StatusDescription_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -90,8 +90,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_LicenseClassCode__c</fieldItem>
-                <identifier>Recordht_LicenseClassCode_cField</identifier>
+                <fieldItem>Record.d4c_LicenseClassCode__c</fieldItem>
+                <identifier>Recordd4c_LicenseClassCode_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -100,8 +100,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_LicenseClassDescription__c</fieldItem>
-                <identifier>Recordht_LicenseClassDescription_cField</identifier>
+                <fieldItem>Record.d4c_LicenseClassDescription__c</fieldItem>
+                <identifier>Recordd4c_LicenseClassDescription_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -110,8 +110,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_PeriodDuration__c</fieldItem>
-                <identifier>Recordht_PeriodDuration_cField</identifier>
+                <fieldItem>Record.d4c_PeriodDuration__c</fieldItem>
+                <identifier>Recordd4c_PeriodDuration_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -120,8 +120,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_QualifyingInsuranceLicenseIndicator__c</fieldItem>
-                <identifier>Recordht_QualifyingInsuranceLicenseIndicator_cField</identifier>
+                <fieldItem>Record.d4c_QualifyingInsuranceLicenseIndicator__c</fieldItem>
+                <identifier>Recordd4c_QualifyingInsuranceLicenseIndicator_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -130,8 +130,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_ResidentLicenseIndicator__c</fieldItem>
-                <identifier>Recordht_ResidentLicenseIndicator_cField</identifier>
+                <fieldItem>Record.d4c_ResidentLicenseIndicator__c</fieldItem>
+                <identifier>Recordd4c_ResidentLicenseIndicator_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-bc663206-d32b-4e79-b567-a407629ae268</name>
@@ -144,8 +144,8 @@
                     <name>uiBehavior</name>
                     <value>required</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_Producer__c</fieldItem>
-                <identifier>Recordht_Producer_cField</identifier>
+                <fieldItem>Record.d4c_Producer__c</fieldItem>
+                <identifier>Recordd4c_Producer_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -154,8 +154,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_StartDate__c</fieldItem>
-                <identifier>Recordht_StartDate_cField</identifier>
+                <fieldItem>Record.d4c_StartDate__c</fieldItem>
+                <identifier>Recordd4c_StartDate_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -164,8 +164,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_EndDate__c</fieldItem>
-                <identifier>Recordht_EndDate_cField</identifier>
+                <fieldItem>Record.d4c_EndDate__c</fieldItem>
+                <identifier>Recordd4c_EndDate_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -174,8 +174,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_IssueDate__c</fieldItem>
-                <identifier>Recordht_IssueDate_cField</identifier>
+                <fieldItem>Record.d4c_IssueDate__c</fieldItem>
+                <identifier>Recordd4c_IssueDate_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -184,8 +184,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_AsOfDate__c</fieldItem>
-                <identifier>Recordht_AsOfDate_cField</identifier>
+                <fieldItem>Record.d4c_AsOfDate__c</fieldItem>
+                <identifier>Recordd4c_AsOfDate_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -194,8 +194,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_TypeCode__c</fieldItem>
-                <identifier>Recordht_TypeCode_cField</identifier>
+                <fieldItem>Record.d4c_TypeCode__c</fieldItem>
+                <identifier>Recordd4c_TypeCode_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -204,8 +204,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_License_Products__c</fieldItem>
-                <identifier>Recordht_License_Products_cField</identifier>
+                <fieldItem>Record.d4c_License_Products__c</fieldItem>
+                <identifier>Recordd4c_License_Products_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -214,8 +214,8 @@
                     <name>uiBehavior</name>
                     <value>none</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_NumberOfProductMatchedLOAs__c</fieldItem>
-                <identifier>Recordht_NumberOfProductMatchedLOAs_cField</identifier>
+                <fieldItem>Record.d4c_NumberOfProductMatchedLOAs__c</fieldItem>
+                <identifier>Recordd4c_NumberOfProductMatchedLOAs_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -224,8 +224,8 @@
                     <name>uiBehavior</name>
                     <value>none</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_NumberOfProductNotMatchedLOAs__c</fieldItem>
-                <identifier>Recordht_NumberOfProductNotMatchedLOAs_cField</identifier>
+                <fieldItem>Record.d4c_NumberOfProductNotMatchedLOAs__c</fieldItem>
+                <identifier>Recordd4c_NumberOfProductNotMatchedLOAs_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -234,8 +234,8 @@
                     <name>uiBehavior</name>
                     <value>none</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_AllLOAsMatchedToProduct__c</fieldItem>
-                <identifier>Recordht_AllLOAsMatchedToProduct_cField</identifier>
+                <fieldItem>Record.d4c_AllLOAsMatchedToProduct__c</fieldItem>
+                <identifier>Recordd4c_AllLOAsMatchedToProduct_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-d45faf27-cff5-47a0-a36f-0c3f54275067</name>
@@ -272,8 +272,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_CEStartDate__c</fieldItem>
-                <identifier>Recordht_CEStartDate_cField</identifier>
+                <fieldItem>Record.d4c_CEStartDate__c</fieldItem>
+                <identifier>Recordd4c_CEStartDate_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -282,8 +282,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_CEStatusDescription__c</fieldItem>
-                <identifier>Recordht_CEStatusDescription_cField</identifier>
+                <fieldItem>Record.d4c_CEStatusDescription__c</fieldItem>
+                <identifier>Recordd4c_CEStatusDescription_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -292,8 +292,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_CEUnitsRequiredMeasure__c</fieldItem>
-                <identifier>Recordht_CEUnitsRequiredMeasure_cField</identifier>
+                <fieldItem>Record.d4c_CEUnitsRequiredMeasure__c</fieldItem>
+                <identifier>Recordd4c_CEUnitsRequiredMeasure_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-2f2e6d30-9310-4b7e-a7a3-4c32d396f18e</name>
@@ -306,8 +306,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_StateOrProvinceName__c</fieldItem>
-                <identifier>Recordht_StateOrProvinceName_cField</identifier>
+                <fieldItem>Record.d4c_StateOrProvinceName__c</fieldItem>
+                <identifier>Recordd4c_StateOrProvinceName_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -316,8 +316,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_CEStateOrProvince_Code__c</fieldItem>
-                <identifier>Recordht_CEStateOrProvince_Code_cField</identifier>
+                <fieldItem>Record.d4c_CEStateOrProvince_Code__c</fieldItem>
+                <identifier>Recordd4c_CEStateOrProvince_Code_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-d7e268eb-1878-4b7b-b246-dd3b779dbbef</name>
@@ -364,7 +364,7 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_UniqueIdentifier__c</fieldItem>
+                <fieldItem>Record.d4c_UniqueIdentifier__c</fieldItem>
                 <identifier>RecordUnique_Identifier__cField</identifier>
             </fieldInstance>
         </itemInstances>
@@ -522,7 +522,7 @@
                 </componentInstanceProperties>
                 <componentInstanceProperties>
                     <name>parentFieldApiName</name>
-                    <value>ht_License__c.Id</value>
+                    <value>d4c_License__c.Id</value>
                 </componentInstanceProperties>
                 <componentInstanceProperties>
                     <name>relatedListApiName</name>
@@ -539,16 +539,16 @@
                             <value>NAME</value>
                         </valueListItems>
                         <valueListItems>
-                            <value>ht_StateOrProvinceCode__c</value>
+                            <value>d4c_StateOrProvinceCode__c</value>
                         </valueListItems>
                         <valueListItems>
-                            <value>ht_LineOfAuthorityCode__c</value>
+                            <value>d4c_LineOfAuthorityCode__c</value>
                         </valueListItems>
                         <valueListItems>
-                            <value>ht_LineOfAuthorityDescription__c</value>
+                            <value>d4c_LineOfAuthorityDescription__c</value>
                         </valueListItems>
                         <valueListItems>
-                            <value>ht_IssueDate__c</value>
+                            <value>d4c_IssueDate__c</value>
                         </valueListItems>
                     </valueList>
                 </componentInstanceProperties>
@@ -586,7 +586,7 @@
                 <identifier>flexipage_richText</identifier>
                 <visibilityRule>
                     <criteria>
-                        <leftValue>{!Record.ht_AllLOAsMatchedToProduct__c}</leftValue>
+                        <leftValue>{!Record.d4c_AllLOAsMatchedToProduct__c}</leftValue>
                         <operator>EQUAL</operator>
                         <rightValue>false</rightValue>
                     </criteria>
@@ -604,7 +604,7 @@
                 </componentInstanceProperties>
                 <componentInstanceProperties>
                     <name>parentFieldApiName</name>
-                    <value>ht_License__c.Id</value>
+                    <value>d4c_License__c.Id</value>
                 </componentInstanceProperties>
                 <componentInstanceProperties>
                     <name>relatedListApiName</name>
@@ -618,13 +618,13 @@
                     <name>relatedListFieldAliases</name>
                     <valueList>
                         <valueListItems>
-                            <value>ht_Insurance_Product__c.NAME</value>
+                            <value>d4c_Insurance_Product__c.NAME</value>
                         </valueListItems>
                         <valueListItems>
-                            <value>ht_Insurance_Product__c.ht_ProductName__c</value>
+                            <value>d4c_Insurance_Product__c.d4c_ProductName__c</value>
                         </valueListItems>
                         <valueListItems>
-                            <value>ht_Insurance_Product__c.ht_StateOrProvince__c</value>
+                            <value>d4c_Insurance_Product__c.d4c_StateOrProvince__c</value>
                         </valueListItems>
                     </valueList>
                 </componentInstanceProperties>
@@ -652,7 +652,7 @@
         <type>Region</type>
     </flexiPageRegions>
     <masterLabel>NIPR License Record Page - Read Only</masterLabel>
-    <sobjectType>ht_License__c</sobjectType>
+    <sobjectType>d4c_License__c</sobjectType>
     <template>
         <name>flexipage:recordHomeTemplateDesktop</name>
         <properties>

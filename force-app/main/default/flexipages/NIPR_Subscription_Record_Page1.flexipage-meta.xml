@@ -71,8 +71,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_Subscription_Name__c</fieldItem>
-                <identifier>Recordht_Subscription_Name_cField</identifier>
+                <fieldItem>Record.d4c_Subscription_Name__c</fieldItem>
+                <identifier>Recordd4c_Subscription_Name_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -81,8 +81,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_ExcludeCarrierAppointments__c</fieldItem>
-                <identifier>Recordht_ExcludeCarrierAppointments_cField</identifier>
+                <fieldItem>Record.d4c_ExcludeCarrierAppointments__c</fieldItem>
+                <identifier>Recordd4c_ExcludeCarrierAppointments_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-d7da845c-96ad-4364-968c-0a182ae9b8af</name>
@@ -105,8 +105,8 @@
                     <name>uiBehavior</name>
                     <value>none</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_LastNIPRSync__c</fieldItem>
-                <identifier>Recordht_LastNIPRSync_cField</identifier>
+                <fieldItem>Record.d4c_LastNIPRSync__c</fieldItem>
+                <identifier>Recordd4c_LastNIPRSync_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-8672fc56-b8b4-4bf9-a9be-aa54c5b6ac6c</name>
@@ -292,7 +292,7 @@
     </flexiPageRegions>
     <masterLabel>NIPR Subscription Record Page</masterLabel>
     <parentFlexiPage>flexipage__default_rec_L</parentFlexiPage>
-    <sobjectType>ht_Subscription__c</sobjectType>
+    <sobjectType>d4c_Subscription__c</sobjectType>
     <template>
         <name>flexipage:recordHomeTemplateDesktop</name>
     </template>

@@ -20,11 +20,11 @@ private class ProducerTriggerHandler_Test {
     private static void afterInsert_testEligibleProducers() {
         // Create Data
         Set<String> npns = new Set<String>{'123456789', '987654321'};
-        List<ht_Producer__c> producers = TestDataFactory.createProducers(npns);
+        List<d4c_Producer__c> producers = TestDataFactory.createProducers(npns);
         
         // Set SyncRecordToNIPR__c to 'On' to make them eligible
-        for (ht_Producer__c producer : producers) {
-            producer.ht_SyncRecordToNIPR__c = 'On';
+        for (d4c_Producer__c producer : producers) {
+            producer.d4c_SyncRecordToNIPR__c = 'On';
         }
         
         // Execute
@@ -33,7 +33,7 @@ private class ProducerTriggerHandler_Test {
         Test.stopTest();
         
         // Assert
-        List<ht_Producer__c> insertedProducers = queryProducers(npns);
+        List<d4c_Producer__c> insertedProducers = queryProducers(npns);
 
         System.assertEquals(2, insertedProducers.size(), 'Should have inserted 2 producers');
         System.assertEquals(2, ProducerTriggerHandler.producerNPNsForEntityInfoAPIForTest.size(), 'Should have collected 2 NPNs');
@@ -45,12 +45,12 @@ private class ProducerTriggerHandler_Test {
     private static void afterInsert_testIneligibleProducers() {
         // Create Data
         Set<String> npns = new Set<String>{'123456789', '987654321', ''};
-        List<ht_Producer__c> producers = TestDataFactory.createProducers(npns);
+        List<d4c_Producer__c> producers = TestDataFactory.createProducers(npns);
         
         // Mix of On, Off and empty NPN scenarios
-        producers[0].ht_SyncRecordToNIPR__c = 'On';
-        producers[1].ht_SyncRecordToNIPR__c = 'Off';
-        producers[2].ht_SyncRecordToNIPR__c = 'On';
+        producers[0].d4c_SyncRecordToNIPR__c = 'On';
+        producers[1].d4c_SyncRecordToNIPR__c = 'Off';
+        producers[2].d4c_SyncRecordToNIPR__c = 'On';
         
         // Execute
         Test.startTest();
@@ -67,19 +67,19 @@ private class ProducerTriggerHandler_Test {
     private static void afterUpdate_testNPNChanges() {
         // Create Data
         Set<String> npns = new Set<String>{'123456789', '987654321'};
-        List<ht_Producer__c> producers = TestDataFactory.createProducers(npns);
+        List<d4c_Producer__c> producers = TestDataFactory.createProducers(npns);
         
         // Set initial state
-        for (ht_Producer__c producer : producers) {
-            producer.ht_SyncRecordToNIPR__c = 'On';
+        for (d4c_Producer__c producer : producers) {
+            producer.d4c_SyncRecordToNIPR__c = 'On';
         }
         
         ProducerTriggerHandler.triggerDisabled = true;
         insert producers;
         
         // Update the NPNs for testing update scenario
-        producers[0].ht_NPN__c = '111222333';
-        producers[1].ht_SyncRecordToNIPR__c = 'Off';
+        producers[0].d4c_NPN__c = '111222333';
+        producers[1].d4c_SyncRecordToNIPR__c = 'Off';
         
         ProducerTriggerHandler.triggerDisabled = false;
 
@@ -97,20 +97,20 @@ private class ProducerTriggerHandler_Test {
     private static void afterUpdate_testSubscriptionEligibility() {
         // Create Data
         Set<String> npns = new Set<String>{'123456789', '987654321', '555666777'};
-        List<ht_Producer__c> producers = TestDataFactory.createProducers(npns);
+        List<d4c_Producer__c> producers = TestDataFactory.createProducers(npns);
 
         ProducerTriggerHandler.triggerDisabled = true;
 
         insert producers;
 
-        producers[0].ht_SyncRecordToNIPR__c = 'On';
-        producers[0].ht_NPNStatus__c = 'Active';
+        producers[0].d4c_SyncRecordToNIPR__c = 'On';
+        producers[0].d4c_NPNStatus__c = 'Active';
 
-        producers[1].ht_SyncRecordToNIPR__c = 'On';
-        producers[1].ht_NPNStatus__c = 'Inactive';
+        producers[1].d4c_SyncRecordToNIPR__c = 'On';
+        producers[1].d4c_NPNStatus__c = 'Inactive';
 
-        producers[2].ht_SyncRecordToNIPR__c = 'Off';
-        producers[2].ht_NPNStatus__c = 'Active';
+        producers[2].d4c_SyncRecordToNIPR__c = 'Off';
+        producers[2].d4c_NPNStatus__c = 'Active';
 
         ProducerTriggerHandler.triggerDisabled = false;
 
@@ -143,23 +143,23 @@ private class ProducerTriggerHandler_Test {
     private static void testCombinedScenarios() {
         // Create Data
         Set<String> npns = new Set<String>{'123456789', '987654321', '555666777'};
-        List<ht_Producer__c> producers = TestDataFactory.createProducers(npns);
+        List<d4c_Producer__c> producers = TestDataFactory.createProducers(npns);
 
-        for (ht_Producer__c producer : producers) {
-            producer.ht_SyncRecordToNIPR__c = 'Off';
+        for (d4c_Producer__c producer : producers) {
+            producer.d4c_SyncRecordToNIPR__c = 'Off';
         }
 
         ProducerTriggerHandler.triggerdisabled = true;
 
         insert producers;
 
-        producers[0].ht_SyncRecordToNIPR__c = 'On';
-        producers[0].ht_NPNStatus__c = 'Active';
+        producers[0].d4c_SyncRecordToNIPR__c = 'On';
+        producers[0].d4c_NPNStatus__c = 'Active';
 
-        producers[1].ht_SyncRecordToNIPR__c = 'On';
-        producers[1].ht_NPNStatus__c = 'Inactive';
+        producers[1].d4c_SyncRecordToNIPR__c = 'On';
+        producers[1].d4c_NPNStatus__c = 'Inactive';
 
-        producers[2].ht_NPN__c = '999888777';
+        producers[2].d4c_NPN__c = '999888777';
 
         ProducerTriggerHandler.triggerDisabled = false;
 
@@ -180,17 +180,17 @@ private class ProducerTriggerHandler_Test {
     private static void beforeInsert_testNPNStatusChanges() {
         // Create Data
         Set<String> npns = new Set<String>{'123456789', '987654321', '555666777'};
-        List<ht_Producer__c> producers = TestDataFactory.createProducers(npns);
+        List<d4c_Producer__c> producers = TestDataFactory.createProducers(npns);
         
         // Test different scenarios
-        producers[0].ht_SyncRecordToNIPR__c = 'On';
-        producers[0].ht_NPNStatus__c = null;
+        producers[0].d4c_SyncRecordToNIPR__c = 'On';
+        producers[0].d4c_NPNStatus__c = null;
         
-        producers[1].ht_SyncRecordToNIPR__c = 'Off';
-        producers[1].ht_NPNStatus__c = null;
+        producers[1].d4c_SyncRecordToNIPR__c = 'Off';
+        producers[1].d4c_NPNStatus__c = null;
         
-        producers[2].ht_SyncRecordToNIPR__c = 'On';
-        producers[2].ht_NPNStatus__c = 'Active';
+        producers[2].d4c_SyncRecordToNIPR__c = 'On';
+        producers[2].d4c_NPNStatus__c = 'Active';
         
         // Execute
         Test.startTest();
@@ -198,33 +198,33 @@ private class ProducerTriggerHandler_Test {
         Test.stopTest();
         
         // Assert
-        List<ht_Producer__c> insertedProducers = queryProducers(npns);
+        List<d4c_Producer__c> insertedProducers = queryProducers(npns);
         
-        System.assertEquals('Processing', insertedProducers[0].ht_NPNStatus__c, 'First producer should have NPNStatus set to Processing');
-        System.assertNotEquals('Processing', insertedProducers[1].ht_NPNStatus__c, 'Second producer should not have NPNStatus set to Processing');
-        System.assertEquals('Active', insertedProducers[2].ht_NPNStatus__c, 'Third producer should maintain Active status');
+        System.assertEquals('Processing', insertedProducers[0].d4c_NPNStatus__c, 'First producer should have NPNStatus set to Processing');
+        System.assertNotEquals('Processing', insertedProducers[1].d4c_NPNStatus__c, 'Second producer should not have NPNStatus set to Processing');
+        System.assertEquals('Active', insertedProducers[2].d4c_NPNStatus__c, 'Third producer should maintain Active status');
     }
     
     @isTest
     private static void beforeUpdate_testNPNStatusChanges() {
         // Create Data
         Set<String> npns = new Set<String>{'123456789', '987654321', '555666777'};
-        List<ht_Producer__c> producers = TestDataFactory.createProducers(npns);
+        List<d4c_Producer__c> producers = TestDataFactory.createProducers(npns);
         
         ProducerTriggerHandler.triggerDisabled = true;
         insert producers;
         ProducerTriggerHandler.triggerDisabled = false;
         
         // Test different update scenarios
-        producers[0].ht_NPN__c = '111222333';
-        producers[0].ht_SyncRecordToNIPR__c = 'On';
-        producers[0].ht_NPNStatus__c = 'Inactive';
+        producers[0].d4c_NPN__c = '111222333';
+        producers[0].d4c_SyncRecordToNIPR__c = 'On';
+        producers[0].d4c_NPNStatus__c = 'Inactive';
         
-        producers[1].ht_NPN__c = '987654321'; // No change
-        producers[1].ht_SyncRecordToNIPR__c = 'On';
+        producers[1].d4c_NPN__c = '987654321'; // No change
+        producers[1].d4c_SyncRecordToNIPR__c = 'On';
         
-        producers[2].ht_NPN__c = '999888777';
-        producers[2].ht_SyncRecordToNIPR__c = 'Off';
+        producers[2].d4c_NPN__c = '999888777';
+        producers[2].d4c_SyncRecordToNIPR__c = 'Off';
         
         // Execute
         Test.startTest();
@@ -232,45 +232,45 @@ private class ProducerTriggerHandler_Test {
         Test.stopTest();
         
         // Assert
-        List<ht_Producer__c> updatedProducers = queryProducers(new Set<String>{'111222333', '987654321', '999888777'});
+        List<d4c_Producer__c> updatedProducers = queryProducers(new Set<String>{'111222333', '987654321', '999888777'});
         
         // Find each producer by its NPN
-        ht_Producer__c producer1 = null;
-        ht_Producer__c producer2 = null;
-        ht_Producer__c producer3 = null;
+        d4c_Producer__c producer1 = null;
+        d4c_Producer__c producer2 = null;
+        d4c_Producer__c producer3 = null;
         
-        for (ht_Producer__c p : updatedProducers) {
-            if (p.ht_NPN__c == '111222333') producer1 = p;
-            if (p.ht_NPN__c == '987654321') producer2 = p;
-            if (p.ht_NPN__c == '999888777') producer3 = p;
+        for (d4c_Producer__c p : updatedProducers) {
+            if (p.d4c_NPN__c == '111222333') producer1 = p;
+            if (p.d4c_NPN__c == '987654321') producer2 = p;
+            if (p.d4c_NPN__c == '999888777') producer3 = p;
         }
         
-        System.assertEquals('Processing', producer1.ht_NPNStatus__c, 'First producer should have NPNStatus changed to Processing');
-        System.assertNotEquals('Processing', producer2.ht_NPNStatus__c, 'Second producer should not have NPNStatus changed to Processing');
-        System.assertNotEquals('Processing', producer3.ht_NPNStatus__c, 'Third producer should not have NPNStatus changed to Processing');
+        System.assertEquals('Processing', producer1.d4c_NPNStatus__c, 'First producer should have NPNStatus changed to Processing');
+        System.assertNotEquals('Processing', producer2.d4c_NPNStatus__c, 'Second producer should not have NPNStatus changed to Processing');
+        System.assertNotEquals('Processing', producer3.d4c_NPNStatus__c, 'Third producer should not have NPNStatus changed to Processing');
     }
     
     @isTest
     private static void beforeUpdate_testSyncDisabled() {
         // Create Data
         Set<String> npns = new Set<String>{'123456789', '987654321'};
-        List<ht_Producer__c> producers = TestDataFactory.createProducers(npns);
+        List<d4c_Producer__c> producers = TestDataFactory.createProducers(npns);
         
         // Set initial state - both with Sync On
-        producers[0].ht_SyncRecordToNIPR__c = 'On';
-        producers[0].ht_NPNStatus__c = 'Active';
-        producers[0].ht_NPNSyncError__c = 'Some error message';
+        producers[0].d4c_SyncRecordToNIPR__c = 'On';
+        producers[0].d4c_NPNStatus__c = 'Active';
+        producers[0].d4c_NPNSyncError__c = 'Some error message';
         
-        producers[1].ht_SyncRecordToNIPR__c = 'On';
-        producers[1].ht_NPNStatus__c = 'Processing';
-        producers[1].ht_NPNSyncError__c = 'Another error message';
+        producers[1].d4c_SyncRecordToNIPR__c = 'On';
+        producers[1].d4c_NPNStatus__c = 'Processing';
+        producers[1].d4c_NPNSyncError__c = 'Another error message';
         
         ProducerTriggerHandler.triggerDisabled = true;
         insert producers;
         ProducerTriggerHandler.triggerDisabled = false;
         
         // Update scenario - turning sync off
-        producers[0].ht_SyncRecordToNIPR__c = 'Off';
+        producers[0].d4c_SyncRecordToNIPR__c = 'Off';
         
         // Execute
         Test.startTest();
@@ -278,22 +278,22 @@ private class ProducerTriggerHandler_Test {
         Test.stopTest();
         
         // Assert
-        List<ht_Producer__c> updatedProducers = queryProducers(npns);
+        List<d4c_Producer__c> updatedProducers = queryProducers(npns);
         
-        System.assertEquals('Sync Disabled', updatedProducers[0].ht_NPNStatus__c, 'First producer should have NPNStatus set to Sync Disabled');
-        System.assertEquals(null, updatedProducers[0].ht_NPNSyncError__c, 'First producer should have error message cleared');
-        System.assertNotEquals('Sync Disabled', updatedProducers[1].ht_NPNStatus__c, 'Second producer should not have NPNStatus changed to Sync Disabled');
+        System.assertEquals('Sync Disabled', updatedProducers[0].d4c_NPNStatus__c, 'First producer should have NPNStatus set to Sync Disabled');
+        System.assertEquals(null, updatedProducers[0].d4c_NPNSyncError__c, 'First producer should have error message cleared');
+        System.assertNotEquals('Sync Disabled', updatedProducers[1].d4c_NPNStatus__c, 'Second producer should not have NPNStatus changed to Sync Disabled');
     }
     
     @isTest
     private static void afterUpdate_testSyncStatusChange() {
         // Create Data
         Set<String> npns = new Set<String>{'123456789', '987654321'};
-        List<ht_Producer__c> producers = TestDataFactory.createProducers(npns);
+        List<d4c_Producer__c> producers = TestDataFactory.createProducers(npns);
         
         // Set initial state - both with Sync Off
-        for (ht_Producer__c producer : producers) {
-            producer.ht_SyncRecordToNIPR__c = 'Off';
+        for (d4c_Producer__c producer : producers) {
+            producer.d4c_SyncRecordToNIPR__c = 'Off';
         }
         
         ProducerTriggerHandler.triggerDisabled = true;
@@ -301,8 +301,8 @@ private class ProducerTriggerHandler_Test {
         ProducerTriggerHandler.triggerDisabled = false;
         
         // Update to turn sync on
-        producers[0].ht_SyncRecordToNIPR__c = 'On';
-        producers[1].ht_SyncRecordToNIPR__c = 'On';
+        producers[0].d4c_SyncRecordToNIPR__c = 'On';
+        producers[1].d4c_SyncRecordToNIPR__c = 'On';
         
         // Execute
         Test.startTest();
@@ -323,23 +323,23 @@ private class ProducerTriggerHandler_Test {
     @isTest
     private static void afterUpdate_testNPNRemovalEligibility() {
         // Create Data - producer with subscription and Active status
-        ht_Producer__c producer = TestDataFactory.createProducer('123456789');
+        d4c_Producer__c producer = TestDataFactory.createProducer('123456789');
 
         // Create a mock subscription record
-        ht_Subscription__c subscription = TestDataFactory.createSubscription(false);
+        d4c_Subscription__c subscription = TestDataFactory.createSubscription(false);
         insert subscription;
 
         // Set initial state
-        producer.ht_SyncRecordToNIPR__c = 'On';
-        producer.ht_NPNStatus__c = 'Active';
-        producer.ht_Subscription__c = subscription.Id;
+        producer.d4c_SyncRecordToNIPR__c = 'On';
+        producer.d4c_NPNStatus__c = 'Active';
+        producer.d4c_Subscription__c = subscription.Id;
 
         ProducerTriggerHandler.triggerDisabled = true;
         insert producer;
         ProducerTriggerHandler.triggerDisabled = false;
 
         // Update scenario - turning sync off (triggers REMOVE_NPN_AFTER_UPDATE)
-        producer.ht_SyncRecordToNIPR__c = 'Off';
+        producer.d4c_SyncRecordToNIPR__c = 'Off';
 
         // Execute
         Test.startTest();
@@ -360,24 +360,24 @@ private class ProducerTriggerHandler_Test {
     private static void afterDelete_testNPNRemovalFromDeletedProducers() {
         // Create Data - producers with subscriptions and Active status
         Set<String> npns = new Set<String>{'123456789', '987654321', '555666777'};
-        List<ht_Producer__c> producers = TestDataFactory.createProducers(npns);
+        List<d4c_Producer__c> producers = TestDataFactory.createProducers(npns);
 
         // Create a mock subscription record
-        ht_Subscription__c subscription = TestDataFactory.createSubscription(false);
+        d4c_Subscription__c subscription = TestDataFactory.createSubscription(false);
         insert subscription;
 
         // Set producers with different statuses
         // Producer 0: Active with subscription - should be eligible for removal
-        producers[0].ht_NPNStatus__c = 'Active';
-        producers[0].ht_Subscription__c = subscription.Id;
+        producers[0].d4c_NPNStatus__c = 'Active';
+        producers[0].d4c_Subscription__c = subscription.Id;
 
         // Producer 1: Not Active but with subscription - should not be eligible
-        producers[1].ht_NPNStatus__c = 'Inactive';
-        producers[1].ht_Subscription__c = subscription.Id;
+        producers[1].d4c_NPNStatus__c = 'Inactive';
+        producers[1].d4c_Subscription__c = subscription.Id;
 
         // Producer 2: Active but no subscription - should not be eligible
-        producers[2].ht_NPNStatus__c = 'Active';
-        producers[2].ht_Subscription__c = null;
+        producers[2].d4c_NPNStatus__c = 'Active';
+        producers[2].d4c_Subscription__c = null;
 
         ProducerTriggerHandler.triggerDisabled = true;
         insert producers;
@@ -392,7 +392,7 @@ private class ProducerTriggerHandler_Test {
         System.assertEquals(1, ProducerTriggerHandler.deletedProducersForTest.size(),
                           'Should have collected 1 producer for NPN removal after delete');
 
-        System.assertEquals('123456789', ProducerTriggerHandler.deletedProducersForTest[0].ht_NPN__c,
+        System.assertEquals('123456789', ProducerTriggerHandler.deletedProducersForTest[0].d4c_NPN__c,
                           'The eligible producer should have NPN 123456789');
 
         // NEW: Assert the bulkified Map property
@@ -408,31 +408,31 @@ private class ProducerTriggerHandler_Test {
     @isTest
     private static void afterUpdate_testBulkSubscriptionOperationValidation() {
         // Create Data - 2 producers that will both trigger subscription operations
-        ht_Subscription__c subscription = TestDataFactory.createSubscription(false);
+        d4c_Subscription__c subscription = TestDataFactory.createSubscription(false);
         insert subscription;
 
-        ht_Producer__c producer1 = TestDataFactory.createProducer('123456789');
-        producer1.ht_SyncRecordToNIPR__c = 'On';
-        producer1.ht_NPNStatus__c = 'Active';
-        producer1.ht_Subscription__c = subscription.Id;
+        d4c_Producer__c producer1 = TestDataFactory.createProducer('123456789');
+        producer1.d4c_SyncRecordToNIPR__c = 'On';
+        producer1.d4c_NPNStatus__c = 'Active';
+        producer1.d4c_Subscription__c = subscription.Id;
 
-        ht_Producer__c producer2 = TestDataFactory.createProducer('987654321');
-        producer2.ht_SyncRecordToNIPR__c = 'On';
-        producer2.ht_NPNStatus__c = 'Active';
-        producer2.ht_Subscription__c = subscription.Id;
+        d4c_Producer__c producer2 = TestDataFactory.createProducer('987654321');
+        producer2.d4c_SyncRecordToNIPR__c = 'On';
+        producer2.d4c_NPNStatus__c = 'Active';
+        producer2.d4c_Subscription__c = subscription.Id;
 
         ProducerTriggerHandler.triggerDisabled = true;
-        insert new List<ht_Producer__c>{producer1, producer2};
+        insert new List<d4c_Producer__c>{producer1, producer2};
         ProducerTriggerHandler.triggerDisabled = false;
 
         // Try to trigger subscription operations on both (should fail)
-        producer1.ht_SyncRecordToNIPR__c = 'Off'; // Trigger REMOVE_NPN_AFTER_UPDATE
-        producer2.ht_SyncRecordToNIPR__c = 'Off'; // Trigger REMOVE_NPN_AFTER_UPDATE
+        producer1.d4c_SyncRecordToNIPR__c = 'Off'; // Trigger REMOVE_NPN_AFTER_UPDATE
+        producer2.d4c_SyncRecordToNIPR__c = 'Off'; // Trigger REMOVE_NPN_AFTER_UPDATE
 
         // Execute
         Test.startTest();
         try {
-            update new List<ht_Producer__c>{producer1, producer2};
+            update new List<d4c_Producer__c>{producer1, producer2};
             System.assert(false, 'Expected DmlException was not thrown');
         } catch (DmlException e) {
             // Assert the error message contains our validation message
@@ -447,19 +447,19 @@ private class ProducerTriggerHandler_Test {
     @isTest
     private static void afterUpdate_testExcludeFlagChange_FromFalseToTrue() {
         // Create a subscription and an active producer with exclude flag = false
-        ht_Subscription__c subscription = TestDataFactory.createSubscription(true);
-        subscription.ht_ExcludeCarrierAppointments__c = false;
+        d4c_Subscription__c subscription = TestDataFactory.createSubscription(true);
+        subscription.d4c_ExcludeCarrierAppointments__c = false;
         update subscription;
 
-        ht_Producer__c producer = TestDataFactory.createProducer('12345678');
-        producer.ht_SyncRecordToNIPR__c = 'On';
-        producer.ht_NPNStatus__c = 'Active';
-        producer.ht_ExcludeCarrierAppointments__c = false;
-        producer.ht_Subscription__c = subscription.Id;
+        d4c_Producer__c producer = TestDataFactory.createProducer('12345678');
+        producer.d4c_SyncRecordToNIPR__c = 'On';
+        producer.d4c_NPNStatus__c = 'Active';
+        producer.d4c_ExcludeCarrierAppointments__c = false;
+        producer.d4c_Subscription__c = subscription.Id;
         insert producer;
 
         // Update producer to change exclude flag from false to true
-        producer.ht_ExcludeCarrierAppointments__c = true;
+        producer.d4c_ExcludeCarrierAppointments__c = true;
 
         // Execute
         Test.startTest();
@@ -475,19 +475,19 @@ private class ProducerTriggerHandler_Test {
     @isTest
     private static void afterUpdate_testExcludeFlagChange_FromTrueToFalse() {
         // Create a subscription and an active producer with exclude flag = true
-        ht_Subscription__c subscription = TestDataFactory.createSubscription(true);
-        subscription.ht_ExcludeCarrierAppointments__c = true;
+        d4c_Subscription__c subscription = TestDataFactory.createSubscription(true);
+        subscription.d4c_ExcludeCarrierAppointments__c = true;
         update subscription;
 
-        ht_Producer__c producer = TestDataFactory.createProducer('87654321');
-        producer.ht_SyncRecordToNIPR__c = 'On';
-        producer.ht_NPNStatus__c = 'Active';
-        producer.ht_ExcludeCarrierAppointments__c = true;
-        producer.ht_Subscription__c = subscription.Id;
+        d4c_Producer__c producer = TestDataFactory.createProducer('87654321');
+        producer.d4c_SyncRecordToNIPR__c = 'On';
+        producer.d4c_NPNStatus__c = 'Active';
+        producer.d4c_ExcludeCarrierAppointments__c = true;
+        producer.d4c_Subscription__c = subscription.Id;
         insert producer;
 
         // Update producer to change exclude flag from true to false
-        producer.ht_ExcludeCarrierAppointments__c = false;
+        producer.d4c_ExcludeCarrierAppointments__c = false;
 
         // Execute
         Test.startTest();
@@ -505,23 +505,23 @@ private class ProducerTriggerHandler_Test {
         // Test that producers not active or not subscribed are NOT flagged for re-subscription
 
         // Create producer 1 - Not Active
-        ht_Producer__c producer1 = TestDataFactory.createProducer('11111111');
-        producer1.ht_SyncRecordToNIPR__c = 'On';
-        producer1.ht_NPNStatus__c = 'Processing'; // Not Active
-        producer1.ht_ExcludeCarrierAppointments__c = false;
-        producer1.ht_Subscription__c = null;
+        d4c_Producer__c producer1 = TestDataFactory.createProducer('11111111');
+        producer1.d4c_SyncRecordToNIPR__c = 'On';
+        producer1.d4c_NPNStatus__c = 'Processing'; // Not Active
+        producer1.d4c_ExcludeCarrierAppointments__c = false;
+        producer1.d4c_Subscription__c = null;
         insert producer1;
 
         // Create producer 2 - Active but not subscribed
-        ht_Producer__c producer2 = TestDataFactory.createProducer('22222222');
-        producer2.ht_SyncRecordToNIPR__c = 'On';
-        producer2.ht_NPNStatus__c = 'Active'; // Active but not subscribed
-        producer2.ht_ExcludeCarrierAppointments__c = false;
-        producer2.ht_Subscription__c = null; // No subscription
+        d4c_Producer__c producer2 = TestDataFactory.createProducer('22222222');
+        producer2.d4c_SyncRecordToNIPR__c = 'On';
+        producer2.d4c_NPNStatus__c = 'Active'; // Active but not subscribed
+        producer2.d4c_ExcludeCarrierAppointments__c = false;
+        producer2.d4c_Subscription__c = null; // No subscription
         insert producer2;
 
         // Update producer 1 to change exclude flag (not active, should not be flagged)
-        producer1.ht_ExcludeCarrierAppointments__c = true;
+        producer1.d4c_ExcludeCarrierAppointments__c = true;
 
         // Execute
         Test.startTest();
@@ -531,7 +531,7 @@ private class ProducerTriggerHandler_Test {
         System.assertEquals(null, ProducerTriggerHandler.subscriptionNPNForTest, 'No subscription operation should be triggered for inactive producer');
 
         // Update producer 2 to change exclude flag (active but no subscription, should not be flagged)
-        producer2.ht_ExcludeCarrierAppointments__c = true;
+        producer2.d4c_ExcludeCarrierAppointments__c = true;
         update producer2;
         Test.stopTest();
 
@@ -543,17 +543,17 @@ private class ProducerTriggerHandler_Test {
     private static void afterUpdate_testExcludeFlagNoChange() {
         // Test that producers whose exclude flag doesn't change are NOT flagged
 
-        ht_Subscription__c subscription = TestDataFactory.createSubscription(true);
+        d4c_Subscription__c subscription = TestDataFactory.createSubscription(true);
 
-        ht_Producer__c producer = TestDataFactory.createProducer('99999999');
-        producer.ht_SyncRecordToNIPR__c = 'On';
-        producer.ht_NPNStatus__c = 'Active';
-        producer.ht_ExcludeCarrierAppointments__c = false;
-        producer.ht_Subscription__c = subscription.Id;
+        d4c_Producer__c producer = TestDataFactory.createProducer('99999999');
+        producer.d4c_SyncRecordToNIPR__c = 'On';
+        producer.d4c_NPNStatus__c = 'Active';
+        producer.d4c_ExcludeCarrierAppointments__c = false;
+        producer.d4c_Subscription__c = subscription.Id;
         insert producer;
 
         // Update producer but keep exclude flag the same
-        producer.ht_SyncRecordToNIPR__c = 'Off'; // Change something else
+        producer.d4c_SyncRecordToNIPR__c = 'Off'; // Change something else
 
         // Execute
         Test.startTest();
@@ -569,25 +569,25 @@ private class ProducerTriggerHandler_Test {
         // Test that bulk updates of exclude flag are blocked
 
         // Create 3 producers
-        ht_Producer__c producer1 = TestDataFactory.createProducer('11111111');
-        producer1.ht_ExcludeCarrierAppointments__c = false;
+        d4c_Producer__c producer1 = TestDataFactory.createProducer('11111111');
+        producer1.d4c_ExcludeCarrierAppointments__c = false;
 
-        ht_Producer__c producer2 = TestDataFactory.createProducer('22222222');
-        producer2.ht_ExcludeCarrierAppointments__c = false;
+        d4c_Producer__c producer2 = TestDataFactory.createProducer('22222222');
+        producer2.d4c_ExcludeCarrierAppointments__c = false;
 
-        ht_Producer__c producer3 = TestDataFactory.createProducer('33333333');
-        producer3.ht_ExcludeCarrierAppointments__c = false;
+        d4c_Producer__c producer3 = TestDataFactory.createProducer('33333333');
+        producer3.d4c_ExcludeCarrierAppointments__c = false;
 
-        insert new List<ht_Producer__c>{producer1, producer2, producer3};
+        insert new List<d4c_Producer__c>{producer1, producer2, producer3};
 
         // Try to update exclude flag on 2 producers at once (should fail)
-        producer1.ht_ExcludeCarrierAppointments__c = true;
-        producer2.ht_ExcludeCarrierAppointments__c = true;
+        producer1.d4c_ExcludeCarrierAppointments__c = true;
+        producer2.d4c_ExcludeCarrierAppointments__c = true;
 
         // Execute
         Test.startTest();
         try {
-            update new List<ht_Producer__c>{producer1, producer2};
+            update new List<d4c_Producer__c>{producer1, producer2};
             System.assert(false, 'Expected DmlException was not thrown');
         } catch (DmlException e) {
             // Assert the error message contains our validation message
@@ -599,14 +599,14 @@ private class ProducerTriggerHandler_Test {
         Test.stopTest();
 
         // Verify producers were not updated
-        List<ht_Producer__c> updatedProducers = [
-            SELECT Id, ht_ExcludeCarrierAppointments__c
-            FROM ht_Producer__c
+        List<d4c_Producer__c> updatedProducers = [
+            SELECT Id, d4c_ExcludeCarrierAppointments__c
+            FROM d4c_Producer__c
             WHERE Id IN :new List<Id>{producer1.Id, producer2.Id}
         ];
 
-        for (ht_Producer__c p : updatedProducers) {
-            System.assertEquals(false, p.ht_ExcludeCarrierAppointments__c,
+        for (d4c_Producer__c p : updatedProducers) {
+            System.assertEquals(false, p.d4c_ExcludeCarrierAppointments__c,
                               'Producers should not have been updated due to validation error');
         }
     }
@@ -616,16 +616,16 @@ private class ProducerTriggerHandler_Test {
         // Test that single producer exclude flag change is allowed
 
         // Create 2 producers
-        ht_Producer__c producer1 = TestDataFactory.createProducer('44444444');
-        producer1.ht_ExcludeCarrierAppointments__c = false;
+        d4c_Producer__c producer1 = TestDataFactory.createProducer('44444444');
+        producer1.d4c_ExcludeCarrierAppointments__c = false;
 
-        ht_Producer__c producer2 = TestDataFactory.createProducer('55555555');
-        producer2.ht_ExcludeCarrierAppointments__c = false;
+        d4c_Producer__c producer2 = TestDataFactory.createProducer('55555555');
+        producer2.d4c_ExcludeCarrierAppointments__c = false;
 
-        insert new List<ht_Producer__c>{producer1, producer2};
+        insert new List<d4c_Producer__c>{producer1, producer2};
 
         // Update exclude flag on only 1 producer (should succeed)
-        producer1.ht_ExcludeCarrierAppointments__c = true;
+        producer1.d4c_ExcludeCarrierAppointments__c = true;
 
         // Execute
         Test.startTest();
@@ -633,13 +633,13 @@ private class ProducerTriggerHandler_Test {
         Test.stopTest();
 
         // Verify producer was updated
-        ht_Producer__c updatedProducer = [
-            SELECT Id, ht_ExcludeCarrierAppointments__c
-            FROM ht_Producer__c
+        d4c_Producer__c updatedProducer = [
+            SELECT Id, d4c_ExcludeCarrierAppointments__c
+            FROM d4c_Producer__c
             WHERE Id = :producer1.Id
         ];
 
-        System.assertEquals(true, updatedProducer.ht_ExcludeCarrierAppointments__c,
+        System.assertEquals(true, updatedProducer.d4c_ExcludeCarrierAppointments__c,
                           'Single producer should be allowed to update exclude flag');
     }
 
@@ -653,9 +653,9 @@ private class ProducerTriggerHandler_Test {
     @isTest
     private static void afterInsert_callsOrchestratorService() {
         // Arrange: Create producer with sync On
-        ht_Producer__c producer = new ht_Producer__c(
-            ht_NPN__c = '777888999',
-            ht_SyncRecordToNIPR__c = 'On'
+        d4c_Producer__c producer = new d4c_Producer__c(
+            d4c_NPN__c = '777888999',
+            d4c_SyncRecordToNIPR__c = 'On'
         );
 
         // Act
@@ -676,9 +676,9 @@ private class ProducerTriggerHandler_Test {
     @isTest
     private static void afterUpdate_callsOrchestratorService() {
         // Arrange: Create producer with sync Off
-        ht_Producer__c producer = new ht_Producer__c(
-            ht_NPN__c = '888999000',
-            ht_SyncRecordToNIPR__c = 'Off'
+        d4c_Producer__c producer = new d4c_Producer__c(
+            d4c_NPN__c = '888999000',
+            d4c_SyncRecordToNIPR__c = 'Off'
         );
 
         ProducerTriggerHandler.triggerDisabled = true;
@@ -686,7 +686,7 @@ private class ProducerTriggerHandler_Test {
         ProducerTriggerHandler.triggerDisabled = false;
 
         // Update to turn sync on
-        producer.ht_SyncRecordToNIPR__c = 'On';
+        producer.d4c_SyncRecordToNIPR__c = 'On';
 
         // Act
         Test.startTest();
@@ -707,18 +707,18 @@ private class ProducerTriggerHandler_Test {
     @isTest
     private static void afterInsert_collectsMultipleNPNs() {
         // Arrange: Insert multiple eligible producers in same transaction
-        List<ht_Producer__c> producers = new List<ht_Producer__c>{
-            new ht_Producer__c(
-                ht_NPN__c = '111000111',
-                ht_SyncRecordToNIPR__c = 'On'
+        List<d4c_Producer__c> producers = new List<d4c_Producer__c>{
+            new d4c_Producer__c(
+                d4c_NPN__c = '111000111',
+                d4c_SyncRecordToNIPR__c = 'On'
             ),
-            new ht_Producer__c(
-                ht_NPN__c = '222000222',
-                ht_SyncRecordToNIPR__c = 'On'
+            new d4c_Producer__c(
+                d4c_NPN__c = '222000222',
+                d4c_SyncRecordToNIPR__c = 'On'
             ),
-            new ht_Producer__c(
-                ht_NPN__c = '333000333',
-                ht_SyncRecordToNIPR__c = 'On'
+            new d4c_Producer__c(
+                d4c_NPN__c = '333000333',
+                d4c_SyncRecordToNIPR__c = 'On'
             )
         };
 
@@ -742,18 +742,18 @@ private class ProducerTriggerHandler_Test {
     // SELECTOR METHODS
     // ==========================================
 
-    private static List<ht_Producer__c> queryProducers(Set<String> npns) {
+    private static List<d4c_Producer__c> queryProducers(Set<String> npns) {
         return [
             SELECT
                 Id,
-                ht_NPN__c,
-                ht_SyncRecordToNIPR__c,
-                ht_NPNStatus__c,
-                ht_NPNSyncError__c
+                d4c_NPN__c,
+                d4c_SyncRecordToNIPR__c,
+                d4c_NPNStatus__c,
+                d4c_NPNSyncError__c
             FROM
-                ht_Producer__c
+                d4c_Producer__c
             WHERE
-                ht_NPN__c IN :npns
+                d4c_NPN__c IN :npns
         ];
     }
 }

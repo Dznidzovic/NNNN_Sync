@@ -13,7 +13,7 @@ public without sharing class AccountSelector {
 
     /*********************************************************
      @Method Name    : getAccountsByNPNs
-     @description    : Returns list of Accounts by ht_NPN__c field
+     @description    : Returns list of Accounts by d4c_NPN__c field
      @author         : Stefan Nidzovic
      @param          : npns - Set of unique NPN values
      @return         : List<Account> - list of Account records
@@ -23,11 +23,11 @@ public without sharing class AccountSelector {
         return [
             SELECT 
                 Id, 
-                ht_NPN__c
+                d4c_NPN__c
             FROM 
                 Account
             WHERE 
-                ht_NPN__c IN :npns
+                d4c_NPN__c IN :npns
         ];
     }
 }

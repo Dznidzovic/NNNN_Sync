@@ -18,7 +18,7 @@ private class EntityInfoOrchestratorService_Test {
         ProducerTriggerHandler.triggerDisabled = true;
 
         // Create test producers
-        List<ht_Producer__c> producers = new List<ht_Producer__c>();
+        List<d4c_Producer__c> producers = new List<d4c_Producer__c>();
         for (Integer i = 0; i < 5; i++) {
             producers.add(TestDataFactory.createProducer('12345678' + i));
         }

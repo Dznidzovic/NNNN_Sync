@@ -47,8 +47,8 @@ public class MockHelper {
         Account acc = new Account();
         acc.Id = generateId(Account.SObjectType);
         acc.Name = name;
-        acc.ht_NPN__c = npn;
-        acc.ht_Producer__c = producerId;
+        acc.d4c_NPN__c = npn;
+        acc.d4c_Producer__c = producerId;
         return acc;
     }
 
@@ -66,8 +66,8 @@ public class MockHelper {
         con.Id = generateId(Contact.SObjectType);
         con.FirstName = firstName;
         con.LastName = lastName;
-        con.ht_NPN__c = npn;
-        con.ht_Producer__c = producerId;
+        con.d4c_NPN__c = npn;
+        con.d4c_Producer__c = producerId;
         return con;
     }
 
@@ -86,8 +86,8 @@ public class MockHelper {
         ld.FirstName = firstName;
         ld.LastName = lastName;
         ld.Company = 'Test Company';
-        ld.ht_NPN__c = npn;
-        ld.ht_Producer__c = producerId;
+        ld.d4c_NPN__c = npn;
+        ld.d4c_Producer__c = producerId;
         return ld;
     }
 
@@ -95,12 +95,12 @@ public class MockHelper {
     @Method Name    : createMockProducer
     @description    : Creates a mock Producer with NPN
     @param          : npn - NPN value
-    @return         : ht_Producer__c - Mock producer with fields set
+    @return         : d4c_Producer__c - Mock producer with fields set
     *********************************************************/
-    public static ht_Producer__c createMockProducer(String npn) {
-        ht_Producer__c prod = new ht_Producer__c();
-        prod.Id = generateId(ht_Producer__c.SObjectType);
-        prod.ht_NPN__c = npn;
+    public static d4c_Producer__c createMockProducer(String npn) {
+        d4c_Producer__c prod = new d4c_Producer__c();
+        prod.Id = generateId(d4c_Producer__c.SObjectType);
+        prod.d4c_NPN__c = npn;
         // Name is an auto-number field, cannot be set directly
         return prod;
     }

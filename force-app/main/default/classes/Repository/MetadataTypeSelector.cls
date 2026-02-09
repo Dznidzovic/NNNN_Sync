@@ -16,16 +16,16 @@ public with sharing class MetadataTypeSelector {
      * @Method Name    : getNIPRNPNSubMaxCount
      * @description    : Returns the custom metadata type record containing the maximum NPN count configuration for NIPR subscriptions
      * @param          : None
-     * @return         : ht_NIPR_Subsciption_NPN_Count__mdt - Custom metadata record with maximum NPN count
+     * @return         : d4c_NIPR_Subsciption_NPN_Count__mdt - Custom metadata record with maximum NPN count
      *******************************************************
      **/
-    public ht_NIPR_Subsciption_NPN_Count__mdt getNIPRNPNSubMaxCount() {
+    public d4c_NIPR_Subsciption_NPN_Count__mdt getNIPRNPNSubMaxCount() {
         return [
             SELECT
                 Id,
-                ht_MAX_NPN_Count__c
+                d4c_MAX_NPN_Count__c
             FROM
-                ht_NIPR_Subsciption_NPN_Count__mdt
+                d4c_NIPR_Subsciption_NPN_Count__mdt
             WHERE
                 DeveloperName LIKE '%MAX_NPN_Count'
         ];
@@ -36,16 +36,16 @@ public with sharing class MetadataTypeSelector {
      * @Method Name    : getNIPRNPNSubMaxCount
      * @description    : Returns the custom metadata type record containing the maximum NPN count configuration for NIPR subscriptions
      * @param          : None
-     * @return         : ht_NIPR_Subsciption_NPN_Count__mdt - Custom metadata record with maximum NPN count
+     * @return         : d4c_NIPR_Subsciption_NPN_Count__mdt - Custom metadata record with maximum NPN count
      *******************************************************
      **/
-    public ht_NIPR_Subscription_Email__mdt getNIPRSubscriptionEmail() {
+    public d4c_NIPR_Subscription_Email__mdt getNIPRSubscriptionEmail() {
         return [
             SELECT
                 Id,
-                ht_Email__c
+                d4c_Email__c
             FROM
-                ht_NIPR_Subscription_Email__mdt
+                d4c_NIPR_Subscription_Email__mdt
             WHERE
                 DeveloperName LIKE '%NIPR_Subscription_Email'
         ];
@@ -56,16 +56,16 @@ public with sharing class MetadataTypeSelector {
      * @Method Name    : getLoggerConfig
      * @description    : Returns the custom metadata type record containing the Logger configuration
      * @param          : None
-     * @return         : ht_NIPRLogger__mdt - Custom metadata record with logger configuration
+     * @return         : d4c_NIPRLogger__mdt - Custom metadata record with logger configuration
      *******************************************************
      **/
-    public ht_NIPRLogger__mdt getLoggerConfig() {
+    public d4c_NIPRLogger__mdt getLoggerConfig() {
         return [
             SELECT
                 Id,
-                ht_EnableDebugging__c
+                d4c_EnableDebugging__c
             FROM
-                ht_NIPRLogger__mdt
+                d4c_NIPRLogger__mdt
             WHERE
                 DeveloperName LIKE '%Logger_Config'
         ];

@@ -13,15 +13,15 @@
             </layoutItems>
             <layoutItems>
                 <behavior>Required</behavior>
-                <field>ht_ProductName__c</field>
+                <field>d4c_ProductName__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Required</behavior>
-                <field>ht_StateOrProvince__c</field>
+                <field>d4c_StateOrProvince__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Required</behavior>
-                <field>ht_UniqueIdentifier__c</field>
+                <field>d4c_UniqueIdentifier__c</field>
             </layoutItems>
         </layoutColumns>
         <layoutColumns>

@@ -22,7 +22,7 @@ public without sharing class Logger {
     }
     
     // Static collection to store logs before committing
-    private static List<ht_Logger__c> pendingLogs = new List<ht_Logger__c>();
+    private static List<d4c_Logger__c> pendingLogs = new List<d4c_Logger__c>();
     
     // Transaction ID for grouping logs
     private static String transactionId;
@@ -35,8 +35,8 @@ public without sharing class Logger {
         get {
             if (enableSystemDebug == null) {
                 try {
-                    ht_NIPRLogger__mdt loggerConfig = metadataSelector.getLoggerConfig();
-                    enableSystemDebug = loggerConfig.ht_EnableDebugging__c;
+                    d4c_NIPRLogger__mdt loggerConfig = metadataSelector.getLoggerConfig();
+                    enableSystemDebug = loggerConfig.d4c_EnableDebugging__c;
                 } catch (Exception ex) {
                     // If metadata query fails, default to true for safety
                     enableSystemDebug = true;
@@ -331,18 +331,18 @@ public without sharing class Logger {
     private static void createLog(LogLevel level, String sourceName, String sourceMethod, 
                                String message, String details, String stackTrace, String relatedRecord, Boolean critical) {
         // Create log object
-        ht_Logger__c log = new ht_Logger__c(
-            ht_LogLevel__c = level.name(),
-            ht_SourceName__c = sourceName,
-            ht_SourceMethod__c = sourceMethod,
-            ht_Message__c = truncateField(message, 255),
-            ht_Details__c = truncateField(details, 131071),
-            ht_StackTrace__c = stackTrace,
-            ht_Source__c = 'Apex', // Default to Apex, could be parameterized
-            ht_OccurredDateTime__c = Datetime.now(),
-            ht_RelatedRecord__c = relatedRecord,
-            ht_TransactionId__c = getTransactionId(),
-            ht_Critical__c = critical
+        d4c_Logger__c log = new d4c_Logger__c(
+            d4c_LogLevel__c = level.name(),
+            d4c_SourceName__c = sourceName,
+            d4c_SourceMethod__c = sourceMethod,
+            d4c_Message__c = truncateField(message, 255),
+            d4c_Details__c = truncateField(details, 131071),
+            d4c_StackTrace__c = stackTrace,
+            d4c_Source__c = 'Apex', // Default to Apex, could be parameterized
+            d4c_OccurredDateTime__c = Datetime.now(),
+            d4c_RelatedRecord__c = relatedRecord,
+            d4c_TransactionId__c = getTransactionId(),
+            d4c_Critical__c = critical
         );
         
         // Add to pending logs
@@ -384,15 +384,15 @@ public without sharing class Logger {
      *********************************************************
      * @methodName      : commitSync
      * @description     : Commits all pending logs synchronously in the current transaction
-     * @return          : List<ht_Logger__c> - The committed log records with their IDs
+     * @return          : List<d4c_Logger__c> - The committed log records with their IDs
      *********************************************************
      **/
-    public static List<ht_Logger__c> commitSync() {
+    public static List<d4c_Logger__c> commitSync() {
         if (pendingLogs.isEmpty()) {
-            return new List<ht_Logger__c>();
+            return new List<d4c_Logger__c>();
         }
         
-        List<ht_Logger__c> logsToCommit = pendingLogs.clone();
+        List<d4c_Logger__c> logsToCommit = pendingLogs.clone();
         pendingLogs.clear();
         
         try {
@@ -419,7 +419,7 @@ public without sharing class Logger {
             return null;
         }
         
-        List<ht_Logger__c> logsToCommit = pendingLogs.clone();
+        List<d4c_Logger__c> logsToCommit = pendingLogs.clone();
         pendingLogs.clear();
         
         try {
@@ -436,8 +436,8 @@ public without sharing class Logger {
             }
             
             // Create platform event
-            ht_Log__e logEvent = new ht_Log__e(
-                ht_Content__c = jsonContent
+            d4c_Log__e logEvent = new d4c_Log__e(
+                d4c_Content__c = jsonContent
             );
             
             // Publish the event
@@ -473,7 +473,7 @@ public without sharing class Logger {
     public static void processLogEvent(String logContent) {
         try {
             // Deserialize the JSON content back to log records
-            List<ht_Logger__c> logsToInsert = (List<ht_Logger__c>) JSON.deserialize(logContent, List<ht_Logger__c>.class);
+            List<d4c_Logger__c> logsToInsert = (List<d4c_Logger__c>) JSON.deserialize(logContent, List<d4c_Logger__c>.class);
             
             if (!logsToInsert.isEmpty()) {
                 insert logsToInsert;

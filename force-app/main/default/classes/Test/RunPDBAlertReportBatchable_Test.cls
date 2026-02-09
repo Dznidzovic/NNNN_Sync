@@ -28,7 +28,7 @@ private class RunPDBAlertReportBatchable_Test {
         RunPDBAlertReportBatchable batch = new RunPDBAlertReportBatchable(String.valueOf(Date.today()), 3);
 
         Test.startTest();
-        batch.execute(null, new List<ht_Subscription__c>());
+        batch.execute(null, new List<d4c_Subscription__c>());
         Test.stopTest();
 
         System.assertEquals(false, batch.reportNotAvailable, 'Expected reportNotAvailable to remain false');
@@ -37,17 +37,17 @@ private class RunPDBAlertReportBatchable_Test {
 
     @isTest
     static void testExecuteMethod_reportNotFinished() {
-        ht_Subscription__c sub = TestDataFactory.createSubscription(true);
+        d4c_Subscription__c sub = TestDataFactory.createSubscription(true);
 
-        ht_Producer__c prod = TestDataFactory.createProducer('11111');
-        prod.ht_Subscription__c = sub.Id;
+        d4c_Producer__c prod = TestDataFactory.createProducer('11111');
+        prod.d4c_Subscription__c = sub.Id;
 
         insert prod;
         
         RunPDBAlertReportBatchable batch = new RunPDBAlertReportBatchable(String.valueOf(Date.today()), 3);
         
         Test.startTest();
-        batch.execute(null, new List<ht_Subscription__c>{ getSubscription(sub.Id) });
+        batch.execute(null, new List<d4c_Subscription__c>{ getSubscription(sub.Id) });
         Test.stopTest();
         
         System.assertEquals(true, batch.reportNotAvailable, 'Expected reportNotAvailable set when report not finished');
@@ -80,14 +80,14 @@ private class RunPDBAlertReportBatchable_Test {
         System.assertEquals(false, batch.testRetryScheduled, 'Expected no retry scheduled when no attempts remain');
     }
 
-    private static ht_Subscription__c getSubscription(Id id) {
+    private static d4c_Subscription__c getSubscription(Id id) {
         return [
             SELECT
                 Id,
                 Name,
-                ht_Subscription_Name__c,
+                d4c_Subscription_Name__c,
                 (SELECT Id FROM Producers__r)
-            FROM ht_Subscription__c WHERE Id = :id
+            FROM d4c_Subscription__c WHERE Id = :id
         ];
     }
 }

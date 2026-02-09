@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
     <label><!-- Sync Record To NIPR --></label>
-    <name>ht_SyncRecordToNIPR__c</name>
+    <name>d4c_SyncRecordToNIPR__c</name>
     <picklistValues>
         <masterLabel>Off</masterLabel>
         <translation><!-- Off --></translation>

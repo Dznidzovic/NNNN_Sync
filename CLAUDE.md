@@ -22,7 +22,7 @@
 **ALL NIPR development MUST follow this workflow:**
 
 1. ✅ **DEVELOP IN "NIPR DEV" ORG ONLY**
-   - Make ALL code changes in the "NIPR DEV" org (hiptenadmins@hipten.com.ht_nipr)
+   - Make ALL code changes in the "NIPR DEV" org (hiptenadmins@hipten.com.d4c_nipr)
    - **NEVER develop locally or in scratch orgs**
    - Scratch orgs are ONLY for testing package installations
 
@@ -116,10 +116,10 @@ sf project deploy start --source-dir force-app/main/default/classes/TriggerHandl
 ### Data Operations
 ```bash
 # Query data
-sf data query -q "SELECT Id, Name, ht_NPN__c FROM ht_Producer__c LIMIT 10"
+sf data query -q "SELECT Id, Name, d4c_NPN__c FROM d4c_Producer__c LIMIT 10"
 
 # Delete a record
-sf data delete record -s ht_LOA_Insurance_Product_Mapping__c -i <recordId>
+sf data delete record -s d4c_LOA_Insurance_Product_Mapping__c -i <recordId>
 
 # Run anonymous Apex
 sf apex run -f script.apex
@@ -153,7 +153,7 @@ The codebase follows a strict layered architecture:
 - Schedulable jobs for daily PDB Alert processing
 - **Important**: When chaining queueables, set `AsyncOptions.MaximumQueueableStackDepth` on the INITIAL enqueue only (default is 5, often need 100). Chained jobs inherit this limit.
 
-**External ID Strategy**: All NIPR objects use external IDs (e.g., ht_NPN__c) for upserts. This enables idempotent operations and simplifies data synchronization.
+**External ID Strategy**: All NIPR objects use external IDs (e.g., d4c_NPN__c) for upserts. This enables idempotent operations and simplifies data synchronization.
 
 ---
 
@@ -164,25 +164,25 @@ The codebase follows a strict layered architecture:
 ### Change 1: Many-to-Many Relationships
 
 #### Current State (Before Refactoring)
-- `ht_ProducerAddress__c` - Master-Detail to Producer (non-reparentable)
-- `ht_ProducerCommunication__c` - Master-Detail to Producer (reparentable)
+- `d4c_ProducerAddress__c` - Master-Detail to Producer (non-reparentable)
+- `d4c_ProducerCommunication__c` - Master-Detail to Producer (reparentable)
 - Each address/communication belongs to exactly ONE producer
 
 #### Target State (After Refactoring)
-- `ht_ProducerAddress__c` - **Standalone object** (no parent relationship)
-- `ht_ProducerCommunication__c` - **Standalone object** (no parent relationship)
+- `d4c_ProducerAddress__c` - **Standalone object** (no parent relationship)
+- `d4c_ProducerCommunication__c` - **Standalone object** (no parent relationship)
 
 **NEW Junction Objects** (2):
-1. **`ht_Producer_Address_Junction__c`**
-   - Master-Detail to `ht_Producer__c`
-   - Master-Detail to `ht_ProducerAddress__c`
-   - External ID: `ht_UniqueIdentifier__c` (Producer NPN + Address UniqueIdentifier)
+1. **`d4c_Producer_Address_Junction__c`**
+   - Master-Detail to `d4c_Producer__c`
+   - Master-Detail to `d4c_ProducerAddress__c`
+   - External ID: `d4c_UniqueIdentifier__c` (Producer NPN + Address UniqueIdentifier)
    - Enables many-to-many: One address shared by multiple producers
 
-2. **`ht_Producer_Communication_Junction__c`**
-   - Master-Detail to `ht_Producer__c`
-   - Master-Detail to `ht_ProducerCommunication__c`
-   - External ID: `ht_UniqueIdentifier__c` (Producer NPN + Communication UniqueIdentifier)
+2. **`d4c_Producer_Communication_Junction__c`**
+   - Master-Detail to `d4c_Producer__c`
+   - Master-Detail to `d4c_ProducerCommunication__c`
+   - External ID: `d4c_UniqueIdentifier__c` (Producer NPN + Communication UniqueIdentifier)
    - Enables many-to-many: One communication shared by multiple producers
 
 **Benefits**:
@@ -199,26 +199,26 @@ The codebase follows a strict layered architecture:
 The following 4 objects are being **completely removed** from the product:
 
 #### Objects to DELETE
-1. ❌ `ht_LOA_Insurance_Product_Mapping__c` - LOA mapping configuration
-2. ❌ `ht_Insurance_Product_LOA_Mapping__c` - Junction (LOA mapping to products)
-3. ❌ `ht_Insurance_Product__c` - Insurance product reference data
-4. ❌ `ht_License_Insurance_Product__c` - Junction (license to products)
+1. ❌ `d4c_LOA_Insurance_Product_Mapping__c` - LOA mapping configuration
+2. ❌ `d4c_Insurance_Product_LOA_Mapping__c` - Junction (LOA mapping to products)
+3. ❌ `d4c_Insurance_Product__c` - Insurance product reference data
+4. ❌ `d4c_License_Insurance_Product__c` - Junction (license to products)
 
 #### Objects to MODIFY
-**`ht_LineOfAuthority__c`** - KEEP this object (it's NIPR data)
-- Remove field: `ht_LOAMapping__c` (Lookup to deleted mapping object)
-- Remove field: `ht_IsProductMatched__c` (Boolean)
+**`d4c_LineOfAuthority__c`** - KEEP this object (it's NIPR data)
+- Remove field: `d4c_LOAMapping__c` (Lookup to deleted mapping object)
+- Remove field: `d4c_IsProductMatched__c` (Boolean)
 - All other fields remain
 
-**`ht_License__c`** - Remove calculated fields:
-- Remove: `ht_NumberOfProductMatchedLOAs__c`
-- Remove: `ht_NumberOfProductNotMatchedLOAs__c`
-- Remove: `ht_AllLOAsMatchedToProduct__c`
-- Remove: `ht_License_Products__c` (LongTextArea)
+**`d4c_License__c`** - Remove calculated fields:
+- Remove: `d4c_NumberOfProductMatchedLOAs__c`
+- Remove: `d4c_NumberOfProductNotMatchedLOAs__c`
+- Remove: `d4c_AllLOAsMatchedToProduct__c`
+- Remove: `d4c_License_Products__c` (LongTextArea)
 
 #### Permission Sets to Update
 - **NIPR_View_NIPR_Data** - Remove read access to 4 deleted objects
-- **ht_NIPR_Admin_Access** - Remove full CRUD access to 4 deleted objects
+- **d4c_NIPR_Admin_Access** - Remove full CRUD access to 4 deleted objects
 
 **Reason for Removal**: Simplifying the product by removing LOA-to-product mapping feature entirely.
 
@@ -227,30 +227,30 @@ The following 4 objects are being **completely removed** from the product:
 ### Change 3: Consolidate Custom Metadata Types
 
 #### Current State (5 metadata types)
-1. `ht_NIPRLogger__mdt` - Debug logging control
-2. `ht_NIPRTestXMLResponse__mdt` - Test XML for debugging
-3. `ht_NIPR_Subsciption_NPN_Count__mdt` - Max NPNs per subscription
-4. `ht_NIPR_Subscription_Email__mdt` - Subscription email
-5. `ht_Trigger_Dispatcher_Settings__mdt` - Trigger enable/disable (KEEP)
+1. `d4c_NIPRLogger__mdt` - Debug logging control
+2. `d4c_NIPRTestXMLResponse__mdt` - Test XML for debugging
+3. `d4c_NIPR_Subsciption_NPN_Count__mdt` - Max NPNs per subscription
+4. `d4c_NIPR_Subscription_Email__mdt` - Subscription email
+5. `d4c_Trigger_Dispatcher_Settings__mdt` - Trigger enable/disable (KEEP)
 
 #### Target State (2 metadata types)
 
-**NEW**: `ht_NIPR_Sync_Settings__mdt` - Single consolidated settings object
+**NEW**: `d4c_NIPR_Sync_Settings__mdt` - Single consolidated settings object
 
 Fields:
-- `ht_EnableDebugging__c` (Checkbox) - From NIPRLogger
-- `ht_MaxNPNCountPerSubscription__c` (Number) - From NIPR_Subsciption_NPN_Count
-- `ht_SubscriptionEmail__c` (Email) - From NIPR_Subscription_Email
-- `ht_TestXMLActive__c` (Checkbox) - From NIPRTestXMLResponse
-- `ht_TestXMLData__c` (LongTextArea) - From NIPRTestXMLResponse
+- `d4c_EnableDebugging__c` (Checkbox) - From NIPRLogger
+- `d4c_MaxNPNCountPerSubscription__c` (Number) - From NIPR_Subsciption_NPN_Count
+- `d4c_SubscriptionEmail__c` (Email) - From NIPR_Subscription_Email
+- `d4c_TestXMLActive__c` (Checkbox) - From NIPRTestXMLResponse
+- `d4c_TestXMLData__c` (LongTextArea) - From NIPRTestXMLResponse
 
-**KEEP**: `ht_Trigger_Dispatcher_Settings__mdt` - Separate (framework-level config)
+**KEEP**: `d4c_Trigger_Dispatcher_Settings__mdt` - Separate (framework-level config)
 
 #### Metadata Types to DELETE
-- ❌ `ht_NIPRLogger__mdt`
-- ❌ `ht_NIPRTestXMLResponse__mdt`
-- ❌ `ht_NIPR_Subsciption_NPN_Count__mdt`
-- ❌ `ht_NIPR_Subscription_Email__mdt`
+- ❌ `d4c_NIPRLogger__mdt`
+- ❌ `d4c_NIPRTestXMLResponse__mdt`
+- ❌ `d4c_NIPR_Subsciption_NPN_Count__mdt`
+- ❌ `d4c_NIPR_Subscription_Email__mdt`
 
 **Benefits**:
 - ✅ Single metadata query instead of 4 separate queries
@@ -309,9 +309,9 @@ Fields:
 4. Reassignment logic for capacity management
 
 **LOA Mapping Flow** (Line of Authority → Insurance Product matching):
-1. LOA records are matched to `ht_LOA_Insurance_Product_Mapping__c` by state/code/description via `LOAProductMappingService.matchLoasToMappings()`
-2. `ht_IsProductMatched__c` indicates if LOA has a valid mapping
-3. When an LOA Mapping is deleted, `LOAInsuranceProductMappingTriggerHandler.afterDelete` clears the lookup on related LOAs, triggering re-matching which sets `ht_IsProductMatched__c = false`
+1. LOA records are matched to `d4c_LOA_Insurance_Product_Mapping__c` by state/code/description via `LOAProductMappingService.matchLoasToMappings()`
+2. `d4c_IsProductMatched__c` indicates if LOA has a valid mapping
+3. When an LOA Mapping is deleted, `LOAInsuranceProductMappingTriggerHandler.afterDelete` clears the lookup on related LOAs, triggering re-matching which sets `d4c_IsProductMatched__c = false`
 4. Lookup fields with `SetNull` delete constraint do NOT fire triggers - manual cleanup required
 
 ### Testing Strategy
@@ -328,9 +328,9 @@ Fields:
 2. **Batch Processing**: Process producers individually (batch size=1) to isolate errors
 3. **Retry Logic**: Failed API calls retry up to 3 times with exponential backoff
 4. **License States**: Only active licenses are synchronized
-5. **Carrier Appointments**: Can be excluded via ht_ExcludeCarrierAppointments__c flag
-6. **NPN Field**: Producer NPN (`ht_NPN__c`) has max length of 10 characters
-7. **LastNIPRSync**: `ht_LastNIPRSync__c` field tracks last successful sync - ONLY set AFTER successful HTTP request, never before
+5. **Carrier Appointments**: Can be excluded via d4c_ExcludeCarrierAppointments__c flag
+6. **NPN Field**: Producer NPN (`d4c_NPN__c`) has max length of 10 characters
+7. **LastNIPRSync**: `d4c_LastNIPRSync__c` field tracks last successful sync - ONLY set AFTER successful HTTP request, never before
 
 ## Common Development Tasks
 
@@ -401,7 +401,7 @@ This section provides step-by-step instructions for team members to set up their
 #### 2. NIPR DEV (Namespaced Developer Org)
 - **Purpose**: Primary development and testing org with namespace enabled
 - **Org Type**: Developer Edition org with `niprsync` namespace
-- **Username**: `hiptenadmins@hipten.com.ht_nipr`
+- **Username**: `hiptenadmins@hipten.com.d4c_nipr`
 - **What it does**:
   - All metadata automatically gets `niprsync__` prefix
   - Used for developing and testing package features
@@ -598,24 +598,24 @@ The `niprsync` namespace affects how metadata is referenced:
 #### In Your Code (Inside Namespace)
 ```apex
 // ✅ CORRECT - No namespace prefix needed in your code
-ht_Producer__c producer = new ht_Producer__c();
-producer.ht_NPN__c = '12345';
+d4c_Producer__c producer = new d4c_Producer__c();
+producer.d4c_NPN__c = '12345';
 Account acc = new Account();
-acc.ht_NPN__c = '12345'; // Custom field on standard object
+acc.d4c_NPN__c = '12345'; // Custom field on standard object
 ```
 
 #### In the Org (External API View)
-- Custom objects: `ht_Producer__c` → `niprsync__ht_Producer__c`
-- Fields on standard objects: `Account.ht_NPN__c` → `Account.niprsync__ht_NPN__c`
-- Fields on custom objects: `ht_Producer__c.ht_NPN__c` → stays as `ht_NPN__c` (within namespace)
+- Custom objects: `d4c_Producer__c` → `niprsync__d4c_Producer__c`
+- Fields on standard objects: `Account.d4c_NPN__c` → `Account.niprsync__d4c_NPN__c`
+- Fields on custom objects: `d4c_Producer__c.d4c_NPN__c` → stays as `d4c_NPN__c` (within namespace)
 
 #### In Source Files
 ```
 force-app/main/default/
 ├── objects/
-│   └── ht_Producer__c/  ← No namespace prefix in folder name
+│   └── d4c_Producer__c/  ← No namespace prefix in folder name
 │       └── fields/
-│           └── ht_NPN__c.field-meta.xml  ← No namespace in filename
+│           └── d4c_NPN__c.field-meta.xml  ← No namespace in filename
 ```
 
 **Key Point**: The namespace is implicit in your source code and file structure. Salesforce applies the `niprsync__` prefix automatically at runtime.
@@ -1046,7 +1046,7 @@ sf package install \
 
 # Post-installation: Assign permission sets manually in UI
 # - NIPR_View_NIPR_Data
-# - ht_NIPR_Edit_NPN_Access
+# - d4c_NIPR_Edit_NPN_Access
 ```
 
 ---
@@ -1057,7 +1057,7 @@ sf package install \
 **Namespace**: `niprsync`  
 **Package ID**: `0HoPB00000001P70AI`  
 **Dev Hub**: HIPTEN DEV HUB (`stefan.nidzovic@hipten.com`)  
-**Dev Org**: NIPR DEV (`hiptenadmins@hipten.com.ht_nipr`)  
+**Dev Org**: NIPR DEV (`hiptenadmins@hipten.com.d4c_nipr`)  
 **GitHub Repo**: [https://github.com/stefan-nidzovic_hipten/NIPR](https://github.com/stefan-nidzovic_hipten/NIPR)  
 
 **Current Version**: Check `sfdx-project.json` → `versionNumber`  

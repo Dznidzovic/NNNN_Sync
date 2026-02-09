@@ -30,7 +30,7 @@ public with sharing class LOAInsuranceProductMappingTriggerHandler extends BaseT
     @param          : newItems - List of new LOA Mapping records being inserted
     *********************************************************/
     public override void beforeInsert(List<SObject> newItems) {
-        List<ht_LOA_Insurance_Product_Mapping__c> mappings = (List<ht_LOA_Insurance_Product_Mapping__c>) newItems;
+        List<d4c_LOA_Insurance_Product_Mapping__c> mappings = (List<d4c_LOA_Insurance_Product_Mapping__c>) newItems;
         service.populateLOAMappingUniqueId(mappings);
     }
 
@@ -41,16 +41,16 @@ public with sharing class LOAInsuranceProductMappingTriggerHandler extends BaseT
     @param          : oldItems - Map of updated records (old values)
     *********************************************************/
     public override void beforeUpdate(Map<Id, SObject> newItems, Map<Id, SObject> oldItems) {
-        List<ht_LOA_Insurance_Product_Mapping__c> mappings = (List<ht_LOA_Insurance_Product_Mapping__c>) newItems.values();
+        List<d4c_LOA_Insurance_Product_Mapping__c> mappings = (List<d4c_LOA_Insurance_Product_Mapping__c>) newItems.values();
         service.populateLOAMappingUniqueId(mappings);
     }
 
     /*********************************************************
     @Method Name    : beforeDelete
     @description    : Handles cleanup when mapping is deleted:
-                      1. Sets ht_IsProductMatched__c = false on related LOAs
+                      1. Sets d4c_IsProductMatched__c = false on related LOAs
                       2. Deletes child junction records
-                      Note: ht_LOAMapping__c will be auto-nulled by Salesforce's SetNull cascade.
+                      Note: d4c_LOAMapping__c will be auto-nulled by Salesforce's SetNull cascade.
                       Since mappings are unique by state/code/description, no other mapping
                       can match these LOAs, so we set IsProductMatched directly.
     @param          : oldItems - Map of records being deleted
@@ -58,14 +58,14 @@ public with sharing class LOAInsuranceProductMappingTriggerHandler extends BaseT
     public override void beforeDelete(Map<Id, SObject> oldItems) {
         Set<Id> mappingIds = oldItems.keySet();
 
-        // 1. Update related LOAs - set ht_IsProductMatched__c = false directly
+        // 1. Update related LOAs - set d4c_IsProductMatched__c = false directly
         // (No need to fire LOA trigger since no other mapping can match - mappings are unique)
         LineOfAuthoritySelector loaSelector = new LineOfAuthoritySelector();
-        List<ht_LineOfAuthority__c> relatedLoas = loaSelector.getLoasByMappingIds(mappingIds);
+        List<d4c_LineOfAuthority__c> relatedLoas = loaSelector.getLoasByMappingIds(mappingIds);
 
         if (!relatedLoas.isEmpty()) {
-            for (ht_LineOfAuthority__c loa : relatedLoas) {
-                loa.ht_IsProductMatched__c = false;
+            for (d4c_LineOfAuthority__c loa : relatedLoas) {
+                loa.d4c_IsProductMatched__c = false;
             }
 
             // Disable LOA trigger to avoid unnecessary processing
@@ -80,8 +80,8 @@ public with sharing class LOAInsuranceProductMappingTriggerHandler extends BaseT
             LineOfAuthorityTriggerHandler.triggerDisabled = false;
         }
 
-        // 2. Delete child ht_Insurance_Product_LOA_Mapping__c junctions
-        List<ht_Insurance_Product_LOA_Mapping__c> productLoaMappings =
+        // 2. Delete child d4c_Insurance_Product_LOA_Mapping__c junctions
+        List<d4c_Insurance_Product_LOA_Mapping__c> productLoaMappings =
             loaMappingSelector.getProductLOAJunctionsByLoaMappingIds(mappingIds);
 
         if (!productLoaMappings.isEmpty()) {

@@ -17,8 +17,8 @@ public with sharing class LOAProductCategorizationBatchable implements Database.
     private final String CLASS_NAME = 'LOAProductCategorizationBatchable';
 
     private NIPREnums.OperationMode operationMode;
-    private List<ht_LineOfAuthority__c> loaRecords;
-    private Map<Id, ht_LineOfAuthority__c> oldLoaMap;  // For UPDATE mode: stores old LOA values
+    private List<d4c_LineOfAuthority__c> loaRecords;
+    private Map<Id, d4c_LineOfAuthority__c> oldLoaMap;  // For UPDATE mode: stores old LOA values
 
     private LicenseProductCategorizationService categorizationService = new LicenseProductCategorizationService();
 
@@ -29,7 +29,7 @@ public with sharing class LOAProductCategorizationBatchable implements Database.
      * @param          : mode - Operation mode (CREATE_MODE or DELETE_MODE)
      *********************************************************
      */
-    public LOAProductCategorizationBatchable(List<ht_LineOfAuthority__c> loas, NIPREnums.OperationMode mode) {
+    public LOAProductCategorizationBatchable(List<d4c_LineOfAuthority__c> loas, NIPREnums.OperationMode mode) {
         this.loaRecords = loas;
         this.operationMode = mode;
         this.oldLoaMap = null;
@@ -42,7 +42,7 @@ public with sharing class LOAProductCategorizationBatchable implements Database.
      * @param          : oldLoas - Map of old LOA record values (keyed by Id)
      *********************************************************
      */
-    public LOAProductCategorizationBatchable(List<ht_LineOfAuthority__c> newLoas, Map<Id, ht_LineOfAuthority__c> oldLoas) {
+    public LOAProductCategorizationBatchable(List<d4c_LineOfAuthority__c> newLoas, Map<Id, d4c_LineOfAuthority__c> oldLoas) {
         this.loaRecords = newLoas;
         this.operationMode = NIPREnums.OperationMode.UPDATE_MODE;
         this.oldLoaMap = oldLoas;
@@ -77,7 +77,7 @@ public with sharing class LOAProductCategorizationBatchable implements Database.
     public void execute(Database.BatchableContext context, List<SObject> scope) {
         String methodName = 'execute';
 
-        List<ht_LineOfAuthority__c> loasToProcess = (List<ht_LineOfAuthority__c>) scope;
+        List<d4c_LineOfAuthority__c> loasToProcess = (List<d4c_LineOfAuthority__c>) scope;
 
         Logger.info(CLASS_NAME, methodName, 'Processing batch of LOAs',
                   'Batch size: ' + loasToProcess.size() + ', Mode: ' + operationMode.name(), null);
@@ -104,19 +104,19 @@ public with sharing class LOAProductCategorizationBatchable implements Database.
      *********************************************************
      * @Method Name    : processCreateMode
      * @description    : Creates License-Insurance Product junctions for LOAs with mappings.
-     * @param          : loas - LOA records with populated ht_LOAMapping__c
+     * @param          : loas - LOA records with populated d4c_LOAMapping__c
      *********************************************************
      */
-    private void processCreateMode(List<ht_LineOfAuthority__c> loas) {
+    private void processCreateMode(List<d4c_LineOfAuthority__c> loas) {
         String methodName = 'processCreateMode';
 
         // Use service to create junctions
-        List<ht_License_Insurance_Product__c> junctionsToUpsert = categorizationService.createJunctionsForLoas(loas);
+        List<d4c_License_Insurance_Product__c> junctionsToUpsert = categorizationService.createJunctionsForLoas(loas);
 
         // Upsert junctions using External ID to prevent duplicates
         if (!junctionsToUpsert.isEmpty()) {
-            ListUtils.deduplicateByField(junctionsToUpsert, 'ht_UniqueIdentifier__c');
-            upsert junctionsToUpsert ht_UniqueIdentifier__c;
+            ListUtils.deduplicateByField(junctionsToUpsert, 'd4c_UniqueIdentifier__c');
+            upsert junctionsToUpsert d4c_UniqueIdentifier__c;
         }
 
         Logger.debug(CLASS_NAME, methodName, 'Processing CREATE mode',
@@ -127,20 +127,20 @@ public with sharing class LOAProductCategorizationBatchable implements Database.
      *********************************************************
      * @Method Name    : processUpdateMode
      * @description    : Updates License-Insurance Product junctions when LOA mapping changes.
-     * @param          : loas - LOA records with changed ht_LOAMapping__c
+     * @param          : loas - LOA records with changed d4c_LOAMapping__c
      *********************************************************
      */
-    private void processUpdateMode(List<ht_LineOfAuthority__c> loas) {
+    private void processUpdateMode(List<d4c_LineOfAuthority__c> loas) {
         String methodName = 'processUpdateMode';
 
         // Use service to calculate changes
         Map<String, Object> changes = categorizationService.calculateJunctionChangesForLoaUpdates(loas, oldLoaMap);
-        List<ht_License_Insurance_Product__c> junctionsToCreate = (List<ht_License_Insurance_Product__c>) changes.get('toCreate');
+        List<d4c_License_Insurance_Product__c> junctionsToCreate = (List<d4c_License_Insurance_Product__c>) changes.get('toCreate');
         Set<String> junctionKeysToDelete = (Set<String>) changes.get('keysToDelete');
 
         // Delete junctions FIRST (before creating new ones)
         if (!junctionKeysToDelete.isEmpty()) {
-            List<ht_License_Insurance_Product__c> junctionsToDelete = categorizationService.getJunctionsToDeleteByKeys(junctionKeysToDelete);
+            List<d4c_License_Insurance_Product__c> junctionsToDelete = categorizationService.getJunctionsToDeleteByKeys(junctionKeysToDelete);
             if (!junctionsToDelete.isEmpty()) {
                 delete junctionsToDelete;
             }
@@ -148,8 +148,8 @@ public with sharing class LOAProductCategorizationBatchable implements Database.
 
         // Upsert new junctions
         if (!junctionsToCreate.isEmpty()) {
-            ListUtils.deduplicateByField(junctionsToCreate, 'ht_UniqueIdentifier__c');
-            upsert junctionsToCreate ht_UniqueIdentifier__c;
+            ListUtils.deduplicateByField(junctionsToCreate, 'd4c_UniqueIdentifier__c');
+            upsert junctionsToCreate d4c_UniqueIdentifier__c;
         }
 
         Logger.debug(CLASS_NAME, methodName, 'Processing UPDATE mode',
@@ -164,7 +164,7 @@ public with sharing class LOAProductCategorizationBatchable implements Database.
      * @param          : loas - Deleted LOA records
      *********************************************************
      */
-    private void processDeleteMode(List<ht_LineOfAuthority__c> loas) {
+    private void processDeleteMode(List<d4c_LineOfAuthority__c> loas) {
         String methodName = 'processDeleteMode';
 
         // Use service to get junction keys to delete
@@ -172,7 +172,7 @@ public with sharing class LOAProductCategorizationBatchable implements Database.
 
         // Query and delete junctions
         if (!junctionKeysToDelete.isEmpty()) {
-            List<ht_License_Insurance_Product__c> junctionsToDelete = categorizationService.getJunctionsToDeleteByKeys(junctionKeysToDelete);
+            List<d4c_License_Insurance_Product__c> junctionsToDelete = categorizationService.getJunctionsToDeleteByKeys(junctionKeysToDelete);
             if (!junctionsToDelete.isEmpty()) {
                 delete junctionsToDelete;
             }

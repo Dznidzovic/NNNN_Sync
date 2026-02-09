@@ -13,29 +13,29 @@
             </layoutItems>
             <layoutItems>
                 <behavior>Required</behavior>
-                <field>ht_Producer__c</field>
+                <field>d4c_Producer__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>ht_EmailType__c</field>
+                <field>d4c_EmailType__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>ht_EmailAddress__c</field>
+                <field>d4c_EmailAddress__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>ht_UniqueIdentifier__c</field>
+                <field>d4c_UniqueIdentifier__c</field>
             </layoutItems>
         </layoutColumns>
         <layoutColumns>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>ht_PhoneType__c</field>
+                <field>d4c_PhoneType__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>ht_PhoneNumber__c</field>
+                <field>d4c_PhoneNumber__c</field>
             </layoutItems>
         </layoutColumns>
         <style>TwoColumnsTopToBottom</style>

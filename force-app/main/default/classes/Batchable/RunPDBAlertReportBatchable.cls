@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : Stefan Nidzovic
  * @group             : 
- * @last modified on  : 07-25-2025
+ * @last modified on  : 02-09-2026
  * @last modified by  : Stefan Nidzovic
 **/
 public class RunPDBAlertReportBatchable implements Database.Batchable<SObject>, Database.Stateful, Database.AllowsCallouts {
@@ -36,14 +36,14 @@ public class RunPDBAlertReportBatchable implements Database.Batchable<SObject>, 
             SELECT
                 Id,
                 Name,
-                ht_Subscription_Name__c,
+                d4c_Subscription_Name__c,
                 (SELECT Id FROM Producers__r LIMIT 1)
-            FROM ht_Subscription__c
+            FROM d4c_Subscription__c
             ORDER BY Id
         ]);
     }
 
-    public void execute(Database.BatchableContext bc, List<ht_Subscription__c> subscriptions) {
+    public void execute(Database.BatchableContext bc, List<d4c_Subscription__c> subscriptions) {
         if (reportNotAvailable || noAlertsToday) {
             return;
         }
@@ -52,32 +52,32 @@ public class RunPDBAlertReportBatchable implements Database.Batchable<SObject>, 
             return;
         }
         
-        ht_Subscription__c subscription = subscriptions[0];
+        d4c_Subscription__c subscription = subscriptions[0];
         
         if (subscription.Producers__r == null || subscription.Producers__r.isEmpty()) {
             return;
         }
         
         try {
-            String niprSubscriptionName = subscription.ht_Subscription_Name__c + '-' + UserInfo.getOrganizationId();
+            String niprSubscriptionName = subscription.d4c_Subscription_Name__c + '-' + UserInfo.getOrganizationId();
 
             if (!Test.isRunningTest()) {
 
                 Logger.info('RunPDBAlertReportBatchable', 'execute', 'Processing subscription',
-            'Subscription: ' + subscription.ht_Subscription_Name__c + ', Report Date: ' + reportDate, subscription.Id);
+            'Subscription: ' + subscription.d4c_Subscription_Name__c + ', Report Date: ' + reportDate, subscription.Id);
 
                 ProcessPDBAlertReportService niprService = new ProcessPDBAlertReportService();
                 niprService.importData(reportDate, niprSubscriptionName);
 
                 // Update subscription's last sync timestamp after successful processing
-                subscription.ht_LastNIPRSync__c = Datetime.now();
+                subscription.d4c_LastNIPRSync__c = Datetime.now();
                 update subscription;
             } else {
                 throw new ProcessPDBAlertReportService.PDBAlertReportException('REPORT_NOT_AVAILABLE: The requested report is not available or complete');
             }
 
             Logger.info('RunPDBAlertReportBatchable', 'execute', 'Successfully processed subscription',
-            'Subscription: ' + subscription.ht_Subscription_Name__c, subscription.Id);
+            'Subscription: ' + subscription.d4c_Subscription_Name__c, subscription.Id);
 
         } catch (Exception ex) {
             Logger.error('RunPDBAlertReportBatchable', 'execute', ex, subscription.Id);
@@ -87,12 +87,12 @@ public class RunPDBAlertReportBatchable implements Database.Batchable<SObject>, 
                 
                 if (ex.getMessage().contains('There are no alerts scheduled for the day')) {
                     Logger.warning('RunPDBAlertReportBatchable', 'execute', 'No alerts run today - no retry needed',
-                                 'Subscription: ' + subscription.ht_Subscription_Name__c, subscription.Id);
+                                 'Subscription: ' + subscription.d4c_Subscription_Name__c, subscription.Id);
 
                     noAlertsToday = true;
                 } else if (ex.getMessage().contains('The requested report is not available or complete')) {
                     Logger.warning('RunPDBAlertReportBatchable', 'execute', 'Report not finished yet - will retry',
-                                 'Subscription: ' + subscription.ht_Subscription_Name__c + ', Retries Remaining: ' + retryAttemptsRemaining,
+                                 'Subscription: ' + subscription.d4c_Subscription_Name__c + ', Retries Remaining: ' + retryAttemptsRemaining,
                                  subscription.Id);
 
                     reportNotAvailable = true;

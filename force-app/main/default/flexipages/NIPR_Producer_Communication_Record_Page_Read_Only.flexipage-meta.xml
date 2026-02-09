@@ -50,8 +50,8 @@
                     <name>uiBehavior</name>
                     <value>required</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_Producer__c</fieldItem>
-                <identifier>Recordht_Producer_cField</identifier>
+                <fieldItem>Record.d4c_Producer__c</fieldItem>
+                <identifier>Recordd4c_Producer_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -60,8 +60,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_EmailAddress__c</fieldItem>
-                <identifier>Recordht_EmailAddress_cField</identifier>
+                <fieldItem>Record.d4c_EmailAddress__c</fieldItem>
+                <identifier>Recordd4c_EmailAddress_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -70,8 +70,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_EmailType__c</fieldItem>
-                <identifier>Recordht_EmailType_cField</identifier>
+                <fieldItem>Record.d4c_EmailType__c</fieldItem>
+                <identifier>Recordd4c_EmailType_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-35276670-4e44-4716-80ee-1748bc24ba9e</name>
@@ -84,8 +84,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_PhoneNumber__c</fieldItem>
-                <identifier>Recordht_PhoneNumber_cField</identifier>
+                <fieldItem>Record.d4c_PhoneNumber__c</fieldItem>
+                <identifier>Recordd4c_PhoneNumber_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -94,8 +94,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_PhoneType__c</fieldItem>
-                <identifier>Recordht_PhoneType_cField</identifier>
+                <fieldItem>Record.d4c_PhoneType__c</fieldItem>
+                <identifier>Recordd4c_PhoneType_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-8b268b94-4e00-4919-b6e1-e532c1766064</name>
@@ -142,8 +142,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_UniqueIdentifier__c</fieldItem>
-                <identifier>Recordht_UniqueIdentifier_cField</identifier>
+                <fieldItem>Record.d4c_UniqueIdentifier__c</fieldItem>
+                <identifier>Recordd4c_UniqueIdentifier_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-65995e2a-34cc-4f44-9f39-344f74529565</name>
@@ -272,7 +272,7 @@
         <type>Region</type>
     </flexiPageRegions>
     <masterLabel>NIPR Producer Communication Record Page - Read Only</masterLabel>
-    <sobjectType>ht_ProducerCommunication__c</sobjectType>
+    <sobjectType>d4c_ProducerCommunication__c</sobjectType>
     <template>
         <name>flexipage:recordHomeTemplateDesktop</name>
         <properties>

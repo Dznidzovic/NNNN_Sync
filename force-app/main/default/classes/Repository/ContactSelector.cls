@@ -13,7 +13,7 @@ public without sharing class ContactSelector {
 
     /*********************************************************
      @Method Name    : getContactsByNPNs
-     @description    : Returns list of Contacts by ht_NPN__c field
+     @description    : Returns list of Contacts by d4c_NPN__c field
      @author         : Stefan Nidzovic
      @param          : npns - Set of unique NPN values
      @return         : List<Contact> - list of Contact records
@@ -23,11 +23,11 @@ public without sharing class ContactSelector {
         return [
             SELECT 
                 Id, 
-                ht_NPN__c
+                d4c_NPN__c
             FROM 
                 Contact
             WHERE 
-                ht_NPN__c IN :npns
+                d4c_NPN__c IN :npns
         ];
     }
 }

@@ -30,13 +30,13 @@ public with sharing class LineOfAuthorityTriggerHandler extends BaseTriggerHandl
 
     // Captures LOAs for test verification (prevents async batch in tests)
     @TestVisible
-    private static List<ht_LineOfAuthority__c> loasEnqueuedForBatchCreate;
+    private static List<d4c_LineOfAuthority__c> loasEnqueuedForBatchCreate;
     @TestVisible
-    private static List<ht_LineOfAuthority__c> loasEnqueuedForBatchUpdate;
+    private static List<d4c_LineOfAuthority__c> loasEnqueuedForBatchUpdate;
     @TestVisible
-    private static Map<Id, ht_LineOfAuthority__c> oldLoasEnqueuedForBatchUpdate;
+    private static Map<Id, d4c_LineOfAuthority__c> oldLoasEnqueuedForBatchUpdate;
     @TestVisible
-    private static List<ht_LineOfAuthority__c> loasEnqueuedForBatchDelete;
+    private static List<d4c_LineOfAuthority__c> loasEnqueuedForBatchDelete;
 
     @TestVisible
     private static LOAProductMappingService mockMappingService;
@@ -65,7 +65,7 @@ public with sharing class LineOfAuthorityTriggerHandler extends BaseTriggerHandl
     @param          : newItems - List of new LOA records being inserted
     *********************************************************/
     public override void beforeInsert(List<SObject> newItems) {
-        List<ht_LineOfAuthority__c> loas = (List<ht_LineOfAuthority__c>) newItems;
+        List<d4c_LineOfAuthority__c> loas = (List<d4c_LineOfAuthority__c>) newItems;
         mappingService.matchLoasToMappings(loas);
     }
 
@@ -76,7 +76,7 @@ public with sharing class LineOfAuthorityTriggerHandler extends BaseTriggerHandl
     @param          : oldItems - Map of updated LOA records (old values)
     *********************************************************/
     public override void beforeUpdate(Map<Id, SObject> newItems, Map<Id, SObject> oldItems) {
-        List<ht_LineOfAuthority__c> loas = (List<ht_LineOfAuthority__c>) newItems.values();
+        List<d4c_LineOfAuthority__c> loas = (List<d4c_LineOfAuthority__c>) newItems.values();
         mappingService.matchLoasToMappings(loas);
     }
 
@@ -86,7 +86,7 @@ public with sharing class LineOfAuthorityTriggerHandler extends BaseTriggerHandl
     @param          : newItems - Map of newly inserted LOA records
     *********************************************************/
     public override void afterInsert(Map<Id, SObject> newItems) {
-        List<ht_LineOfAuthority__c> loas = (List<ht_LineOfAuthority__c>) newItems.values();
+        List<d4c_LineOfAuthority__c> loas = (List<d4c_LineOfAuthority__c>) newItems.values();
         enqueueCreateBatch(loas);
     }
 
@@ -97,8 +97,8 @@ public with sharing class LineOfAuthorityTriggerHandler extends BaseTriggerHandl
     @param          : oldItems - Map of updated LOA records (old values)
     *********************************************************/
     public override void afterUpdate(Map<Id, SObject> newItems, Map<Id, SObject> oldItems) {
-        Map<Id, ht_LineOfAuthority__c> newLoaMap = (Map<Id, ht_LineOfAuthority__c>) newItems;
-        Map<Id, ht_LineOfAuthority__c> oldLoaMap = (Map<Id, ht_LineOfAuthority__c>) oldItems;
+        Map<Id, d4c_LineOfAuthority__c> newLoaMap = (Map<Id, d4c_LineOfAuthority__c>) newItems;
+        Map<Id, d4c_LineOfAuthority__c> oldLoaMap = (Map<Id, d4c_LineOfAuthority__c>) oldItems;
         enqueueUpdateBatch(newLoaMap, oldLoaMap);
     }
 
@@ -108,7 +108,7 @@ public with sharing class LineOfAuthorityTriggerHandler extends BaseTriggerHandl
     @param          : oldItems - Map of deleted LOA records
     *********************************************************/
     public override void afterDelete(Map<Id, SObject> oldItems) {
-        List<ht_LineOfAuthority__c> deletedLoas = (List<ht_LineOfAuthority__c>) oldItems.values();
+        List<d4c_LineOfAuthority__c> deletedLoas = (List<d4c_LineOfAuthority__c>) oldItems.values();
         enqueueDeleteBatch(deletedLoas);
     }
 
@@ -117,7 +117,7 @@ public with sharing class LineOfAuthorityTriggerHandler extends BaseTriggerHandl
     @description    : Filters LOAs with mappings and enqueues batch to create junctions.
     @param          : loas - List of newly inserted LOA records
     *********************************************************/
-    private void enqueueCreateBatch(List<ht_LineOfAuthority__c> loas) {
+    private void enqueueCreateBatch(List<d4c_LineOfAuthority__c> loas) {
         String methodName = 'enqueueCreateBatch';
 
         try {
@@ -127,7 +127,7 @@ public with sharing class LineOfAuthorityTriggerHandler extends BaseTriggerHandl
             }
 
             // Use service to filter LOAs with mappings
-            List<ht_LineOfAuthority__c> loasWithMapping = mappingService.filterLoasWithMappings(loas);
+            List<d4c_LineOfAuthority__c> loasWithMapping = mappingService.filterLoasWithMappings(loas);
 
             if (!loasWithMapping.isEmpty()) {
                 // TESTABILITY: In tests, capture data instead of enqueueing async job
@@ -155,8 +155,8 @@ public with sharing class LineOfAuthorityTriggerHandler extends BaseTriggerHandl
     @param          : oldLoaMap - Map of old LOA values
     *********************************************************/
     private void enqueueUpdateBatch(
-        Map<Id, ht_LineOfAuthority__c> newLoaMap,
-        Map<Id, ht_LineOfAuthority__c> oldLoaMap
+        Map<Id, d4c_LineOfAuthority__c> newLoaMap,
+        Map<Id, d4c_LineOfAuthority__c> oldLoaMap
     ) {
         String methodName = 'enqueueUpdateBatch';
 
@@ -168,8 +168,8 @@ public with sharing class LineOfAuthorityTriggerHandler extends BaseTriggerHandl
 
             // Only process LOAs where mapping changed
             Map<String, Object> filterResult = mappingService.filterLoasWithChangedMappings(newLoaMap, oldLoaMap);
-            List<ht_LineOfAuthority__c> loasToProcess = (List<ht_LineOfAuthority__c>) filterResult.get('changed');
-            Map<Id, ht_LineOfAuthority__c> oldLoasForBatch = (Map<Id, ht_LineOfAuthority__c>) filterResult.get('old');
+            List<d4c_LineOfAuthority__c> loasToProcess = (List<d4c_LineOfAuthority__c>) filterResult.get('changed');
+            Map<Id, d4c_LineOfAuthority__c> oldLoasForBatch = (Map<Id, d4c_LineOfAuthority__c>) filterResult.get('old');
 
             if (!loasToProcess.isEmpty()) {
                 // TESTABILITY: In tests, capture data instead of enqueueing async job
@@ -201,12 +201,12 @@ public with sharing class LineOfAuthorityTriggerHandler extends BaseTriggerHandl
     @description    : Filters deleted LOAs with mappings and enqueues batch to delete junctions.
     @param          : deletedLoas - List of deleted LOA records
     *********************************************************/
-    private void enqueueDeleteBatch(List<ht_LineOfAuthority__c> deletedLoas) {
+    private void enqueueDeleteBatch(List<d4c_LineOfAuthority__c> deletedLoas) {
         String methodName = 'enqueueDeleteBatch';
 
         try {
             // Use service to filter LOAs with mappings
-            List<ht_LineOfAuthority__c> loasWithMapping = mappingService.filterLoasWithMappings(deletedLoas);
+            List<d4c_LineOfAuthority__c> loasWithMapping = mappingService.filterLoasWithMappings(deletedLoas);
 
             if (!loasWithMapping.isEmpty()) {
                 // TESTABILITY: In tests, capture data instead of enqueueing async job

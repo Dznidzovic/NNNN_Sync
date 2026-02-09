@@ -10,7 +10,7 @@ Ver   Date         Author         Modification
 1.0   2025-12-13   Stefan         Initial Version
 *********************************************************
 */
-trigger LicenseInsuranceProductTrigger on ht_License_Insurance_Product__c (
+trigger LicenseInsuranceProductTrigger on d4c_License_Insurance_Product__c (
     before insert,
     after insert,
     after delete

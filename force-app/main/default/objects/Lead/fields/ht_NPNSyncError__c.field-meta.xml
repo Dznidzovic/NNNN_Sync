@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>ht_NPNSyncError__c</fullName>
+    <fullName>d4c_NPNSyncError__c</fullName>
     <externalId>false</externalId>
     <formula>IF(
     OR(
-        TEXT(ht_Producer__r.ht_NPNStatus__c) = &quot;Active&quot;,
-        TEXT(ht_Producer__r.ht_NPNStatus__c) = &quot;Processing&quot;
+        TEXT(d4c_Producer__r.d4c_NPNStatus__c) = &quot;Active&quot;,
+        TEXT(d4c_Producer__r.d4c_NPNStatus__c) = &quot;Processing&quot;
     ),
     &quot;&quot;,
 
     IF(
-        TEXT(ht_Producer__r.ht_NPNStatus__c) = &quot;Invalid NPN&quot;,
+        TEXT(d4c_Producer__r.d4c_NPNStatus__c) = &quot;Invalid NPN&quot;,
         &quot;The NPN was rejected by NIPR&quot;,
 
-        ht_Producer__r.ht_NPNSyncError__c
+        d4c_Producer__r.d4c_NPNSyncError__c
     )
 )</formula>
     <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>

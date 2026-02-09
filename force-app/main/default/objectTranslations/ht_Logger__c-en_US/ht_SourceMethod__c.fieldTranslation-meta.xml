@@ -2,5 +2,5 @@
 <CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
     <help><!-- Stores the Apex Method or Flow Element name (if applicable). --></help>
     <label><!-- Method / Flow Element --></label>
-    <name>ht_SourceMethod__c</name>
+    <name>d4c_SourceMethod__c</name>
 </CustomFieldTranslation>

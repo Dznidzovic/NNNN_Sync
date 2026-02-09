@@ -43,10 +43,10 @@ public with sharing class RetrieveEntityInfoApiData {
             // Query existing producer to check if user manually set exclude flag
             // Producer will always exist when this callout runs
             ProducerSelector producerSelector = new ProducerSelector();
-            List<ht_Producer__c> existingProducers = producerSelector.getProducersByNPNs(new Set<String>{ entityNPN });
+            List<d4c_Producer__c> existingProducers = producerSelector.getProducersByNPNs(new Set<String>{ entityNPN });
             Boolean existingExcludeValue = false;
             if (!existingProducers.isEmpty()) {
-                existingExcludeValue = existingProducers[0].ht_ExcludeCarrierAppointments__c;
+                existingExcludeValue = existingProducers[0].d4c_ExcludeCarrierAppointments__c;
             }
 
             // Build the HTTP Request

@@ -3,7 +3,7 @@
     <label>NIPR Subscription Email</label>
     <protected>false</protected>
     <values>
-        <field>ht_Email__c</field>
+        <field>d4c_Email__c</field>
         <value xsi:type="xsd:string">stefan.nidzovic@hipten.com</value>
     </values>
 </CustomMetadata>

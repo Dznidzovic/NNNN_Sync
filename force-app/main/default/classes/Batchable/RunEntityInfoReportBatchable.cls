@@ -57,12 +57,12 @@ public with sharing class RunEntityInfoReportBatchable implements Database.Batch
 
                 // Track successful NPN for subscription processing in finish()
                 // Query the producer to check its exclude flag
-                List<ht_Producer__c> producers = producerSelector.getProducersByNPNs(new Set<String>{ npn });
+                List<d4c_Producer__c> producers = producerSelector.getProducersByNPNs(new Set<String>{ npn });
                 if (!producers.isEmpty()) {
-                    ht_Producer__c producer = producers[0];
+                    d4c_Producer__c producer = producers[0];
                     // Only add NPNs that are Active and don't already have a subscription
-                    if (producer.ht_NPNStatus__c == 'Active' && producer.ht_Subscription__c == null) {
-                        if (producer.ht_ExcludeCarrierAppointments__c) {
+                    if (producer.d4c_NPNStatus__c == 'Active' && producer.d4c_Subscription__c == null) {
+                        if (producer.d4c_ExcludeCarrierAppointments__c) {
                             successfulExcludeNPNs.add(npn);
                         } else {
                             successfulRegularNPNs.add(npn);
@@ -75,26 +75,26 @@ public with sharing class RunEntityInfoReportBatchable implements Database.Batch
 
                 String exceptionMessage = e.getMessage();
 
-                List<ht_Producer__c> producers = producerSelector.getProducersByNPNs(new Set<String>{ npn });
+                List<d4c_Producer__c> producers = producerSelector.getProducersByNPNs(new Set<String>{ npn });
 
                 if (producers == null || producers.isEmpty()) {
                     Logger.warning(CLASS_NAME, methodName, 'Producer with this NPN not yet created',
                                  'NPN: ' + npn, null);
                 } else {
-                    ht_Producer__c producer = producers[0];
+                    d4c_Producer__c producer = producers[0];
 
                     if (exceptionMessage.contains(NIPREnums.EntityInfoError.NO_PRODUCER_DATA.toString())) {
-                        producer.ht_NPNStatus__c = 'Invalid NPN';
-                        producer.ht_NPNSyncError__c = exceptionMessage.split(':')[0];
-                        producer.ht_IntegrationError__c = '';
+                        producer.d4c_NPNStatus__c = 'Invalid NPN';
+                        producer.d4c_NPNSyncError__c = exceptionMessage.split(':')[0];
+                        producer.d4c_IntegrationError__c = '';
 
                         Logger.warning(CLASS_NAME, methodName, 'Invalid NPN detected',
-                                     'NPN: ' + npn + ', Error: ' + producer.ht_NPNSyncError__c,
+                                     'NPN: ' + npn + ', Error: ' + producer.d4c_NPNSyncError__c,
                                      producer.Id);
                     } else {
-                        producer.ht_NPNStatus__c = 'Error';
-                        producer.ht_NPNSyncError__c = 'Integration Error';
-                        producer.ht_IntegrationError__c = exceptionMessage;
+                        producer.d4c_NPNStatus__c = 'Error';
+                        producer.d4c_NPNSyncError__c = 'Integration Error';
+                        producer.d4c_IntegrationError__c = exceptionMessage;
 
                         Logger.error(CLASS_NAME, methodName,
                                    'Integration error for NPN',

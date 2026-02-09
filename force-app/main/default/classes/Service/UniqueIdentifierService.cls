@@ -4,10 +4,10 @@ Apex Class Name    : UniqueIdentifierService
 Created Date       : 2025-12-15
 @description       : Service class for generating unique identifiers on LOA Product Categorization objects.
                      Centralizes unique identifier generation logic for:
-                     - ht_Insurance_Product__c
-                     - ht_LOA_Insurance_Product_Mapping__c
-                     - ht_Insurance_Product_LOA_Mapping__c (junction)
-                     - ht_License_Insurance_Product__c (junction)
+                     - d4c_Insurance_Product__c
+                     - d4c_LOA_Insurance_Product_Mapping__c
+                     - d4c_Insurance_Product_LOA_Mapping__c (junction)
+                     - d4c_License_Insurance_Product__c (junction)
 @author            : Stefan Nidzovic
 Modification Log:
 Ver   Date         Author         Modification
@@ -25,12 +25,12 @@ public with sharing class UniqueIdentifierService {
      * @param          : products - List of Insurance Product records to process
      *********************************************************
      */
-    public void populateInsuranceProductUniqueId(List<ht_Insurance_Product__c> products) {
-        for (ht_Insurance_Product__c product : products) {
-            if (String.isNotBlank(product.ht_StateOrProvince__c) &&
-                String.isNotBlank(product.ht_ProductName__c)) {
-                product.ht_UniqueIdentifier__c = product.ht_StateOrProvince__c + '-' +
-                    product.ht_ProductName__c;
+    public void populateInsuranceProductUniqueId(List<d4c_Insurance_Product__c> products) {
+        for (d4c_Insurance_Product__c product : products) {
+            if (String.isNotBlank(product.d4c_StateOrProvince__c) &&
+                String.isNotBlank(product.d4c_ProductName__c)) {
+                product.d4c_UniqueIdentifier__c = product.d4c_StateOrProvince__c + '-' +
+                    product.d4c_ProductName__c;
             }
         }
     }
@@ -44,14 +44,14 @@ public with sharing class UniqueIdentifierService {
      * @param          : mappings - List of LOA Mapping records to process
      *********************************************************
      */
-    public void populateLOAMappingUniqueId(List<ht_LOA_Insurance_Product_Mapping__c> mappings) {
-        for (ht_LOA_Insurance_Product_Mapping__c mapping : mappings) {
-            if (String.isNotBlank(mapping.ht_StateOrProvinceCode__c) &&
-                String.isNotBlank(mapping.ht_LineOfAuthorityCode__c) &&
-                String.isNotBlank(mapping.ht_LineOfAuthorityDescription__c)) {
-                mapping.ht_UniqueIdentifier__c = mapping.ht_StateOrProvinceCode__c + '-' +
-                    mapping.ht_LineOfAuthorityCode__c + '-' +
-                    mapping.ht_LineOfAuthorityDescription__c;
+    public void populateLOAMappingUniqueId(List<d4c_LOA_Insurance_Product_Mapping__c> mappings) {
+        for (d4c_LOA_Insurance_Product_Mapping__c mapping : mappings) {
+            if (String.isNotBlank(mapping.d4c_StateOrProvinceCode__c) &&
+                String.isNotBlank(mapping.d4c_LineOfAuthorityCode__c) &&
+                String.isNotBlank(mapping.d4c_LineOfAuthorityDescription__c)) {
+                mapping.d4c_UniqueIdentifier__c = mapping.d4c_StateOrProvinceCode__c + '-' +
+                    mapping.d4c_LineOfAuthorityCode__c + '-' +
+                    mapping.d4c_LineOfAuthorityDescription__c;
             }
         }
     }
@@ -64,11 +64,11 @@ public with sharing class UniqueIdentifierService {
      * @param          : junctions - List of junction records to process
      *********************************************************
      */
-    public void populateInsProdLOAMappingUniqueId(List<ht_Insurance_Product_LOA_Mapping__c> junctions) {
-        for (ht_Insurance_Product_LOA_Mapping__c junction : junctions) {
-            if (junction.ht_InsuranceProduct__c != null && junction.ht_LOAMapping__c != null) {
-                junction.ht_UniqueIdentifier__c = String.valueOf(junction.ht_InsuranceProduct__c) +
-                    '-' + String.valueOf(junction.ht_LOAMapping__c);
+    public void populateInsProdLOAMappingUniqueId(List<d4c_Insurance_Product_LOA_Mapping__c> junctions) {
+        for (d4c_Insurance_Product_LOA_Mapping__c junction : junctions) {
+            if (junction.d4c_InsuranceProduct__c != null && junction.d4c_LOAMapping__c != null) {
+                junction.d4c_UniqueIdentifier__c = String.valueOf(junction.d4c_InsuranceProduct__c) +
+                    '-' + String.valueOf(junction.d4c_LOAMapping__c);
             }
         }
     }
@@ -81,11 +81,11 @@ public with sharing class UniqueIdentifierService {
      * @param          : junctions - List of junction records to process
      *********************************************************
      */
-    public void populateLicenseInsProdUniqueId(List<ht_License_Insurance_Product__c> junctions) {
-        for (ht_License_Insurance_Product__c junction : junctions) {
-            if (junction.ht_License__c != null && junction.ht_InsuranceProduct__c != null) {
-                junction.ht_UniqueIdentifier__c = String.valueOf(junction.ht_License__c) +
-                    '-' + String.valueOf(junction.ht_InsuranceProduct__c);
+    public void populateLicenseInsProdUniqueId(List<d4c_License_Insurance_Product__c> junctions) {
+        for (d4c_License_Insurance_Product__c junction : junctions) {
+            if (junction.d4c_License__c != null && junction.d4c_InsuranceProduct__c != null) {
+                junction.d4c_UniqueIdentifier__c = String.valueOf(junction.d4c_License__c) +
+                    '-' + String.valueOf(junction.d4c_InsuranceProduct__c);
             }
         }
     }

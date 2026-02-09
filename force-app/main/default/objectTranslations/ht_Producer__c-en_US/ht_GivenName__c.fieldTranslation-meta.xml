@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
     <label><!-- Given Name --></label>
-    <name>ht_GivenName__c</name>
+    <name>d4c_GivenName__c</name>
 </CustomFieldTranslation>

@@ -31,7 +31,7 @@ public with sharing class InsuranceProductTriggerHandler extends BaseTriggerHand
     @param          : newItems - List of new Insurance Product records being inserted
     *********************************************************/
     public override void beforeInsert(List<SObject> newItems) {
-        List<ht_Insurance_Product__c> products = (List<ht_Insurance_Product__c>) newItems;
+        List<d4c_Insurance_Product__c> products = (List<d4c_Insurance_Product__c>) newItems;
         service.populateInsuranceProductUniqueId(products);
     }
 
@@ -42,7 +42,7 @@ public with sharing class InsuranceProductTriggerHandler extends BaseTriggerHand
     @param          : oldItems - Map of updated records (old values)
     *********************************************************/
     public override void beforeUpdate(Map<Id, SObject> newItems, Map<Id, SObject> oldItems) {
-        List<ht_Insurance_Product__c> products = (List<ht_Insurance_Product__c>) newItems.values();
+        List<d4c_Insurance_Product__c> products = (List<d4c_Insurance_Product__c>) newItems.values();
         service.populateInsuranceProductUniqueId(products);
     }
 
@@ -54,10 +54,10 @@ public with sharing class InsuranceProductTriggerHandler extends BaseTriggerHand
     public override void beforeDelete(Map<Id, SObject> oldItems) {
         Set<Id> productIds = oldItems.keySet();
 
-        // Query and delete ht_Insurance_Product_LOA_Mapping__c junctions
+        // Query and delete d4c_Insurance_Product_LOA_Mapping__c junctions
         // When these are deleted, the InsuranceProductLOAMappingTriggerHandler.afterDelete()
-        // will handle deleting the related ht_License_Insurance_Product__c junctions
-        List<ht_Insurance_Product_LOA_Mapping__c> productLoaMappings =
+        // will handle deleting the related d4c_License_Insurance_Product__c junctions
+        List<d4c_Insurance_Product_LOA_Mapping__c> productLoaMappings =
             productLOAMappingSelector.getJunctionsByInsuranceProductIds(productIds);
 
         if (!productLoaMappings.isEmpty()) {

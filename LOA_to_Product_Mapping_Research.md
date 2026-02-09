@@ -108,7 +108,7 @@ NIPR LOA Code (e.g., "11 - Casualty")
 - ❌ Official mapping: NIPR LOA Code → NAIC LOB Name
 - ❌ Official mapping: NAIC LOB Name → Company Product Name
 
-**Our Solution**: `ht_LOA_Insurance_Product_Mapping__c` object allows clients to manually map:
+**Our Solution**: `d4c_LOA_Insurance_Product_Mapping__c` object allows clients to manually map:
 ```
 State + LOA Code + LOA Description → Company's Insurance Product
 ```

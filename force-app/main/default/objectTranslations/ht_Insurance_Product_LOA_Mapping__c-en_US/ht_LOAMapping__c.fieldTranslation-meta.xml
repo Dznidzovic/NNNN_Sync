@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
     <label><!-- LOA Mapping --></label>
-    <name>ht_LOAMapping__c</name>
+    <name>d4c_LOAMapping__c</name>
     <relationshipLabel><!-- LOA Mapping Insurance Products --></relationshipLabel>
 </CustomFieldTranslation>

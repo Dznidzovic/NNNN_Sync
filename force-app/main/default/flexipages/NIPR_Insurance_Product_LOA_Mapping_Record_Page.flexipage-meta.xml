@@ -52,8 +52,8 @@
                     <name>uiBehavior</name>
                     <value>required</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_LOAMapping__c</fieldItem>
-                <identifier>Recordht_LOAMapping_cField</identifier>
+                <fieldItem>Record.d4c_LOAMapping__c</fieldItem>
+                <identifier>Recordd4c_LOAMapping_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-ac5c212e-6635-4800-8ab8-d909a3eabcbb</name>
@@ -66,8 +66,8 @@
                     <name>uiBehavior</name>
                     <value>required</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_InsuranceProduct__c</fieldItem>
-                <identifier>Recordht_InsuranceProduct_cField</identifier>
+                <fieldItem>Record.d4c_InsuranceProduct__c</fieldItem>
+                <identifier>Recordd4c_InsuranceProduct_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -124,8 +124,8 @@
                     <name>uiBehavior</name>
                     <value>required</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_UniqueIdentifier__c</fieldItem>
-                <identifier>Recordht_UniqueIdentifier_cField</identifier>
+                <fieldItem>Record.d4c_UniqueIdentifier__c</fieldItem>
+                <identifier>Recordd4c_UniqueIdentifier_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-ba7df578-09ab-4209-9fe2-f959800f64c4</name>
@@ -259,7 +259,7 @@
     </flexiPageRegions>
     <masterLabel>NIPR Insurance Product LOA Mapping Record Page</masterLabel>
     <parentFlexiPage>flexipage__default_rec_L</parentFlexiPage>
-    <sobjectType>ht_Insurance_Product_LOA_Mapping__c</sobjectType>
+    <sobjectType>d4c_Insurance_Product_LOA_Mapping__c</sobjectType>
     <template>
         <name>flexipage:recordHomeTemplateDesktop</name>
     </template>

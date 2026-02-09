@@ -1,3 +1,10 @@
+/**
+ * @description       : 
+ * @author            : Stefan Nidzovic
+ * @group             : 
+ * @last modified on  : 02-09-2026
+ * @last modified by  : Stefan Nidzovic
+**/
 // First delete any existing License-Product junctions for these licenses and this product
 List<Id> licenseIds = new List<Id>{
     'a02am00001n50qkAAA', 'a02am00001n5fCsAAI', 'a02am00001n602lAAA', 
@@ -6,9 +13,9 @@ List<Id> licenseIds = new List<Id>{
 };
 Id productId = 'a0Cam00008rh4mTEAQ';
 
-List<ht_License_Insurance_Product__c> existingJunctions = [
-    SELECT Id FROM ht_License_Insurance_Product__c 
-    WHERE ht_License__c IN :licenseIds AND ht_InsuranceProduct__c = :productId
+List<d4c_License_Insurance_Product__c> existingJunctions = [
+    SELECT Id FROM d4c_License_Insurance_Product__c 
+    WHERE d4c_License__c IN :licenseIds AND d4c_InsuranceProduct__c = :productId
 ];
 if (!existingJunctions.isEmpty()) {
     delete existingJunctions;
@@ -16,9 +23,9 @@ if (!existingJunctions.isEmpty()) {
 }
 
 // Now create the junction
-ht_Insurance_Product_LOA_Mapping__c junction = new ht_Insurance_Product_LOA_Mapping__c(
-    ht_LOAMapping__c = 'a09am00000d0sUiAAI',
-    ht_InsuranceProduct__c = productId
+d4c_Insurance_Product_LOA_Mapping__c junction = new d4c_Insurance_Product_LOA_Mapping__c(
+    d4c_LOAMapping__c = 'a09am00000d0sUiAAI',
+    d4c_InsuranceProduct__c = productId
 );
 insert junction;
 System.debug('Created junction: ' + junction.Id);

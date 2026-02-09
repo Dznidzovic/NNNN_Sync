@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>ht_LargeProducerIndicator__c</fullName>
+    <fullName>d4c_LargeProducerIndicator__c</fullName>
     <defaultValue>false</defaultValue>
     <description>Indicates if this producer requires licensing-only subscriptions due to large payload size exceeding threshold</description>
     <label>Large Producer Indicator</label>

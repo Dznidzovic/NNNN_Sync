@@ -79,37 +79,37 @@
 
     <!-- Custom Objects -->
     <types>
-        <members>ht_CarrierAppointment__c</members>
-        <members>ht_Carrier__c</members>
-        <members>ht_License__c</members>
-        <members>ht_LineOfAuthority__c</members>
-        <members>ht_Log__e</members>
-        <members>ht_Logger__c</members>
-        <members>ht_NIPRLogger__mdt</members>
-        <members>ht_NIPRTestXMLResponse__mdt</members>
-        <members>ht_NIPR_Subsciption_NPN_Count__mdt</members>
-        <members>ht_NIPR_Subscription_Email__mdt</members>
-        <members>ht_ProducerAddress__c</members>
-        <members>ht_ProducerCommunication__c</members>
-        <members>ht_Producer__c</members>
-        <members>ht_Subscription__c</members>
+        <members>d4c_CarrierAppointment__c</members>
+        <members>d4c_Carrier__c</members>
+        <members>d4c_License__c</members>
+        <members>d4c_LineOfAuthority__c</members>
+        <members>d4c_Log__e</members>
+        <members>d4c_Logger__c</members>
+        <members>d4c_NIPRLogger__mdt</members>
+        <members>d4c_NIPRTestXMLResponse__mdt</members>
+        <members>d4c_NIPR_Subsciption_NPN_Count__mdt</members>
+        <members>d4c_NIPR_Subscription_Email__mdt</members>
+        <members>d4c_ProducerAddress__c</members>
+        <members>d4c_ProducerCommunication__c</members>
+        <members>d4c_Producer__c</members>
+        <members>d4c_Subscription__c</members>
         <name>CustomObject</name>
     </types>
 
     <!-- Custom Fields on Standard Objects -->
     <types>
-        <members>Account.ht_NPNStatus__c</members>
-        <members>Account.ht_NPNSyncError__c</members>
-        <members>Account.ht_NPN__c</members>
-        <members>Account.ht_Producer__c</members>
-        <members>Contact.ht_NPNStatus__c</members>
-        <members>Contact.ht_NPNSyncError__c</members>
-        <members>Contact.ht_NPN__c</members>
-        <members>Contact.ht_Producer__c</members>
+        <members>Account.d4c_NPNStatus__c</members>
+        <members>Account.d4c_NPNSyncError__c</members>
+        <members>Account.d4c_NPN__c</members>
+        <members>Account.d4c_Producer__c</members>
+        <members>Contact.d4c_NPNStatus__c</members>
+        <members>Contact.d4c_NPNSyncError__c</members>
+        <members>Contact.d4c_NPN__c</members>
+        <members>Contact.d4c_Producer__c</members>
         <members>Lead.NPN_Status__c</members>
-        <members>Lead.ht_NPNSyncError__c</members>
-        <members>Lead.ht_NPN__c</members>
-        <members>Lead.ht_Producer__c</members>
+        <members>Lead.d4c_NPNSyncError__c</members>
+        <members>Lead.d4c_NPN__c</members>
+        <members>Lead.d4c_Producer__c</members>
         <name>CustomField</name>
     </types>
 
@@ -122,8 +122,8 @@
 
     <!-- Permission Sets -->
     <types>
-        <members>ht_NIPR_API_Callout</members>
-        <members>HT_Manage_Producer</members>
+        <members>d4c_NIPR_API_Callout</members>
+        <members>d4c_Manage_Producer</members>
         <name>PermissionSet</name>
     </types>
 
@@ -148,7 +148,7 @@
 
     <!-- Quick Actions -->
     <types>
-        <members>ht_Producer__c.ht_Force_NPN_Sync</members>
+        <members>d4c_Producer__c.d4c_Force_NPN_Sync</members>
         <name>QuickAction</name>
     </types>
 

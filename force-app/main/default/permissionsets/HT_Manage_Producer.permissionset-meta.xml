@@ -2,77 +2,77 @@
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
     <fieldPermissions>
         <editable>true</editable>
-        <field>ht_Producer__c.ht_BirthDate__c</field>
+        <field>d4c_Producer__c.d4c_BirthDate__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>ht_Producer__c.ht_BranchId__c</field>
+        <field>d4c_Producer__c.d4c_BranchId__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>ht_Producer__c.ht_FEIN__c</field>
+        <field>d4c_Producer__c.d4c_FEIN__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>ht_Producer__c.ht_FullName__c</field>
+        <field>d4c_Producer__c.d4c_FullName__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>ht_Producer__c.ht_GivenName__c</field>
+        <field>d4c_Producer__c.d4c_GivenName__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>ht_Producer__c.ht_MiddleName__c</field>
+        <field>d4c_Producer__c.d4c_MiddleName__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>ht_Producer__c.ht_NPNStatus__c</field>
+        <field>d4c_Producer__c.d4c_NPNStatus__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>ht_Producer__c.ht_NPNSyncError__c</field>
+        <field>d4c_Producer__c.d4c_NPNSyncError__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>ht_Producer__c.ht_NPN__c</field>
+        <field>d4c_Producer__c.d4c_NPN__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>ht_Producer__c.ht_NameSuffix__c</field>
+        <field>d4c_Producer__c.d4c_NameSuffix__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>ht_Producer__c.ht_NameTypeCode__c</field>
+        <field>d4c_Producer__c.d4c_NameTypeCode__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>ht_Producer__c.ht_OtherGivenName__c</field>
+        <field>d4c_Producer__c.d4c_OtherGivenName__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>ht_Producer__c.ht_StateOrProvinceCode__c</field>
+        <field>d4c_Producer__c.d4c_StateOrProvinceCode__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>ht_Producer__c.ht_SurName__c</field>
+        <field>d4c_Producer__c.d4c_SurName__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>ht_Producer__c.ht_SyncRecordToNIPR__c</field>
+        <field>d4c_Producer__c.d4c_SyncRecordToNIPR__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <hasActivationRequired>false</hasActivationRequired>
@@ -83,7 +83,7 @@
         <allowEdit>true</allowEdit>
         <allowRead>true</allowRead>
         <modifyAllRecords>true</modifyAllRecords>
-        <object>ht_Producer__c</object>
+        <object>d4c_Producer__c</object>
         <viewAllFields>true</viewAllFields>
         <viewAllRecords>true</viewAllRecords>
     </objectPermissions>

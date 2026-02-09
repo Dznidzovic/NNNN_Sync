@@ -16,29 +16,29 @@ private class LicenseProductCategorizationService_Test {
     @TestSetup
     static void setupTestData() {
         // Create Producer with License
-        ht_Producer__c producer = TestDataFactory.createProducer('12345678');
+        d4c_Producer__c producer = TestDataFactory.createProducer('12345678');
         ProducerTriggerHandler.triggerDisabled = true;
         insert producer;
         ProducerTriggerHandler.triggerDisabled = false;
 
         // Create License
-        ht_License__c license = TestDataFactory.createLicense('LIC123', producer.Id);
-        license.ht_StateOrProvinceCode__c = 'CA';
+        d4c_License__c license = TestDataFactory.createLicense('LIC123', producer.Id);
+        license.d4c_StateOrProvinceCode__c = 'CA';
         insert license;
 
         // Create LOA Insurance Product Mapping
-        ht_LOA_Insurance_Product_Mapping__c mapping = TestDataFactory.createLOAInsuranceProductMapping('CA', '935', 'Accident & Health', true);
+        d4c_LOA_Insurance_Product_Mapping__c mapping = TestDataFactory.createLOAInsuranceProductMapping('CA', '935', 'Accident & Health', true);
 
         // Create Insurance Products
-        ht_Insurance_Product__c product1 = TestDataFactory.createInsuranceProduct('Health Insurance', '12345', true);
-        ht_Insurance_Product__c product2 = TestDataFactory.createInsuranceProduct('Life Insurance', '67890', true);
+        d4c_Insurance_Product__c product1 = TestDataFactory.createInsuranceProduct('Health Insurance', '12345', true);
+        d4c_Insurance_Product__c product2 = TestDataFactory.createInsuranceProduct('Life Insurance', '67890', true);
 
         // Create junctions between Products and Mapping
         TestDataFactory.createInsuranceProductLOAMappingJunction(product1.Id, mapping.Id, true);
         TestDataFactory.createInsuranceProductLOAMappingJunction(product2.Id, mapping.Id, true);
 
-        // Create LOA with mapping (trigger will auto-populate ht_LOAMapping__c)
-        ht_LineOfAuthority__c loa = TestDataFactory.createLOAForMatching(license.Id, 'CA', '935', 'Accident & Health', true);
+        // Create LOA with mapping (trigger will auto-populate d4c_LOAMapping__c)
+        d4c_LineOfAuthority__c loa = TestDataFactory.createLOAForMatching(license.Id, 'CA', '935', 'Accident & Health', true);
     }
 
     @isTest
@@ -46,8 +46,8 @@ private class LicenseProductCategorizationService_Test {
         // Arrange
         LicenseProductCategorizationService service = new LicenseProductCategorizationService();
 
-        List<ht_License__c> licenses = queryLicenses();
-        List<ht_Insurance_Product__c> products = queryProducts();
+        List<d4c_License__c> licenses = queryLicenses();
+        List<d4c_Insurance_Product__c> products = queryProducts();
 
         // Act
         Test.startTest();
@@ -64,7 +64,7 @@ private class LicenseProductCategorizationService_Test {
     static void testGetProductIdsForMappings_withRealData() {
         // Arrange
         LicenseProductCategorizationService service = new LicenseProductCategorizationService();
-        List<ht_LOA_Insurance_Product_Mapping__c> mappings = queryLoaMappings();
+        List<d4c_LOA_Insurance_Product_Mapping__c> mappings = queryLoaMappings();
         Set<Id> mappingIds = new Set<Id>{mappings[0].Id};
 
         // Act
@@ -96,7 +96,7 @@ private class LicenseProductCategorizationService_Test {
     static void testGetProductIdSetForMappings_withRealData() {
         // Arrange
         LicenseProductCategorizationService service = new LicenseProductCategorizationService();
-        List<ht_LOA_Insurance_Product_Mapping__c> mappings = queryLoaMappings();
+        List<d4c_LOA_Insurance_Product_Mapping__c> mappings = queryLoaMappings();
         Set<Id> mappingIds = new Set<Id>{mappings[0].Id};
 
         // Act
@@ -128,21 +128,21 @@ private class LicenseProductCategorizationService_Test {
     static void testCreateJunctionsForLoas_withRealData() {
         // Arrange
         LicenseProductCategorizationService service = new LicenseProductCategorizationService();
-        List<ht_LineOfAuthority__c> loas = queryLoas();
+        List<d4c_LineOfAuthority__c> loas = queryLoas();
 
         // Act
         Test.startTest();
-        List<ht_License_Insurance_Product__c> junctions = service.createJunctionsForLoas(loas);
+        List<d4c_License_Insurance_Product__c> junctions = service.createJunctionsForLoas(loas);
         Test.stopTest();
 
         // Assert
         System.assertEquals(2, junctions.size(), 'Should create 2 junctions (LOA has mapping with 2 products)');
 
         // Verify unique identifiers are set
-        for (ht_License_Insurance_Product__c junction : junctions) {
-            System.assertNotEquals(null, junction.ht_UniqueIdentifier__c, 'Unique ID should be set');
-            System.assertNotEquals(null, junction.ht_License__c, 'License should be set');
-            System.assertNotEquals(null, junction.ht_InsuranceProduct__c, 'Product should be set');
+        for (d4c_License_Insurance_Product__c junction : junctions) {
+            System.assertNotEquals(null, junction.d4c_UniqueIdentifier__c, 'Unique ID should be set');
+            System.assertNotEquals(null, junction.d4c_License__c, 'License should be set');
+            System.assertNotEquals(null, junction.d4c_InsuranceProduct__c, 'Product should be set');
         }
     }
 
@@ -153,7 +153,7 @@ private class LicenseProductCategorizationService_Test {
 
         // Act
         Test.startTest();
-        List<ht_License_Insurance_Product__c> result = service.createJunctionsForLoas(new List<ht_LineOfAuthority__c>());
+        List<d4c_License_Insurance_Product__c> result = service.createJunctionsForLoas(new List<d4c_LineOfAuthority__c>());
         Test.stopTest();
 
         // Assert
@@ -165,13 +165,13 @@ private class LicenseProductCategorizationService_Test {
         // Arrange
         LicenseProductCategorizationService service = new LicenseProductCategorizationService();
 
-        List<ht_LineOfAuthority__c> loas = new List<ht_LineOfAuthority__c>{
-            new ht_LineOfAuthority__c(ht_LOAMapping__c = null)
+        List<d4c_LineOfAuthority__c> loas = new List<d4c_LineOfAuthority__c>{
+            new d4c_LineOfAuthority__c(d4c_LOAMapping__c = null)
         };
 
         // Act
         Test.startTest();
-        List<ht_License_Insurance_Product__c> result = service.createJunctionsForLoas(loas);
+        List<d4c_License_Insurance_Product__c> result = service.createJunctionsForLoas(loas);
         Test.stopTest();
 
         // Assert
@@ -182,16 +182,16 @@ private class LicenseProductCategorizationService_Test {
     static void testCalculateJunctionChangesForLoaUpdates_withRealData() {
         // Arrange
         LicenseProductCategorizationService service = new LicenseProductCategorizationService();
-        List<ht_LineOfAuthority__c> loas = queryLoas();
+        List<d4c_LineOfAuthority__c> loas = queryLoas();
 
         // Create old map (LOA with old mapping)
-        Map<Id, ht_LineOfAuthority__c> oldLoaMap = new Map<Id, ht_LineOfAuthority__c>();
-        for (ht_LineOfAuthority__c loa : loas) {
+        Map<Id, d4c_LineOfAuthority__c> oldLoaMap = new Map<Id, d4c_LineOfAuthority__c>();
+        for (d4c_LineOfAuthority__c loa : loas) {
             oldLoaMap.put(loa.Id, loa.clone(true, true, true, true));
         }
 
         // Change mapping to null (simulating mapping change)
-        loas[0].ht_LOAMapping__c = null;
+        loas[0].d4c_LOAMapping__c = null;
 
         // Act
         Test.startTest();
@@ -199,7 +199,7 @@ private class LicenseProductCategorizationService_Test {
         Test.stopTest();
 
         // Assert
-        List<ht_License_Insurance_Product__c> toCreate = (List<ht_License_Insurance_Product__c>) result.get('toCreate');
+        List<d4c_License_Insurance_Product__c> toCreate = (List<d4c_License_Insurance_Product__c>) result.get('toCreate');
         Set<String> keysToDelete = (Set<String>) result.get('keysToDelete');
 
         System.assertEquals(0, toCreate.size(), 'Should not create new junctions (mapping set to null)');
@@ -214,13 +214,13 @@ private class LicenseProductCategorizationService_Test {
         // Act
         Test.startTest();
         Map<String, Object> result = service.calculateJunctionChangesForLoaUpdates(
-            new List<ht_LineOfAuthority__c>(),
-            new Map<Id, ht_LineOfAuthority__c>()
+            new List<d4c_LineOfAuthority__c>(),
+            new Map<Id, d4c_LineOfAuthority__c>()
         );
         Test.stopTest();
 
         // Assert
-        List<ht_License_Insurance_Product__c> toCreate = (List<ht_License_Insurance_Product__c>) result.get('toCreate');
+        List<d4c_License_Insurance_Product__c> toCreate = (List<d4c_License_Insurance_Product__c>) result.get('toCreate');
         Set<String> keysToDelete = (Set<String>) result.get('keysToDelete');
 
         System.assertEquals(0, toCreate.size(), 'Should return empty list for toCreate');
@@ -231,7 +231,7 @@ private class LicenseProductCategorizationService_Test {
     static void testGetJunctionKeysToDeleteForLoas_withRealData() {
         // Arrange
         LicenseProductCategorizationService service = new LicenseProductCategorizationService();
-        List<ht_LineOfAuthority__c> loas = queryLoas();
+        List<d4c_LineOfAuthority__c> loas = queryLoas();
 
         // Act
         Test.startTest();
@@ -249,7 +249,7 @@ private class LicenseProductCategorizationService_Test {
 
         // Act
         Test.startTest();
-        Set<String> result = service.getJunctionKeysToDeleteForLoas(new List<ht_LineOfAuthority__c>());
+        Set<String> result = service.getJunctionKeysToDeleteForLoas(new List<d4c_LineOfAuthority__c>());
         Test.stopTest();
 
         // Assert
@@ -263,7 +263,7 @@ private class LicenseProductCategorizationService_Test {
 
         // Act
         Test.startTest();
-        List<ht_License_Insurance_Product__c> result = service.getJunctionsToDeleteByKeys(new Set<String>());
+        List<d4c_License_Insurance_Product__c> result = service.getJunctionsToDeleteByKeys(new Set<String>());
         Test.stopTest();
 
         // Assert
@@ -277,7 +277,7 @@ private class LicenseProductCategorizationService_Test {
 
         // Act
         Test.startTest();
-        List<ht_License_Insurance_Product__c> result = service.getJunctionsToDeleteByKeys(null);
+        List<d4c_License_Insurance_Product__c> result = service.getJunctionsToDeleteByKeys(null);
         Test.stopTest();
 
         // Assert
@@ -285,33 +285,33 @@ private class LicenseProductCategorizationService_Test {
     }
 
     // HELPER METHODS
-    private static List<ht_License__c> queryLicenses() {
-        return [SELECT Id FROM ht_License__c];
+    private static List<d4c_License__c> queryLicenses() {
+        return [SELECT Id FROM d4c_License__c];
     }
 
-    private static List<ht_LOA_Insurance_Product_Mapping__c> queryLoaMappings() {
-        return [SELECT Id FROM ht_LOA_Insurance_Product_Mapping__c];
+    private static List<d4c_LOA_Insurance_Product_Mapping__c> queryLoaMappings() {
+        return [SELECT Id FROM d4c_LOA_Insurance_Product_Mapping__c];
     }
 
-    private static List<ht_Insurance_Product__c> queryProducts() {
-        return [SELECT Id FROM ht_Insurance_Product__c];
+    private static List<d4c_Insurance_Product__c> queryProducts() {
+        return [SELECT Id FROM d4c_Insurance_Product__c];
     }
 
-    private static List<ht_LineOfAuthority__c> queryLoas() {
-        return [SELECT Id, ht_LOAMapping__c, ht_License__c FROM ht_LineOfAuthority__c];
+    private static List<d4c_LineOfAuthority__c> queryLoas() {
+        return [SELECT Id, d4c_LOAMapping__c, d4c_License__c FROM d4c_LineOfAuthority__c];
     }
 
-    private static List<ht_License_Insurance_Product__c> queryLicenseProductJunctions() {
+    private static List<d4c_License_Insurance_Product__c> queryLicenseProductJunctions() {
         return [
-            SELECT Id, ht_License__c, ht_InsuranceProduct__c, ht_UniqueIdentifier__c
-            FROM ht_License_Insurance_Product__c
+            SELECT Id, d4c_License__c, d4c_InsuranceProduct__c, d4c_UniqueIdentifier__c
+            FROM d4c_License_Insurance_Product__c
         ];
     }
 
-    private static List<ht_Insurance_Product_LOA_Mapping__c> queryProductLOAJunctions() {
+    private static List<d4c_Insurance_Product_LOA_Mapping__c> queryProductLOAJunctions() {
         return [
-            SELECT Id, ht_InsuranceProduct__c, ht_LOAMapping__c, ht_UniqueIdentifier__c
-            FROM ht_Insurance_Product_LOA_Mapping__c
+            SELECT Id, d4c_InsuranceProduct__c, d4c_LOAMapping__c, d4c_UniqueIdentifier__c
+            FROM d4c_Insurance_Product_LOA_Mapping__c
         ];
     }
 }

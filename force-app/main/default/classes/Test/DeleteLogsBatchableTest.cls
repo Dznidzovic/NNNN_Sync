@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : Stefan Nidzovic
  * @group             : 
- * @last modified on  : 04-30-2025
+ * @last modified on  : 02-09-2026
  * @last modified by  : Stefan Nidzovic
 **/
 @isTest
@@ -10,14 +10,14 @@ public class DeleteLogsBatchableTest {
     
     @testSetup
     static void setupTestData() {
-        // Insert test ht_Logger__c records
-        List<ht_Logger__c> logRecords = new List<ht_Logger__c>();
+        // Insert test d4c_Logger__c records
+        List<d4c_Logger__c> logRecords = new List<d4c_Logger__c>();
         for (Integer i = 0; i < 10; i++) {
-            ht_Logger__c log = new ht_Logger__c();
+            d4c_Logger__c log = new d4c_Logger__c();
 
-            log.ht_LogLevel__c = 'Info';
-            log.ht_Message__c = 'Test Message ' + i;
-            log.ht_Details__c = 'Test Details ' + i;
+            log.d4c_LogLevel__c = 'Info';
+            log.d4c_Message__c = 'Test Message ' + i;
+            log.d4c_Details__c = 'Test Details ' + i;
 
             logRecords.add(log);
         }
@@ -36,8 +36,8 @@ public class DeleteLogsBatchableTest {
     @isTest
     static void testDeleteLogsBatch() {
         // create data
-        Integer initialCount = [SELECT COUNT() FROM ht_Logger__c];
-        System.assertEquals(10, initialCount, 'Initial count of ht_Logger__c records should be 10');
+        Integer initialCount = [SELECT COUNT() FROM d4c_Logger__c];
+        System.assertEquals(10, initialCount, 'Initial count of d4c_Logger__c records should be 10');
 
         // execute
         Test.startTest();
@@ -45,8 +45,8 @@ public class DeleteLogsBatchableTest {
         Test.stopTest();
 
         // assert
-        Integer finalCount = [SELECT COUNT() FROM ht_Logger__c];
-        System.assertEquals(5, finalCount, 'All ht_Logger__c records should be deleted');
+        Integer finalCount = [SELECT COUNT() FROM d4c_Logger__c];
+        System.assertEquals(5, finalCount, 'All d4c_Logger__c records should be deleted');
     }
 
     @isTest

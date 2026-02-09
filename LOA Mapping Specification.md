@@ -87,20 +87,20 @@ A custom object-based categorization system that maps state-specific LOA codes t
 NIPR Data (Existing)           Categorization System (New)              Output (New)
 ─────────────────────          ───────────────────────────────          ────────────────
 ┌─────────────────┐            ┌──────────────────────────┐            ┌──────────────┐
-│  ht_Producer__c │            │  Product_Category__c     │            │ ht_License__c│
-│                 │            │  (CA-HEALTH, CA-LIFE)    │◄───────────│ .ht_License_ │
+│  d4c_Producer__c │            │  Product_Category__c     │            │ d4c_License__c│
+│                 │            │  (CA-HEALTH, CA-LIFE)    │◄───────────│ .d4c_License_ │
 └────────┬────────┘            └────────────┬─────────────┘            │  Products__c │
          │                                  │                          │ (Multi-select)│
          │                                  │                          └──────────────┘
          │                                  │                                  ▲
 ┌────────▼────────┐            ┌────────────▼─────────────┐                  │
-│ ht_License__c   │            │ License_Product_         │                  │
+│ d4c_License__c   │            │ License_Product_         │                  │
 │                 │◄───────────│ Category__c (Junction)   │──────────────────┘
 └────────┬────────┘            └──────────────────────────┘
          │                                  ▲
          │                                  │
 ┌────────▼────────┐            ┌────────────┴─────────────┐
-│ht_LineOf        │            │ Mapping_Product_         │
+│d4c_LineOf        │            │ Mapping_Product_         │
 │Authority__c     │◄───────────│ Category__c (Junction)   │
 │                 │            └────────────┬─────────────┘
 └─────────────────┘                         │
@@ -115,7 +115,7 @@ NIPR Data (Existing)           Categorization System (New)              Output (
 ### Data Flow
 1. **Configuration**: Client uploads LOA mappings to `LOA_Product_Category_Mapping__c`
 2. **Junction Creation**: Client creates `Mapping_Product_Category__c` records linking LOA mappings to product categories
-3. **Automation (Future)**: Trigger on `ht_LineOfAuthority__c` matches LOAs to mappings
+3. **Automation (Future)**: Trigger on `d4c_LineOfAuthority__c` matches LOAs to mappings
 4. **License Categorization**: System creates `License_Product_Category__c` junction records
 5. **Rollup**: Multi-picklist field on License shows all product categories
 
@@ -127,12 +127,12 @@ NIPR Data (Existing)           Categorization System (New)              Output (
 
 ```
 ┌─────────────────────────────────────────┐
-│  ht_Insurance_Product__c                │
+│  d4c_Insurance_Product__c                │
 │  ─────────────────────────────────────  │
 │  Name (Text 80) *Required               │
-│  ht_StateOrProvince__c (Text 10) *Req   │
-│  ht_ProductName__c (Text) *Required     │
-│  ht_UniqueIdentifier__c (Text 255)      │
+│  d4c_StateOrProvince__c (Text 10) *Req   │
+│  d4c_ProductName__c (Text) *Required     │
+│  d4c_UniqueIdentifier__c (Text 255)      │
 │    External ID, Unique                  │
 │    Populated by automation              │
 └───────────┬─────────────────────────────┘
@@ -140,23 +140,23 @@ NIPR Data (Existing)           Categorization System (New)              Output (
             │ ┌─ Master-Detail (Many)
             │ │
 ┌───────────▼──────────────────────────────┐
-│  ht_Insurance_Product_LOA_Mapping__c     │
+│  d4c_Insurance_Product_LOA_Mapping__c     │
 │  ──────────────────────────────────────  │
 │  Name (AutoNumber) IPLM-0000             │
-│  ht_InsuranceProduct__c (MD) *Required   │
-│  ht_LOAMapping__c (MD) *Required         │
+│  d4c_InsuranceProduct__c (MD) *Required   │
+│  d4c_LOAMapping__c (MD) *Required         │
 └───────────┬──────────────────────────────┘
             │
             │ Master-Detail (Many) ─┐
             │                       │
 ┌───────────▼───────────────────────▼──────┐
-│  ht_LOA_Insurance_Product_Mapping__c     │
+│  d4c_LOA_Insurance_Product_Mapping__c     │
 │  ──────────────────────────────────────  │
 │  Name (AutoNumber) LOAIPM-0000           │
-│  ht_StateOrProvinceCode__c (Text 10)     │
-│  ht_LineOfAuthorityCode__c (Text 50)     │
-│  ht_LineOfAuthorityDescription__c (Text) │
-│  ht_UniqueIdentifier__c (Text 255)       │
+│  d4c_StateOrProvinceCode__c (Text 10)     │
+│  d4c_LineOfAuthorityCode__c (Text 50)     │
+│  d4c_LineOfAuthorityDescription__c (Text) │
+│  d4c_UniqueIdentifier__c (Text 255)       │
 │    External ID, Unique                   │
 │    Populated by automation               │
 └──────────────────────────────────────────┘
@@ -164,20 +164,20 @@ NIPR Data (Existing)           Categorization System (New)              Output (
             │ Lookup
             │
 ┌───────────┴──────────────────────────────┐
-│  ht_LineOfAuthority__c (Existing)        │
+│  d4c_LineOfAuthority__c (Existing)        │
 │  ──────────────────────────────────────  │
-│  ht_LineOfAuthorityCode__c               │
-│  ht_LineOfAuthorityDescription__c        │
-│  ht_LOAMapping__c (New Lookup Field)     │
+│  d4c_LineOfAuthorityCode__c               │
+│  d4c_LineOfAuthorityDescription__c        │
+│  d4c_LOAMapping__c (New Lookup Field)     │
 └───────────┬──────────────────────────────┘
             │
             │ Master-Detail (to License)
             │
 ┌───────────▼──────────────────────────────┐
-│  ht_License__c (Existing)                │
+│  d4c_License__c (Existing)                │
 │  ──────────────────────────────────────  │
-│  ht_LicenseNumber__c                     │
-│  ht_InsuranceProducts__c                 │
+│  d4c_LicenseNumber__c                     │
+│  d4c_InsuranceProducts__c                 │
 │    (New Multi-select Picklist)           │
 │    No initial values                     │
 └───────────┬──────────────────────────────┘
@@ -185,17 +185,17 @@ NIPR Data (Existing)           Categorization System (New)              Output (
             │ ┌─ Master-Detail (Many)
             │ │
 ┌───────────▼──────────────────────────────┐
-│  ht_License_Insurance_Product__c         │
+│  d4c_License_Insurance_Product__c         │
 │  ──────────────────────────────────────  │
 │  Name (AutoNumber) LIP-0000              │
-│  ht_License__c (MD) *Required            │
-│  ht_InsuranceProduct__c (MD) *Required   │
+│  d4c_License__c (MD) *Required            │
+│  d4c_InsuranceProduct__c (MD) *Required   │
 └──────────────────────────────────────────┘
 ```
 
 ### Relationship Summary
-- **Insurance Product ↔ LOA Mapping**: Many-to-Many via `ht_Insurance_Product_LOA_Mapping__c`
-- **License ↔ Insurance Product**: Many-to-Many via `ht_License_Insurance_Product__c`
+- **Insurance Product ↔ LOA Mapping**: Many-to-Many via `d4c_Insurance_Product_LOA_Mapping__c`
+- **License ↔ Insurance Product**: Many-to-Many via `d4c_License_Insurance_Product__c`
 - **LOA ↔ LOA Mapping**: Lookup relationship (LOA looks up to its mapping)
 - **License ↔ LOA**: Master-Detail (existing NIPR structure)
 
@@ -203,11 +203,11 @@ NIPR Data (Existing)           Categorization System (New)              Output (
 
 ## 6. Object Specifications
 
-### 6.1 ht_Insurance_Product__c
+### 6.1 d4c_Insurance_Product__c
 
 **Purpose**: Represents unified insurance products per state/province (e.g., "CA-HEALTH", "FL-LIFE", "ON-HEALTH")
 
-**API Name**: `ht_Insurance_Product__c`
+**API Name**: `d4c_Insurance_Product__c`
 **Label**: NIPR Insurance Product
 **Plural Label**: NIPR Insurance Products
 **Name Field**: Standard Name field (Text, Required)
@@ -218,13 +218,13 @@ NIPR Data (Existing)           Categorization System (New)              Output (
 | Field API Name | Type | Label | Required | Description |
 |---|---|---|---|---|
 | Name | Text(80) | Insurance Product Name | Yes | Standard Name field (required) |
-| ht_StateOrProvince__c | Text(10) | State or Province | Yes | US states (CA, NY, TX) or Canadian provinces (ON, BC, QC) |
-| ht_ProductName__c | Text(255) | Product Name | Yes | HEALTH, LIFE, PROPERTY, CASUALTY, MEDICARE, etc. |
-| ht_UniqueIdentifier__c | Text(255), External ID, Unique | Unique Identifier | Yes | Populated by automation: State-ProductName |
+| d4c_StateOrProvince__c | Text(10) | State or Province | Yes | US states (CA, NY, TX) or Canadian provinces (ON, BC, QC) |
+| d4c_ProductName__c | Text(255) | Product Name | Yes | HEALTH, LIFE, PROPERTY, CASUALTY, MEDICARE, etc. |
+| d4c_UniqueIdentifier__c | Text(255), External ID, Unique | Unique Identifier | Yes | Populated by automation: State-ProductName |
 
 #### Relationships
-- **Parent in**: `ht_Insurance_Product_LOA_Mapping__c.ht_InsuranceProduct__c` (Master-Detail)
-- **Parent in**: `ht_License_Insurance_Product__c.ht_InsuranceProduct__c` (Master-Detail)
+- **Parent in**: `d4c_Insurance_Product_LOA_Mapping__c.d4c_InsuranceProduct__c` (Master-Detail)
+- **Parent in**: `d4c_License_Insurance_Product__c.d4c_InsuranceProduct__c` (Master-Detail)
 
 #### Related Lists
 - Mapping Product Categories
@@ -232,11 +232,11 @@ NIPR Data (Existing)           Categorization System (New)              Output (
 
 ---
 
-### 6.2 ht_LOA_Insurance_Product_Mapping__c
+### 6.2 d4c_LOA_Insurance_Product_Mapping__c
 
 **Purpose**: Client-defined mappings of state-specific LOA codes/descriptions to insurance products
 
-**API Name**: `ht_LOA_Insurance_Product_Mapping__c`
+**API Name**: `d4c_LOA_Insurance_Product_Mapping__c`
 **Label**: NIPR LOA Insurance Product Mapping
 **Name Field**: AutoNumber (LOAIPM-{0000})
 **Sharing Model**: Read/Write
@@ -246,14 +246,14 @@ NIPR Data (Existing)           Categorization System (New)              Output (
 | Field API Name | Type | Label | Required | Description |
 |---|---|---|---|---|
 | Name | AutoNumber | LOA Insurance Product Mapping Name | System | LOAIPM-0000 format |
-| ht_StateOrProvinceCode__c | Text(10) | State or Province Code | Yes | US state or Canadian province code (e.g., CA, FL, ON, BC) |
-| ht_LineOfAuthorityCode__c | Text(50) | Line of Authority Code | Yes | NIPR LOA code (e.g., 935, 770) |
-| ht_LineOfAuthorityDescription__c | Text(255) | Line of Authority Description | Yes | NIPR LOA description (e.g., "Accident & Health or Sickness") |
-| ht_UniqueIdentifier__c | Text(255), External ID, Unique | Unique Identifier | Yes | Populated by automation: State-Code-Description |
+| d4c_StateOrProvinceCode__c | Text(10) | State or Province Code | Yes | US state or Canadian province code (e.g., CA, FL, ON, BC) |
+| d4c_LineOfAuthorityCode__c | Text(50) | Line of Authority Code | Yes | NIPR LOA code (e.g., 935, 770) |
+| d4c_LineOfAuthorityDescription__c | Text(255) | Line of Authority Description | Yes | NIPR LOA description (e.g., "Accident & Health or Sickness") |
+| d4c_UniqueIdentifier__c | Text(255), External ID, Unique | Unique Identifier | Yes | Populated by automation: State-Code-Description |
 
 #### Relationships
-- **Child of**: `ht_LineOfAuthority__c.ht_LOAMapping__c` (Lookup - reverse)
-- **Parent in**: `ht_Insurance_Product_LOA_Mapping__c.ht_LOAMapping__c` (Master-Detail)
+- **Child of**: `d4c_LineOfAuthority__c.d4c_LOAMapping__c` (Lookup - reverse)
+- **Parent in**: `d4c_Insurance_Product_LOA_Mapping__c.d4c_LOAMapping__c` (Master-Detail)
 
 #### Related Lists
 - Insurance Product LOA Mappings (junction to Insurance Products)
@@ -266,11 +266,11 @@ NIPR Data (Existing)           Categorization System (New)              Output (
 
 ---
 
-### 6.3 ht_Insurance_Product_LOA_Mapping__c (Junction)
+### 6.3 d4c_Insurance_Product_LOA_Mapping__c (Junction)
 
 **Purpose**: Many-to-many junction enabling one LOA mapping to associate with multiple insurance products
 
-**API Name**: `ht_Insurance_Product_LOA_Mapping__c`
+**API Name**: `d4c_Insurance_Product_LOA_Mapping__c`
 **Label**: NIPR Insurance Product LOA Mapping
 **Name Field**: AutoNumber (IPLM-{0000})
 **Sharing Model**: Controlled by Parent
@@ -280,13 +280,13 @@ NIPR Data (Existing)           Categorization System (New)              Output (
 | Field API Name | Type | Label | Required | Description |
 |---|---|---|---|---|
 | Name | AutoNumber | Insurance Product LOA Mapping Name | System | IPLM-0000 format |
-| ht_LOAMapping__c | Master-Detail | LOA Mapping | Yes | Links to LOA Insurance Product Mapping |
-| ht_InsuranceProduct__c | Master-Detail | Insurance Product | Yes | Links to Insurance Product |
-| ht_UniqueIdentifier__c | Text(255), External ID, Unique | Unique Identifier | Yes | Populated by automation |
+| d4c_LOAMapping__c | Master-Detail | LOA Mapping | Yes | Links to LOA Insurance Product Mapping |
+| d4c_InsuranceProduct__c | Master-Detail | Insurance Product | Yes | Links to Insurance Product |
+| d4c_UniqueIdentifier__c | Text(255), External ID, Unique | Unique Identifier | Yes | Populated by automation |
 
 #### Relationships
-- **Child of**: `ht_LOA_Insurance_Product_Mapping__c` (Master-Detail)
-- **Child of**: `ht_Insurance_Product__c` (Master-Detail)
+- **Child of**: `d4c_LOA_Insurance_Product_Mapping__c` (Master-Detail)
+- **Child of**: `d4c_Insurance_Product__c` (Master-Detail)
 
 #### Notes
 - Master-Detail fields are auto-required (cannot mark as required in metadata)
@@ -295,11 +295,11 @@ NIPR Data (Existing)           Categorization System (New)              Output (
 
 ---
 
-### 6.4 ht_License_Insurance_Product__c (Junction)
+### 6.4 d4c_License_Insurance_Product__c (Junction)
 
 **Purpose**: Many-to-many junction showing which insurance products a license is authorized for
 
-**API Name**: `ht_License_Insurance_Product__c`
+**API Name**: `d4c_License_Insurance_Product__c`
 **Label**: License Insurance Product
 **Name Field**: AutoNumber (LIP-{0000})
 **Sharing Model**: Controlled by Parent
@@ -309,22 +309,22 @@ NIPR Data (Existing)           Categorization System (New)              Output (
 | Field API Name | Type | Label | Required | Description |
 |---|---|---|---|---|
 | Name | AutoNumber | License Insurance Product Name | System | LIP-0000 format |
-| ht_License__c | Master-Detail | License | Yes | Links to License |
-| ht_InsuranceProduct__c | Master-Detail | Insurance Product | Yes | Links to Insurance Product |
-| ht_UniqueIdentifier__c | Text(255), External ID, Unique | Unique Identifier | Yes | Populated by automation |
+| d4c_License__c | Master-Detail | License | Yes | Links to License |
+| d4c_InsuranceProduct__c | Master-Detail | Insurance Product | Yes | Links to Insurance Product |
+| d4c_UniqueIdentifier__c | Text(255), External ID, Unique | Unique Identifier | Yes | Populated by automation |
 
 #### Relationships
-- **Child of**: `ht_License__c` (Master-Detail)
-- **Child of**: `ht_Insurance_Product__c` (Master-Detail)
+- **Child of**: `d4c_License__c` (Master-Detail)
+- **Child of**: `d4c_Insurance_Product__c` (Master-Detail)
 
 #### Notes
 - Created by batch job automation
 - UniqueIdentifier prevents duplicate junction records
-- Rolled up to `ht_License__c.ht_InsuranceProducts__c` multi-select picklist
+- Rolled up to `d4c_License__c.d4c_InsuranceProducts__c` multi-select picklist
 
 ---
 
-### 6.5 ht_License__c (Enhanced)
+### 6.5 d4c_License__c (Enhanced)
 
 **Existing Object with New Field**
 
@@ -332,14 +332,14 @@ NIPR Data (Existing)           Categorization System (New)              Output (
 
 | Field API Name | Type | Label | Required | Description |
 |---|---|---|---|---|
-| ht_InsuranceProducts__c | Multi-select Picklist (Non-restricted) | Insurance Products | No | Aggregated product categories for quick visibility. No initial picklist values - populated by automation. |
+| d4c_InsuranceProducts__c | Multi-select Picklist (Non-restricted) | Insurance Products | No | Aggregated product categories for quick visibility. No initial picklist values - populated by automation. |
 
 #### New Relationships
-- **Parent in**: `License_Product_Category__c.ht_License__c` (Master-Detail)
+- **Parent in**: `License_Product_Category__c.d4c_License__c` (Master-Detail)
 
 ---
 
-### 6.6 ht_LineOfAuthority__c (Enhanced)
+### 6.6 d4c_LineOfAuthority__c (Enhanced)
 
 **Existing Object with New Field**
 
@@ -347,7 +347,7 @@ NIPR Data (Existing)           Categorization System (New)              Output (
 
 | Field API Name | Type | Label | Required | Description |
 |---|---|---|---|---|
-| ht_LOAProductCategoryMapping__c | Lookup | LOA Product Category Mapping | No | Links LOA to its categorization mapping |
+| d4c_LOAProductCategoryMapping__c | Lookup | LOA Product Category Mapping | No | Links LOA to its categorization mapping |
 
 #### New Relationships
 - **Lookup to**: `LOA_Product_Category_Mapping__c`
@@ -383,7 +383,7 @@ NIPR Data (Existing)           Categorization System (New)              Output (
 
 **Example**:
 ```
-ht_UniqueIdentifier__c = TEXT(ht_State__c) & "-" & ht_LOACode__c & "-" & ht_LOADescription__c
+d4c_UniqueIdentifier__c = TEXT(d4c_State__c) & "-" & d4c_LOACode__c & "-" & d4c_LOADescription__c
 ```
 
 **Benefits**:
@@ -411,7 +411,7 @@ ht_UniqueIdentifier__c = TEXT(ht_State__c) & "-" & ht_LOACode__c & "-" & ht_LOAD
 ### 7.4 Trigger vs Flow vs Batch
 
 **Decision**: Apex Trigger (Future Implementation)
-**Trigger Object**: `ht_LineOfAuthority__c`
+**Trigger Object**: `d4c_LineOfAuthority__c`
 **Trigger Events**: After Insert, After Update
 
 **Rationale**:
@@ -425,7 +425,7 @@ ht_UniqueIdentifier__c = TEXT(ht_State__c) & "-" & ht_LOACode__c & "-" & ht_LOAD
 2. Match LOA to `LOA_Product_Category_Mapping__c` via External ID formula
 3. Find related Product Categories via `Mapping_Product_Category__c` junction
 4. Create/update `License_Product_Category__c` junction records
-5. Roll up categories to `ht_License__c.ht_License_Products__c` multi-picklist
+5. Roll up categories to `d4c_License__c.d4c_License_Products__c` multi-picklist
 
 ---
 
@@ -558,7 +558,7 @@ All pages follow naming convention: `NCC_[Object]_Record_Page_Read_Only`
 ### ⏳ Pending (Automation Phase)
 
 #### Automation Logic
-- [ ] Apex trigger on ht_LineOfAuthority__c
+- [ ] Apex trigger on d4c_LineOfAuthority__c
 - [ ] Trigger handler class (extends BaseTriggerHandler)
 - [ ] Service class for categorization logic
 - [ ] Selector class for querying mappings
@@ -580,7 +580,7 @@ All pages follow naming convention: `NCC_[Object]_Record_Page_Read_Only`
 
 ### 11.1 Trigger: LineOfAuthorityTriggerHandler
 
-**Trigger Object**: `ht_LineOfAuthority__c`
+**Trigger Object**: `d4c_LineOfAuthority__c`
 **Events**: After Insert, After Update
 **Handler Class**: `LineOfAuthorityTriggerHandler` (extends `BaseTriggerHandler`)
 
@@ -588,40 +588,40 @@ All pages follow naming convention: `NCC_[Object]_Record_Page_Read_Only`
 
 ```apex
 // After Insert/Update context
-for each ht_LineOfAuthority__c loa in Trigger.new {
+for each d4c_LineOfAuthority__c loa in Trigger.new {
 
     // Step 1: Build external ID for matching
-    String externalId = loa.State + '-' + loa.ht_LineOfAuthorityCode__c + '-' + loa.ht_LineOfAuthorityDescription__c;
+    String externalId = loa.State + '-' + loa.d4c_LineOfAuthorityCode__c + '-' + loa.d4c_LineOfAuthorityDescription__c;
 
     // Step 2: Query LOA_Product_Category_Mapping__c by External ID
     LOA_Product_Category_Mapping__c mapping =
         [SELECT Id FROM LOA_Product_Category_Mapping__c
-         WHERE ht_UniqueIdentifier__c = :externalId LIMIT 1];
+         WHERE d4c_UniqueIdentifier__c = :externalId LIMIT 1];
 
     // Step 3: Update LOA with mapping lookup
     if (mapping != null) {
-        loa.ht_LOAProductCategoryMapping__c = mapping.Id;
+        loa.d4c_LOAProductCategoryMapping__c = mapping.Id;
     }
 
     // Step 4: Query related Product Categories via junction
     List<Mapping_Product_Category__c> junctions =
-        [SELECT ht_ProductCategory__c FROM Mapping_Product_Category__c
-         WHERE ht_LOAProductCategoryMapping__c = :mapping.Id];
+        [SELECT d4c_ProductCategory__c FROM Mapping_Product_Category__c
+         WHERE d4c_LOAProductCategoryMapping__c = :mapping.Id];
 
     // Step 5: Create License_Product_Category__c records
     List<License_Product_Category__c> licenseCategoryRecords = new List<>();
     for (Mapping_Product_Category__c junction : junctions) {
         licenseCategoryRecords.add(new License_Product_Category__c(
-            ht_License__c = loa.ht_License__c,
-            ht_ProductCategory__c = junction.ht_ProductCategory__c
+            d4c_License__c = loa.d4c_License__c,
+            d4c_ProductCategory__c = junction.d4c_ProductCategory__c
         ));
     }
     upsert licenseCategoryRecords; // Use upsert to avoid duplicates
 
     // Step 6: Roll up to License multi-picklist
     // Query all License_Product_Category__c for this License
-    // Aggregate unique ht_CategoryName__c values
-    // Update ht_License__c.ht_License_Products__c with semicolon-separated string
+    // Aggregate unique d4c_CategoryName__c values
+    // Update d4c_License__c.d4c_License_Products__c with semicolon-separated string
 }
 ```
 
@@ -638,8 +638,8 @@ for each ht_LineOfAuthority__c loa in Trigger.new {
 
 **Purpose**: Encapsulate business logic for LOA categorization
 **Methods**:
-- `categorizeLOAs(List<ht_LineOfAuthority__c> loas)` - Main entry point
-- `matchLOAToMapping(ht_LineOfAuthority__c loa)` - External ID matching
+- `categorizeLOAs(List<d4c_LineOfAuthority__c> loas)` - Main entry point
+- `matchLOAToMapping(d4c_LineOfAuthority__c loa)` - External ID matching
 - `getProductCategoriesForMapping(Id mappingId)` - Query junction records
 - `createLicenseCategoryJunctions(Map<Id, Set<Id>> licenseToCategories)` - Bulk create junctions
 - `rollupCategoryToLicense(Set<Id> licenseIds)` - Update multi-picklist
@@ -690,7 +690,7 @@ for each ht_LineOfAuthority__c loa in Trigger.new {
 
 #### License Multi-Picklist Value
 ```
-ht_License_Products__c = "HEALTH;LIFE;PROPERTY;CASUALTY"
+d4c_License_Products__c = "HEALTH;LIFE;PROPERTY;CASUALTY"
 ```
 
 ---
@@ -743,10 +743,10 @@ A Salesforce object with two Master-Detail relationships that enables many-to-ma
 A Salesforce relationship where the child record's lifecycle is controlled by the parent. Deleting the parent deletes all children. Used for junction objects.
 
 **Lookup Relationship**
-A Salesforce relationship that creates a link between two objects but doesn't control lifecycle. Used for `ht_LineOfAuthority__c.ht_LOAProductCategoryMapping__c`.
+A Salesforce relationship that creates a link between two objects but doesn't control lifecycle. Used for `d4c_LineOfAuthority__c.d4c_LOAProductCategoryMapping__c`.
 
 **Multi-Select Picklist**
-A Salesforce field type that allows multiple values to be selected from a predefined list. Used for `ht_License__c.ht_License_Products__c` to show aggregated categories.
+A Salesforce field type that allows multiple values to be selected from a predefined list. Used for `d4c_License__c.d4c_License_Products__c` to show aggregated categories.
 
 **Trigger Dispatcher Pattern**
 A design pattern where all triggers delegate to handler classes via a central dispatcher (`TriggerDispatcher.cls`). Enables better testing and separation of concerns.
@@ -776,8 +776,8 @@ A relationship between an insurance agent and an insurance carrier that authoriz
 - `/force-app/main/default/objects/License_Product_Category__c/`
 
 #### Fields
-- `/force-app/main/default/objects/ht_License__c/fields/ht_License_Products__c.field-meta.xml`
-- `/force-app/main/default/objects/ht_LineOfAuthority__c/fields/ht_LOAProductCategoryMapping__c.field-meta.xml`
+- `/force-app/main/default/objects/d4c_License__c/fields/d4c_License_Products__c.field-meta.xml`
+- `/force-app/main/default/objects/d4c_LineOfAuthority__c/fields/d4c_LOAProductCategoryMapping__c.field-meta.xml`
 
 #### Tabs
 - `/force-app/main/default/tabs/Product_Category__c.tab-meta.xml`
@@ -809,8 +809,8 @@ sf project deploy start -d force-app/main/default/objects/Product_Category__c \
 
 # Deploy enhanced fields
 sf project deploy start \
-  -m CustomField:ht_LineOfAuthority__c.ht_LOAProductCategoryMapping__c \
-  -m CustomField:ht_License__c.ht_License_Products__c
+  -m CustomField:d4c_LineOfAuthority__c.d4c_LOAProductCategoryMapping__c \
+  -m CustomField:d4c_License__c.d4c_License_Products__c
 
 # Deploy UI components
 sf project deploy start \
@@ -827,13 +827,13 @@ sf project deploy start \
 ### Query Sample Data
 ```bash
 # View Product Categories
-sf data query --query "SELECT Id, Name, ht_State__c, ht_CategoryName__c, ht_UniqueIdentifier__c FROM Product_Category__c"
+sf data query --query "SELECT Id, Name, d4c_State__c, d4c_CategoryName__c, d4c_UniqueIdentifier__c FROM Product_Category__c"
 
 # View License with Products
-sf data query --query "SELECT Id, Name, ht_License_Products__c FROM ht_License__c WHERE Name = 'LIC-2867'"
+sf data query --query "SELECT Id, Name, d4c_License_Products__c FROM d4c_License__c WHERE Name = 'LIC-2867'"
 
 # View License Product Category junctions
-sf data query --query "SELECT Id, ht_License__r.Name, ht_ProductCategory__r.ht_CategoryName__c FROM License_Product_Category__c"
+sf data query --query "SELECT Id, d4c_License__r.Name, d4c_ProductCategory__r.d4c_CategoryName__c FROM License_Product_Category__c"
 ```
 
 ---

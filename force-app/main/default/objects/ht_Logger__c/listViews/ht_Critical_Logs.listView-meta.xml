@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ListView xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>ht_Critical_Logs</fullName>
+    <fullName>d4c_Critical_Logs</fullName>
     <columns>NAME</columns>
     <columns>CREATED_DATE</columns>
-    <columns>ht_LogLevel__c</columns>
-    <columns>ht_Critical__c</columns>
-    <columns>ht_Details__c</columns>
-    <columns>ht_Message__c</columns>
+    <columns>d4c_LogLevel__c</columns>
+    <columns>d4c_Critical__c</columns>
+    <columns>d4c_Details__c</columns>
+    <columns>d4c_Message__c</columns>
     <filterScope>Everything</filterScope>
     <filters>
-        <field>ht_Critical__c</field>
+        <field>d4c_Critical__c</field>
         <operation>equals</operation>
         <value>1</value>
     </filters>

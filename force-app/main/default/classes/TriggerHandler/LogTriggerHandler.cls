@@ -1,8 +1,8 @@
 /*
 *********************************************************
-Apex Class Name    : ht_LogTriggerHandler
+Apex Class Name    : d4c_LogTriggerHandler
 Created Date       : 06-08-2025
-@description       : Handles trigger logic for ht_Log__e platform event
+@description       : Handles trigger logic for d4c_Log__e platform event
 @author            : HipTen Admin
 Modification Log:
 Ver   Date         Author          Modification
@@ -27,12 +27,12 @@ public with sharing class LogTriggerHandler extends BaseTriggerHandler {
      *********************************************************
      **/
     public override void afterInsert(Map<Id, SObject> newItems) {
-        List<ht_Log__e> logEvents = (List<ht_Log__e>) newItems.values();
+        List<d4c_Log__e> logEvents = (List<d4c_Log__e>) newItems.values();
         
-        for (ht_Log__e logEvent : logEvents) {
-            if (String.isNotBlank(logEvent.ht_Content__c)) {
+        for (d4c_Log__e logEvent : logEvents) {
+            if (String.isNotBlank(logEvent.d4c_Content__c)) {
                 // Use the Logger class's static method to process the event
-                Logger.processLogEvent(logEvent.ht_Content__c);
+                Logger.processLogEvent(logEvent.d4c_Content__c);
             }
         }
     }

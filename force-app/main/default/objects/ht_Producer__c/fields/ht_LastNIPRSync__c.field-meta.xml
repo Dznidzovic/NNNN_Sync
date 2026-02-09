@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>ht_LastNIPRSync__c</fullName>
+    <fullName>d4c_LastNIPRSync__c</fullName>
     <description>Date and time of the last successful NIPR sync for this producer (via Entity Info API or PDB Alert).</description>
     <label>Last NIPR Sync</label>
     <required>false</required>

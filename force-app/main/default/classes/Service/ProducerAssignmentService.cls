@@ -2,12 +2,12 @@
 *********************************************************
 Apex Class Name    : ProducerAssignmentService
 Created Date       : 2025-04-08
-@description       : Service class for assigning Producer__c based on ht_NPN__c for any SObject
+@description       : Service class for assigning Producer__c based on d4c_NPN__c for any SObject
 @author            : Uros Markovic
 Modification Log:
 Ver   Date         Author          Modification
 1.0   2025-04-08   Uros Markovic   Initial Version
-1.1   2025-04-10   Uros Markovic   Replaced manual insert logic with upsert on ht_NPN__c
+1.1   2025-04-10   Uros Markovic   Replaced manual insert logic with upsert on d4c_NPN__c
 1.2   2025-04-25   Stefan Nidzovic   Added handling for orphaned producers when NPN is changed
 *********************************************************
 */
@@ -16,7 +16,7 @@ public with sharing class ProducerAssignmentService {
     private static final String CLASS_NAME = 'ProducerAssignmentService';
 
     // Test-visible mock properties for unit testing without DML
-    @TestVisible private static Map<String, ht_Producer__c> mockProducersByNPN;
+    @TestVisible private static Map<String, d4c_Producer__c> mockProducersByNPN;
     @TestVisible private static List<Account> mockAccountsByNPN;
     @TestVisible private static List<Contact> mockContactsByNPN;
     @TestVisible private static List<Lead> mockLeadsByNPN;
@@ -32,7 +32,7 @@ public with sharing class ProducerAssignmentService {
     *********************************************************
     @Method Name    : assignProducers
     @author         : Uros Markovic
-    @description    : Main entry method to assign Producer__c based on ht_NPN__c field
+    @description    : Main entry method to assign Producer__c based on d4c_NPN__c field
     @param          : records - List of incoming SObject records
     @param          : oldRecords - Map of old SObject records (for update comparison)
     @return         : void
@@ -45,10 +45,10 @@ public with sharing class ProducerAssignmentService {
 
         // Handle new NPNs - assign or create producers for these NPNs
         Set<String> newNpns = extractUniqueNPNs(recordsToProcess);
-        List<ht_Producer__c> existingProducers = useMocks && mockProducersByNPN != null
+        List<d4c_Producer__c> existingProducers = useMocks && mockProducersByNPN != null
             ? mockProducersByNPN.values()
             : producerSelector.getProducersByNPNs(newNpns);
-        Map<String, ht_Producer__c> producerMap = buildProducerMapByNPN(existingProducers);
+        Map<String, d4c_Producer__c> producerMap = buildProducerMapByNPN(existingProducers);
 
         Boolean upsertFailed = upsertMissingProducers(newNpns, producerMap, recordsToProcess);
 
@@ -76,8 +76,8 @@ public with sharing class ProducerAssignmentService {
             if (oldRecords.containsKey(recordId)) {
                 SObject oldRecord = oldRecords.get(recordId);
                 
-                String oldNpn = (String) oldRecord.get('ht_NPN__c');
-                String newNpn = (String) newRecord.get('ht_NPN__c');
+                String oldNpn = (String) oldRecord.get('d4c_NPN__c');
+                String newNpn = (String) newRecord.get('d4c_NPN__c');
                 
                 if (String.isNotBlank(oldNpn) && oldNpn != newNpn) {
                     potentialOrphanedNpns.add(oldNpn);
@@ -88,7 +88,7 @@ public with sharing class ProducerAssignmentService {
         if (potentialOrphanedNpns.isEmpty()) return;
 
         // Get producers with these NPNs
-        List<ht_Producer__c> potentialOrphanedProducers = useMocks && mockProducersByNPN != null
+        List<d4c_Producer__c> potentialOrphanedProducers = useMocks && mockProducersByNPN != null
             ? getProducersFromMockByNPNs(potentialOrphanedNpns)
             : producerSelector.getProducersByNPNs(potentialOrphanedNpns);
         
@@ -98,9 +98,9 @@ public with sharing class ProducerAssignmentService {
         Set<String> npnsStillInUse = checkForRelatedRecords(potentialOrphanedNpns);
         
         // Collect producers whose NPNs are no longer in use
-        List<ht_Producer__c> producersToDelete = new List<ht_Producer__c>();
-        for (ht_Producer__c producer : potentialOrphanedProducers) {
-            if (!npnsStillInUse.contains(producer.ht_NPN__c)) {
+        List<d4c_Producer__c> producersToDelete = new List<d4c_Producer__c>();
+        for (d4c_Producer__c producer : potentialOrphanedProducers) {
+            if (!npnsStillInUse.contains(producer.d4c_NPN__c)) {
                 producersToDelete.add(producer);
             }
         }
@@ -131,11 +131,11 @@ public with sharing class ProducerAssignmentService {
     @author         : Stefan Nidzovic
     @description    : Helper method to get producers from mock map by NPNs
     @param          : npns - Set of NPNs to search for
-    @return         : List<ht_Producer__c> - List of producers matching the NPNs
+    @return         : List<d4c_Producer__c> - List of producers matching the NPNs
     ********************************************************
     */
-    private List<ht_Producer__c> getProducersFromMockByNPNs(Set<String> npns) {
-        List<ht_Producer__c> result = new List<ht_Producer__c>();
+    private List<d4c_Producer__c> getProducersFromMockByNPNs(Set<String> npns) {
+        List<d4c_Producer__c> result = new List<d4c_Producer__c>();
         for (String npn : npns) {
             if (mockProducersByNPN.containsKey(npn)) {
                 result.add(mockProducersByNPN.get(npn));
@@ -165,8 +165,8 @@ public with sharing class ProducerAssignmentService {
             : accountSelector.getAccountsByNPNs(npnsToCheck);
 
         for (Account acc : accounts) {
-            if (String.isNotBlank(acc.ht_NPN__c)) {
-                npnsStillInUse.add(acc.ht_NPN__c);
+            if (String.isNotBlank(acc.d4c_NPN__c)) {
+                npnsStillInUse.add(acc.d4c_NPN__c);
             }
         }
 
@@ -180,8 +180,8 @@ public with sharing class ProducerAssignmentService {
             : contactSelector.getContactsByNPNs(npnsToCheck);
 
         for (Contact con : contacts) {
-            if (String.isNotBlank(con.ht_NPN__c)) {
-                npnsStillInUse.add(con.ht_NPN__c);
+            if (String.isNotBlank(con.d4c_NPN__c)) {
+                npnsStillInUse.add(con.d4c_NPN__c);
             }
         }
         
@@ -195,8 +195,8 @@ public with sharing class ProducerAssignmentService {
             : leadSelector.getLeadsByNPNs(npnsToCheck);
         
         for (Lead lead : leads) {
-            if (String.isNotBlank(lead.ht_NPN__c)) {
-                npnsStillInUse.add(lead.ht_NPN__c);
+            if (String.isNotBlank(lead.d4c_NPN__c)) {
+                npnsStillInUse.add(lead.d4c_NPN__c);
             }
         }
         
@@ -207,7 +207,7 @@ public with sharing class ProducerAssignmentService {
     *********************************************************
     @Method Name    : filterChangedAndValidRecords
     @author         : Uros Markovic
-    @description    : Filters records where ht_NPN__c is changed and valid
+    @description    : Filters records where d4c_NPN__c is changed and valid
     @param          : records - New list of SObject records
     @param          : oldRecords - Map of old SObject records
     @return         : List<SObject> - filtered valid records
@@ -217,22 +217,22 @@ public with sharing class ProducerAssignmentService {
         List<SObject> result = new List<SObject>();
 
         for (SObject record : records) {
-            String newNpn = (String) record.get('ht_NPN__c');
+            String newNpn = (String) record.get('d4c_NPN__c');
             Boolean npnChanged = true;
 
             if (oldRecords != null && oldRecords.containsKey(record.Id)) {
-                String oldNpn = (String) oldRecords.get(record.Id).get('ht_NPN__c');
+                String oldNpn = (String) oldRecords.get(record.Id).get('d4c_NPN__c');
                 npnChanged = oldNpn != newNpn;
             }
 
             if (String.isNotBlank(newNpn)) {
                 if (!RegexUtils.isValidNPN(newNpn)) {
                     if (record instanceof Contact) {
-                        ((Contact) record).ht_NPN__c.addError('NPN must contain only numeric characters.');
+                        ((Contact) record).d4c_NPN__c.addError('NPN must contain only numeric characters.');
                     } else if (record instanceof Lead) {
-                        ((Lead) record).ht_NPN__c.addError('NPN must contain only numeric characters.');
+                        ((Lead) record).d4c_NPN__c.addError('NPN must contain only numeric characters.');
                     } else if (record instanceof Account) {
-                        ((Account) record).ht_NPN__c.addError('NPN must contain only numeric characters.');
+                        ((Account) record).d4c_NPN__c.addError('NPN must contain only numeric characters.');
                     } else {
                         record.addError('Invalid record type for NPN validation.');
                     }
@@ -251,7 +251,7 @@ public with sharing class ProducerAssignmentService {
     /*
     *********************************************************
     @Method Name    : extractUniqueNPNs
-    @description    : Extracts unique ht_NPN__c values from SObject records
+    @description    : Extracts unique d4c_NPN__c values from SObject records
     @author         : Uros Markovic
     @param          : records - List of filtered SObject records
     @return         : Set<String> - set of unique NPNs
@@ -260,7 +260,7 @@ public with sharing class ProducerAssignmentService {
     private Set<String> extractUniqueNPNs(List<SObject> records) {
         Set<String> npns = new Set<String>();
         for (SObject record : records) {
-            npns.add((String) record.get('ht_NPN__c'));
+            npns.add((String) record.get('d4c_NPN__c'));
         }
         return npns;
     }
@@ -268,16 +268,16 @@ public with sharing class ProducerAssignmentService {
     /*
     *********************************************************
     @Method Name    : buildProducerMapByNPN
-    @description    : Builds map of ht_Producer__c records by ht_NPN__c
+    @description    : Builds map of d4c_Producer__c records by d4c_NPN__c
     @author         : Uros Markovic
     @param          : producerList - List of Producer records
-    @return         : Map<String, ht_Producer__c>
+    @return         : Map<String, d4c_Producer__c>
     ********************************************************
     */
-    private Map<String, ht_Producer__c> buildProducerMapByNPN(List<ht_Producer__c> producerList) {
-        Map<String, ht_Producer__c> producerMap = new Map<String, ht_Producer__c>();
-        for (ht_Producer__c p : producerList) {
-            producerMap.put(p.ht_NPN__c, p);
+    private Map<String, d4c_Producer__c> buildProducerMapByNPN(List<d4c_Producer__c> producerList) {
+        Map<String, d4c_Producer__c> producerMap = new Map<String, d4c_Producer__c>();
+        for (d4c_Producer__c p : producerList) {
+            producerMap.put(p.d4c_NPN__c, p);
         }
         return producerMap;
     }
@@ -292,11 +292,11 @@ public with sharing class ProducerAssignmentService {
     @return         : Boolean - true if error occurred, false otherwise
     ********************************************************
     */
-    private Boolean upsertMissingProducers(Set<String> npns, Map<String, ht_Producer__c> producerMap, List<SObject> recordsToProcess) {
-        List<ht_Producer__c> producersToUpsert = new List<ht_Producer__c>();
+    private Boolean upsertMissingProducers(Set<String> npns, Map<String, d4c_Producer__c> producerMap, List<SObject> recordsToProcess) {
+        List<d4c_Producer__c> producersToUpsert = new List<d4c_Producer__c>();
         for (String npn : npns) {
             if (!producerMap.containsKey(npn)) {
-                producersToUpsert.add(new ht_Producer__c(ht_NPN__c = npn));
+                producersToUpsert.add(new d4c_Producer__c(d4c_NPN__c = npn));
             }
         }
 
@@ -305,26 +305,26 @@ public with sharing class ProducerAssignmentService {
         // Skip DML in test mode with mocks
         if (useMocks) {
             // In mock mode, create producers with proper mock IDs using dynamic key prefix
-            String keyPrefix = ht_Producer__c.SObjectType.getDescribe().getKeyPrefix();
+            String keyPrefix = d4c_Producer__c.SObjectType.getDescribe().getKeyPrefix();
             Integer counter = mockProducersByNPN != null ? mockProducersByNPN.size() : 0;
-            for (ht_Producer__c p : producersToUpsert) {
+            for (d4c_Producer__c p : producersToUpsert) {
                 if (mockProducersByNPN == null) {
-                    mockProducersByNPN = new Map<String, ht_Producer__c>();
+                    mockProducersByNPN = new Map<String, d4c_Producer__c>();
                 }
                 // Create a new producer with proper ID using dynamic key prefix
                 counter++;
                 String fakeId = keyPrefix + '0'.repeat(12 - String.valueOf(counter).length()) + counter;
-                ht_Producer__c mockProducer = new ht_Producer__c();
+                d4c_Producer__c mockProducer = new d4c_Producer__c();
                 mockProducer.Id = Id.valueOf(fakeId);
-                mockProducer.ht_NPN__c = p.ht_NPN__c;
-                mockProducersByNPN.put(mockProducer.ht_NPN__c, mockProducer);
-                producerMap.put(mockProducer.ht_NPN__c, mockProducer);
+                mockProducer.d4c_NPN__c = p.d4c_NPN__c;
+                mockProducersByNPN.put(mockProducer.d4c_NPN__c, mockProducer);
+                producerMap.put(mockProducer.d4c_NPN__c, mockProducer);
             }
             return false;
         }
 
         try {
-            upsert producersToUpsert ht_NPN__c;
+            upsert producersToUpsert d4c_NPN__c;
         } catch (DmlException e) {
             for (SObject record : recordsToProcess) {
                 record.addError('Failed to assign producer. Contact your administrator.');
@@ -341,7 +341,7 @@ public with sharing class ProducerAssignmentService {
         }
 
         // Refresh map after successful upsert
-        List<ht_Producer__c> updatedProducers = producerSelector.getProducersByNPNs(npns);
+        List<d4c_Producer__c> updatedProducers = producerSelector.getProducersByNPNs(npns);
         producerMap.clear();
         producerMap.putAll(buildProducerMapByNPN(updatedProducers));
 
@@ -351,18 +351,18 @@ public with sharing class ProducerAssignmentService {
     /*
     *********************************************************
     @Method Name    : assignProducersToRecords
-    @description    : Assigns Producer__c lookup to record based on ht_NPN__c match
+    @description    : Assigns Producer__c lookup to record based on d4c_NPN__c match
     @author         : Uros Markovic
     @param          : records - List of filtered SObject records
-    @param          : producerMap - Map of NPN to ht_Producer__c records
+    @param          : producerMap - Map of NPN to d4c_Producer__c records
     @return         : void
     ********************************************************
     */
-    private void assignProducersToRecords(List<SObject> records, Map<String, ht_Producer__c> producerMap) {
+    private void assignProducersToRecords(List<SObject> records, Map<String, d4c_Producer__c> producerMap) {
         for (SObject record : records) {
-            String npn = (String) record.get('ht_NPN__c');
+            String npn = (String) record.get('d4c_NPN__c');
             if (producerMap.containsKey(npn)) {
-                record.put('ht_Producer__c', producerMap.get(npn).Id);
+                record.put('d4c_Producer__c', producerMap.get(npn).Id);
             }
         }
     }

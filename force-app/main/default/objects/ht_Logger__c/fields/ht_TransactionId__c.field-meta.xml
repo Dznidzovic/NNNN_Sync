@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>ht_TransactionId__c</fullName>
+    <fullName>d4c_TransactionId__c</fullName>
     <externalId>false</externalId>
     <label>Transaction Id</label>
     <length>255</length>

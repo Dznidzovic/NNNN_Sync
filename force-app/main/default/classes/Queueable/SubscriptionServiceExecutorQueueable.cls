@@ -191,7 +191,7 @@ public class SubscriptionServiceExecutorQueueable extends SubscriptionService im
             return;
         }
 
-        List<ht_Producer__c> producers = producerSelector.getProducersByNPNs(new Set<String>{ npn });
+        List<d4c_Producer__c> producers = producerSelector.getProducersByNPNs(new Set<String>{ npn });
         if (producers.isEmpty()) {
             Logger.error(CLASS_NAME, methodName, 'Producer not found', 'NPN: ' + npn, null, null);
             return;
@@ -238,7 +238,7 @@ public class SubscriptionServiceExecutorQueueable extends SubscriptionService im
             return;
         }
 
-        List<ht_Producer__c> producers = producerSelector.getProducersByNPNs(new Set<String>{ npn });
+        List<d4c_Producer__c> producers = producerSelector.getProducersByNPNs(new Set<String>{ npn });
         if (producers.isEmpty()) {
             Logger.error(CLASS_NAME, methodName, 'Producer not found', 'NPN: ' + npn, null, null);
             return;

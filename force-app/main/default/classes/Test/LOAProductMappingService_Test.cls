@@ -16,28 +16,28 @@ private class LOAProductMappingService_Test {
     @TestSetup
     static void setupTestData() {
         // Create Producer with License using TestDataFactory
-        ht_Producer__c producer = TestDataFactory.createProducer('12345678');
+        d4c_Producer__c producer = TestDataFactory.createProducer('12345678');
         ProducerTriggerHandler.triggerDisabled = true;
         insert producer;
         ProducerTriggerHandler.triggerDisabled = false;
 
         // Create License
-        ht_License__c license = TestDataFactory.createLicense('LIC123', producer.Id);
-        license.ht_StateOrProvinceCode__c = 'CA';
+        d4c_License__c license = TestDataFactory.createLicense('LIC123', producer.Id);
+        license.d4c_StateOrProvinceCode__c = 'CA';
         insert license;
 
         // Create LOA Insurance Product Mapping
-        ht_LOA_Insurance_Product_Mapping__c mapping = TestDataFactory.createLOAInsuranceProductMapping('CA', '935', 'Accident & Health', true);
+        d4c_LOA_Insurance_Product_Mapping__c mapping = TestDataFactory.createLOAInsuranceProductMapping('CA', '935', 'Accident & Health', true);
 
         // Create Insurance Product
-        ht_Insurance_Product__c product = TestDataFactory.createInsuranceProduct('Health Insurance', '12345', true);
+        d4c_Insurance_Product__c product = TestDataFactory.createInsuranceProduct('Health Insurance', '12345', true);
 
         // Create junction between Product and Mapping
         TestDataFactory.createInsuranceProductLOAMappingJunction(product.Id, mapping.Id, true);
 
-        // Create LOAs (trigger will auto-populate ht_LOAMapping__c for loa1)
-        ht_LineOfAuthority__c loa1 = TestDataFactory.createLOAForMatching(license.Id, 'CA', '935', 'Accident & Health', true);
-        ht_LineOfAuthority__c loa2 = TestDataFactory.createLOAForMatching(license.Id, 'NY', '101', 'Life', true);
+        // Create LOAs (trigger will auto-populate d4c_LOAMapping__c for loa1)
+        d4c_LineOfAuthority__c loa1 = TestDataFactory.createLOAForMatching(license.Id, 'CA', '935', 'Accident & Health', true);
+        d4c_LineOfAuthority__c loa2 = TestDataFactory.createLOAForMatching(license.Id, 'NY', '101', 'Life', true);
     }
 
     @isTest
@@ -71,12 +71,12 @@ private class LOAProductMappingService_Test {
     static void testMatchLoasToMappings_withRealData() {
         // Arrange
         LOAProductMappingService service = new LOAProductMappingService();
-        List<ht_LineOfAuthority__c> loas = queryLoas();
-        List<ht_LOA_Insurance_Product_Mapping__c> mappings = queryLoaMappings();
+        List<d4c_LineOfAuthority__c> loas = queryLoas();
+        List<d4c_LOA_Insurance_Product_Mapping__c> mappings = queryLoaMappings();
 
         // Reset mapping to null
-        for (ht_LineOfAuthority__c loa : loas) {
-            loa.ht_LOAMapping__c = null;
+        for (d4c_LineOfAuthority__c loa : loas) {
+            loa.d4c_LOAMapping__c = null;
         }
 
         // Act
@@ -88,11 +88,11 @@ private class LOAProductMappingService_Test {
         System.assertEquals(1, mappings.size(), 'Should have 1 mapping');
 
         // First LOA (CA-935-Accident & Health) should match the mapping
-        System.assertNotEquals(null, loas[0].ht_LOAMapping__c, 'First LOA should be matched');
-        System.assertEquals(mappings[0].Id, loas[0].ht_LOAMapping__c, 'First LOA should match to correct mapping');
+        System.assertNotEquals(null, loas[0].d4c_LOAMapping__c, 'First LOA should be matched');
+        System.assertEquals(mappings[0].Id, loas[0].d4c_LOAMapping__c, 'First LOA should match to correct mapping');
 
         // Second LOA (NY-101-Life) should not match
-        System.assertEquals(null, loas[1].ht_LOAMapping__c, 'Second LOA should not match (no mapping exists)');
+        System.assertEquals(null, loas[1].d4c_LOAMapping__c, 'Second LOA should not match (no mapping exists)');
     }
 
     @isTest
@@ -101,24 +101,24 @@ private class LOAProductMappingService_Test {
         LOAProductMappingService service = new LOAProductMappingService();
 
         // Create test data with mapping inserted
-        ht_LOA_Insurance_Product_Mapping__c mapping = new ht_LOA_Insurance_Product_Mapping__c(
-            ht_StateOrProvinceCode__c = 'TX',
-            ht_LineOfAuthorityCode__c = '950',
-            ht_LineOfAuthorityDescription__c = 'Life'
+        d4c_LOA_Insurance_Product_Mapping__c mapping = new d4c_LOA_Insurance_Product_Mapping__c(
+            d4c_StateOrProvinceCode__c = 'TX',
+            d4c_LineOfAuthorityCode__c = '950',
+            d4c_LineOfAuthorityDescription__c = 'Life'
         );
         insert mapping;
 
         // Create LOAs to match
-        List<ht_LineOfAuthority__c> loas = new List<ht_LineOfAuthority__c>{
-            new ht_LineOfAuthority__c(
-                ht_StateOrProvinceCode__c = 'TX',
-                ht_LineOfAuthorityCode__c = '950',
-                ht_LineOfAuthorityDescription__c = 'Life'
+        List<d4c_LineOfAuthority__c> loas = new List<d4c_LineOfAuthority__c>{
+            new d4c_LineOfAuthority__c(
+                d4c_StateOrProvinceCode__c = 'TX',
+                d4c_LineOfAuthorityCode__c = '950',
+                d4c_LineOfAuthorityDescription__c = 'Life'
             ),
-            new ht_LineOfAuthority__c(
-                ht_StateOrProvinceCode__c = 'FL',
-                ht_LineOfAuthorityCode__c = '101',
-                ht_LineOfAuthorityDescription__c = 'Property'
+            new d4c_LineOfAuthority__c(
+                d4c_StateOrProvinceCode__c = 'FL',
+                d4c_LineOfAuthorityCode__c = '101',
+                d4c_LineOfAuthorityDescription__c = 'Property'
             )
         };
 
@@ -128,20 +128,20 @@ private class LOAProductMappingService_Test {
         Test.stopTest();
 
         // Assert
-        System.assertEquals(mapping.Id, loas[0].ht_LOAMapping__c, 'First LOA should be matched to mapping');
-        System.assertEquals(null, loas[1].ht_LOAMapping__c, 'Second LOA should not be matched (no matching mapping)');
+        System.assertEquals(mapping.Id, loas[0].d4c_LOAMapping__c, 'First LOA should be matched to mapping');
+        System.assertEquals(null, loas[1].d4c_LOAMapping__c, 'Second LOA should not be matched (no matching mapping)');
     }
 
     @isTest
     static void testFindOrphanLoasForMappings_withRealData() {
         // Arrange
         LOAProductMappingService service = new LOAProductMappingService();
-        List<ht_LOA_Insurance_Product_Mapping__c> mappings = queryLoaMappings();
+        List<d4c_LOA_Insurance_Product_Mapping__c> mappings = queryLoaMappings();
 
         // Set LOAs to have null mapping (orphans)
-        List<ht_LineOfAuthority__c> loas = queryLoas();
-        for (ht_LineOfAuthority__c loa : loas) {
-            loa.ht_LOAMapping__c = null;
+        List<d4c_LineOfAuthority__c> loas = queryLoas();
+        for (d4c_LineOfAuthority__c loa : loas) {
+            loa.d4c_LOAMapping__c = null;
         }
         LineOfAuthorityTriggerHandler.triggerDisabled = true;
         update loas;
@@ -149,29 +149,29 @@ private class LOAProductMappingService_Test {
 
         // Act
         Test.startTest();
-        List<ht_LineOfAuthority__c> orphans = service.findOrphanLoasForMappings(new Set<Id>{mappings[0].Id});
+        List<d4c_LineOfAuthority__c> orphans = service.findOrphanLoasForMappings(new Set<Id>{mappings[0].Id});
         Test.stopTest();
 
         // Assert
         System.assertEquals(1, orphans.size(), 'Should find 1 orphan LOA (CA-935-Accident & Health)');
-        System.assertEquals(mappings[0].Id, orphans[0].ht_LOAMapping__c, 'Orphan should be matched to mapping');
+        System.assertEquals(mappings[0].Id, orphans[0].d4c_LOAMapping__c, 'Orphan should be matched to mapping');
     }
 
     @isTest
     static void testFilterLoasWithMappings() {
         // Arrange
         LOAProductMappingService service = new LOAProductMappingService();
-        List<ht_LOA_Insurance_Product_Mapping__c> mappings = queryLoaMappings();
+        List<d4c_LOA_Insurance_Product_Mapping__c> mappings = queryLoaMappings();
 
-        List<ht_LineOfAuthority__c> loas = new List<ht_LineOfAuthority__c>{
-            new ht_LineOfAuthority__c(ht_LOAMapping__c = mappings[0].Id),
-            new ht_LineOfAuthority__c(ht_LOAMapping__c = null),
-            new ht_LineOfAuthority__c(ht_LOAMapping__c = mappings[0].Id)
+        List<d4c_LineOfAuthority__c> loas = new List<d4c_LineOfAuthority__c>{
+            new d4c_LineOfAuthority__c(d4c_LOAMapping__c = mappings[0].Id),
+            new d4c_LineOfAuthority__c(d4c_LOAMapping__c = null),
+            new d4c_LineOfAuthority__c(d4c_LOAMapping__c = mappings[0].Id)
         };
 
         // Act
         Test.startTest();
-        List<ht_LineOfAuthority__c> filtered = service.filterLoasWithMappings(loas);
+        List<d4c_LineOfAuthority__c> filtered = service.filterLoasWithMappings(loas);
         Test.stopTest();
 
         // Assert
@@ -182,20 +182,20 @@ private class LOAProductMappingService_Test {
     static void testFilterLoasWithChangedMappings() {
         // Arrange
         LOAProductMappingService service = new LOAProductMappingService();
-        List<ht_LOA_Insurance_Product_Mapping__c> mappings = queryLoaMappings();
-        List<ht_LineOfAuthority__c> loas = queryLoas();
+        List<d4c_LOA_Insurance_Product_Mapping__c> mappings = queryLoaMappings();
+        List<d4c_LineOfAuthority__c> loas = queryLoas();
 
         // Create old map
-        Map<Id, ht_LineOfAuthority__c> newLoaMap = new Map<Id, ht_LineOfAuthority__c>();
-        Map<Id, ht_LineOfAuthority__c> oldLoaMap = new Map<Id, ht_LineOfAuthority__c>();
+        Map<Id, d4c_LineOfAuthority__c> newLoaMap = new Map<Id, d4c_LineOfAuthority__c>();
+        Map<Id, d4c_LineOfAuthority__c> oldLoaMap = new Map<Id, d4c_LineOfAuthority__c>();
 
-        for (ht_LineOfAuthority__c loa : loas) {
+        for (d4c_LineOfAuthority__c loa : loas) {
             oldLoaMap.put(loa.Id, loa.clone(true, true, true, true));
             newLoaMap.put(loa.Id, loa);
         }
 
         // Change mapping on first LOA
-        newLoaMap.get(loas[0].Id).ht_LOAMapping__c = null;
+        newLoaMap.get(loas[0].Id).d4c_LOAMapping__c = null;
 
         // Act
         Test.startTest();
@@ -203,8 +203,8 @@ private class LOAProductMappingService_Test {
         Test.stopTest();
 
         // Assert
-        List<ht_LineOfAuthority__c> changedLoas = (List<ht_LineOfAuthority__c>) result.get('changed');
-        Map<Id, ht_LineOfAuthority__c> oldLoas = (Map<Id, ht_LineOfAuthority__c>) result.get('old');
+        List<d4c_LineOfAuthority__c> changedLoas = (List<d4c_LineOfAuthority__c>) result.get('changed');
+        Map<Id, d4c_LineOfAuthority__c> oldLoas = (Map<Id, d4c_LineOfAuthority__c>) result.get('old');
 
         System.assertEquals(1, changedLoas.size(), 'Should return 1 changed LOA');
         System.assertEquals(1, oldLoas.size(), 'Should return old values for 1 changed LOA');
@@ -217,7 +217,7 @@ private class LOAProductMappingService_Test {
 
         // Act
         Test.startTest();
-        List<ht_LineOfAuthority__c> result = service.findOrphanLoasForMappings(new Set<Id>());
+        List<d4c_LineOfAuthority__c> result = service.findOrphanLoasForMappings(new Set<Id>());
         Test.stopTest();
 
         // Assert
@@ -231,7 +231,7 @@ private class LOAProductMappingService_Test {
 
         // Act
         Test.startTest();
-        service.matchLoasToMappings(new List<ht_LineOfAuthority__c>());
+        service.matchLoasToMappings(new List<d4c_LineOfAuthority__c>());
         Test.stopTest();
 
         // Assert - test passes if no exception
@@ -244,7 +244,7 @@ private class LOAProductMappingService_Test {
         LOAProductMappingService service = new LOAProductMappingService();
 
         // Get the Product-LOA junction
-        List<ht_Insurance_Product_LOA_Mapping__c> productLoaJunctions = queryProductLOAJunctions();
+        List<d4c_Insurance_Product_LOA_Mapping__c> productLoaJunctions = queryProductLOAJunctions();
         System.assertEquals(1, productLoaJunctions.size(), 'Should have 1 product-LOA junction');
 
         // Act
@@ -263,7 +263,7 @@ private class LOAProductMappingService_Test {
 
         // Act
         Test.startTest();
-        Integer deletedCount = service.deleteLicenseProductsForDeletedMappingJunctions(new List<ht_Insurance_Product_LOA_Mapping__c>());
+        Integer deletedCount = service.deleteLicenseProductsForDeletedMappingJunctions(new List<d4c_Insurance_Product_LOA_Mapping__c>());
         Test.stopTest();
 
         // Assert
@@ -271,34 +271,34 @@ private class LOAProductMappingService_Test {
     }
 
     // HELPER METHODS
-    private static List<ht_LOA_Insurance_Product_Mapping__c> queryLoaMappings() {
+    private static List<d4c_LOA_Insurance_Product_Mapping__c> queryLoaMappings() {
         return [
-            SELECT Id, ht_StateOrProvinceCode__c, ht_LineOfAuthorityCode__c,
-                   ht_LineOfAuthorityDescription__c, ht_UniqueIdentifier__c
-            FROM ht_LOA_Insurance_Product_Mapping__c
+            SELECT Id, d4c_StateOrProvinceCode__c, d4c_LineOfAuthorityCode__c,
+                   d4c_LineOfAuthorityDescription__c, d4c_UniqueIdentifier__c
+            FROM d4c_LOA_Insurance_Product_Mapping__c
         ];
     }
 
-    private static List<ht_LineOfAuthority__c> queryLoas() {
+    private static List<d4c_LineOfAuthority__c> queryLoas() {
         return [
-            SELECT Id, ht_LOAMapping__c, ht_StateOrProvinceCode__c,
-                   ht_LineOfAuthorityCode__c, ht_LineOfAuthorityDescription__c, ht_License__c
-            FROM ht_LineOfAuthority__c
-            ORDER BY ht_StateOrProvinceCode__c
+            SELECT Id, d4c_LOAMapping__c, d4c_StateOrProvinceCode__c,
+                   d4c_LineOfAuthorityCode__c, d4c_LineOfAuthorityDescription__c, d4c_License__c
+            FROM d4c_LineOfAuthority__c
+            ORDER BY d4c_StateOrProvinceCode__c
         ];
     }
 
-    private static List<ht_License_Insurance_Product__c> queryLicenseProductJunctions() {
+    private static List<d4c_License_Insurance_Product__c> queryLicenseProductJunctions() {
         return [
-            SELECT Id, ht_License__c, ht_InsuranceProduct__c, ht_UniqueIdentifier__c
-            FROM ht_License_Insurance_Product__c
+            SELECT Id, d4c_License__c, d4c_InsuranceProduct__c, d4c_UniqueIdentifier__c
+            FROM d4c_License_Insurance_Product__c
         ];
     }
 
-    private static List<ht_Insurance_Product_LOA_Mapping__c> queryProductLOAJunctions() {
+    private static List<d4c_Insurance_Product_LOA_Mapping__c> queryProductLOAJunctions() {
         return [
-            SELECT Id, ht_InsuranceProduct__c, ht_LOAMapping__c, ht_UniqueIdentifier__c
-            FROM ht_Insurance_Product_LOA_Mapping__c
+            SELECT Id, d4c_InsuranceProduct__c, d4c_LOAMapping__c, d4c_UniqueIdentifier__c
+            FROM d4c_Insurance_Product_LOA_Mapping__c
         ];
     }
 }

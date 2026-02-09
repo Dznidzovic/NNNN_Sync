@@ -29,8 +29,8 @@
 | Record   |    |      v                                         |   |        |
 | (NPN)    |    | ProducerTriggerHandler.afterInsert()           |   +--------+
 |          |    |      |                                         |
-+----------+    |      | Check: ht_SyncRecordToNIPR__c = 'On'    |
-                |      | Check: ht_NPNStatus__c != 'Active'      |
++----------+    |      | Check: d4c_SyncRecordToNIPR__c = 'On'    |
+                |      | Check: d4c_NPNStatus__c != 'Active'      |
                 |      |                                         |
                 |      v                                         |
                 | RunEntityInfoReportBatchable                   |
@@ -53,7 +53,7 @@
                 |           +---> Create/Update LOAs             |
                 |           +---> Create/Update Appointments     |
                 |           +---> Create/Update Addresses        |
-                |           +---> Set ht_LastNIPRSync__c         |
+                |           +---> Set d4c_LastNIPRSync__c         |
                 +------------------------------------------------+
 
 
@@ -92,7 +92,7 @@
 | Producer Records        License/LOA Data        Appointments                |
 |                              |                                              |
 |                              v                                              |
-|                 Set ht_LastNIPRSync__c on Subscription                      |
+|                 Set d4c_LastNIPRSync__c on Subscription                      |
 +-----------------------------------------------------------------------------+
 
 
@@ -114,13 +114,13 @@
 |  +--------------------------+         +---------------------------+         |
 |  | LOA Mapping Records      |         | Line of Authority (LOA)   |         |
 |  | (State + Code + Desc)    |<------->| Records from NIPR         |         |
-|  | ht_UniqueIdentifier__c   |  Match  | (State + Code + Desc)     |         |
+|  | d4c_UniqueIdentifier__c   |  Match  | (State + Code + Desc)     |         |
 |  +--------------------------+   by    +---------------------------+         |
 |            |                  Key              |                            |
 |            v                                   v                            |
 |  +--------------------------+         +---------------------------+         |
-|  | Product-LOA Junction     |         | ht_LOAMapping__c (lookup) |         |
-|  | (many-to-many)           |         | ht_IsProductMatched__c    |         |
+|  | Product-LOA Junction     |         | d4c_LOAMapping__c (lookup) |         |
+|  | (many-to-many)           |         | d4c_IsProductMatched__c    |         |
 |  +--------------------------+         +---------------------------+         |
 |                                                |                            |
 |                                                v                            |
@@ -179,7 +179,7 @@
    1. Find subscription with capacity (< 500 NPNs)
    2. If none found, create new subscription
    3. Call AddNPNToSubscription SOAP API
-   4. Update ht_Subscription__c lookup on Producer
+   4. Update d4c_Subscription__c lookup on Producer
 
 
 ==============================================================================
@@ -194,11 +194,11 @@
 |   +------------------------+------------------------------------------+     |
 |   | Object                 | External ID Field                        |     |
 |   +------------------------+------------------------------------------+     |
-|   | ht_Producer__c         | ht_NPN__c                                |     |
-|   | ht_License__c          | ht_UniqueIdentifier__c (LicNum+State+Cls)|     |
-|   | ht_LineOfAuthority__c  | ht_UniqueIdentifier__c (License+Code+Dsc)|     |
-|   | ht_CarrierAppointment__c| ht_UniqueIdentifier__c                  |     |
-|   | ht_LOA_Insurance_Product_Mapping__c | ht_UniqueIdentifier__c      |     |
+|   | d4c_Producer__c         | d4c_NPN__c                                |     |
+|   | d4c_License__c          | d4c_UniqueIdentifier__c (LicNum+State+Cls)|     |
+|   | d4c_LineOfAuthority__c  | d4c_UniqueIdentifier__c (License+Code+Dsc)|     |
+|   | d4c_CarrierAppointment__c| d4c_UniqueIdentifier__c                  |     |
+|   | d4c_LOA_Insurance_Product_Mapping__c | d4c_UniqueIdentifier__c      |     |
 |   +------------------------+------------------------------------------+     |
 |                                                                             |
 |   Benefits:                                                                 |
@@ -220,14 +220,14 @@
                                    v
                         +------------------------+
                         | Log Error to           |
-                        | ht_Logger__c           |
+                        | d4c_Logger__c           |
                         +------------------------+
                                    |
                                    v
                         +------------------------+
                         | Set Error Fields:      |
-                        | - ht_NPNSyncError__c   |
-                        | - ht_IntegrationError__c|
+                        | - d4c_NPNSyncError__c   |
+                        | - d4c_IntegrationError__c|
                         +------------------------+
                                    |
                                    v

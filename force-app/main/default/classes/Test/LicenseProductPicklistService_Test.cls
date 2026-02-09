@@ -59,7 +59,7 @@ private class LicenseProductPicklistService_Test {
 
         // Act
         Test.startTest();
-        List<ht_License__c> result = service.addProductNamesToLicenses(new List<ht_License_Insurance_Product__c>());
+        List<d4c_License__c> result = service.addProductNamesToLicenses(new List<d4c_License_Insurance_Product__c>());
         Test.stopTest();
 
         // Assert
@@ -73,7 +73,7 @@ private class LicenseProductPicklistService_Test {
 
         // Act
         Test.startTest();
-        List<ht_License__c> result = service.removeProductNamesFromLicenses(new List<ht_License_Insurance_Product__c>());
+        List<d4c_License__c> result = service.removeProductNamesFromLicenses(new List<d4c_License_Insurance_Product__c>());
         Test.stopTest();
 
         // Assert

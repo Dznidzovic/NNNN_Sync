@@ -2,7 +2,7 @@
 *********************************************************
 Apex Class Name    : InsuranceProductLOAMappingSelector
 Created Date       : 2025-12-15
-@description       : Selector class for querying ht_Insurance_Product_LOA_Mapping__c junction records
+@description       : Selector class for querying d4c_Insurance_Product_LOA_Mapping__c junction records
 @author            : Stefan Nidzovic
 Modification Log:
 Ver   Date         Author         Modification
@@ -15,21 +15,21 @@ public with sharing class InsuranceProductLOAMappingSelector {
      ********************************************************
      * @Method Name    : getJunctionsByLoaMappingIds
      * @description    : Returns list of junctions by parent LOA Mapping IDs
-     * @param          : loaMappingIds - Set of ht_LOA_Insurance_Product_Mapping__c IDs
-     * @return         : List<ht_Insurance_Product_LOA_Mapping__c> - list of junction records
+     * @param          : loaMappingIds - Set of d4c_LOA_Insurance_Product_Mapping__c IDs
+     * @return         : List<d4c_Insurance_Product_LOA_Mapping__c> - list of junction records
      *******************************************************
      **/
-    public List<ht_Insurance_Product_LOA_Mapping__c> getJunctionsByLoaMappingIds(Set<Id> loaMappingIds) {
+    public List<d4c_Insurance_Product_LOA_Mapping__c> getJunctionsByLoaMappingIds(Set<Id> loaMappingIds) {
         return [
             SELECT
                 Id,
-                ht_LOAMapping__c,
-                ht_InsuranceProduct__c,
-                ht_UniqueIdentifier__c
+                d4c_LOAMapping__c,
+                d4c_InsuranceProduct__c,
+                d4c_UniqueIdentifier__c
             FROM
-                ht_Insurance_Product_LOA_Mapping__c
+                d4c_Insurance_Product_LOA_Mapping__c
             WHERE
-                ht_LOAMapping__c IN :loaMappingIds
+                d4c_LOAMapping__c IN :loaMappingIds
         ];
     }
 
@@ -37,21 +37,21 @@ public with sharing class InsuranceProductLOAMappingSelector {
      ********************************************************
      * @Method Name    : getJunctionsByInsuranceProductIds
      * @description    : Returns list of junctions by Insurance Product IDs
-     * @param          : productIds - Set of ht_Insurance_Product__c IDs
-     * @return         : List<ht_Insurance_Product_LOA_Mapping__c> - list of junction records
+     * @param          : productIds - Set of d4c_Insurance_Product__c IDs
+     * @return         : List<d4c_Insurance_Product_LOA_Mapping__c> - list of junction records
      *******************************************************
      **/
-    public List<ht_Insurance_Product_LOA_Mapping__c> getJunctionsByInsuranceProductIds(Set<Id> productIds) {
+    public List<d4c_Insurance_Product_LOA_Mapping__c> getJunctionsByInsuranceProductIds(Set<Id> productIds) {
         return [
             SELECT
                 Id,
-                ht_LOAMapping__c,
-                ht_InsuranceProduct__c,
-                ht_UniqueIdentifier__c
+                d4c_LOAMapping__c,
+                d4c_InsuranceProduct__c,
+                d4c_UniqueIdentifier__c
             FROM
-                ht_Insurance_Product_LOA_Mapping__c
+                d4c_Insurance_Product_LOA_Mapping__c
             WHERE
-                ht_InsuranceProduct__c IN :productIds
+                d4c_InsuranceProduct__c IN :productIds
         ];
     }
 
@@ -59,7 +59,7 @@ public with sharing class InsuranceProductLOAMappingSelector {
      ********************************************************
      * @Method Name    : countJunctionsByLoaMappingIds
      * @description    : Returns count of junctions per LOA Mapping ID
-     * @param          : loaMappingIds - Set of ht_LOA_Insurance_Product_Mapping__c IDs
+     * @param          : loaMappingIds - Set of d4c_LOA_Insurance_Product_Mapping__c IDs
      * @return         : Map<Id, Integer> - map of LOA Mapping ID to junction count
      *******************************************************
      **/
@@ -74,14 +74,14 @@ public with sharing class InsuranceProductLOAMappingSelector {
         // Count remaining junctions
         List<AggregateResult> results = [
             SELECT
-                ht_LOAMapping__c loaMappingId,
+                d4c_LOAMapping__c loaMappingId,
                 COUNT(Id) junctionCount
             FROM
-                ht_Insurance_Product_LOA_Mapping__c
+                d4c_Insurance_Product_LOA_Mapping__c
             WHERE
-                ht_LOAMapping__c IN :loaMappingIds
+                d4c_LOAMapping__c IN :loaMappingIds
             GROUP BY
-                ht_LOAMapping__c
+                d4c_LOAMapping__c
         ];
 
         for (AggregateResult ar : results) {

@@ -25,7 +25,7 @@ public with sharing class LicenseProductCategorizationService {
      *********************************************************
      * @Method Name    : getProductIdsForMappings
      * @description    : Gets Insurance Product IDs linked to LOA Mapping IDs.
-     * @param          : loaMappingIds - Set of ht_LOA_Insurance_Product_Mapping__c IDs
+     * @param          : loaMappingIds - Set of d4c_LOA_Insurance_Product_Mapping__c IDs
      * @return         : Map of LOA Mapping ID to List of Insurance Product IDs
      *********************************************************
      */
@@ -36,12 +36,12 @@ public with sharing class LicenseProductCategorizationService {
             return mappingToProductIds;
         }
 
-        List<ht_Insurance_Product_LOA_Mapping__c> junctions = junctionSelector.getJunctionsByLoaMappingIds(loaMappingIds);
-        for (ht_Insurance_Product_LOA_Mapping__c junction : junctions) {
-            if (!mappingToProductIds.containsKey(junction.ht_LOAMapping__c)) {
-                mappingToProductIds.put(junction.ht_LOAMapping__c, new List<Id>());
+        List<d4c_Insurance_Product_LOA_Mapping__c> junctions = junctionSelector.getJunctionsByLoaMappingIds(loaMappingIds);
+        for (d4c_Insurance_Product_LOA_Mapping__c junction : junctions) {
+            if (!mappingToProductIds.containsKey(junction.d4c_LOAMapping__c)) {
+                mappingToProductIds.put(junction.d4c_LOAMapping__c, new List<Id>());
             }
-            mappingToProductIds.get(junction.ht_LOAMapping__c).add(junction.ht_InsuranceProduct__c);
+            mappingToProductIds.get(junction.d4c_LOAMapping__c).add(junction.d4c_InsuranceProduct__c);
         }
 
         return mappingToProductIds;
@@ -51,7 +51,7 @@ public with sharing class LicenseProductCategorizationService {
      *********************************************************
      * @Method Name    : getProductIdSetForMappings
      * @description    : Gets Insurance Product IDs linked to LOA Mapping IDs as Sets.
-     * @param          : loaMappingIds - Set of ht_LOA_Insurance_Product_Mapping__c IDs
+     * @param          : loaMappingIds - Set of d4c_LOA_Insurance_Product_Mapping__c IDs
      * @return         : Map of LOA Mapping ID to Set of Insurance Product IDs
      *********************************************************
      */
@@ -62,12 +62,12 @@ public with sharing class LicenseProductCategorizationService {
             return mappingToProductIds;
         }
 
-        List<ht_Insurance_Product_LOA_Mapping__c> junctions = junctionSelector.getJunctionsByLoaMappingIds(loaMappingIds);
-        for (ht_Insurance_Product_LOA_Mapping__c junction : junctions) {
-            if (!mappingToProductIds.containsKey(junction.ht_LOAMapping__c)) {
-                mappingToProductIds.put(junction.ht_LOAMapping__c, new Set<Id>());
+        List<d4c_Insurance_Product_LOA_Mapping__c> junctions = junctionSelector.getJunctionsByLoaMappingIds(loaMappingIds);
+        for (d4c_Insurance_Product_LOA_Mapping__c junction : junctions) {
+            if (!mappingToProductIds.containsKey(junction.d4c_LOAMapping__c)) {
+                mappingToProductIds.put(junction.d4c_LOAMapping__c, new Set<Id>());
             }
-            mappingToProductIds.get(junction.ht_LOAMapping__c).add(junction.ht_InsuranceProduct__c);
+            mappingToProductIds.get(junction.d4c_LOAMapping__c).add(junction.d4c_InsuranceProduct__c);
         }
 
         return mappingToProductIds;
@@ -94,20 +94,20 @@ public with sharing class LicenseProductCategorizationService {
      * @Method Name    : createJunctionsForLoas
      * @description    : Creates License-Insurance Product junctions for LOAs with mappings.
      *                   Uses upsert with External ID to prevent duplicates.
-     * @param          : loas - List of LOA records with populated ht_LOAMapping__c
+     * @param          : loas - List of LOA records with populated d4c_LOAMapping__c
      * @return         : List of junctions ready for upsert
      *********************************************************
      */
-    public List<ht_License_Insurance_Product__c> createJunctionsForLoas(List<ht_LineOfAuthority__c> loas) {
+    public List<d4c_License_Insurance_Product__c> createJunctionsForLoas(List<d4c_LineOfAuthority__c> loas) {
         String methodName = 'createJunctionsForLoas';
-        List<ht_License_Insurance_Product__c> junctionsToCreate = new List<ht_License_Insurance_Product__c>();
+        List<d4c_License_Insurance_Product__c> junctionsToCreate = new List<d4c_License_Insurance_Product__c>();
 
         try {
             // 1. Collect all LOA Mapping IDs from loas
             Set<Id> loaMappingIds = new Set<Id>();
-            for (ht_LineOfAuthority__c loa : loas) {
-                if (loa.ht_LOAMapping__c != null) {
-                    loaMappingIds.add(loa.ht_LOAMapping__c);
+            for (d4c_LineOfAuthority__c loa : loas) {
+                if (loa.d4c_LOAMapping__c != null) {
+                    loaMappingIds.add(loa.d4c_LOAMapping__c);
                 }
             }
 
@@ -119,18 +119,18 @@ public with sharing class LicenseProductCategorizationService {
             Map<Id, List<Id>> mappingToProductIds = getProductIdsForMappings(loaMappingIds);
 
             // 3. For each LOA, create junction records
-            for (ht_LineOfAuthority__c loa : loas) {
-                if (loa.ht_LOAMapping__c == null || loa.ht_License__c == null) {
+            for (d4c_LineOfAuthority__c loa : loas) {
+                if (loa.d4c_LOAMapping__c == null || loa.d4c_License__c == null) {
                     continue;
                 }
-                Id licenseId = loa.ht_License__c;
-                List<Id> productIds = mappingToProductIds.get(loa.ht_LOAMapping__c);
+                Id licenseId = loa.d4c_License__c;
+                List<Id> productIds = mappingToProductIds.get(loa.d4c_LOAMapping__c);
                 if (productIds != null) {
                     for (Id productId : productIds) {
-                        junctionsToCreate.add(new ht_License_Insurance_Product__c(
-                            ht_License__c = licenseId,
-                            ht_InsuranceProduct__c = productId,
-                            ht_UniqueIdentifier__c = buildLicenseProductUniqueId(licenseId, productId)
+                        junctionsToCreate.add(new d4c_License_Insurance_Product__c(
+                            d4c_License__c = licenseId,
+                            d4c_InsuranceProduct__c = productId,
+                            d4c_UniqueIdentifier__c = buildLicenseProductUniqueId(licenseId, productId)
                         ));
                     }
                 }
@@ -154,23 +154,23 @@ public with sharing class LicenseProductCategorizationService {
      *********************************************************
      */
     public Map<String, Object> calculateJunctionChangesForLoaUpdates(
-        List<ht_LineOfAuthority__c> loas,
-        Map<Id, ht_LineOfAuthority__c> oldLoaMap
+        List<d4c_LineOfAuthority__c> loas,
+        Map<Id, d4c_LineOfAuthority__c> oldLoaMap
     ) {
         String methodName = 'calculateJunctionChangesForLoaUpdates';
-        List<ht_License_Insurance_Product__c> junctionsToCreate = new List<ht_License_Insurance_Product__c>();
+        List<d4c_License_Insurance_Product__c> junctionsToCreate = new List<d4c_License_Insurance_Product__c>();
         Set<String> junctionKeysToDelete = new Set<String>();
 
         try {
             // 1. Collect all mapping IDs (both old and new)
             Set<Id> allMappingIds = new Set<Id>();
-            for (ht_LineOfAuthority__c loa : loas) {
-                if (loa.ht_LOAMapping__c != null) {
-                    allMappingIds.add(loa.ht_LOAMapping__c);
+            for (d4c_LineOfAuthority__c loa : loas) {
+                if (loa.d4c_LOAMapping__c != null) {
+                    allMappingIds.add(loa.d4c_LOAMapping__c);
                 }
-                ht_LineOfAuthority__c oldLoa = oldLoaMap != null ? oldLoaMap.get(loa.Id) : null;
-                if (oldLoa != null && oldLoa.ht_LOAMapping__c != null) {
-                    allMappingIds.add(oldLoa.ht_LOAMapping__c);
+                d4c_LineOfAuthority__c oldLoa = oldLoaMap != null ? oldLoaMap.get(loa.Id) : null;
+                if (oldLoa != null && oldLoa.d4c_LOAMapping__c != null) {
+                    allMappingIds.add(oldLoa.d4c_LOAMapping__c);
                 }
             }
 
@@ -178,23 +178,23 @@ public with sharing class LicenseProductCategorizationService {
             Map<Id, Set<Id>> mappingToProductIds = getProductIdSetForMappings(allMappingIds);
 
             // 3. Calculate products to add and remove for each LOA
-            for (ht_LineOfAuthority__c loa : loas) {
-                Id licenseId = loa.ht_License__c;
+            for (d4c_LineOfAuthority__c loa : loas) {
+                Id licenseId = loa.d4c_License__c;
                 if (licenseId == null) {
                     continue;
                 }
 
-                ht_LineOfAuthority__c oldLoa = oldLoaMap != null ? oldLoaMap.get(loa.Id) : null;
+                d4c_LineOfAuthority__c oldLoa = oldLoaMap != null ? oldLoaMap.get(loa.Id) : null;
 
                 // Get old and new product sets
                 Set<Id> oldProducts = new Set<Id>();
                 Set<Id> newProducts = new Set<Id>();
 
-                if (oldLoa != null && oldLoa.ht_LOAMapping__c != null && mappingToProductIds.containsKey(oldLoa.ht_LOAMapping__c)) {
-                    oldProducts = mappingToProductIds.get(oldLoa.ht_LOAMapping__c);
+                if (oldLoa != null && oldLoa.d4c_LOAMapping__c != null && mappingToProductIds.containsKey(oldLoa.d4c_LOAMapping__c)) {
+                    oldProducts = mappingToProductIds.get(oldLoa.d4c_LOAMapping__c);
                 }
-                if (loa.ht_LOAMapping__c != null && mappingToProductIds.containsKey(loa.ht_LOAMapping__c)) {
-                    newProducts = mappingToProductIds.get(loa.ht_LOAMapping__c);
+                if (loa.d4c_LOAMapping__c != null && mappingToProductIds.containsKey(loa.d4c_LOAMapping__c)) {
+                    newProducts = mappingToProductIds.get(loa.d4c_LOAMapping__c);
                 }
 
                 // Products to remove: in old but not in new
@@ -207,10 +207,10 @@ public with sharing class LicenseProductCategorizationService {
                 // Products to add: in new but not in old
                 for (Id productId : newProducts) {
                     if (!oldProducts.contains(productId)) {
-                        junctionsToCreate.add(new ht_License_Insurance_Product__c(
-                            ht_License__c = licenseId,
-                            ht_InsuranceProduct__c = productId,
-                            ht_UniqueIdentifier__c = buildLicenseProductUniqueId(licenseId, productId)
+                        junctionsToCreate.add(new d4c_License_Insurance_Product__c(
+                            d4c_License__c = licenseId,
+                            d4c_InsuranceProduct__c = productId,
+                            d4c_UniqueIdentifier__c = buildLicenseProductUniqueId(licenseId, productId)
                         ));
                     }
                 }
@@ -235,16 +235,16 @@ public with sharing class LicenseProductCategorizationService {
      * @return         : Set of junction unique identifier keys to delete
      *********************************************************
      */
-    public Set<String> getJunctionKeysToDeleteForLoas(List<ht_LineOfAuthority__c> deletedLoas) {
+    public Set<String> getJunctionKeysToDeleteForLoas(List<d4c_LineOfAuthority__c> deletedLoas) {
         String methodName = 'getJunctionKeysToDeleteForLoas';
         Set<String> junctionKeysToDelete = new Set<String>();
 
         try {
             // 1. Collect all LOA Mapping IDs from deleted loas
             Set<Id> loaMappingIds = new Set<Id>();
-            for (ht_LineOfAuthority__c loa : deletedLoas) {
-                if (loa.ht_LOAMapping__c != null) {
-                    loaMappingIds.add(loa.ht_LOAMapping__c);
+            for (d4c_LineOfAuthority__c loa : deletedLoas) {
+                if (loa.d4c_LOAMapping__c != null) {
+                    loaMappingIds.add(loa.d4c_LOAMapping__c);
                 }
             }
 
@@ -256,12 +256,12 @@ public with sharing class LicenseProductCategorizationService {
             Map<Id, Set<Id>> mappingToProductIds = getProductIdSetForMappings(loaMappingIds);
 
             // 3. Build set of junction keys to delete
-            for (ht_LineOfAuthority__c loa : deletedLoas) {
-                if (loa.ht_LOAMapping__c == null || loa.ht_License__c == null) {
+            for (d4c_LineOfAuthority__c loa : deletedLoas) {
+                if (loa.d4c_LOAMapping__c == null || loa.d4c_License__c == null) {
                     continue;
                 }
-                Id licenseId = loa.ht_License__c;
-                Set<Id> productIds = mappingToProductIds.get(loa.ht_LOAMapping__c);
+                Id licenseId = loa.d4c_License__c;
+                Set<Id> productIds = mappingToProductIds.get(loa.d4c_LOAMapping__c);
                 if (productIds != null) {
                     for (Id productId : productIds) {
                         junctionKeysToDelete.add(buildLicenseProductUniqueId(licenseId, productId));
@@ -285,9 +285,9 @@ public with sharing class LicenseProductCategorizationService {
      * @return         : List of junction records to delete
      *********************************************************
      */
-    public List<ht_License_Insurance_Product__c> getJunctionsToDeleteByKeys(Set<String> junctionKeys) {
+    public List<d4c_License_Insurance_Product__c> getJunctionsToDeleteByKeys(Set<String> junctionKeys) {
         if (junctionKeys == null || junctionKeys.isEmpty()) {
-            return new List<ht_License_Insurance_Product__c>();
+            return new List<d4c_License_Insurance_Product__c>();
         }
         return licenseProductSelector.getJunctionsByUniqueIdentifiers(junctionKeys);
     }

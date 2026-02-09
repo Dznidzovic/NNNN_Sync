@@ -15,36 +15,36 @@
     <tabs>standard-Lead</tabs>
     <tabs>standard-Account</tabs>
     <tabs>standard-Contact</tabs>
-    <tabs>ht_Producer__c</tabs>
-    <tabs>ht_License__c</tabs>
-    <tabs>ht_Carrier__c</tabs>
-    <tabs>ht_CarrierAppointment__c</tabs>
-    <tabs>ht_Insurance_Product__c</tabs>
-    <tabs>ht_LOA_Insurance_Product_Mapping__c</tabs>
-    <tabs>ht_Logger__c</tabs>
+    <tabs>d4c_Producer__c</tabs>
+    <tabs>d4c_License__c</tabs>
+    <tabs>d4c_Carrier__c</tabs>
+    <tabs>d4c_CarrierAppointment__c</tabs>
+    <tabs>d4c_Insurance_Product__c</tabs>
+    <tabs>d4c_LOA_Insurance_Product_Mapping__c</tabs>
+    <tabs>d4c_Logger__c</tabs>
     <uiType>Lightning</uiType>
     <utilityBar>NIPR_Console_UtilityBar</utilityBar>
     <workspaceConfig>
         <mappings>
-            <tab>ht_CarrierAppointment__c</tab>
+            <tab>d4c_CarrierAppointment__c</tab>
         </mappings>
         <mappings>
-            <tab>ht_Carrier__c</tab>
+            <tab>d4c_Carrier__c</tab>
         </mappings>
         <mappings>
-            <tab>ht_Insurance_Product__c</tab>
+            <tab>d4c_Insurance_Product__c</tab>
         </mappings>
         <mappings>
-            <tab>ht_LOA_Insurance_Product_Mapping__c</tab>
+            <tab>d4c_LOA_Insurance_Product_Mapping__c</tab>
         </mappings>
         <mappings>
-            <tab>ht_License__c</tab>
+            <tab>d4c_License__c</tab>
         </mappings>
         <mappings>
-            <tab>ht_Logger__c</tab>
+            <tab>d4c_Logger__c</tab>
         </mappings>
         <mappings>
-            <tab>ht_Producer__c</tab>
+            <tab>d4c_Producer__c</tab>
         </mappings>
         <mappings>
             <tab>standard-Account</tab>

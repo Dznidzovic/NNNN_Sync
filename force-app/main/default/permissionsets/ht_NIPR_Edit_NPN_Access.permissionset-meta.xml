@@ -5,70 +5,70 @@
     <!-- Account - NPN Editable -->
     <fieldPermissions>
         <editable>true</editable>
-        <field>Account.ht_NPN__c</field>
+        <field>Account.d4c_NPN__c</field>
         <readable>true</readable>
     </fieldPermissions>
 
     <!-- Account - Producer Read Only -->
     <fieldPermissions>
         <editable>false</editable>
-        <field>Account.ht_Producer__c</field>
+        <field>Account.d4c_Producer__c</field>
         <readable>true</readable>
     </fieldPermissions>
 
     <!-- Account - NPN Status Read Only (Formula Field) -->
     <fieldPermissions>
         <editable>false</editable>
-        <field>Account.ht_NPNStatus__c</field>
+        <field>Account.d4c_NPNStatus__c</field>
         <readable>true</readable>
     </fieldPermissions>
 
     <!-- Account - NPN Sync Error Read Only (Formula Field) -->
     <fieldPermissions>
         <editable>false</editable>
-        <field>Account.ht_NPNSyncError__c</field>
+        <field>Account.d4c_NPNSyncError__c</field>
         <readable>true</readable>
     </fieldPermissions>
 
     <!-- Contact - NPN Editable -->
     <fieldPermissions>
         <editable>true</editable>
-        <field>Contact.ht_NPN__c</field>
+        <field>Contact.d4c_NPN__c</field>
         <readable>true</readable>
     </fieldPermissions>
 
     <!-- Contact - Producer Read Only -->
     <fieldPermissions>
         <editable>false</editable>
-        <field>Contact.ht_Producer__c</field>
+        <field>Contact.d4c_Producer__c</field>
         <readable>true</readable>
     </fieldPermissions>
 
     <!-- Contact - NPN Status Read Only (Formula Field) -->
     <fieldPermissions>
         <editable>false</editable>
-        <field>Contact.ht_NPNStatus__c</field>
+        <field>Contact.d4c_NPNStatus__c</field>
         <readable>true</readable>
     </fieldPermissions>
 
     <!-- Contact - NPN Sync Error Read Only (Formula Field) -->
     <fieldPermissions>
         <editable>false</editable>
-        <field>Contact.ht_NPNSyncError__c</field>
+        <field>Contact.d4c_NPNSyncError__c</field>
         <readable>true</readable>
     </fieldPermissions>
 
     <!-- Lead - NPN Editable -->
     <fieldPermissions>
         <editable>true</editable>
-        <field>Lead.ht_NPN__c</field>
+        <field>Lead.d4c_NPN__c</field>
         <readable>true</readable>
     </fieldPermissions>
 
     <!-- Lead - Producer Read Only -->
     <fieldPermissions>
         <editable>false</editable>
-        <field>Lead.ht_Producer__c</field>
+        <field>Lead.d4c_Producer__c</field>
         <readable>true</readable>
     </fieldPermissions>
 
@@ -82,7 +82,7 @@
     <!-- Lead - NPN Sync Error Read Only (Formula Field) -->
     <fieldPermissions>
         <editable>false</editable>
-        <field>Lead.ht_NPNSyncError__c</field>
+        <field>Lead.d4c_NPNSyncError__c</field>
         <readable>true</readable>
     </fieldPermissions>
 

@@ -2,5 +2,5 @@
 <CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
     <help><!-- Timestamp of when the log was recorded. --></help>
     <label><!-- Occurred Date/Time --></label>
-    <name>ht_OccurredDateTime__c</name>
+    <name>d4c_OccurredDateTime__c</name>
 </CustomFieldTranslation>

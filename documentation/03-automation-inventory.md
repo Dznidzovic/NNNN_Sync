@@ -46,12 +46,12 @@ Legend: BI=beforeInsert, AI=afterInsert, BU=beforeUpdate, AU=afterUpdate,
 | Location: classes/TriggerHandler/ProducerTriggerHandler.cls                 |
 |                                                                             |
 | afterInsert:                                                                |
-|   - Check ht_SyncRecordToNIPR__c = 'On' AND ht_NPNStatus__c != 'Active'     |
+|   - Check d4c_SyncRecordToNIPR__c = 'On' AND d4c_NPNStatus__c != 'Active'     |
 |   - Collect NPNs for Entity Info API sync                                   |
 |   - Enqueue RunEntityInfoReportBatchable                                    |
 |                                                                             |
 | afterUpdate:                                                                |
-|   - Check if ht_SyncRecordToNIPR__c changed to 'On'                         |
+|   - Check if d4c_SyncRecordToNIPR__c changed to 'On'                         |
 |   - Trigger Entity Info API sync for newly enabled producers                |
 +-----------------------------------------------------------------------------+
 
@@ -62,8 +62,8 @@ Legend: BI=beforeInsert, AI=afterInsert, BU=beforeUpdate, AU=afterUpdate,
 |                                                                             |
 | beforeInsert / beforeUpdate:                                                |
 |   - Call LOAProductMappingService.matchLoasToMappings()                     |
-|   - Set ht_LOAMapping__c lookup based on State/Code/Description match       |
-|   - Set ht_IsProductMatched__c = true/false                                 |
+|   - Set d4c_LOAMapping__c lookup based on State/Code/Description match       |
+|   - Set d4c_IsProductMatched__c = true/false                                 |
 |                                                                             |
 | afterInsert:                                                                |
 |   - Enqueue LOAProductCategorizationBatchable for LOAs with mappings        |
@@ -82,15 +82,15 @@ Legend: BI=beforeInsert, AI=afterInsert, BU=beforeUpdate, AU=afterUpdate,
 |                                                                             |
 | beforeInsert / beforeUpdate:                                                |
 |   - Call UniqueIdentifierService.populateLOAMappingUniqueId()               |
-|   - Generate ht_UniqueIdentifier__c = State-Code-Description                |
+|   - Generate d4c_UniqueIdentifier__c = State-Code-Description                |
 |                                                                             |
 | beforeDelete:                                                               |
 |   - Store related LOA IDs in static variable (for afterDelete)              |
-|   - Delete child ht_Insurance_Product_LOA_Mapping__c junctions              |
+|   - Delete child d4c_Insurance_Product_LOA_Mapping__c junctions              |
 |                                                                             |
 | afterDelete:                                                                |
-|   - Query stored LOA IDs, set ht_LOAMapping__c = null                       |
-|   - LOA trigger will set ht_IsProductMatched__c = false                     |
+|   - Query stored LOA IDs, set d4c_LOAMapping__c = null                       |
+|   - LOA trigger will set d4c_IsProductMatched__c = false                     |
 +-----------------------------------------------------------------------------+
 
 +-----------------------------------------------------------------------------+
@@ -105,7 +105,7 @@ Legend: BI=beforeInsert, AI=afterInsert, BU=beforeUpdate, AU=afterUpdate,
 |   - Enqueue LOAProductCategorizationBatchable                               |
 |                                                                             |
 | afterDelete:                                                                |
-|   - Delete related ht_License_Insurance_Product__c records                  |
+|   - Delete related d4c_License_Insurance_Product__c records                  |
 +-----------------------------------------------------------------------------+
 
 
@@ -187,7 +187,7 @@ Legend: BI=beforeInsert, AI=afterInsert, BU=beforeUpdate, AU=afterUpdate,
 +--------------------------------------+--------------------------------------+
 | RunPDBAlertReportBatchable           | Batch process subscriptions for      |
 |   classes/Batchable/                 | PDB Alert sync (batch size=1)        |
-|                                      | Updates ht_LastNIPRSync__c           |
+|                                      | Updates d4c_LastNIPRSync__c           |
 +--------------------------------------+--------------------------------------+
 | LOAProductCategorizationBatchable    | Batch create/update License_         |
 |   classes/Batchable/                 | Insurance_Product records            |
@@ -232,19 +232,19 @@ Legend: BI=beforeInsert, AI=afterInsert, BU=beforeUpdate, AU=afterUpdate,
 +-----------------------------------------------------------------------------+
 | SELECTOR CLASS                       | OBJECT(S)                            |
 +--------------------------------------+--------------------------------------+
-| ProducerSelector                     | ht_Producer__c                       |
-| LicenseSelector                      | ht_License__c                        |
-| LineOfAuthoritySelector              | ht_LineOfAuthority__c                |
-| CarrierAppointmentSelector           | ht_CarrierAppointment__c             |
-| SubscriptionSelector                 | ht_Subscription__c                   |
-| ProducerAddressSelector              | ht_ProducerAddress__c                |
-| ProducerCommunicationSelector        | ht_ProducerCommunication__c          |
+| ProducerSelector                     | d4c_Producer__c                       |
+| LicenseSelector                      | d4c_License__c                        |
+| LineOfAuthoritySelector              | d4c_LineOfAuthority__c                |
+| CarrierAppointmentSelector           | d4c_CarrierAppointment__c             |
+| SubscriptionSelector                 | d4c_Subscription__c                   |
+| ProducerAddressSelector              | d4c_ProducerAddress__c                |
+| ProducerCommunicationSelector        | d4c_ProducerCommunication__c          |
 | AccountSelector                      | Account                              |
 | ContactSelector                      | Contact                              |
 | LeadSelector                         | Lead                                 |
-| LOAInsuranceProductMappingSelector   | ht_LOA_Insurance_Product_Mapping__c  |
-| InsuranceProductLOAMappingSelector   | ht_Insurance_Product_LOA_Mapping__c  |
-| LicenseInsuranceProductSelector      | ht_License_Insurance_Product__c      |
+| LOAInsuranceProductMappingSelector   | d4c_LOA_Insurance_Product_Mapping__c  |
+| InsuranceProductLOAMappingSelector   | d4c_Insurance_Product_LOA_Mapping__c  |
+| LicenseInsuranceProductSelector      | d4c_License_Insurance_Product__c      |
 | RecordTypeSelector                   | RecordType                           |
 | MetadataTypeSelector                 | Custom Metadata Types                |
 +--------------------------------------+--------------------------------------+

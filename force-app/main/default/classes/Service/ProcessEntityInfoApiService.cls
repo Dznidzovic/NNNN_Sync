@@ -4,8 +4,8 @@
  * Created Date       : 04-08-2025
  * @description       : Imports data from the NIPR Entity Info API and maps it to Salesforce records.
  *                      This class processes the EntityInfoDTO structure and generates records for
- *                      ht_Producer__c, ht_ProducerCommunication__c, ht_ProducerAddress__c, ht_License__c,
- *                      ht_LineOfAuthority__c, and ht_CarrierAppointment__c.
+ *                      d4c_Producer__c, d4c_ProducerCommunication__c, d4c_ProducerAddress__c, d4c_License__c,
+ *                      d4c_LineOfAuthority__c, and d4c_CarrierAppointment__c.
  * @author            : Stefan Nidzovic
  * Modification Log:
  * Ver   Date         Author             Modification
@@ -17,20 +17,20 @@ public with sharing class ProcessEntityInfoApiService {
     // Stores the NPN of the producer being processed
     private String producerNPN;
     // Stores the producer record to be upserted
-    private ht_Producer__c producer;
+    private d4c_Producer__c producer;
     // Stores new or updated producer communication records (Phone, Email)
-    private List<ht_ProducerCommunication__c> producerCommunications = new List<ht_ProducerCommunication__c>();
+    private List<d4c_ProducerCommunication__c> producerCommunications = new List<d4c_ProducerCommunication__c>();
     // Stores new or updated producer address records
-    private List<ht_ProducerAddress__c> producerAddresses = new List<ht_ProducerAddress__c>();
+    private List<d4c_ProducerAddress__c> producerAddresses = new List<d4c_ProducerAddress__c>();
     // Stores new or updated license records
-    private List<ht_License__c> licenses = new List<ht_License__c>();
+    private List<d4c_License__c> licenses = new List<d4c_License__c>();
     // Stores new or updated Line of Authority records for licenses
-    private List<ht_LineOfAuthority__c> licenseLoas = new List<ht_LineOfAuthority__c>();
+    private List<d4c_LineOfAuthority__c> licenseLoas = new List<d4c_LineOfAuthority__c>();
     // Stores new or updated carrier appointment records
-    private List<ht_CarrierAppointment__c> carrierAppointments = new List<ht_CarrierAppointment__c>();
+    private List<d4c_CarrierAppointment__c> carrierAppointments = new List<d4c_CarrierAppointment__c>();
     // Stores new or updated Line of Authority records for carrier appointments
     // Stores new or updatedCarrier records for carriers upsert
-    private list<ht_Carrier__c> carriers = new List<ht_Carrier__c>();
+    private list<d4c_Carrier__c> carriers = new List<d4c_Carrier__c>();
     // Tracks unique record Identifiers to remove duplicates where needed
     private Set<String> uniqueRecordIds = new Set<String>();
 
@@ -76,13 +76,13 @@ public with sharing class ProcessEntityInfoApiService {
             processProducer(entityInfoDTO.PRODUCER.FIRM);
         }
 
-        producer.ht_NPNSyncError__c = null;
-        producer.ht_IntegrationError__c = null;
-        producer.ht_LastNIPRSync__c = Datetime.now();
+        producer.d4c_NPNSyncError__c = null;
+        producer.d4c_IntegrationError__c = null;
+        producer.d4c_LastNIPRSync__c = Datetime.now();
 
         // Set exclude carrier appointments flag based on what was determined in RetrieveEntityInfoApiData
         // That class handles checking existing producer value and payload size
-        producer.ht_ExcludeCarrierAppointments__c = entityInfoCallout.shouldExcludeCarrierAppointments;
+        producer.d4c_ExcludeCarrierAppointments__c = entityInfoCallout.shouldExcludeCarrierAppointments;
 
         try {
             syncDataWithSalesforce();
@@ -104,7 +104,7 @@ public with sharing class ProcessEntityInfoApiService {
     /**
      *********************************************************
      * @methodName      : processProducer
-     * @description     : Maps the INDIVIDUAL(AGENT) node to a ht_Producer__c record and queues
+     * @description     : Maps the INDIVIDUAL(AGENT) node to a d4c_Producer__c record and queues
      *                    related communications for upsert.
      * @param individual : INDIVIDUAL node from the DTO.
      *********************************************************
@@ -117,7 +117,7 @@ public with sharing class ProcessEntityInfoApiService {
         EntityInfoDTO.BIOGRAPHIC bio = individual.ENTITY_BIOGRAPHIC.BIOGRAPHIC;
         
         producer = createProducerRecord(bio);
-        producer.ht_Type__c = 'Agent';
+        producer.d4c_Type__c = 'Agent';
 
         // Process communications if available
         if (individual.ENTITY_BIOGRAPHIC?.CONTACT_INFOS != null) {
@@ -136,7 +136,7 @@ public with sharing class ProcessEntityInfoApiService {
     /**
      *********************************************************
      * @methodName      : processProducer
-     * @description     : Maps the FIRM(AGENCY) node to a ht_Producer__c record and queues
+     * @description     : Maps the FIRM(AGENCY) node to a d4c_Producer__c record and queues
      *                    related communications for upsert.
      * @param firm      : FIRM node from the DTO.
      *********************************************************
@@ -149,7 +149,7 @@ public with sharing class ProcessEntityInfoApiService {
         EntityInfoDTO.BIOGRAPHIC bio = firm.ENTITY_BIOGRAPHIC.BIOGRAPHIC;
         
         producer = createProducerRecord(bio, true);
-        producer.ht_Type__c = 'Agency';
+        producer.d4c_Type__c = 'Agency';
 
         // Process communications if available
         if (firm.ENTITY_BIOGRAPHIC?.CONTACT_INFOS != null) {
@@ -169,7 +169,7 @@ public with sharing class ProcessEntityInfoApiService {
      *********************************************************
      * @methodName      : processProducerCommunications
      * @description     : Extracts business phones, faxes, and emails from CONTACT_INFOS and
-     *                    stores them as `ht_ProducerCommunication__c` records for the given NPN.
+     *                    stores them as `d4c_ProducerCommunication__c` records for the given NPN.
      * @param contactInfos : Contact info section of the EntityInfoDTO.
      *********************************************************
      **/
@@ -222,12 +222,12 @@ public with sharing class ProcessEntityInfoApiService {
             String uniqueId = formattedPhone + phoneType + producerNPN;
             
             if (!uniqueRecordIds.contains(uniqueId)) {
-                ht_ProducerCommunication__c comm = new ht_ProducerCommunication__c();
+                d4c_ProducerCommunication__c comm = new d4c_ProducerCommunication__c();
 
-                comm.ht_Producer__r = new ht_Producer__c(ht_NPN__c = producerNPN);
-                comm.ht_PhoneType__c = phoneType;
-                comm.ht_PhoneNumber__c = formattedPhone;
-                comm.ht_UniqueIdentifier__c = uniqueId;
+                comm.d4c_Producer__r = new d4c_Producer__c(d4c_NPN__c = producerNPN);
+                comm.d4c_PhoneType__c = phoneType;
+                comm.d4c_PhoneNumber__c = formattedPhone;
+                comm.d4c_UniqueIdentifier__c = uniqueId;
                 
                 producerCommunications.add(comm);
                 uniqueRecordIds.add(uniqueId);
@@ -252,12 +252,12 @@ public with sharing class ProcessEntityInfoApiService {
         String uniqueId = email + emailType + producerNPN;
         
         if (!uniqueRecordIds.contains(uniqueId)) {
-            ht_ProducerCommunication__c emailComm = new ht_ProducerCommunication__c();
+            d4c_ProducerCommunication__c emailComm = new d4c_ProducerCommunication__c();
 
-            emailComm.ht_Producer__r = new ht_Producer__c(ht_NPN__c = producerNPN);
-            emailComm.ht_EmailType__c = emailType;
-            emailComm.ht_EmailAddress__c = email;
-            emailComm.ht_UniqueIdentifier__c = uniqueId;
+            emailComm.d4c_Producer__r = new d4c_Producer__c(d4c_NPN__c = producerNPN);
+            emailComm.d4c_EmailType__c = emailType;
+            emailComm.d4c_EmailAddress__c = email;
+            emailComm.d4c_UniqueIdentifier__c = uniqueId;
             
             producerCommunications.add(emailComm);
             uniqueRecordIds.add(uniqueId);
@@ -298,11 +298,11 @@ public with sharing class ProcessEntityInfoApiService {
                 continue;
             }
             
-            ht_ProducerAddress__c producerAddress = createProducerAddressRecord(address);
+            d4c_ProducerAddress__c producerAddress = createProducerAddressRecord(address);
 
-            if (producerAddress != null && !uniqueRecordIds.contains(producerAddress.ht_UniqueIdentifier__c)) {
+            if (producerAddress != null && !uniqueRecordIds.contains(producerAddress.d4c_UniqueIdentifier__c)) {
                 producerAddresses.add(producerAddress);
-                uniqueRecordIds.add(producerAddress.ht_UniqueIdentifier__c);
+                uniqueRecordIds.add(producerAddress.d4c_UniqueIdentifier__c);
             }
         }
     }
@@ -327,18 +327,18 @@ public with sharing class ProcessEntityInfoApiService {
             // Process each license in the list
             for (EntityInfoDTO.LICENSE license : stateLicense.LICENSE) {
                 // Create license record
-                ht_License__c licenseRecord = createLicenseRecord(license, stateLicense.attributes?.name);
+                d4c_License__c licenseRecord = createLicenseRecord(license, stateLicense.attributes?.name);
 
-                String licenseUniqueId = licenseRecord.ht_LicenseNumber__c + StringUtils.safeParseNullString(licenseRecord.ht_StateOrProvinceCode__c) + StringUtils.safeParseNullString(licenseRecord.ht_LicenseClassCode__c);
+                String licenseUniqueId = licenseRecord.d4c_LicenseNumber__c + StringUtils.safeParseNullString(licenseRecord.d4c_StateOrProvinceCode__c) + StringUtils.safeParseNullString(licenseRecord.d4c_LicenseClassCode__c);
 
-                licenseRecord.ht_UniqueIdentifier__c = licenseUniqueId;
+                licenseRecord.d4c_UniqueIdentifier__c = licenseUniqueId;
                 
                 if (licenseRecord != null) {
                     licenses.add(licenseRecord);
                     
                     // Process lines of authority if available
                     if (license.DETAILS != null && license.DETAILS.DETAIL != null) {
-                        processLinesOfAuthority(license.DETAILS.DETAIL, licenseRecord.ht_UniqueIdentifier__c, stateLicense.attributes?.name);
+                        processLinesOfAuthority(license.DETAILS.DETAIL, licenseRecord.d4c_UniqueIdentifier__c, stateLicense.attributes?.name);
                     }
                 }
             }
@@ -369,12 +369,12 @@ public with sharing class ProcessEntityInfoApiService {
                 continue;
             }
             
-            ht_LineOfAuthority__c loaRecord = createLineOfAuthorityRecord(detail, licenseUniqueId, stateCode);
+            d4c_LineOfAuthority__c loaRecord = createLineOfAuthorityRecord(detail, licenseUniqueId, stateCode);
             
             if (loaRecord != null) {
                 // Generate a unique identifier for this LOA
-                String uniqueId = loaRecord.ht_LineOfAuthorityCode__c + stateCode + StringUtils.safeParseFromDate(loaRecord.ht_IssueDate__c) + licenseUniqueId;
-                loaRecord.ht_UniqueIdentifier__c = uniqueId;
+                String uniqueId = loaRecord.d4c_LineOfAuthorityCode__c + stateCode + StringUtils.safeParseFromDate(loaRecord.d4c_IssueDate__c) + licenseUniqueId;
+                loaRecord.d4c_UniqueIdentifier__c = uniqueId;
                 licenseLoas.add(loaRecord);
             }
         }
@@ -400,54 +400,54 @@ public with sharing class ProcessEntityInfoApiService {
             }
 
             // Create a Carrier Record
-            ht_Carrier__c carrierRecord = createCarrierRecord(appointment);
+            d4c_Carrier__c carrierRecord = createCarrierRecord(appointment);
 
             // Make sure only one carrier record is being added to the list for upsert, as multiple nodes can contain carrier information
-            if (carrierRecord != null && !uniqueRecordIds.contains(carrierRecord.ht_UniqueIdentifier__c)) {
+            if (carrierRecord != null && !uniqueRecordIds.contains(carrierRecord.d4c_UniqueIdentifier__c)) {
                 carriers.add(carrierRecord);
-                uniqueRecordIds.add(carrierRecord.ht_UniqueIdentifier__c);
+                uniqueRecordIds.add(carrierRecord.d4c_UniqueIdentifier__c);
             }
             
-            ht_CarrierAppointment__c appointmentRecord = createCarrierAppointmentRecord(appointment, stateCode);
+            d4c_CarrierAppointment__c appointmentRecord = createCarrierAppointmentRecord(appointment, stateCode);
             
             if (appointmentRecord != null) {       
                 // Set the producer lookup using external ID
-                appointmentRecord.ht_Producer__r = new ht_Producer__c(ht_NPN__c = producerNPN);
-                appointmentRecord.ht_Carrier__r = new ht_Carrier__c(ht_UniqueIdentifier__c = carrierRecord.ht_UniqueIdentifier__c);
+                appointmentRecord.d4c_Producer__r = new d4c_Producer__c(d4c_NPN__c = producerNPN);
+                appointmentRecord.d4c_Carrier__r = new d4c_Carrier__c(d4c_UniqueIdentifier__c = carrierRecord.d4c_UniqueIdentifier__c);
 
-                String countyCode = StringUtils.safeParseNullString(appointmentRecord.ht_CountyCode__c);
+                String countyCode = StringUtils.safeParseNullString(appointmentRecord.d4c_CountyCode__c);
 
                 // Generate a unique identifier for this carrier appointment
-                String carrierAppIdentifier = producerNPN + carrierRecord.ht_UniqueIdentifier__c + stateCode + countyCode + appointment.STATUS;
-                appointmentRecord.ht_UniqueIdentifier__c = carrierAppIdentifier;
+                String carrierAppIdentifier = producerNPN + carrierRecord.d4c_UniqueIdentifier__c + stateCode + countyCode + appointment.STATUS;
+                appointmentRecord.d4c_UniqueIdentifier__c = carrierAppIdentifier;
                 
                 // Populate LOA fields directly on carrier appointment if available
                 if (String.isNotBlank(appointment.LINE_OF_AUTHORITY)) {
                     // Set LOA fields directly on carrier appointment
-                    appointmentRecord.ht_LineOfAuthorityCode__c = StringUtils.truncateField(appointment.LOA_CODE, 50);
-                    appointmentRecord.ht_LineOfAuthorityDescription__c = StringUtils.truncateField(appointment.LINE_OF_AUTHORITY, 255);
+                    appointmentRecord.d4c_LineOfAuthorityCode__c = StringUtils.truncateField(appointment.LOA_CODE, 50);
+                    appointmentRecord.d4c_LineOfAuthorityDescription__c = StringUtils.truncateField(appointment.LINE_OF_AUTHORITY, 255);
 
                     // Parse renewal date - format from 'MM/dd/yyyy' to 'yyyy-MM-dd' and convert to Date
                     String formattedRenewalDate = StringUtils.convertToISODateFormat(
                         StringUtils.swapCharacters(appointment.APPONT_RENEWAL_DATE, '/', '-')
                     );
-                    appointmentRecord.ht_RenewalDate__c = DateUtils.safeParseDateFromString(formattedRenewalDate);
+                    appointmentRecord.d4c_RenewalDate__c = DateUtils.safeParseDateFromString(formattedRenewalDate);
 
                     String loaCode = StringUtils.safeParseNullString(appointment.LOA_CODE);
-                    String loaRenewalDate = StringUtils.safeParseFromDate(appointmentRecord.ht_RenewalDate__c);
-                    String statusReasonDate = StringUtils.safeParseFromDate(appointmentRecord.ht_StatusReasonDate__c);
+                    String loaRenewalDate = StringUtils.safeParseFromDate(appointmentRecord.d4c_RenewalDate__c);
+                    String statusReasonDate = StringUtils.safeParseFromDate(appointmentRecord.d4c_StatusReasonDate__c);
 
                     // Create the unique identifier component for the LOA info
-                    String loaUniqueId = producerNPN + carrierRecord.ht_UniqueIdentifier__c + loaRenewalDate + statusReasonDate + countyCode + loaCode;
+                    String loaUniqueId = producerNPN + carrierRecord.d4c_UniqueIdentifier__c + loaRenewalDate + statusReasonDate + countyCode + loaCode;
 
                     // Carrier appointment Unique Id has to be combined with it's LOA information in order to stay Unique
                     carrierAppIdentifier += loaUniqueId;
-                    appointmentRecord.ht_UniqueIdentifier__c = carrierAppIdentifier;
+                    appointmentRecord.d4c_UniqueIdentifier__c = carrierAppIdentifier;
                 }
 
-                if (!uniqueRecordIds.contains(appointmentRecord.ht_UniqueIdentifier__c)) {
+                if (!uniqueRecordIds.contains(appointmentRecord.d4c_UniqueIdentifier__c)) {
                     carrierAppointments.add(appointmentRecord);
-                    uniqueRecordIds.add(appointmentRecord.ht_UniqueIdentifier__c);
+                    uniqueRecordIds.add(appointmentRecord.d4c_UniqueIdentifier__c);
                 }
             }
         }
@@ -458,10 +458,10 @@ public with sharing class ProcessEntityInfoApiService {
      * @methodName      : createProducerRecord
      * @description     : Creates a producer (Individual) record with data from the biographic section.
      * @param bio       : Biographic data from the Entity Info DTO.
-     * @return          : Populated ht_Producer__c record.
+     * @return          : Populated d4c_Producer__c record.
      *********************************************************
      **/
-    private ht_Producer__c createProducerRecord(EntityInfoDTO.BIOGRAPHIC bio) {
+    private d4c_Producer__c createProducerRecord(EntityInfoDTO.BIOGRAPHIC bio) {
         return createProducerRecord(bio, false);
     }
 
@@ -472,45 +472,45 @@ public with sharing class ProcessEntityInfoApiService {
      *                    Can create either an Individual (Agent) or Firm (Agency) record.
      * @param bio       : Biographic data from the Entity Info DTO.
      * @param isFirm    : Boolean flag indicating if this is a Firm (Agency) record.
-     * @return          : Populated ht_Producer__c record.
+     * @return          : Populated d4c_Producer__c record.
      *********************************************************
      **/
-    private ht_Producer__c createProducerRecord(EntityInfoDTO.BIOGRAPHIC bio, Boolean isFirm) {
-        ht_Producer__c producerRecord = new ht_Producer__c();
+    private d4c_Producer__c createProducerRecord(EntityInfoDTO.BIOGRAPHIC bio, Boolean isFirm) {
+        d4c_Producer__c producerRecord = new d4c_Producer__c();
         
-        producerRecord.ht_NPN__c = producerNPN;
-        producerRecord.ht_NPNStatus__c = 'Active';
-        producerRecord.ht_SyncRecordToNIPR__c = 'On';
+        producerRecord.d4c_NPN__c = producerNPN;
+        producerRecord.d4c_NPNStatus__c = 'Active';
+        producerRecord.d4c_SyncRecordToNIPR__c = 'On';
 
         if (isFirm) {
             // Set Agency-specific fields
-            producerRecord.ht_FullName__c = StringUtils.truncateField(bio.NAME_COMPANY, 255);
-            producerRecord.ht_FEIN__c = StringUtils.truncateField(StringUtils.swapCharacters(bio.ID_FEIN, '-', ''), 9);
-            producerRecord.ht_StateCOID__c = bio.STATE_CO_ID;
-            producerRecord.ht_StateDomicile__c = bio.STATE_DOMICILE;
+            producerRecord.d4c_FullName__c = StringUtils.truncateField(bio.NAME_COMPANY, 255);
+            producerRecord.d4c_FEIN__c = StringUtils.truncateField(StringUtils.swapCharacters(bio.ID_FEIN, '-', ''), 9);
+            producerRecord.d4c_StateCOID__c = bio.STATE_CO_ID;
+            producerRecord.d4c_StateDomicile__c = bio.STATE_DOMICILE;
             
             // Set name type code if available
             if (bio?.OTHER_NAME?.STATE?.NAME?.attributes != null) {
-                producerRecord.ht_NameTypeCode__c = bio.OTHER_NAME.STATE.NAME.attributes.type;
+                producerRecord.d4c_NameTypeCode__c = bio.OTHER_NAME.STATE.NAME.attributes.type;
             }
         } else {
             // Set Individual-specific fields
-            producerRecord.ht_GivenName__c = bio.NAME_FIRST;
-            producerRecord.ht_MiddleName__c = bio.NAME_MIDDLE;
-            producerRecord.ht_SurName__c = bio.NAME_LAST;
-            producerRecord.ht_NameSuffix__c = bio.NAME_SUFFIX;
-            producerRecord.ht_SSN__c = bio.ID_SSN;
+            producerRecord.d4c_GivenName__c = bio.NAME_FIRST;
+            producerRecord.d4c_MiddleName__c = bio.NAME_MIDDLE;
+            producerRecord.d4c_SurName__c = bio.NAME_LAST;
+            producerRecord.d4c_NameSuffix__c = bio.NAME_SUFFIX;
+            producerRecord.d4c_SSN__c = bio.ID_SSN;
 
             // Format and parse birth date
             String formattedBirthDate = StringUtils.convertToISODateFormat(
                 StringUtils.swapCharacters(bio.DATE_BIRTH, '/', '-')
             );
 
-            producerRecord.ht_BirthDate__c = DateUtils.safeParseDateFromString(formattedBirthDate);
+            producerRecord.d4c_BirthDate__c = DateUtils.safeParseDateFromString(formattedBirthDate);
             
             // Set name type code if available
             if (bio?.OTHER_NAME?.STATE?.NAME?.attributes != null) {
-                producerRecord.ht_NameTypeCode__c = bio.OTHER_NAME.STATE.NAME.attributes.type;
+                producerRecord.d4c_NameTypeCode__c = bio.OTHER_NAME.STATE.NAME.attributes.type;
             }
         }
 
@@ -522,11 +522,11 @@ public with sharing class ProcessEntityInfoApiService {
      * @methodName      : createProducerAddressRecord
      * @description     : Creates a Producer Address record based on provided address information.
      * @param address   : Address information from the Entity Info DTO.
-     * @return          : A new ht_ProducerAddress__c record.
+     * @return          : A new d4c_ProducerAddress__c record.
      *********************************************************
      **/
-    private ht_ProducerAddress__c createProducerAddressRecord(EntityInfoDTO.ADDRESS address) {
-        ht_ProducerAddress__c producerAddress = new ht_ProducerAddress__c();
+    private d4c_ProducerAddress__c createProducerAddressRecord(EntityInfoDTO.ADDRESS address) {
+        d4c_ProducerAddress__c producerAddress = new d4c_ProducerAddress__c();
         
         if (address != null) {
             // Format and parse as of date
@@ -534,35 +534,35 @@ public with sharing class ProcessEntityInfoApiService {
                 StringUtils.swapCharacters(address.DATE_UPDATED, '/', '-')
             );
 
-            producerAddress.ht_AsOfDate__c = DateUtils.safeParseDateFromString(formattedAsOfDate);
-            producerAddress.ht_AddressLineOne__c = address.ADDR_LINE_1;
-            producerAddress.ht_AddressLineTwo__c = address.ADDR_LINE_2;
-            producerAddress.ht_AddressLineThree__c = address.ADDR_LINE_3;
-            producerAddress.ht_City__c = address.NAME_CITY;
-            producerAddress.ht_CountryCode__c = address.COUNTRY;
-            producerAddress.ht_PostalCode__c = address.ZIP;
-            producerAddress.ht_State__c = address.NAME_STATE;
+            producerAddress.d4c_AsOfDate__c = DateUtils.safeParseDateFromString(formattedAsOfDate);
+            producerAddress.d4c_AddressLineOne__c = address.ADDR_LINE_1;
+            producerAddress.d4c_AddressLineTwo__c = address.ADDR_LINE_2;
+            producerAddress.d4c_AddressLineThree__c = address.ADDR_LINE_3;
+            producerAddress.d4c_City__c = address.NAME_CITY;
+            producerAddress.d4c_CountryCode__c = address.COUNTRY;
+            producerAddress.d4c_PostalCode__c = address.ZIP;
+            producerAddress.d4c_State__c = address.NAME_STATE;
 
             String addressType = address.ADDR_TYPE == 'Residence' ? 'Residential' : address.ADDR_TYPE;
-            producerAddress.ht_AddressType__c = addressType;            
+            producerAddress.d4c_AddressType__c = addressType;            
                 
-            ht_Producer__c producerForExtId = new ht_Producer__c(ht_NPN__c = producerNPN);
-            producerAddress.ht_Producer__r = producerForExtId;
+            d4c_Producer__c producerForExtId = new d4c_Producer__c(d4c_NPN__c = producerNPN);
+            producerAddress.d4c_Producer__r = producerForExtId;
             
             String uniqueId = 
-                producerAddress.ht_AddressLineOne__c + 
-                producerAddress.ht_AddressLineTwo__c +
-                producerAddress.ht_AddressLineThree__c +
-                producerAddress.ht_City__c + 
-                producerAddress.ht_State__c + 
-                producerAddress.ht_PostalCode__c + 
-                producerAddress.ht_CountryCode__c +
-                producerAddress.ht_AddressType__c + 
+                producerAddress.d4c_AddressLineOne__c + 
+                producerAddress.d4c_AddressLineTwo__c +
+                producerAddress.d4c_AddressLineThree__c +
+                producerAddress.d4c_City__c + 
+                producerAddress.d4c_State__c + 
+                producerAddress.d4c_PostalCode__c + 
+                producerAddress.d4c_CountryCode__c +
+                producerAddress.d4c_AddressType__c + 
                 producerNPN;
 
             // Remove spaces and nulls
             List<String> patternsToRemove = new List<String>{ '\\s+', 'null' };
-            producerAddress.ht_UniqueIdentifier__c = StringUtils.cleanString(uniqueId, patternsToRemove);
+            producerAddress.d4c_UniqueIdentifier__c = StringUtils.cleanString(uniqueId, patternsToRemove);
 
         }
         
@@ -576,22 +576,22 @@ public with sharing class ProcessEntityInfoApiService {
      * @description     : Creates a carrier appointment record from an APPOINTMENT node.
      * @param appointment : APPOINTMENT node containing carrier appointment information.
      * @param stateCode : The state code for the appointment.
-     * @return          : A populated ht_CarrierAppointment__c record.
+     * @return          : A populated d4c_CarrierAppointment__c record.
      *********************************************************
      **/
-    private ht_CarrierAppointment__c createCarrierAppointmentRecord(EntityInfoDTO.APPOINTMENT appointment, String stateCode) {
+    private d4c_CarrierAppointment__c createCarrierAppointmentRecord(EntityInfoDTO.APPOINTMENT appointment, String stateCode) {
         if (appointment == null) {
             return null;
         }
         
-        ht_CarrierAppointment__c carrierApp = new ht_CarrierAppointment__c();
+        d4c_CarrierAppointment__c carrierApp = new d4c_CarrierAppointment__c();
         
         // Map basic appointment fields
-        carrierApp.ht_StateOrProvinceCode__c = stateCode;
-        carrierApp.ht_CountyCode__c = appointment.COUNTY_CODE;
-        carrierApp.ht_AppointerStateCOID__c = appointment.APPOINTER_STATE_CO_ID;
-        carrierApp.ht_StatusCode__c = appointment.STATUS;
-        carrierApp.ht_TerminationReason__c = StringUtils.truncateField(appointment.TERMINATION_REASON, 255);
+        carrierApp.d4c_StateOrProvinceCode__c = stateCode;
+        carrierApp.d4c_CountyCode__c = appointment.COUNTY_CODE;
+        carrierApp.d4c_AppointerStateCOID__c = appointment.APPOINTER_STATE_CO_ID;
+        carrierApp.d4c_StatusCode__c = appointment.STATUS;
+        carrierApp.d4c_TerminationReason__c = StringUtils.truncateField(appointment.TERMINATION_REASON, 255);
         
         // Format and parse dates
         if (String.isNotBlank(appointment.STATUS_REASON_DATE)) {
@@ -599,7 +599,7 @@ public with sharing class ProcessEntityInfoApiService {
                 StringUtils.swapCharacters(appointment.STATUS_REASON_DATE, '/', '-')
             );
 
-            carrierApp.ht_StatusReasonDate__c = DateUtils.safeParseDateFromString(formattedStatusReasonDate);
+            carrierApp.d4c_StatusReasonDate__c = DateUtils.safeParseDateFromString(formattedStatusReasonDate);
         }
         
         if (String.isNotBlank(appointment.APPONT_RENEWAL_DATE)) {
@@ -607,7 +607,7 @@ public with sharing class ProcessEntityInfoApiService {
                 StringUtils.swapCharacters(appointment.APPONT_RENEWAL_DATE, '/', '-')
             );
 
-            carrierApp.ht_RenewalDate__c = DateUtils.safeParseDateFromString(formattedRenewalDate);
+            carrierApp.d4c_RenewalDate__c = DateUtils.safeParseDateFromString(formattedRenewalDate);
         }
         
         return carrierApp;
@@ -618,25 +618,25 @@ public with sharing class ProcessEntityInfoApiService {
      * @methodName      : createCarrierRecord
      * @description     : Creates a carrier record from an APPOINTMENT node.
      * @param appointment : APPOINTMENT node containing carrier information.
-     * @return          : A populated ht_Carrier__c record.
+     * @return          : A populated d4c_Carrier__c record.
      *********************************************************
      **/
-    private ht_Carrier__c createCarrierRecord(EntityInfoDTO.APPOINTMENT appointment) {
+    private d4c_Carrier__c createCarrierRecord(EntityInfoDTO.APPOINTMENT appointment) {
         if (appointment == null || (String.isBlank(appointment.COCODE) && String.isBlank(appointment.FEIN))) {
             return null;
         }
         
-        ht_Carrier__c carrier = new ht_Carrier__c();
+        d4c_Carrier__c carrier = new d4c_Carrier__c();
         
         // Set the key fields
-        carrier.ht_CoCode__c = appointment.COCODE;
-        carrier.ht_FullName__c = StringUtils.truncateField(appointment.COMPANY_NAME, 255);
+        carrier.d4c_CoCode__c = appointment.COCODE;
+        carrier.d4c_FullName__c = StringUtils.truncateField(appointment.COMPANY_NAME, 255);
         carrier.Name = StringUtils.truncateField(appointment.COMPANY_NAME, 80);
-        carrier.ht_FEIN__c = StringUtils.truncateField(StringUtils.swapCharacters(appointment.FEIN, '-', ''), 9);
+        carrier.d4c_FEIN__c = StringUtils.truncateField(StringUtils.swapCharacters(appointment.FEIN, '-', ''), 9);
 
         // Concatenate CoCode and FEIN
-        String uniqueIdentifier = StringUtils.safeParseNullString(carrier.ht_CoCode__c) + StringUtils.safeParseNullString(carrier.ht_FEIN__c);
-        carrier.ht_UniqueIdentifier__c = uniqueIdentifier;
+        String uniqueIdentifier = StringUtils.safeParseNullString(carrier.d4c_CoCode__c) + StringUtils.safeParseNullString(carrier.d4c_FEIN__c);
+        carrier.d4c_UniqueIdentifier__c = uniqueIdentifier;
 
         return carrier;
     }
@@ -648,30 +648,30 @@ public with sharing class ProcessEntityInfoApiService {
      * @param detail    : DETAIL node containing line of authority information.
      * @param licenseUniqueId : The license unique Id to associate with this line of authority.
      * @param stateCode : The state code for the license.
-     * @return          : A populated ht_LineOfAuthority__c record.
+     * @return          : A populated d4c_LineOfAuthority__c record.
      *********************************************************
      **/
-    private ht_LineOfAuthority__c createLineOfAuthorityRecord(EntityInfoDTO.DETAIL detail, String licenseUniqueId, String stateCode) {
+    private d4c_LineOfAuthority__c createLineOfAuthorityRecord(EntityInfoDTO.DETAIL detail, String licenseUniqueId, String stateCode) {
         if (detail == null) {
             return null;
         }
         
-        ht_LineOfAuthority__c loa = new ht_LineOfAuthority__c();
+        d4c_LineOfAuthority__c loa = new d4c_LineOfAuthority__c();
         
         // Set the license lookup using external ID
-        loa.ht_License__r = new ht_License__c(ht_UniqueIdentifier__c = licenseUniqueId);
+        loa.d4c_License__r = new d4c_License__c(d4c_UniqueIdentifier__c = licenseUniqueId);
         
-        // Map fields from DETAIL to ht_LineOfAuthority__c
-        loa.ht_LineOfAuthorityCode__c = detail.LOA_CODE;
-        loa.ht_LineOfAuthorityDescription__c = StringUtils.truncateField(detail.LOA, 255);
-        loa.ht_StateOrProvinceCode__c = stateCode;
-        loa.ht_StateOrProvinceName__c = stateCode;
-        loa.ht_StatusCode__c = detail.STATUS;
-        loa.ht_StatusReasonCode__c = detail.STATUS_REASON;
+        // Map fields from DETAIL to d4c_LineOfAuthority__c
+        loa.d4c_LineOfAuthorityCode__c = detail.LOA_CODE;
+        loa.d4c_LineOfAuthorityDescription__c = StringUtils.truncateField(detail.LOA, 255);
+        loa.d4c_StateOrProvinceCode__c = stateCode;
+        loa.d4c_StateOrProvinceName__c = stateCode;
+        loa.d4c_StatusCode__c = detail.STATUS;
+        loa.d4c_StatusReasonCode__c = detail.STATUS_REASON;
         
         // Map CE (Continuing Education) fields if available
-        loa.ht_CEStatusDescription__c = StringUtils.truncateField(detail.CE_COMPLIANCE, 255);
-        loa.ht_CEUnitsRequiredMeasure__c = detail.CE_CREDITS_NEEDED;
+        loa.d4c_CEStatusDescription__c = StringUtils.truncateField(detail.CE_COMPLIANCE, 255);
+        loa.d4c_CEUnitsRequiredMeasure__c = detail.CE_CREDITS_NEEDED;
 
         // Format and parse dates
         if (String.isNotBlank(detail.AUTHORITY_ISSUE_DATE)) {
@@ -679,7 +679,7 @@ public with sharing class ProcessEntityInfoApiService {
                 StringUtils.swapCharacters(detail.AUTHORITY_ISSUE_DATE, '/', '-')
             );
 
-            loa.ht_IssueDate__c = DateUtils.safeParseDateFromString(formattedIssueDate);
+            loa.d4c_IssueDate__c = DateUtils.safeParseDateFromString(formattedIssueDate);
         }
 
         if (String.isNotBlank(detail.STATUS_REASON_DATE)) {
@@ -687,7 +687,7 @@ public with sharing class ProcessEntityInfoApiService {
                 StringUtils.swapCharacters(detail.STATUS_REASON_DATE, '/', '-')
             );
 
-            loa.ht_StartDate__c = DateUtils.safeParseDateFromString(formattedIssueDate);
+            loa.d4c_StartDate__c = DateUtils.safeParseDateFromString(formattedIssueDate);
         }
 
         if (String.isNotBlank(detail.CE_RENEWAL_DATE)) {
@@ -695,7 +695,7 @@ public with sharing class ProcessEntityInfoApiService {
                 StringUtils.swapCharacters(detail.CE_RENEWAL_DATE, '/', '-')
             );
 
-            loa.ht_CERenewalDate__c = DateUtils.safeParseDateFromString(formattedIssueDate);
+            loa.d4c_CERenewalDate__c = DateUtils.safeParseDateFromString(formattedIssueDate);
         }
         
         
@@ -708,47 +708,47 @@ public with sharing class ProcessEntityInfoApiService {
      * @description     : Creates a license record from license data.
      * @param license   : LICENSE node from the DTO.
      * @param stateCode : State code from the STATE node attributes.
-     * @return          : A populated ht_License__c record.
+     * @return          : A populated d4c_License__c record.
      *********************************************************
      **/
-    private ht_License__c createLicenseRecord(EntityInfoDTO.LICENSE license, String stateCode) {
+    private d4c_License__c createLicenseRecord(EntityInfoDTO.LICENSE license, String stateCode) {
         if (license == null) {
             return null;
         }
         
-        ht_License__c licenseRecord = new ht_License__c();
+        d4c_License__c licenseRecord = new d4c_License__c();
         
         // Set the producer lookup using external ID
-        licenseRecord.ht_Producer__r = new ht_Producer__c(ht_NPN__c = producerNPN);
+        licenseRecord.d4c_Producer__r = new d4c_Producer__c(d4c_NPN__c = producerNPN);
         
         // Set basic license fields
-        licenseRecord.ht_LicenseNumber__c = license.LICENSE_NUM;
-        licenseRecord.ht_StateOrProvinceCode__c = stateCode;
-        licenseRecord.ht_StateOrProvinceName__c = stateCode;
-        licenseRecord.ht_LicenseClassCode__c = license.LICENSE_CLASS_CODE;
-        licenseRecord.ht_LicenseClassDescription__c = StringUtils.truncateField(license.LICENSE_CLASS, 255);
-        licenseRecord.ht_StatusCode__c = license.ACTIVE == 'Yes' ? 'Active' : 'Inactive';
-        licenseRecord.ht_ResidentLicenseIndicator__c = license.RESIDENCY_STATUS == 'R' ? true: false;
-        licenseRecord.ht_TypeCode__c = 'Producer';
+        licenseRecord.d4c_LicenseNumber__c = license.LICENSE_NUM;
+        licenseRecord.d4c_StateOrProvinceCode__c = stateCode;
+        licenseRecord.d4c_StateOrProvinceName__c = stateCode;
+        licenseRecord.d4c_LicenseClassCode__c = license.LICENSE_CLASS_CODE;
+        licenseRecord.d4c_LicenseClassDescription__c = StringUtils.truncateField(license.LICENSE_CLASS, 255);
+        licenseRecord.d4c_StatusCode__c = license.ACTIVE == 'Yes' ? 'Active' : 'Inactive';
+        licenseRecord.d4c_ResidentLicenseIndicator__c = license.RESIDENCY_STATUS == 'R' ? true: false;
+        licenseRecord.d4c_TypeCode__c = 'Producer';
         
         // Format and parse dates
         String formattedIssueDate = StringUtils.convertToISODateFormat(
             StringUtils.swapCharacters(license.DATE_ISSUE_LICENSE_ORIG, '/', '-')
         );
 
-        licenseRecord.ht_IssueDate__c = DateUtils.safeParseDateFromString(formattedIssueDate);
+        licenseRecord.d4c_IssueDate__c = DateUtils.safeParseDateFromString(formattedIssueDate);
         
         String formattedExpirationDate = StringUtils.convertToISODateFormat(
             StringUtils.swapCharacters(license.DATE_EXPIRE_LICENSE, '/', '-')
         );
 
-        licenseRecord.ht_EndDate__c = DateUtils.safeParseDateFromString(formattedExpirationDate);
+        licenseRecord.d4c_EndDate__c = DateUtils.safeParseDateFromString(formattedExpirationDate);
 
         String formattedDateUpdated = StringUtils.convertToISODateFormat(
             StringUtils.swapCharacters(license.DATE_UPDATED, '/', '-')
         );
 
-        licenseRecord.ht_AsOfDate__c = DateUtils.safeParseDateFromString(formattedDateUpdated);
+        licenseRecord.d4c_AsOfDate__c = DateUtils.safeParseDateFromString(formattedDateUpdated);
                 
         return licenseRecord;
     }
@@ -791,7 +791,7 @@ public with sharing class ProcessEntityInfoApiService {
     private void deleteExistingProducerCommunications(Set<String> npnSet) {
         // Query for existing producer communications
         ProducerCommunicationSelector communicationSelector = new ProducerCommunicationSelector();
-        List<ht_ProducerCommunication__c> existingCommunications = communicationSelector.getProducerCommsByProducerNPNs(npnSet);
+        List<d4c_ProducerCommunication__c> existingCommunications = communicationSelector.getProducerCommsByProducerNPNs(npnSet);
         
         if (!existingCommunications.isEmpty()) {
             Logger.debug(CLASS_NAME, 'DeleteExistingProducerCommunication', 'Deleting ' + existingCommunications.size() + ' existing Producer Communication records for NPN: ' + producerNPN,
@@ -812,7 +812,7 @@ public with sharing class ProcessEntityInfoApiService {
     private void deleteExistingProducerAddresses(Set<String> npnSet) {
         // Query for existing producer addresses
         ProducerAddressSelector addressSelector = new ProducerAddressSelector();
-        List<ht_ProducerAddress__c> existingAddresses = addressSelector.getProducerAddressByProducerNPNs(npnSet);
+        List<d4c_ProducerAddress__c> existingAddresses = addressSelector.getProducerAddressByProducerNPNs(npnSet);
         
         if (!existingAddresses.isEmpty()) {
             Logger.debug(CLASS_NAME, 'deleteExistingProducerAddresses', 'Deleting ' + existingAddresses.size() + ' existing Producer Address records for NPN: ' + producerNPN,
@@ -833,7 +833,7 @@ public with sharing class ProcessEntityInfoApiService {
     private void deleteExistingLicenses(Set<String> npnSet) {
         // Query for existing producer addresses
         LicenseSelector LicenseSelector = new LicenseSelector();
-        List<ht_License__c> existinglicenses = LicenseSelector.getLicensesByProducerNpn(npnSet);
+        List<d4c_License__c> existinglicenses = LicenseSelector.getLicensesByProducerNpn(npnSet);
         
         if (!existinglicenses.isEmpty()) {
             Logger.debug(CLASS_NAME, 'deleteExistingProducerAddresses', 'Deleting ' + existinglicenses.size() + ' existing Producer Licenses records for NPN: ' + producerNPN,
@@ -854,7 +854,7 @@ public with sharing class ProcessEntityInfoApiService {
     private void deleteExistingCarrierAppointments(Set<String> npnSet) {
         // Query for existing carrier appointments
         CarrierAppointmentSelector appointmentSelector = new CarrierAppointmentSelector();
-        List<ht_CarrierAppointment__c> existingAppointments = appointmentSelector.getCarrierAppointmentsByProducerNpn(npnSet);
+        List<d4c_CarrierAppointment__c> existingAppointments = appointmentSelector.getCarrierAppointmentsByProducerNpn(npnSet);
         
         if (!existingAppointments.isEmpty()) {
             Logger.debug(CLASS_NAME, 'deleteExistingProducerAddresses', 'Deleting ' + existingAppointments.size() + ' existing Carrier Appointment records for NPN: ' + producerNPN,
@@ -880,47 +880,47 @@ public with sharing class ProcessEntityInfoApiService {
             
             deleteExistingRelatedRecords();
 
-            ListUtils.deduplicateByField(producerCommunications, 'ht_UniqueIdentifier__c');
-            ListUtils.deduplicateByField(producerAddresses, 'ht_UniqueIdentifier__c');
-            ListUtils.deduplicateByField(carriers, 'ht_UniqueIdentifier__c');
-            ListUtils.deduplicateByField(licenses, 'ht_UniqueIdentifier__c');
-            ListUtils.deduplicateByField(licenseLoas, 'ht_UniqueIdentifier__c');
-            ListUtils.deduplicateByField(carrierAppointments, 'ht_UniqueIdentifier__c');
+            ListUtils.deduplicateByField(producerCommunications, 'd4c_UniqueIdentifier__c');
+            ListUtils.deduplicateByField(producerAddresses, 'd4c_UniqueIdentifier__c');
+            ListUtils.deduplicateByField(carriers, 'd4c_UniqueIdentifier__c');
+            ListUtils.deduplicateByField(licenses, 'd4c_UniqueIdentifier__c');
+            ListUtils.deduplicateByField(licenseLoas, 'd4c_UniqueIdentifier__c');
+            ListUtils.deduplicateByField(carrierAppointments, 'd4c_UniqueIdentifier__c');
             
             Logger.info(CLASS_NAME, methodName, 'Beginning upsert operations for producer',
                     'NPN: ' + producerNPN, null);
             
-            upsert producer ht_NPN__c;
+            upsert producer d4c_NPN__c;
             
             Logger.info(CLASS_NAME, methodName, 'Producer Communication records for Upsert', 
                     'Count: ' + producerCommunications.size() + ', NPN: ' + producerNPN, null);
             
-            upsert producerCommunications ht_UniqueIdentifier__c;
+            upsert producerCommunications d4c_UniqueIdentifier__c;
             
             Logger.info(CLASS_NAME, methodName, 'Producer Address records for Upsert', 
                     'Count: ' + producerAddresses.size() + ', NPN: ' + producerNPN, null);
             
-            upsert producerAddresses ht_UniqueIdentifier__c;
+            upsert producerAddresses d4c_UniqueIdentifier__c;
             
             Logger.info(CLASS_NAME, methodName, 'Carrier records for Upsert', 
                     'Count: ' + carriers.size() + ', NPN: ' + producerNPN, null);
             
-            upsert carriers ht_UniqueIdentifier__c;
+            upsert carriers d4c_UniqueIdentifier__c;
             
             Logger.info(CLASS_NAME, methodName, 'Producer License records for Upsert', 
                     'Count: ' + licenses.size() + ', NPN: ' + producerNPN, null);
             
-            upsert licenses ht_UniqueIdentifier__c;
+            upsert licenses d4c_UniqueIdentifier__c;
             
             Logger.info(CLASS_NAME, methodName, 'Line Of Authority records for Upsert', 
                     'Count: ' + licenseLoas.size() + ', NPN: ' + producerNPN, null);
             
-            upsert licenseLoas ht_uniqueIdentifier__c;
+            upsert licenseLoas d4c_uniqueIdentifier__c;
             
             Logger.info(CLASS_NAME, methodName, 'Carrier Appointment records for Upsert',
                     'Count: ' + carrierAppointments.size() + ', NPN: ' + producerNPN, null);
 
-            upsert carrierAppointments ht_UniqueIdentifier__c;
+            upsert carrierAppointments d4c_UniqueIdentifier__c;
 
             Logger.info(CLASS_NAME, methodName, 'Successfully completed all upsert operations',
                     'NPN: ' + producerNPN + ', Total records processed: ' +

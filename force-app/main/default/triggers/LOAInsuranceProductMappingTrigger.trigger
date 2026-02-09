@@ -10,7 +10,7 @@ Ver   Date         Author         Modification
 1.0   2025-12-15   Stefan         Initial Version
 *********************************************************
 */
-trigger LOAInsuranceProductMappingTrigger on ht_LOA_Insurance_Product_Mapping__c (
+trigger LOAInsuranceProductMappingTrigger on d4c_LOA_Insurance_Product_Mapping__c (
     before insert,
     before update,
     before delete,

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>ht_InsuranceProduct__c</fullName>
+    <fullName>d4c_InsuranceProduct__c</fullName>
     <label>Insurance Product</label>
-    <referenceTo>ht_Insurance_Product__c</referenceTo>
+    <referenceTo>d4c_Insurance_Product__c</referenceTo>
     <relationshipName>Insurance_Product_Licenses</relationshipName>
     <relationshipOrder>1</relationshipOrder>
     <reparentableMasterDetail>false</reparentableMasterDetail>

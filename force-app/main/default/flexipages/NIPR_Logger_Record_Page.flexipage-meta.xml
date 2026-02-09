@@ -51,8 +51,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_LogLevel__c</fieldItem>
-                <identifier>Recordht_LogLevel_cField</identifier>
+                <fieldItem>Record.d4c_LogLevel__c</fieldItem>
+                <identifier>Recordd4c_LogLevel_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -61,8 +61,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_Critical__c</fieldItem>
-                <identifier>Recordht_Critical_cField</identifier>
+                <fieldItem>Record.d4c_Critical__c</fieldItem>
+                <identifier>Recordd4c_Critical_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-29fb35f8-c595-4f84-96fb-18a34b1cc25f</name>
@@ -85,8 +85,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_Message__c</fieldItem>
-                <identifier>Recordht_Message_cField</identifier>
+                <fieldItem>Record.d4c_Message__c</fieldItem>
+                <identifier>Recordd4c_Message_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -95,8 +95,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_Details__c</fieldItem>
-                <identifier>Recordht_Details_cField</identifier>
+                <fieldItem>Record.d4c_Details__c</fieldItem>
+                <identifier>Recordd4c_Details_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -105,8 +105,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_StackTrace__c</fieldItem>
-                <identifier>Recordht_StackTrace_cField</identifier>
+                <fieldItem>Record.d4c_StackTrace__c</fieldItem>
+                <identifier>Recordd4c_StackTrace_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-127501ac-07ea-4ce6-a335-220f76145937</name>
@@ -153,8 +153,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_TransactionId__c</fieldItem>
-                <identifier>Recordht_TransactionId_cField</identifier>
+                <fieldItem>Record.d4c_TransactionId__c</fieldItem>
+                <identifier>Recordd4c_TransactionId_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -163,8 +163,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_RelatedRecord__c</fieldItem>
-                <identifier>Recordht_RelatedRecord_cField</identifier>
+                <fieldItem>Record.d4c_RelatedRecord__c</fieldItem>
+                <identifier>Recordd4c_RelatedRecord_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -173,8 +173,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_Source__c</fieldItem>
-                <identifier>Recordht_Source_cField</identifier>
+                <fieldItem>Record.d4c_Source__c</fieldItem>
+                <identifier>Recordd4c_Source_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-1b34bdb8-1318-41bb-a286-d71e66db814f</name>
@@ -197,8 +197,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_OccurredDateTime__c</fieldItem>
-                <identifier>Recordht_OccurredDateTime_cField</identifier>
+                <fieldItem>Record.d4c_OccurredDateTime__c</fieldItem>
+                <identifier>Recordd4c_OccurredDateTime_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -207,8 +207,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_SourceName__c</fieldItem>
-                <identifier>Recordht_SourceName_cField</identifier>
+                <fieldItem>Record.d4c_SourceName__c</fieldItem>
+                <identifier>Recordd4c_SourceName_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -217,8 +217,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_SourceMethod__c</fieldItem>
-                <identifier>Recordht_SourceMethod_cField</identifier>
+                <fieldItem>Record.d4c_SourceMethod__c</fieldItem>
+                <identifier>Recordd4c_SourceMethod_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-00d303c5-219a-48f2-8fac-62ab57234e5d</name>
@@ -338,7 +338,7 @@
     </flexiPageRegions>
     <masterLabel>NIPR Logger Record Page</masterLabel>
     <parentFlexiPage>flexipage__default_rec_L</parentFlexiPage>
-    <sobjectType>ht_Logger__c</sobjectType>
+    <sobjectType>d4c_Logger__c</sobjectType>
     <template>
         <name>flexipage:recordHomeTemplateDesktop</name>
     </template>

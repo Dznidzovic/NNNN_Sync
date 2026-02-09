@@ -17,7 +17,7 @@
     </layouts>
     <quickActions>
         <label><!-- Force NPN Sync --></label>
-        <name>ht_Force_NPN_Sync</name>
+        <name>d4c_Force_NPN_Sync</name>
     </quickActions>
     <startsWith>Consonant</startsWith>
 </CustomObjectTranslation>

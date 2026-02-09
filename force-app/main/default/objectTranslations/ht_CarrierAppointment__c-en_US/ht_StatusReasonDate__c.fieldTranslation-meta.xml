@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
     <label><!-- Status Reason Date --></label>
-    <name>ht_StatusReasonDate__c</name>
+    <name>d4c_StatusReasonDate__c</name>
 </CustomFieldTranslation>

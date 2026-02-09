@@ -161,9 +161,9 @@ private class TriggerDispatcherTest {
     @IsTest
     static void testIsDisabled_WithCustomMetadata() {
         // Query to check if any custom metadata exists
-        List<ht_Trigger_Dispatcher_Settings__mdt> existingSettings = [
-            SELECT DeveloperName, ht_Disabled__c
-            FROM ht_Trigger_Dispatcher_Settings__mdt
+        List<d4c_Trigger_Dispatcher_Settings__mdt> existingSettings = [
+            SELECT DeveloperName, d4c_Disabled__c
+            FROM d4c_Trigger_Dispatcher_Settings__mdt
             LIMIT 1
         ];
 

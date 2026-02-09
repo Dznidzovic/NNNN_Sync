@@ -3,8 +3,8 @@
     <description>Read-only access to NIPR data with producer management capabilities</description>
     <hasActivationRequired>false</hasActivationRequired>
     <label>NIPR Manage Producers User</label>
-    <permissionSets>niprsync__HT_Manage_Producer</permissionSets>
+    <permissionSets>niprsync__d4c_Manage_Producer</permissionSets>
     <permissionSets>niprsync__NIPR_View_NIPR_Data</permissionSets>
-    <permissionSets>niprsync__ht_NIPR_API_Callout</permissionSets>
+    <permissionSets>niprsync__d4c_NIPR_API_Callout</permissionSets>
     <status>Updated</status>
 </PermissionSetGroup>

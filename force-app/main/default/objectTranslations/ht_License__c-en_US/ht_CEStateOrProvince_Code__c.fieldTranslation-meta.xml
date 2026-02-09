@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
     <label><!-- CE State Or Province Code --></label>
-    <name>ht_CEStateOrProvince_Code__c</name>
+    <name>d4c_CEStateOrProvince_Code__c</name>
 </CustomFieldTranslation>

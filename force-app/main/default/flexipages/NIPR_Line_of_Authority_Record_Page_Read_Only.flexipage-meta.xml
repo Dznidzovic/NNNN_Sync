@@ -50,8 +50,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_LineOfAuthorityCode__c</fieldItem>
-                <identifier>Recordht_LineOfAuthorityCode_cField</identifier>
+                <fieldItem>Record.d4c_LineOfAuthorityCode__c</fieldItem>
+                <identifier>Recordd4c_LineOfAuthorityCode_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -60,8 +60,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_LineOfAuthorityDescription__c</fieldItem>
-                <identifier>Recordht_LineOfAuthorityDescription_cField</identifier>
+                <fieldItem>Record.d4c_LineOfAuthorityDescription__c</fieldItem>
+                <identifier>Recordd4c_LineOfAuthorityDescription_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -70,8 +70,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_StatusCode__c</fieldItem>
-                <identifier>Recordht_StatusCode_cField</identifier>
+                <fieldItem>Record.d4c_StatusCode__c</fieldItem>
+                <identifier>Recordd4c_StatusCode_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -80,8 +80,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_StatusReasonCode__c</fieldItem>
-                <identifier>Recordht_StatusReasonCode_cField</identifier>
+                <fieldItem>Record.d4c_StatusReasonCode__c</fieldItem>
+                <identifier>Recordd4c_StatusReasonCode_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -90,8 +90,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_StatusReasonDescription__c</fieldItem>
-                <identifier>Recordht_StatusReasonDescription_cField</identifier>
+                <fieldItem>Record.d4c_StatusReasonDescription__c</fieldItem>
+                <identifier>Recordd4c_StatusReasonDescription_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-44e4f65c-86c5-4af9-b22c-d142b6a18682</name>
@@ -104,8 +104,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_License__c</fieldItem>
-                <identifier>Recordht_License_cField</identifier>
+                <fieldItem>Record.d4c_License__c</fieldItem>
+                <identifier>Recordd4c_License_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -114,8 +114,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_StateOrProvinceName__c</fieldItem>
-                <identifier>Recordht_StateOrProvinceName_cField</identifier>
+                <fieldItem>Record.d4c_StateOrProvinceName__c</fieldItem>
+                <identifier>Recordd4c_StateOrProvinceName_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -124,8 +124,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_StateOrProvinceCode__c</fieldItem>
-                <identifier>Recordht_StateOrProvinceCode_cField</identifier>
+                <fieldItem>Record.d4c_StateOrProvinceCode__c</fieldItem>
+                <identifier>Recordd4c_StateOrProvinceCode_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -134,8 +134,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_StartDate__c</fieldItem>
-                <identifier>Recordht_StartDate_cField</identifier>
+                <fieldItem>Record.d4c_StartDate__c</fieldItem>
+                <identifier>Recordd4c_StartDate_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -144,8 +144,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_RenewalDate__c</fieldItem>
-                <identifier>Recordht_RenewalDate_cField</identifier>
+                <fieldItem>Record.d4c_RenewalDate__c</fieldItem>
+                <identifier>Recordd4c_RenewalDate_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -154,8 +154,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_IssueDate__c</fieldItem>
-                <identifier>Recordht_IssueDate_cField</identifier>
+                <fieldItem>Record.d4c_IssueDate__c</fieldItem>
+                <identifier>Recordd4c_IssueDate_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-e261be79-3026-47c6-8701-e9aff2d43fa0</name>
@@ -192,8 +192,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_CEAsOfDate__c</fieldItem>
-                <identifier>Recordht_CEAsOfDate_cField</identifier>
+                <fieldItem>Record.d4c_CEAsOfDate__c</fieldItem>
+                <identifier>Recordd4c_CEAsOfDate_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -202,8 +202,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_CERenewalDate__c</fieldItem>
-                <identifier>Recordht_CERenewalDate_cField</identifier>
+                <fieldItem>Record.d4c_CERenewalDate__c</fieldItem>
+                <identifier>Recordd4c_CERenewalDate_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -212,8 +212,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_CEStatusCode__c</fieldItem>
-                <identifier>Recordht_CEStatusCode_cField</identifier>
+                <fieldItem>Record.d4c_CEStatusCode__c</fieldItem>
+                <identifier>Recordd4c_CEStatusCode_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -222,8 +222,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_CEStatusDescription__c</fieldItem>
-                <identifier>Recordht_CEStatusDescription_cField</identifier>
+                <fieldItem>Record.d4c_CEStatusDescription__c</fieldItem>
+                <identifier>Recordd4c_CEStatusDescription_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-8898f531-dad6-4eaf-b4bd-894fe9de21c1</name>
@@ -236,8 +236,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_CEEndDate__c</fieldItem>
-                <identifier>Recordht_CEEndDate_cField</identifier>
+                <fieldItem>Record.d4c_CEEndDate__c</fieldItem>
+                <identifier>Recordd4c_CEEndDate_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -246,8 +246,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_CEUnitsRequiredMeasure__c</fieldItem>
-                <identifier>Recordht_CEUnitsRequiredMeasure_cField</identifier>
+                <fieldItem>Record.d4c_CEUnitsRequiredMeasure__c</fieldItem>
+                <identifier>Recordd4c_CEUnitsRequiredMeasure_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -256,8 +256,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_CEUnitsRemainingMeasure__c</fieldItem>
-                <identifier>Recordht_CEUnitsRemainingMeasure_cField</identifier>
+                <fieldItem>Record.d4c_CEUnitsRemainingMeasure__c</fieldItem>
+                <identifier>Recordd4c_CEUnitsRemainingMeasure_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -266,8 +266,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_CEStateOrProvinceCode__c</fieldItem>
-                <identifier>Recordht_CEStateOrProvinceCode_cField</identifier>
+                <fieldItem>Record.d4c_CEStateOrProvinceCode__c</fieldItem>
+                <identifier>Recordd4c_CEStateOrProvinceCode_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-04f0f1b4-e097-4fc4-91b1-4b5d9dfef215</name>
@@ -314,8 +314,8 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_UniqueIdentifier__c</fieldItem>
-                <identifier>Recordht_UniqueIdentifier_cField</identifier>
+                <fieldItem>Record.d4c_UniqueIdentifier__c</fieldItem>
+                <identifier>Recordd4c_UniqueIdentifier_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-46be8d50-0677-4fd4-9aa9-4ebee05a876f</name>
@@ -338,8 +338,8 @@
                     <name>uiBehavior</name>
                     <value>none</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_LOAMapping__c</fieldItem>
-                <identifier>Recordht_LOAMapping_cField</identifier>
+                <fieldItem>Record.d4c_LOAMapping__c</fieldItem>
+                <identifier>Recordd4c_LOAMapping_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-57f0d91f-faf1-47b3-9a26-df8e75c9a217</name>
@@ -478,7 +478,7 @@
         <type>Region</type>
     </flexiPageRegions>
     <masterLabel>NIPR Line of Authority Record Page - Read Only</masterLabel>
-    <sobjectType>ht_LineOfAuthority__c</sobjectType>
+    <sobjectType>d4c_LineOfAuthority__c</sobjectType>
     <template>
         <name>flexipage:recordHomeTemplateDesktop</name>
         <properties>

@@ -12,7 +12,7 @@
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>ht_Subscription_Name__c</field>
+                <field>d4c_Subscription_Name__c</field>
             </layoutItems>
         </layoutColumns>
         <layoutColumns>
@@ -54,11 +54,11 @@
     </layoutSections>
     <relatedLists>
         <fields>NAME</fields>
-        <fields>ht_FullName__c</fields>
-        <fields>ht_NPN__c</fields>
-        <fields>ht_FEIN__c</fields>
-        <fields>ht_NPNStatus__c</fields>
-        <relatedList>ht_Producer__c.ht_Subscription__c</relatedList>
+        <fields>d4c_FullName__c</fields>
+        <fields>d4c_NPN__c</fields>
+        <fields>d4c_FEIN__c</fields>
+        <fields>d4c_NPNStatus__c</fields>
+        <relatedList>d4c_Producer__c.d4c_Subscription__c</relatedList>
     </relatedLists>
     <showEmailCheckbox>false</showEmailCheckbox>
     <showHighlightsPanel>false</showHighlightsPanel>

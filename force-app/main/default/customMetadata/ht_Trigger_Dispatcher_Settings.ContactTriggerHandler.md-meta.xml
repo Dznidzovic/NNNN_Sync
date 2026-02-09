@@ -3,7 +3,7 @@
     <label>ContactTriggerHandler</label>
     <protected>false</protected>
     <values>
-        <field>ht_Disabled__c</field>
+        <field>d4c_Disabled__c</field>
         <value xsi:type="xsd:boolean">false</value>
     </values>
 </CustomMetadata>

@@ -16,11 +16,11 @@
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>ht_Active__c</field>
+                <field>d4c_Active__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>ht_XMLData__c</field>
+                <field>d4c_XMLData__c</field>
             </layoutItems>
         </layoutColumns>
         <layoutColumns>

@@ -52,8 +52,8 @@
                     <name>uiBehavior</name>
                     <value>none</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_License__c</fieldItem>
-                <identifier>Recordht_License_cField</identifier>
+                <fieldItem>Record.d4c_License__c</fieldItem>
+                <identifier>Recordd4c_License_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -62,8 +62,8 @@
                     <name>uiBehavior</name>
                     <value>none</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_InsuranceProduct__c</fieldItem>
-                <identifier>Recordht_InsuranceProduct_cField</identifier>
+                <fieldItem>Record.d4c_InsuranceProduct__c</fieldItem>
+                <identifier>Recordd4c_InsuranceProduct_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-Column2</name>
@@ -110,8 +110,8 @@
                     <name>uiBehavior</name>
                     <value>none</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_UniqueIdentifier__c</fieldItem>
-                <identifier>Recordht_UniqueIdentifier_cField</identifier>
+                <fieldItem>Record.d4c_UniqueIdentifier__c</fieldItem>
+                <identifier>Recordd4c_UniqueIdentifier_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-4186a00d-5805-4f50-ad87-6fe6863a867f</name>
@@ -245,7 +245,7 @@
     </flexiPageRegions>
     <masterLabel>NIPR License Insurance Product Record Page - Read Only</masterLabel>
     <parentFlexiPage>flexipage__default_rec_L</parentFlexiPage>
-    <sobjectType>ht_License_Insurance_Product__c</sobjectType>
+    <sobjectType>d4c_License_Insurance_Product__c</sobjectType>
     <template>
         <name>flexipage:recordHomeTemplateDesktop</name>
     </template>

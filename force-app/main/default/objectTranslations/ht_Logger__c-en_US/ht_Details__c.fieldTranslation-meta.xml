@@ -2,5 +2,5 @@
 <CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
     <help><!-- Captures the actual error message or log details. --></help>
     <label><!-- Details --></label>
-    <name>ht_Details__c</name>
+    <name>d4c_Details__c</name>
 </CustomFieldTranslation>

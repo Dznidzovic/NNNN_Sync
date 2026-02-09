@@ -13,7 +13,7 @@ public without sharing class LeadSelector {
 
     /*********************************************************
      @Method Name    : getLeadsByNPNs
-     @description    : Returns list of Leads by ht_NPN__c field
+     @description    : Returns list of Leads by d4c_NPN__c field
      @author         : Stefan Nidzovic
      @param          : npns - Set of unique NPN values
      @return         : List<Lead> - list of Lead records
@@ -23,11 +23,11 @@ public without sharing class LeadSelector {
         return [
             SELECT 
                 Id, 
-                ht_NPN__c
+                d4c_NPN__c
             FROM 
                 Lead
             WHERE 
-                ht_NPN__c IN :npns
+                d4c_NPN__c IN :npns
         ];
     }
 }

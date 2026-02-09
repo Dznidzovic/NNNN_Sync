@@ -16,8 +16,8 @@ public virtual class BaseTriggerHandler {
     @Method Name    : isDisabled
     @description    : Determines if trigger execution should be disabled.
                       Checks BOTH in-code static boolean flag (for tests) AND
-                      ht_Trigger_Dispatcher_Settings__mdt Custom Metadata Type.
-                      If a metadata record exists with ht_Disabled__c = true, the trigger is disabled.
+                      d4c_Trigger_Dispatcher_Settings__mdt Custom Metadata Type.
+                      If a metadata record exists with d4c_Disabled__c = true, the trigger is disabled.
     @return         : Boolean - True if the trigger should be disabled, otherwise False.
     *********************************************************/
     public virtual Boolean isDisabled() {
@@ -28,10 +28,10 @@ public virtual class BaseTriggerHandler {
         String handlerName = String.valueOf(this).substring(0, String.valueOf(this).indexOf(':'));
 
         // Get custom metadata type record using cached getInstance() method (no SOQL query)
-        ht_Trigger_Dispatcher_Settings__mdt setting = ht_Trigger_Dispatcher_Settings__mdt.getInstance(handlerName);
+        d4c_Trigger_Dispatcher_Settings__mdt setting = d4c_Trigger_Dispatcher_Settings__mdt.getInstance(handlerName);
 
-        // If a record exists and ht_Disabled__c is true, the trigger is disabled
-        return setting != null && setting.ht_Disabled__c == true;
+        // If a record exists and d4c_Disabled__c is true, the trigger is disabled
+        return setting != null && setting.d4c_Disabled__c == true;
     }
 
     /*********************************************************

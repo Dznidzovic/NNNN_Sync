@@ -45,21 +45,21 @@ public with sharing class LOAProductMappingService {
      * @Method Name    : matchLoasToMappings
      * @description    : Matches LOA records to their Insurance Product mappings.
      *                   Uses state/code/description composite key to find matching mappings.
-     *                   Sets ht_LOAMapping__c lookup field on each LOA.
+     *                   Sets d4c_LOAMapping__c lookup field on each LOA.
      * @param          : loas - List of LOA records to match
      *********************************************************
      */
-    public void matchLoasToMappings(List<ht_LineOfAuthority__c> loas) {
+    public void matchLoasToMappings(List<d4c_LineOfAuthority__c> loas) {
         String methodName = 'matchLoasToMappings';
 
         try {
             // 1. Build Set<String> of unique keys for all LOAs
             Set<String> keys = new Set<String>();
-            for (ht_LineOfAuthority__c loa : loas) {
+            for (d4c_LineOfAuthority__c loa : loas) {
                 String key = buildMappingKey(
-                    loa.ht_StateOrProvinceCode__c,
-                    loa.ht_LineOfAuthorityCode__c,
-                    loa.ht_LineOfAuthorityDescription__c
+                    loa.d4c_StateOrProvinceCode__c,
+                    loa.d4c_LineOfAuthorityCode__c,
+                    loa.d4c_LineOfAuthorityDescription__c
                 );
                 if (key != null) {
                     keys.add(key);
@@ -73,24 +73,24 @@ public with sharing class LOAProductMappingService {
 
             // 2. Query mappings by UniqueIdentifier using selector
             Map<String, Id> keyToMappingId = new Map<String, Id>();
-            List<ht_LOA_Insurance_Product_Mapping__c> mappings = mappingSelector.getMappingsByUniqueIdentifiers(keys);
-            for (ht_LOA_Insurance_Product_Mapping__c mapping : mappings) {
-                keyToMappingId.put(mapping.ht_UniqueIdentifier__c, mapping.Id);
+            List<d4c_LOA_Insurance_Product_Mapping__c> mappings = mappingSelector.getMappingsByUniqueIdentifiers(keys);
+            for (d4c_LOA_Insurance_Product_Mapping__c mapping : mappings) {
+                keyToMappingId.put(mapping.d4c_UniqueIdentifier__c, mapping.Id);
             }
 
             // 3. For each LOA, set the mapping lookup
-            for (ht_LineOfAuthority__c loa : loas) {
+            for (d4c_LineOfAuthority__c loa : loas) {
                 String key = buildMappingKey(
-                    loa.ht_StateOrProvinceCode__c,
-                    loa.ht_LineOfAuthorityCode__c,
-                    loa.ht_LineOfAuthorityDescription__c
+                    loa.d4c_StateOrProvinceCode__c,
+                    loa.d4c_LineOfAuthorityCode__c,
+                    loa.d4c_LineOfAuthorityDescription__c
                 );
                 if (key != null && keyToMappingId.containsKey(key)) {
-                    loa.ht_LOAMapping__c = keyToMappingId.get(key);
-                    loa.ht_IsProductMatched__c = true;
+                    loa.d4c_LOAMapping__c = keyToMappingId.get(key);
+                    loa.d4c_IsProductMatched__c = true;
                 } else {
-                    loa.ht_LOAMapping__c = null;
-                    loa.ht_IsProductMatched__c = false;
+                    loa.d4c_LOAMapping__c = null;
+                    loa.d4c_IsProductMatched__c = false;
                 }
             }
 
@@ -106,14 +106,14 @@ public with sharing class LOAProductMappingService {
      * @Method Name    : findOrphanLoasForMappings
      * @description    : Finds LOA records that should be linked to given mappings.
      *                   "Orphan" LOAs are those with matching state/code/description
-     *                   but null ht_LOAMapping__c.
-     * @param          : loaMappingIds - Set of ht_LOA_Insurance_Product_Mapping__c IDs
-     * @return         : List of orphan LOA records with ht_LOAMapping__c populated
+     *                   but null d4c_LOAMapping__c.
+     * @param          : loaMappingIds - Set of d4c_LOA_Insurance_Product_Mapping__c IDs
+     * @return         : List of orphan LOA records with d4c_LOAMapping__c populated
      *********************************************************
      */
-    public List<ht_LineOfAuthority__c> findOrphanLoasForMappings(Set<Id> loaMappingIds) {
+    public List<d4c_LineOfAuthority__c> findOrphanLoasForMappings(Set<Id> loaMappingIds) {
         String methodName = 'findOrphanLoasForMappings';
-        List<ht_LineOfAuthority__c> loasToUpdate = new List<ht_LineOfAuthority__c>();
+        List<d4c_LineOfAuthority__c> loasToUpdate = new List<d4c_LineOfAuthority__c>();
 
         try {
             if (loaMappingIds == null || loaMappingIds.isEmpty()) {
@@ -121,7 +121,7 @@ public with sharing class LOAProductMappingService {
             }
 
             // 1. Query mappings with state/code/description fields
-            List<ht_LOA_Insurance_Product_Mapping__c> mappings = mappingSelector.getMappingsByIds(loaMappingIds);
+            List<d4c_LOA_Insurance_Product_Mapping__c> mappings = mappingSelector.getMappingsByIds(loaMappingIds);
 
             // 2. Build unique keys and collect filter values
             Map<String, Id> keyToMappingId = new Map<String, Id>();
@@ -129,17 +129,17 @@ public with sharing class LOAProductMappingService {
             Set<String> codes = new Set<String>();
             Set<String> descriptions = new Set<String>();
 
-            for (ht_LOA_Insurance_Product_Mapping__c mapping : mappings) {
+            for (d4c_LOA_Insurance_Product_Mapping__c mapping : mappings) {
                 String key = buildMappingKey(
-                    mapping.ht_StateOrProvinceCode__c,
-                    mapping.ht_LineOfAuthorityCode__c,
-                    mapping.ht_LineOfAuthorityDescription__c
+                    mapping.d4c_StateOrProvinceCode__c,
+                    mapping.d4c_LineOfAuthorityCode__c,
+                    mapping.d4c_LineOfAuthorityDescription__c
                 );
                 if (key != null) {
                     keyToMappingId.put(key, mapping.Id);
-                    states.add(mapping.ht_StateOrProvinceCode__c);
-                    codes.add(mapping.ht_LineOfAuthorityCode__c);
-                    descriptions.add(mapping.ht_LineOfAuthorityDescription__c);
+                    states.add(mapping.d4c_StateOrProvinceCode__c);
+                    codes.add(mapping.d4c_LineOfAuthorityCode__c);
+                    descriptions.add(mapping.d4c_LineOfAuthorityDescription__c);
                 }
             }
 
@@ -148,19 +148,19 @@ public with sharing class LOAProductMappingService {
             }
 
             // 3. Query orphan LOAs using selector
-            List<ht_LineOfAuthority__c> potentialOrphans = loaSelector.getOrphanLoasByStateCodeDesc(
+            List<d4c_LineOfAuthority__c> potentialOrphans = loaSelector.getOrphanLoasByStateCodeDesc(
                 states, codes, descriptions
             );
 
             // 4. Match orphan LOAs with mappings using composite key
-            for (ht_LineOfAuthority__c loa : potentialOrphans) {
+            for (d4c_LineOfAuthority__c loa : potentialOrphans) {
                 String loaKey = buildMappingKey(
-                    loa.ht_StateOrProvinceCode__c,
-                    loa.ht_LineOfAuthorityCode__c,
-                    loa.ht_LineOfAuthorityDescription__c
+                    loa.d4c_StateOrProvinceCode__c,
+                    loa.d4c_LineOfAuthorityCode__c,
+                    loa.d4c_LineOfAuthorityDescription__c
                 );
                 if (keyToMappingId.containsKey(loaKey)) {
-                    loa.ht_LOAMapping__c = keyToMappingId.get(loaKey);
+                    loa.d4c_LOAMapping__c = keyToMappingId.get(loaKey);
                     loasToUpdate.add(loa);
                 }
             }
@@ -176,14 +176,14 @@ public with sharing class LOAProductMappingService {
     /**
      *********************************************************
      * @Method Name    : deleteLicenseProductsForDeletedMappingJunctions
-     * @description    : When ht_Insurance_Product_LOA_Mapping__c junctions are deleted,
+     * @description    : When d4c_Insurance_Product_LOA_Mapping__c junctions are deleted,
      *                   finds and deletes the License-Product junctions that were granted
      *                   by those specific mapping-product relationships.
-     * @param          : deletedJunctions - List of deleted ht_Insurance_Product_LOA_Mapping__c records
+     * @param          : deletedJunctions - List of deleted d4c_Insurance_Product_LOA_Mapping__c records
      * @return         : Number of License-Product junctions deleted
      *********************************************************
      */
-    public Integer deleteLicenseProductsForDeletedMappingJunctions(List<ht_Insurance_Product_LOA_Mapping__c> deletedJunctions) {
+    public Integer deleteLicenseProductsForDeletedMappingJunctions(List<d4c_Insurance_Product_LOA_Mapping__c> deletedJunctions) {
         String methodName = 'deleteLicenseProductsForDeletedMappingJunctions';
         Integer deletedCount = 0;
         
@@ -197,16 +197,16 @@ public with sharing class LOAProductMappingService {
             Set<Id> productIds = new Set<Id>();
             Map<Id, Set<Id>> mappingToProductIds = new Map<Id, Set<Id>>();
 
-            for (ht_Insurance_Product_LOA_Mapping__c junction : deletedJunctions) {
-                if (junction.ht_LOAMapping__c != null && junction.ht_InsuranceProduct__c != null) {
-                    loaMappingIds.add(junction.ht_LOAMapping__c);
-                    productIds.add(junction.ht_InsuranceProduct__c);
+            for (d4c_Insurance_Product_LOA_Mapping__c junction : deletedJunctions) {
+                if (junction.d4c_LOAMapping__c != null && junction.d4c_InsuranceProduct__c != null) {
+                    loaMappingIds.add(junction.d4c_LOAMapping__c);
+                    productIds.add(junction.d4c_InsuranceProduct__c);
 
                     // Build map of mapping to products
-                    if (!mappingToProductIds.containsKey(junction.ht_LOAMapping__c)) {
-                        mappingToProductIds.put(junction.ht_LOAMapping__c, new Set<Id>());
+                    if (!mappingToProductIds.containsKey(junction.d4c_LOAMapping__c)) {
+                        mappingToProductIds.put(junction.d4c_LOAMapping__c, new Set<Id>());
                     }
-                    mappingToProductIds.get(junction.ht_LOAMapping__c).add(junction.ht_InsuranceProduct__c);
+                    mappingToProductIds.get(junction.d4c_LOAMapping__c).add(junction.d4c_InsuranceProduct__c);
                 }
             }
 
@@ -215,7 +215,7 @@ public with sharing class LOAProductMappingService {
             }
 
             // 2. Get all LOAs affected by these mappings
-            List<ht_LineOfAuthority__c> affectedLoas = loaSelector.getLoasByMappingIds(loaMappingIds);
+            List<d4c_LineOfAuthority__c> affectedLoas = loaSelector.getLoasByMappingIds(loaMappingIds);
 
             if (affectedLoas.isEmpty()) {
                 return deletedCount;
@@ -224,16 +224,16 @@ public with sharing class LOAProductMappingService {
             // 3. Build unique identifiers for junctions to delete
             Set<String> junctionKeysToDelete = new Set<String>();
 
-            for (ht_LineOfAuthority__c loa : affectedLoas) {
-                if (loa.ht_License__c == null || loa.ht_LOAMapping__c == null) {
+            for (d4c_LineOfAuthority__c loa : affectedLoas) {
+                if (loa.d4c_License__c == null || loa.d4c_LOAMapping__c == null) {
                     continue;
                 }
 
-                Set<Id> productsForThisMapping = mappingToProductIds.get(loa.ht_LOAMapping__c);
+                Set<Id> productsForThisMapping = mappingToProductIds.get(loa.d4c_LOAMapping__c);
                 if (productsForThisMapping != null) {
                     for (Id productId : productsForThisMapping) {
                         // Build unique identifier for License-Product junction
-                        String junctionKey = categorizationService.buildLicenseProductUniqueId(loa.ht_License__c, productId);
+                        String junctionKey = categorizationService.buildLicenseProductUniqueId(loa.d4c_License__c, productId);
                         if (junctionKey != null) {
                             junctionKeysToDelete.add(junctionKey);
                         }
@@ -243,7 +243,7 @@ public with sharing class LOAProductMappingService {
 
             // 4. Query and delete the specific License-Product junctions
             if (!junctionKeysToDelete.isEmpty()) {
-                List<ht_License_Insurance_Product__c> junctionsToDelete =
+                List<d4c_License_Insurance_Product__c> junctionsToDelete =
                     licenseProductSelector.getJunctionsByUniqueIdentifiers(junctionKeysToDelete);
 
                 if (!junctionsToDelete.isEmpty()) {
@@ -264,15 +264,15 @@ public with sharing class LOAProductMappingService {
     /**
      *********************************************************
      * @Method Name    : filterLoasWithMappings
-     * @description    : Filters LOA records to only include those with ht_LOAMapping__c populated.
+     * @description    : Filters LOA records to only include those with d4c_LOAMapping__c populated.
      * @param          : loas - List of LOA records to filter
-     * @return         : List of LOA records where ht_LOAMapping__c is not null
+     * @return         : List of LOA records where d4c_LOAMapping__c is not null
      *********************************************************
      */
-    public List<ht_LineOfAuthority__c> filterLoasWithMappings(List<ht_LineOfAuthority__c> loas) {
-        List<ht_LineOfAuthority__c> result = new List<ht_LineOfAuthority__c>();
-        for (ht_LineOfAuthority__c loa : loas) {
-            if (loa.ht_LOAMapping__c != null) {
+    public List<d4c_LineOfAuthority__c> filterLoasWithMappings(List<d4c_LineOfAuthority__c> loas) {
+        List<d4c_LineOfAuthority__c> result = new List<d4c_LineOfAuthority__c>();
+        for (d4c_LineOfAuthority__c loa : loas) {
+            if (loa.d4c_LOAMapping__c != null) {
                 result.add(loa);
             }
         }
@@ -282,25 +282,25 @@ public with sharing class LOAProductMappingService {
     /**
      *********************************************************
      * @Method Name    : filterLoasWithChangedMappings
-     * @description    : Filters LOA records to only include those where ht_LOAMapping__c changed.
+     * @description    : Filters LOA records to only include those where d4c_LOAMapping__c changed.
      * @param          : newLoaMap - Map of new LOA values
      * @param          : oldLoaMap - Map of old LOA values
      * @return         : Map with 'changed' key containing filtered new LOAs and 'old' containing their old values
      *********************************************************
      */
     public Map<String, Object> filterLoasWithChangedMappings(
-        Map<Id, ht_LineOfAuthority__c> newLoaMap,
-        Map<Id, ht_LineOfAuthority__c> oldLoaMap
+        Map<Id, d4c_LineOfAuthority__c> newLoaMap,
+        Map<Id, d4c_LineOfAuthority__c> oldLoaMap
     ) {
-        List<ht_LineOfAuthority__c> changedLoas = new List<ht_LineOfAuthority__c>();
-        Map<Id, ht_LineOfAuthority__c> oldLoasForChanged = new Map<Id, ht_LineOfAuthority__c>();
+        List<d4c_LineOfAuthority__c> changedLoas = new List<d4c_LineOfAuthority__c>();
+        Map<Id, d4c_LineOfAuthority__c> oldLoasForChanged = new Map<Id, d4c_LineOfAuthority__c>();
 
         for (Id loaId : newLoaMap.keySet()) {
-            ht_LineOfAuthority__c newLoa = newLoaMap.get(loaId);
-            ht_LineOfAuthority__c oldLoa = oldLoaMap.get(loaId);
+            d4c_LineOfAuthority__c newLoa = newLoaMap.get(loaId);
+            d4c_LineOfAuthority__c oldLoa = oldLoaMap.get(loaId);
 
             // Check if mapping changed (including null to value, value to null, value to different value)
-            if (newLoa.ht_LOAMapping__c != oldLoa.ht_LOAMapping__c) {
+            if (newLoa.d4c_LOAMapping__c != oldLoa.d4c_LOAMapping__c) {
                 changedLoas.add(newLoa);
                 oldLoasForChanged.put(loaId, oldLoa);
             }

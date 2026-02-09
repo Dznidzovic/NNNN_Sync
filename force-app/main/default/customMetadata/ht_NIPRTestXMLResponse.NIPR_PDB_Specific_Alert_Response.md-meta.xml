@@ -3,11 +3,11 @@
     <label>NIPR PDB Specific Alert Response</label>
     <protected>false</protected>
     <values>
-        <field>ht_Active__c</field>
+        <field>d4c_Active__c</field>
         <value xsi:type="xsd:boolean">false</value>
     </values>
     <values>
-        <field>ht_XMLData__c</field>
+        <field>d4c_XMLData__c</field>
         <value xsi:type="xsd:string">----- DO NOT ACTIVATE ----
 
 Used only for debugging purposes without invoking the integration during Daily PDB Alert sync</value>

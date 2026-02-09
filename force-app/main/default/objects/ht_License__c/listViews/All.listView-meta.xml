@@ -2,12 +2,12 @@
 <ListView xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>All</fullName>
     <columns>NAME</columns>
-    <columns>ht_LicenseNumber__c</columns>
-    <columns>ht_StatusCode__c</columns>
-    <columns>ht_StartDate__c</columns>
-    <columns>ht_EndDate__c</columns>
-    <columns>ht_StateOrProvinceCode__c</columns>
-    <columns>ht_Producer__c</columns>
+    <columns>d4c_LicenseNumber__c</columns>
+    <columns>d4c_StatusCode__c</columns>
+    <columns>d4c_StartDate__c</columns>
+    <columns>d4c_EndDate__c</columns>
+    <columns>d4c_StateOrProvinceCode__c</columns>
+    <columns>d4c_Producer__c</columns>
     <filterScope>Everything</filterScope>
     <label>All</label>
 </ListView>

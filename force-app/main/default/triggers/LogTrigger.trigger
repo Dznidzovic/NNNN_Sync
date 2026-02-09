@@ -1,8 +1,8 @@
 /*
 *********************************************************
-Trigger Name       : ht_LogTrigger  
+Trigger Name       : d4c_LogTrigger  
 Created Date       : 06-08-2025
-@description       : Handles logic for ht_Log__e platform event trigger
+@description       : Handles logic for d4c_Log__e platform event trigger
 @author            : HipTen Admin
 Modification Log:
 Ver   Date         Author         Modification
@@ -10,6 +10,6 @@ Ver   Date         Author         Modification
 *********************************************************
 */
 
-trigger LogTrigger on ht_Log__e (after insert) {
+trigger LogTrigger on d4c_Log__e (after insert) {
     TriggerDispatcher.run(new LogTriggerHandler(), Trigger.operationType);
 }

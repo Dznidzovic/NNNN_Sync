@@ -60,7 +60,7 @@ public with sharing class LicenseInsuranceProductTriggerHandler extends BaseTrig
     @param          : newItems - List of new junction records being inserted
     *********************************************************/
     public override void beforeInsert(List<SObject> newItems) {
-        List<ht_License_Insurance_Product__c> junctions = (List<ht_License_Insurance_Product__c>) newItems;
+        List<d4c_License_Insurance_Product__c> junctions = (List<d4c_License_Insurance_Product__c>) newItems;
         uniqueIdService.populateLicenseInsProdUniqueId(junctions);
     }
 
@@ -70,7 +70,7 @@ public with sharing class LicenseInsuranceProductTriggerHandler extends BaseTrig
     @param          : newItems - Map of newly inserted junction records
     *********************************************************/
     public override void afterInsert(Map<Id, SObject> newItems) {
-        List<ht_License_Insurance_Product__c> junctions = (List<ht_License_Insurance_Product__c>) newItems.values();
+        List<d4c_License_Insurance_Product__c> junctions = (List<d4c_License_Insurance_Product__c>) newItems.values();
         addProductNamesToLicenses(junctions);
     }
 
@@ -80,7 +80,7 @@ public with sharing class LicenseInsuranceProductTriggerHandler extends BaseTrig
     @param          : oldItems - Map of deleted junction records
     *********************************************************/
     public override void afterDelete(Map<Id, SObject> oldItems) {
-        List<ht_License_Insurance_Product__c> deletedJunctions = (List<ht_License_Insurance_Product__c>) oldItems.values();
+        List<d4c_License_Insurance_Product__c> deletedJunctions = (List<d4c_License_Insurance_Product__c>) oldItems.values();
         removeProductNamesFromLicenses(deletedJunctions);
     }
 
@@ -89,11 +89,11 @@ public with sharing class LicenseInsuranceProductTriggerHandler extends BaseTrig
     @description    : Uses service to add product names to License picklist and performs update.
     @param          : junctions - List of newly inserted junction records
     *********************************************************/
-    private void addProductNamesToLicenses(List<ht_License_Insurance_Product__c> junctions) {
+    private void addProductNamesToLicenses(List<d4c_License_Insurance_Product__c> junctions) {
         String methodName = 'addProductNamesToLicenses';
 
         try {
-            List<ht_License__c> licensesToUpdate = picklistService.addProductNamesToLicenses(junctions);
+            List<d4c_License__c> licensesToUpdate = picklistService.addProductNamesToLicenses(junctions);
             if (!licensesToUpdate.isEmpty()) {
                 update licensesToUpdate;
             }
@@ -108,11 +108,11 @@ public with sharing class LicenseInsuranceProductTriggerHandler extends BaseTrig
     @description    : Uses service to remove product names from License picklist and performs update.
     @param          : deletedJunctions - List of deleted junction records
     *********************************************************/
-    private void removeProductNamesFromLicenses(List<ht_License_Insurance_Product__c> deletedJunctions) {
+    private void removeProductNamesFromLicenses(List<d4c_License_Insurance_Product__c> deletedJunctions) {
         String methodName = 'removeProductNamesFromLicenses';
 
         try {
-            List<ht_License__c> licensesToUpdate = picklistService.removeProductNamesFromLicenses(deletedJunctions);
+            List<d4c_License__c> licensesToUpdate = picklistService.removeProductNamesFromLicenses(deletedJunctions);
             if (!licensesToUpdate.isEmpty()) {
                 update licensesToUpdate;
             }

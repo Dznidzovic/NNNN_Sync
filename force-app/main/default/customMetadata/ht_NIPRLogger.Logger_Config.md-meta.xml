@@ -3,7 +3,7 @@
     <label>Logger Config</label>
     <protected>false</protected>
     <values>
-        <field>ht_EnableDebugging__c</field>
+        <field>d4c_EnableDebugging__c</field>
         <value xsi:type="xsd:boolean">false</value>
     </values>
 </CustomMetadata>

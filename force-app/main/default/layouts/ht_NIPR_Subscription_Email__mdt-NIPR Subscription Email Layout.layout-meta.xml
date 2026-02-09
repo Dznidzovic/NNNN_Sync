@@ -16,7 +16,7 @@
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>ht_Email__c</field>
+                <field>d4c_Email__c</field>
             </layoutItems>
         </layoutColumns>
         <layoutColumns>

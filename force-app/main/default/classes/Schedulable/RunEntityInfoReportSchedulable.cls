@@ -41,15 +41,15 @@ public class RunEntityInfoReportSchedulable implements Schedulable {
     public void execute(SchedulableContext ctx) {
         // Query all producers awaiting processing created/modified since scheduling
         Set<String> npns = new Set<String>();
-        for (ht_Producer__c p : [
-            SELECT ht_NPN__c
-            FROM ht_Producer__c
-            WHERE ht_NPNStatus__c = 'Processing'
-            AND ht_SyncRecordToNIPR__c = 'On'
-            AND ht_NPN__c != null
+        for (d4c_Producer__c p : [
+            SELECT d4c_NPN__c
+            FROM d4c_Producer__c
+            WHERE d4c_NPNStatus__c = 'Processing'
+            AND d4c_SyncRecordToNIPR__c = 'On'
+            AND d4c_NPN__c != null
             AND LastModifiedDate >= :scheduledSince
         ]) {
-            npns.add(p.ht_NPN__c);
+            npns.add(p.d4c_NPN__c);
         }
 
         if (!npns.isEmpty()) {

@@ -62,8 +62,8 @@
                     <name>uiBehavior</name>
                     <value>none</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_LineOfAuthorityCode__c</fieldItem>
-                <identifier>Recordht_LineOfAuthorityCode_cField</identifier>
+                <fieldItem>Record.d4c_LineOfAuthorityCode__c</fieldItem>
+                <identifier>Recordd4c_LineOfAuthorityCode_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -72,8 +72,8 @@
                     <name>uiBehavior</name>
                     <value>none</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_StateOrProvinceCode__c</fieldItem>
-                <identifier>Recordht_StateOrProvinceCode_cField</identifier>
+                <fieldItem>Record.d4c_StateOrProvinceCode__c</fieldItem>
+                <identifier>Recordd4c_StateOrProvinceCode_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>
@@ -82,8 +82,8 @@
                     <name>uiBehavior</name>
                     <value>none</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_LineOfAuthorityDescription__c</fieldItem>
-                <identifier>Recordht_LineOfAuthorityDescription_cField</identifier>
+                <fieldItem>Record.d4c_LineOfAuthorityDescription__c</fieldItem>
+                <identifier>Recordd4c_LineOfAuthorityDescription_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-Column1</name>
@@ -144,8 +144,8 @@
                     <name>uiBehavior</name>
                     <value>none</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.ht_UniqueIdentifier__c</fieldItem>
-                <identifier>Recordht_UniqueIdentifier_cField</identifier>
+                <fieldItem>Record.d4c_UniqueIdentifier__c</fieldItem>
+                <identifier>Recordd4c_UniqueIdentifier_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <name>Facet-a1977015-e237-499c-a103-10515e89790a</name>
@@ -287,7 +287,7 @@
                 </componentInstanceProperties>
                 <componentInstanceProperties>
                     <name>parentFieldApiName</name>
-                    <value>ht_LOA_Insurance_Product_Mapping__c.Id</value>
+                    <value>d4c_LOA_Insurance_Product_Mapping__c.Id</value>
                 </componentInstanceProperties>
                 <componentInstanceProperties>
                     <name>relatedListApiName</name>
@@ -304,13 +304,13 @@
                             <value>NAME</value>
                         </valueListItems>
                         <valueListItems>
-                            <value>ht_LineOfAuthorityCode__c</value>
+                            <value>d4c_LineOfAuthorityCode__c</value>
                         </valueListItems>
                         <valueListItems>
-                            <value>ht_LineOfAuthorityDescription__c</value>
+                            <value>d4c_LineOfAuthorityDescription__c</value>
                         </valueListItems>
                         <valueListItems>
-                            <value>ht_License__c</value>
+                            <value>d4c_License__c</value>
                         </valueListItems>
                     </valueList>
                 </componentInstanceProperties>
@@ -350,7 +350,7 @@
                 </componentInstanceProperties>
                 <componentInstanceProperties>
                     <name>parentFieldApiName</name>
-                    <value>ht_LOA_Insurance_Product_Mapping__c.Id</value>
+                    <value>d4c_LOA_Insurance_Product_Mapping__c.Id</value>
                 </componentInstanceProperties>
                 <componentInstanceProperties>
                     <name>relatedListApiName</name>
@@ -364,13 +364,13 @@
                     <name>relatedListFieldAliases</name>
                     <valueList>
                         <valueListItems>
-                            <value>ht_Insurance_Product__c.NAME</value>
+                            <value>d4c_Insurance_Product__c.NAME</value>
                         </valueListItems>
                         <valueListItems>
-                            <value>ht_Insurance_Product__c.ht_ProductName__c</value>
+                            <value>d4c_Insurance_Product__c.d4c_ProductName__c</value>
                         </valueListItems>
                         <valueListItems>
-                            <value>ht_Insurance_Product__c.ht_StateOrProvince__c</value>
+                            <value>d4c_Insurance_Product__c.d4c_StateOrProvince__c</value>
                         </valueListItems>
                     </valueList>
                 </componentInstanceProperties>
@@ -400,7 +400,7 @@
     </flexiPageRegions>
     <masterLabel>NIPR LOA Insurance Product Mapping Record Page - Read Only</masterLabel>
     <parentFlexiPage>flexipage__default_rec_L</parentFlexiPage>
-    <sobjectType>ht_LOA_Insurance_Product_Mapping__c</sobjectType>
+    <sobjectType>d4c_LOA_Insurance_Product_Mapping__c</sobjectType>
     <template>
         <name>flexipage:recordHomeTemplateDesktop</name>
     </template>

@@ -2,7 +2,7 @@
 *********************************************************
 Apex Class Name    : AccountProducerAssignmentService_Test
 Created Date       : 2025-04-01
-@description       : Test class for AccountProducerAssignmentService that validates assignment of Producer__c based on ht_NPN__c using mocks (no DML)
+@description       : Test class for AccountProducerAssignmentService that validates assignment of Producer__c based on d4c_NPN__c using mocks (no DML)
 @author            : Uros Markovic
 Modification Log:
 Ver   Date         Author          Modification
@@ -18,10 +18,10 @@ private class AccountProducerAssignmentService_Test {
     static void testBeforeInsert_ExistingProducers() {
         // Setup mocks
         MockHelper.resetCounter();
-        ht_Producer__c producer1 = MockHelper.createMockProducer('11111111');
-        ht_Producer__c producer2 = MockHelper.createMockProducer('22222222');
+        d4c_Producer__c producer1 = MockHelper.createMockProducer('11111111');
+        d4c_Producer__c producer2 = MockHelper.createMockProducer('22222222');
 
-        Map<String, ht_Producer__c> mockProducers = new Map<String, ht_Producer__c>{
+        Map<String, d4c_Producer__c> mockProducers = new Map<String, d4c_Producer__c>{
             '11111111' => producer1,
             '22222222' => producer2
         };
@@ -47,8 +47,8 @@ private class AccountProducerAssignmentService_Test {
 
         // Verify producers were assigned (in memory)
         for (Account acc : mockAccounts) {
-            System.assertNotEquals(null, acc.ht_Producer__c,
-                'Producer should be assigned for NPN: ' + acc.ht_NPN__c);
+            System.assertNotEquals(null, acc.d4c_Producer__c,
+                'Producer should be assigned for NPN: ' + acc.d4c_NPN__c);
         }
 
         // Cleanup
@@ -69,7 +69,7 @@ private class AccountProducerAssignmentService_Test {
 
         // Enable mocks with empty producer map (simulates no existing producers)
         ProducerAssignmentService.useMocks = true;
-        ProducerAssignmentService.mockProducersByNPN = new Map<String, ht_Producer__c>();
+        ProducerAssignmentService.mockProducersByNPN = new Map<String, d4c_Producer__c>();
 
         // Create handler
         AccountTriggerHandler handler = new AccountTriggerHandler();
@@ -81,8 +81,8 @@ private class AccountProducerAssignmentService_Test {
 
         // Verify producers were created and assigned
         for (Account acc : mockAccounts) {
-            System.assertNotEquals(null, acc.ht_Producer__c,
-                'Producer should be newly created and assigned for NPN: ' + acc.ht_NPN__c);
+            System.assertNotEquals(null, acc.d4c_Producer__c,
+                'Producer should be newly created and assigned for NPN: ' + acc.d4c_NPN__c);
         }
 
         // Verify new producers were added to the mock map
@@ -105,7 +105,7 @@ private class AccountProducerAssignmentService_Test {
 
         // Enable mocks
         ProducerAssignmentService.useMocks = true;
-        ProducerAssignmentService.mockProducersByNPN = new Map<String, ht_Producer__c>();
+        ProducerAssignmentService.mockProducersByNPN = new Map<String, d4c_Producer__c>();
 
         // Create handler
         AccountTriggerHandler handler = new AccountTriggerHandler();
@@ -118,7 +118,7 @@ private class AccountProducerAssignmentService_Test {
         // Verify validation errors were added
         Boolean hasError = false;
         for (Account acc : mockAccounts) {
-            if (acc.ht_NPN__c.containsAny('abc#$%')) {
+            if (acc.d4c_NPN__c.containsAny('abc#$%')) {
                 hasError = true;
             }
         }
@@ -137,7 +137,7 @@ private class AccountProducerAssignmentService_Test {
 
         // Enable mocks
         ProducerAssignmentService.useMocks = true;
-        ProducerAssignmentService.mockProducersByNPN = new Map<String, ht_Producer__c>();
+        ProducerAssignmentService.mockProducersByNPN = new Map<String, d4c_Producer__c>();
 
         // Create handler
         AccountTriggerHandler handler = new AccountTriggerHandler();
@@ -148,7 +148,7 @@ private class AccountProducerAssignmentService_Test {
         Test.stopTest();
 
         // Verify producer was not assigned
-        System.assertEquals(null, mockAccount.ht_Producer__c,
+        System.assertEquals(null, mockAccount.d4c_Producer__c,
             'Producer should not be assigned for blank NPN');
 
         // Cleanup
@@ -160,10 +160,10 @@ private class AccountProducerAssignmentService_Test {
     static void testAssignProducers_UpdateNPN_ReassignsProducer() {
         // Setup
         MockHelper.resetCounter();
-        ht_Producer__c oldProducer = MockHelper.createMockProducer('55555555');
-        ht_Producer__c newProducer = MockHelper.createMockProducer('66666666');
+        d4c_Producer__c oldProducer = MockHelper.createMockProducer('55555555');
+        d4c_Producer__c newProducer = MockHelper.createMockProducer('66666666');
 
-        Map<String, ht_Producer__c> mockProducers = new Map<String, ht_Producer__c>{
+        Map<String, d4c_Producer__c> mockProducers = new Map<String, d4c_Producer__c>{
             '55555555' => oldProducer,
             '66666666' => newProducer
         };
@@ -195,7 +195,7 @@ private class AccountProducerAssignmentService_Test {
         Test.stopTest();
 
         // Verify producer was reassigned
-        System.assertEquals(newProducer.Id, newAccount.ht_Producer__c,
+        System.assertEquals(newProducer.Id, newAccount.d4c_Producer__c,
             'Producer should be reassigned to new NPN');
 
         // Cleanup
@@ -208,11 +208,11 @@ private class AccountProducerAssignmentService_Test {
     static void testHandleOrphanedProducers_DeletesOrphanedProducer() {
         // Setup
         MockHelper.resetCounter();
-        ht_Producer__c oldProducer = MockHelper.createMockProducer('77777777');
-        ht_Producer__c newProducer = MockHelper.createMockProducer('88888888');
+        d4c_Producer__c oldProducer = MockHelper.createMockProducer('77777777');
+        d4c_Producer__c newProducer = MockHelper.createMockProducer('88888888');
 
         // IMPORTANT: mockProducersByNPN needs BOTH producers for getProducersByNPNs call
-        Map<String, ht_Producer__c> mockProducers = new Map<String, ht_Producer__c>{
+        Map<String, d4c_Producer__c> mockProducers = new Map<String, d4c_Producer__c>{
             '77777777' => oldProducer,
             '88888888' => newProducer
         };
@@ -245,7 +245,7 @@ private class AccountProducerAssignmentService_Test {
         Test.stopTest();
 
         // Verify new producer assigned
-        System.assertEquals(newProducer.Id, newAccount.ht_Producer__c,
+        System.assertEquals(newProducer.Id, newAccount.d4c_Producer__c,
             'New producer should be assigned');
 
         // Cleanup
@@ -256,10 +256,10 @@ private class AccountProducerAssignmentService_Test {
     static void testHandleOrphanedProducers_KeepsProducerInUse() {
         // Setup
         MockHelper.resetCounter();
-        ht_Producer__c sharedProducer = MockHelper.createMockProducer('99999999');
-        ht_Producer__c newProducer = MockHelper.createMockProducer('88888888');
+        d4c_Producer__c sharedProducer = MockHelper.createMockProducer('99999999');
+        d4c_Producer__c newProducer = MockHelper.createMockProducer('88888888');
 
-        Map<String, ht_Producer__c> mockProducers = new Map<String, ht_Producer__c>{
+        Map<String, d4c_Producer__c> mockProducers = new Map<String, d4c_Producer__c>{
             '99999999' => sharedProducer,
             '88888888' => newProducer
         };
@@ -292,7 +292,7 @@ private class AccountProducerAssignmentService_Test {
         Test.stopTest();
 
         // Verify new producer assigned to account1
-        System.assertEquals(newProducer.Id, newAccount1.ht_Producer__c,
+        System.assertEquals(newProducer.Id, newAccount1.d4c_Producer__c,
             'New producer should be assigned');
 
         // Old producer should still exist (verified by not throwing error in handleOrphanedProducers)

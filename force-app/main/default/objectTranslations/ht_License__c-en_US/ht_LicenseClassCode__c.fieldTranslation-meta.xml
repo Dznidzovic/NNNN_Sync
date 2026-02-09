@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
     <label><!-- License Class Code --></label>
-    <name>ht_LicenseClassCode__c</name>
+    <name>d4c_LicenseClassCode__c</name>
 </CustomFieldTranslation>

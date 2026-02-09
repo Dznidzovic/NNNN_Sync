@@ -55,7 +55,7 @@ public class ListUtils {
      * @description      : Removes duplicate records in-place from a List<SObject> based on a unique external ID field.
      *                     Only the first occurrence of each unique key is retained.
      * @param records     : The original list of SObjects (will be modified in-place)
-     * @param externalIdField : The API name of the field to use for deduplication (e.g. 'ht_UniqueIdentifier__c')
+     * @param externalIdField : The API name of the field to use for deduplication (e.g. 'd4c_UniqueIdentifier__c')
     */
     public static void deduplicateByField(List<SObject> records, String externalIdField) {
         if (records == null || records.isEmpty()) return;

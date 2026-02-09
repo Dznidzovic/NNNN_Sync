@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>ht_LogLevel__c</fullName>
+    <fullName>d4c_LogLevel__c</fullName>
     <inlineHelpText>Defines the severity of the log: Info, Debug, Warning, Error.</inlineHelpText>
     <label>Log Level</label>
     <required>false</required>

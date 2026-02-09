@@ -14,89 +14,89 @@
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>ht_RenewalDate__c</field>
+                <field>d4c_RenewalDate__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>ht_StatusReasonDescription__c</field>
+                <field>d4c_StatusReasonDescription__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>ht_StatusReasonCode__c</field>
+                <field>d4c_StatusReasonCode__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>ht_CEStatusCode__c</field>
+                <field>d4c_CEStatusCode__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>ht_CEAsOfDate__c</field>
+                <field>d4c_CEAsOfDate__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>ht_UniqueIdentifier__c</field>
+                <field>d4c_UniqueIdentifier__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Required</behavior>
-                <field>ht_License__c</field>
+                <field>d4c_License__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>ht_CEUnitsRemainingMeasure__c</field>
+                <field>d4c_CEUnitsRemainingMeasure__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>ht_StatusCode__c</field>
+                <field>d4c_StatusCode__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>ht_CERenewalDate__c</field>
+                <field>d4c_CERenewalDate__c</field>
             </layoutItems>
         </layoutColumns>
         <layoutColumns>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>ht_CEEndDate__c</field>
+                <field>d4c_CEEndDate__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>ht_CEStateOrProvinceCode__c</field>
+                <field>d4c_CEStateOrProvinceCode__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>ht_CEStatusDescription__c</field>
+                <field>d4c_CEStatusDescription__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>ht_IssueDate__c</field>
+                <field>d4c_IssueDate__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>ht_CEUnitsRequiredMeasure__c</field>
+                <field>d4c_CEUnitsRequiredMeasure__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>ht_LineOfAuthorityCode__c</field>
+                <field>d4c_LineOfAuthorityCode__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>ht_StartDate__c</field>
+                <field>d4c_StartDate__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>ht_LineOfAuthorityDescription__c</field>
+                <field>d4c_LineOfAuthorityDescription__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>ht_StateOrProvinceCode__c</field>
+                <field>d4c_StateOrProvinceCode__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>ht_StateOrProvinceName__c</field>
+                <field>d4c_StateOrProvinceName__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>ht_StatusDescription__c</field>
+                <field>d4c_StatusDescription__c</field>
             </layoutItems>
         </layoutColumns>
         <style>TwoColumnsTopToBottom</style>

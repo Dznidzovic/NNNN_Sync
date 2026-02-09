@@ -13,19 +13,19 @@
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>ht_CoCode__c</field>
+                <field>d4c_CoCode__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>ht_FullName__c</field>
+                <field>d4c_FullName__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>ht_FEIN__c</field>
+                <field>d4c_FEIN__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Edit</behavior>
-                <field>ht_UniqueIdentifier__c</field>
+                <field>d4c_UniqueIdentifier__c</field>
             </layoutItems>
         </layoutColumns>
         <layoutColumns>
@@ -67,10 +67,10 @@
     </layoutSections>
     <relatedLists>
         <fields>NAME</fields>
-        <fields>ht_Producer__c.ht_NPN__c</fields>
-        <fields>ht_Producer__c.ht_FEIN__c</fields>
-        <fields>ht_StateOrProvinceCode__c</fields>
-        <relatedList>ht_CarrierAppointment__c.ht_Carrier__c</relatedList>
+        <fields>d4c_Producer__c.d4c_NPN__c</fields>
+        <fields>d4c_Producer__c.d4c_FEIN__c</fields>
+        <fields>d4c_StateOrProvinceCode__c</fields>
+        <relatedList>d4c_CarrierAppointment__c.d4c_Carrier__c</relatedList>
     </relatedLists>
     <showEmailCheckbox>false</showEmailCheckbox>
     <showHighlightsPanel>false</showHighlightsPanel>
