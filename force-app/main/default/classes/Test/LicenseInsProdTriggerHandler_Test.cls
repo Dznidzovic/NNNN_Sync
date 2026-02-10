@@ -25,16 +25,16 @@ private class LicenseInsProdTriggerHandler_Test {
         InsuranceProductLOAMappingTriggerHandler.triggerDisabled = true;
 
         // Create Entity
-        d4c_Entity__c producer = TestDataFactory.createEntity('1234567890');
-        insert producer;
+        d4c_Entity__c entity = TestDataFactory.createEntity('1234567890');
+        insert entity;
 
         // Create License
-        d4c_License__c license = TestDataFactory.createLicense('LIPTEST123', producer.Id);
+        d4c_License__c license = TestDataFactory.createLicense('LIPTEST123', entity.Id);
         license.d4c_StateOrProvinceCode__c = TEST_STATE;
         insert license;
 
         // Create second License for multi-license tests
-        d4c_License__c license2 = TestDataFactory.createLicense('LIPTEST456', producer.Id);
+        d4c_License__c license2 = TestDataFactory.createLicense('LIPTEST456', entity.Id);
         license2.d4c_StateOrProvinceCode__c = 'TX';
         insert license2;
 

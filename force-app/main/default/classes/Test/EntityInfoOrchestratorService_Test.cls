@@ -14,15 +14,15 @@ private class EntityInfoOrchestratorService_Test {
 
     @TestSetup
     static void setupTestData() {
-        // Disable producer trigger to avoid batch scheduling during setup
+        // Disable entity trigger to avoid batch scheduling during setup
         EntityTriggerHandler.triggerDisabled = true;
 
-        // Create test producers
-        List<d4c_Entity__c> producers = new List<d4c_Entity__c>();
+        // Create test entitys
+        List<d4c_Entity__c> entitys = new List<d4c_Entity__c>();
         for (Integer i = 0; i < 5; i++) {
-            producers.add(TestDataFactory.createEntity('12345678' + i));
+            entitys.add(TestDataFactory.createEntity('12345678' + i));
         }
-        insert producers;
+        insert entitys;
 
         EntityTriggerHandler.triggerDisabled = false;
     }

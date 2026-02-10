@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ApexTestSuite xmlns="http://soap.sforce.com/2006/04/metadata">
-    <testClassName>niprsync.AccountProducerAssignmentService_Test</testClassName>
+    <testClassName>niprsync.AccountEntityAssignmentService_Test</testClassName>
     <testClassName>niprsync.AccountSelector_Test</testClassName>
     <testClassName>niprsync.BaseApiInvoker_Test</testClassName>
-    <testClassName>niprsync.ContactProducerAssignmentService_Test</testClassName>
+    <testClassName>niprsync.ContactEntityAssignmentService_Test</testClassName>
     <testClassName>niprsync.ContactSelector_Test</testClassName>
     <testClassName>niprsync.CorrelationIdUtils_Test</testClassName>
     <testClassName>niprsync.DeleteLogsBatchableTest</testClassName>
@@ -14,7 +14,7 @@
     <testClassName>niprsync.HttpSoapMultiMockFactory</testClassName>
     <testClassName>niprsync.InsProdLOAMappingHandler_Test</testClassName>
     <testClassName>niprsync.InsuranceProductTriggerHandler_Test</testClassName>
-    <testClassName>niprsync.LeadProducerAssignmentService_Test</testClassName>
+    <testClassName>niprsync.LeadEntityAssignmentService_Test</testClassName>
     <testClassName>niprsync.LeadSelector_Test</testClassName>
     <testClassName>niprsync.LicenseInsProdTriggerHandler_Test</testClassName>
     <testClassName>niprsync.LicenseProductCategorizationService_Test</testClassName>
@@ -29,7 +29,7 @@
     <testClassName>niprsync.PDBAlertReportSchedulable_Test</testClassName>
     <testClassName>niprsync.ProcessEntityInfoApiService_Test</testClassName>
     <testClassName>niprsync.ProcessPDBAlertReportService_Test</testClassName>
-    <testClassName>niprsync.ProducerTriggerHandler_Test</testClassName>
+    <testClassName>niprsync.EntityTriggerHandler_Test</testClassName>
     <testClassName>niprsync.RunEntityInfoReportBatchable_Test</testClassName>
     <testClassName>niprsync.RunEntityInfoReportSchedulable_Test</testClassName>
     <testClassName>niprsync.RunPDBAlert_Test</testClassName>

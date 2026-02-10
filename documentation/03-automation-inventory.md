@@ -17,7 +17,7 @@
 | AccountTrigger                | AccountTriggerHandler            | AI,AU    |
 | ContactTrigger                | ContactTriggerHandler            | AI,AU    |
 | LeadTrigger                   | LeadTriggerHandler               | AI,AU    |
-| ProducerTrigger               | ProducerTriggerHandler           | AI,AU    |
+| EntityTrigger               | EntityTriggerHandler           | AI,AU    |
 | SubscriptionTrigger           | SubscriptionTriggerHandler       | AI,AU    |
 | CarrierAppointmentTrigger     | CarrierAppointmentTriggerHandler | BI,BU    |
 | LineOfAuthorityTrigger        | LineOfAuthorityTriggerHandler    | BI,BU,   |
@@ -41,9 +41,9 @@ Legend: BI=beforeInsert, AI=afterInsert, BU=beforeUpdate, AU=afterUpdate,
 ==============================================================================
 
 +-----------------------------------------------------------------------------+
-| ProducerTriggerHandler                                                      |
+| EntityTriggerHandler                                                      |
 |-----------------------------------------------------------------------------|
-| Location: classes/TriggerHandler/ProducerTriggerHandler.cls                 |
+| Location: classes/TriggerHandler/EntityTriggerHandler.cls                 |
 |                                                                             |
 | afterInsert:                                                                |
 |   - Check d4c_SyncRecordToNIPR__c = 'On' AND d4c_NPNStatus__c != 'Active'     |
@@ -52,7 +52,7 @@ Legend: BI=beforeInsert, AI=afterInsert, BU=beforeUpdate, AU=afterUpdate,
 |                                                                             |
 | afterUpdate:                                                                |
 |   - Check if d4c_SyncRecordToNIPR__c changed to 'On'                         |
-|   - Trigger Entity Info API sync for newly enabled producers                |
+|   - Trigger Entity Info API sync for newly enabled entitys                |
 +-----------------------------------------------------------------------------+
 
 +-----------------------------------------------------------------------------+
@@ -117,7 +117,7 @@ Legend: BI=beforeInsert, AI=afterInsert, BU=beforeUpdate, AU=afterUpdate,
 | SERVICE CLASS                        | PURPOSE                              |
 +--------------------------------------+--------------------------------------+
 | ProcessEntityInfoApiService          | Process Entity Info API response,    |
-|   classes/Service/                   | create/update Producer, Licenses,    |
+|   classes/Service/                   | create/update Entity, Licenses,    |
 |                                      | LOAs, Appointments, Addresses        |
 +--------------------------------------+--------------------------------------+
 | ProcessPDBAlertReportService         | Process PDB Alert response,          |
@@ -127,8 +127,8 @@ Legend: BI=beforeInsert, AI=afterInsert, BU=beforeUpdate, AU=afterUpdate,
 | SubscriptionService                  | Manage NIPR subscriptions,           |
 |   classes/Service/                   | add/remove NPNs, capacity mgmt       |
 +--------------------------------------+--------------------------------------+
-| ProducerAssignmentService            | Auto-link Account/Contact/Lead       |
-|   classes/Service/                   | to Producer by NPN match             |
+| EntityAssignmentService            | Auto-link Account/Contact/Lead       |
+|   classes/Service/                   | to Entity by NPN match             |
 +--------------------------------------+--------------------------------------+
 | LOAProductMappingService             | Match LOAs to Insurance Product      |
 |   classes/Service/                   | Mappings by State/Code/Description   |
@@ -154,7 +154,7 @@ Legend: BI=beforeInsert, AI=afterInsert, BU=beforeUpdate, AU=afterUpdate,
 +-----------------------------------------------------------------------------+
 | CALLOUT CLASS                        | NIPR API ENDPOINT                    |
 +--------------------------------------+--------------------------------------+
-| RetrieveEntityInfoApiData            | Get full producer data by NPN        |
+| RetrieveEntityInfoApiData            | Get full entity data by NPN        |
 |   classes/Callout/                   | (licenses, LOAs, appointments)       |
 +--------------------------------------+--------------------------------------+
 | RetrievePDBSpecificReportData        | Get PDB Alert updates for a          |
@@ -181,7 +181,7 @@ Legend: BI=beforeInsert, AI=afterInsert, BU=beforeUpdate, AU=afterUpdate,
 +-----------------------------------------------------------------------------+
 | CLASS                                | PURPOSE                              |
 +--------------------------------------+--------------------------------------+
-| RunEntityInfoReportBatchable         | Batch process producers for Entity   |
+| RunEntityInfoReportBatchable         | Batch process entitys for Entity   |
 |   classes/Batchable/                 | Info API sync (batch size=1)         |
 |                                      | Enqueues SubscriptionServiceExecutor |
 +--------------------------------------+--------------------------------------+
@@ -232,7 +232,7 @@ Legend: BI=beforeInsert, AI=afterInsert, BU=beforeUpdate, AU=afterUpdate,
 +-----------------------------------------------------------------------------+
 | SELECTOR CLASS                       | OBJECT(S)                            |
 +--------------------------------------+--------------------------------------+
-| ProducerSelector                     | d4c_Entity__c                       |
+| EntitySelector                     | d4c_Entity__c                       |
 | LicenseSelector                      | d4c_License__c                        |
 | LineOfAuthoritySelector              | d4c_LineOfAuthority__c                |
 | CarrierAppointmentSelector           | d4c_CarrierAppointment__c             |
@@ -339,7 +339,7 @@ Legend: BI=beforeInsert, AI=afterInsert, BU=beforeUpdate, AU=afterUpdate,
 | ProcessEntityInfoApiService_Test     | Entity Info processing               |
 | ProcessPDBAlertReportService_Test    | PDB Alert processing                 |
 | SubscriptionService_Test             | Subscription management              |
-| ProducerTriggerHandler_Test          | Producer trigger logic               |
+| EntityTriggerHandler_Test          | Entity trigger logic               |
 | LineOfAuthorityTriggerHandler_Test   | LOA trigger logic                    |
 | LOAInsProdMappingTriggerHandler_Test | LOA Mapping trigger logic            |
 | InsuranceProductTriggerHandler_Test  | Insurance Product trigger            |

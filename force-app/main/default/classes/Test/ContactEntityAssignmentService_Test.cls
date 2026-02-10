@@ -17,12 +17,12 @@ private class ContactEntityAssignmentService_Test {
     static void testBeforeInsert_ExistingEntitys() {
         // Setup mocks
         MockHelper.resetCounter();
-        d4c_Entity__c producer1 = MockHelper.createMockEntity('11111111');
-        d4c_Entity__c producer2 = MockHelper.createMockEntity('22222222');
+        d4c_Entity__c entity1 = MockHelper.createMockEntity('11111111');
+        d4c_Entity__c entity2 = MockHelper.createMockEntity('22222222');
 
         Map<String, d4c_Entity__c> mockEntitys = new Map<String, d4c_Entity__c>{
-            '11111111' => producer1,
-            '22222222' => producer2
+            '11111111' => entity1,
+            '22222222' => entity2
         };
 
         // Create mock contacts (no DML)
@@ -43,7 +43,7 @@ private class ContactEntityAssignmentService_Test {
         handler.beforeInsert(mockContacts);
         Test.stopTest();
 
-        // Verify producers were assigned
+        // Verify entitys were assigned
         for (Contact con : mockContacts) {
             System.assertNotEquals(null, con.d4c_Entity__c,
                 'Entity should be assigned for NPN: ' + con.d4c_NPN__c);
@@ -64,7 +64,7 @@ private class ContactEntityAssignmentService_Test {
             MockHelper.createMockContact('Test', 'Contact2', '30002', null)
         };
 
-        // Enable mocks with empty producer map
+        // Enable mocks with empty entity map
         EntityAssignmentService.useMocks = true;
         EntityAssignmentService.mockEntitysByNPN = new Map<String, d4c_Entity__c>();
 
@@ -76,14 +76,14 @@ private class ContactEntityAssignmentService_Test {
         handler.beforeInsert(mockContacts);
         Test.stopTest();
 
-        // Verify producers were created and assigned
+        // Verify entitys were created and assigned
         for (Contact con : mockContacts) {
             System.assertNotEquals(null, con.d4c_Entity__c,
                 'Entity should be newly created and assigned');
         }
 
         System.assertEquals(2, EntityAssignmentService.mockEntitysByNPN.size(),
-            'Two new producers should have been created');
+            'Two new entitys should have been created');
 
         // Cleanup
         EntityAssignmentService.useMocks = false;
@@ -126,7 +126,7 @@ private class ContactEntityAssignmentService_Test {
         handler.afterUpdate(newMap, oldMap);
         Test.stopTest();
 
-        // Verify producer was reassigned
+        // Verify entity was reassigned
         System.assertEquals(newEntity.Id, newContact.d4c_Entity__c,
             'Entity should be reassigned to new NPN');
 
@@ -176,11 +176,11 @@ private class ContactEntityAssignmentService_Test {
         handler.afterUpdate(newMap, oldMap);
         Test.stopTest();
 
-        // Verify new producer assigned
+        // Verify new entity assigned
         System.assertEquals(newEntity.Id, newContact.d4c_Entity__c,
-            'New producer should be assigned');
+            'New entity should be assigned');
 
-        // Old producer should not be deleted (still used by Account)
+        // Old entity should not be deleted (still used by Account)
         System.assert(true, 'Entity should not be deleted when used by other SObject types');
 
         // Cleanup

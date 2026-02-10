@@ -6,7 +6,7 @@
  *                      LOA Product Categorization feature. Tests cover:
  *                      - Entity Info API mass data load (80% mapped, 20% unmapped)
  *                      - PDB Alerts incremental updates
- *                      - Multiple producers, licenses, and LOAs
+ *                      - Multiple entitys, licenses, and LOAs
  *                      - Multi-product mappings
  *                      - Edge cases and error handling
  * @author            : Dev4Clouds
@@ -22,13 +22,13 @@ private class LOAProductCategorizationIntegration_Test {
 
     // ============================================================
     // TEST SCENARIO 1: ENTITY INFO API - MASS DATA LOAD
-    // Simulates initial producer import via Entity Info API
+    // Simulates initial entity import via Entity Info API
     // 80% of LOAs have mappings, 20% do not
     // ============================================================
 
     @isTest
     static void scenario1_entityInfoMassLoad_80PercentMapped20PercentUnmapped() {
-        // Arrange: Create multiple producers with licenses (simulating import)
+        // Arrange: Create multiple entitys with licenses (simulating import)
         // Disable triggers during setup to simulate pre-categorization state
         LineOfAuthorityTriggerHandler.triggerDisabled = true;
         LicenseInsuranceProductTriggerHandler.triggerDisabled = true;
@@ -36,28 +36,28 @@ private class LOAProductCategorizationIntegration_Test {
 
         // Create 5 Entitys (simulating NPN import)
         // NPN max length is 10 characters
-        List<d4c_Entity__c> producers = new List<d4c_Entity__c>();
+        List<d4c_Entity__c> entitys = new List<d4c_Entity__c>();
         for (Integer i = 1; i <= 5; i++) {
-            producers.add(new d4c_Entity__c(d4c_NPN__c = 'MAS' + String.valueOf(i).leftPad(7, '0')));
+            entitys.add(new d4c_Entity__c(d4c_NPN__c = 'MAS' + String.valueOf(i).leftPad(7, '0')));
         }
-        insert producers;
+        insert entitys;
 
         // Create 2 Licenses per Entity (10 total)
         List<d4c_License__c> licenses = new List<d4c_License__c>();
-        for (d4c_Entity__c producer : producers) {
+        for (d4c_Entity__c entity : entitys) {
             licenses.add(new d4c_License__c(
-                d4c_LicenseNumber__c = 'LIC' + producer.d4c_NPN__c + 'CA',
-                d4c_Entity__c = producer.Id,
+                d4c_LicenseNumber__c = 'LIC' + entity.d4c_NPN__c + 'CA',
+                d4c_Entity__c = entity.Id,
                 d4c_StateOrProvinceCode__c = 'CA',
                 d4c_LicenseClassCode__c = '3',
-                d4c_UniqueIdentifier__c = 'LIC' + producer.d4c_NPN__c + 'CA3'
+                d4c_UniqueIdentifier__c = 'LIC' + entity.d4c_NPN__c + 'CA3'
             ));
             licenses.add(new d4c_License__c(
-                d4c_LicenseNumber__c = 'LIC' + producer.d4c_NPN__c + 'TX',
-                d4c_Entity__c = producer.Id,
+                d4c_LicenseNumber__c = 'LIC' + entity.d4c_NPN__c + 'TX',
+                d4c_Entity__c = entity.Id,
                 d4c_StateOrProvinceCode__c = 'TX',
                 d4c_LicenseClassCode__c = '3',
-                d4c_UniqueIdentifier__c = 'LIC' + producer.d4c_NPN__c + 'TX3'
+                d4c_UniqueIdentifier__c = 'LIC' + entity.d4c_NPN__c + 'TX3'
             ));
         }
         insert licenses;
@@ -276,19 +276,19 @@ private class LOAProductCategorizationIntegration_Test {
 
     @isTest
     static void scenario2_pdbAlertIncrementalUpdate_loaChangesProcessedCorrectly() {
-        // Arrange: Create existing producer with licenses and LOAs
+        // Arrange: Create existing entity with licenses and LOAs
         LineOfAuthorityTriggerHandler.triggerDisabled = true;
         LicenseInsuranceProductTriggerHandler.triggerDisabled = true;
         InsuranceProductLOAMappingTriggerHandler.triggerDisabled = true;
 
         // Create Entity (NPN max length is 10)
-        d4c_Entity__c producer = new d4c_Entity__c(d4c_NPN__c = 'PDB1234567');
-        insert producer;
+        d4c_Entity__c entity = new d4c_Entity__c(d4c_NPN__c = 'PDB1234567');
+        insert entity;
 
         // Create License
         d4c_License__c license = new d4c_License__c(
             d4c_LicenseNumber__c = 'PDBLIC123',
-            d4c_Entity__c = producer.Id,
+            d4c_Entity__c = entity.Id,
             d4c_StateOrProvinceCode__c = 'CA',
             d4c_LicenseClassCode__c = '3',
             d4c_UniqueIdentifier__c = 'PDBLIC123CA3'
@@ -404,30 +404,30 @@ private class LOAProductCategorizationIntegration_Test {
 
     // ============================================================
     // TEST SCENARIO 3: MULTIPLE PRODUCERS WITH SAME LOA TYPE
-    // Verifies each producer's license gets correct products
+    // Verifies each entity's license gets correct products
     // ============================================================
 
     @isTest
     static void scenario3_multipleEntitysSameLOAType_eachGetsCorrectProducts() {
-        // Arrange: Create 3 producers with same LOA type
+        // Arrange: Create 3 entitys with same LOA type
         LineOfAuthorityTriggerHandler.triggerDisabled = true;
         LicenseInsuranceProductTriggerHandler.triggerDisabled = true;
 
-        List<d4c_Entity__c> producers = new List<d4c_Entity__c>{
+        List<d4c_Entity__c> entitys = new List<d4c_Entity__c>{
             new d4c_Entity__c(d4c_NPN__c = 'MULTI001'),
             new d4c_Entity__c(d4c_NPN__c = 'MULTI002'),
             new d4c_Entity__c(d4c_NPN__c = 'MULTI003')
         };
-        insert producers;
+        insert entitys;
 
         List<d4c_License__c> licenses = new List<d4c_License__c>();
-        for (d4c_Entity__c producer : producers) {
+        for (d4c_Entity__c entity : entitys) {
             licenses.add(new d4c_License__c(
-                d4c_LicenseNumber__c = 'LIC' + producer.d4c_NPN__c,
-                d4c_Entity__c = producer.Id,
+                d4c_LicenseNumber__c = 'LIC' + entity.d4c_NPN__c,
+                d4c_Entity__c = entity.Id,
                 d4c_StateOrProvinceCode__c = 'CA',
                 d4c_LicenseClassCode__c = '3',
-                d4c_UniqueIdentifier__c = 'LIC' + producer.d4c_NPN__c + 'CA3'
+                d4c_UniqueIdentifier__c = 'LIC' + entity.d4c_NPN__c + 'CA3'
             ));
         }
         insert licenses;
@@ -494,7 +494,7 @@ private class LOAProductCategorizationIntegration_Test {
 
         // Assert: 3 total junctions created
         Integer totalJunctions = [SELECT COUNT() FROM d4c_License_Insurance_Product__c];
-        System.assertEquals(3, totalJunctions, 'Should have 3 total junctions (one per producer)');
+        System.assertEquals(3, totalJunctions, 'Should have 3 total junctions (one per entity)');
     }
 
     // ============================================================
@@ -508,12 +508,12 @@ private class LOAProductCategorizationIntegration_Test {
         LineOfAuthorityTriggerHandler.triggerDisabled = true;
         LicenseInsuranceProductTriggerHandler.triggerDisabled = true;
 
-        d4c_Entity__c producer = new d4c_Entity__c(d4c_NPN__c = 'MPROD00001');
-        insert producer;
+        d4c_Entity__c entity = new d4c_Entity__c(d4c_NPN__c = 'MPROD00001');
+        insert entity;
 
         d4c_License__c license = new d4c_License__c(
             d4c_LicenseNumber__c = 'LICMULTIPROD',
-            d4c_Entity__c = producer.Id,
+            d4c_Entity__c = entity.Id,
             d4c_StateOrProvinceCode__c = 'CA',
             d4c_LicenseClassCode__c = '3',
             d4c_UniqueIdentifier__c = 'LICMULTIPRODCA3'
@@ -597,12 +597,12 @@ private class LOAProductCategorizationIntegration_Test {
         LineOfAuthorityTriggerHandler.triggerDisabled = true;
         LicenseInsuranceProductTriggerHandler.triggerDisabled = true;
 
-        d4c_Entity__c producer = new d4c_Entity__c(d4c_NPN__c = 'BULKDEL001');
-        insert producer;
+        d4c_Entity__c entity = new d4c_Entity__c(d4c_NPN__c = 'BULKDEL001');
+        insert entity;
 
         d4c_License__c license = new d4c_License__c(
             d4c_LicenseNumber__c = 'LICBULKDEL',
-            d4c_Entity__c = producer.Id,
+            d4c_Entity__c = entity.Id,
             d4c_StateOrProvinceCode__c = 'CA',
             d4c_LicenseClassCode__c = '3',
             d4c_UniqueIdentifier__c = 'LICBULKDELCA3'
@@ -699,12 +699,12 @@ private class LOAProductCategorizationIntegration_Test {
         // Arrange: Create LOAs without any matching mappings
         LineOfAuthorityTriggerHandler.triggerDisabled = true;
 
-        d4c_Entity__c producer = new d4c_Entity__c(d4c_NPN__c = 'UNMAP00001');
-        insert producer;
+        d4c_Entity__c entity = new d4c_Entity__c(d4c_NPN__c = 'UNMAP00001');
+        insert entity;
 
         d4c_License__c license = new d4c_License__c(
             d4c_LicenseNumber__c = 'LICUNMAPPED',
-            d4c_Entity__c = producer.Id,
+            d4c_Entity__c = entity.Id,
             d4c_StateOrProvinceCode__c = 'XX',
             d4c_LicenseClassCode__c = '3',
             d4c_UniqueIdentifier__c = 'LICUNMAPPEDXX3'
@@ -748,15 +748,15 @@ private class LOAProductCategorizationIntegration_Test {
         LineOfAuthorityTriggerHandler.triggerDisabled = true;
         LicenseInsuranceProductTriggerHandler.triggerDisabled = true;
 
-        d4c_Entity__c producer = new d4c_Entity__c(d4c_NPN__c = 'LARGEB001');
-        insert producer;
+        d4c_Entity__c entity = new d4c_Entity__c(d4c_NPN__c = 'LARGEB001');
+        insert entity;
 
         // Create 200 licenses
         List<d4c_License__c> licenses = new List<d4c_License__c>();
         for (Integer i = 0; i < 200; i++) {
             licenses.add(new d4c_License__c(
                 d4c_LicenseNumber__c = 'LARGELIC' + String.valueOf(i).leftPad(3, '0'),
-                d4c_Entity__c = producer.Id,
+                d4c_Entity__c = entity.Id,
                 d4c_StateOrProvinceCode__c = 'CA',
                 d4c_LicenseClassCode__c = '3',
                 d4c_UniqueIdentifier__c = 'LARGELIC' + String.valueOf(i).leftPad(3, '0') + 'CA3'

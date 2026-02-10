@@ -260,10 +260,10 @@ private class InsuranceProductTriggerHandler_Test {
     @isTest
     static void beforeDelete_deletesProductLOAMappingJunctions() {
         // Arrange: Create test data
-        d4c_Entity__c producer = TestDataFactory.createEntity('1234567890');
-        insert producer;
+        d4c_Entity__c entity = TestDataFactory.createEntity('1234567890');
+        insert entity;
 
-        d4c_License__c license = TestDataFactory.createLicense('LIC123', producer.Id);
+        d4c_License__c license = TestDataFactory.createLicense('LIC123', entity.Id);
         license.d4c_StateOrProvinceCode__c = TEST_STATE;
         insert license;
 
@@ -301,10 +301,10 @@ private class InsuranceProductTriggerHandler_Test {
     @isTest
     static void beforeDelete_deletesLicenseProductJunctions() {
         // Arrange: Create test data
-        d4c_Entity__c producer = TestDataFactory.createEntity('1234567890');
-        insert producer;
+        d4c_Entity__c entity = TestDataFactory.createEntity('1234567890');
+        insert entity;
 
-        d4c_License__c license = TestDataFactory.createLicense('LIC123', producer.Id);
+        d4c_License__c license = TestDataFactory.createLicense('LIC123', entity.Id);
         license.d4c_StateOrProvinceCode__c = TEST_STATE;
         insert license;
 
@@ -338,10 +338,10 @@ private class InsuranceProductTriggerHandler_Test {
     @isTest
     static void beforeDelete_bulkDeleteProducts() {
         // Arrange: Create test data for multiple products
-        d4c_Entity__c producer = TestDataFactory.createEntity('1234567890');
-        insert producer;
+        d4c_Entity__c entity = TestDataFactory.createEntity('1234567890');
+        insert entity;
 
-        d4c_License__c license = TestDataFactory.createLicense('LIC123', producer.Id);
+        d4c_License__c license = TestDataFactory.createLicense('LIC123', entity.Id);
         license.d4c_StateOrProvinceCode__c = TEST_STATE;
         insert license;
 

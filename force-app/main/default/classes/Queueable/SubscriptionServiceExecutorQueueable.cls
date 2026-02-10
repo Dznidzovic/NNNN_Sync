@@ -8,8 +8,8 @@
  *
  *                      Operations:
  *                      - REMOVE_NPN_AFTER_UPDATE: Sync - removes NPNs from NIPR + clears SF lookup
- *                      - REMOVE_NPN_AFTER_DELETE: Sync - removes NPNs from NIPR only (producers already deleted)
- *                      - RESUBSCRIBE_TO_DIFFERENT_POOL: Sync - moves producer between subscription pools
+ *                      - REMOVE_NPN_AFTER_DELETE: Sync - removes NPNs from NIPR only (entitys already deleted)
+ *                      - RESUBSCRIBE_TO_DIFFERENT_POOL: Sync - moves entity between subscription pools
  *                      - ADD_NPNS_BULK: Chained - processes allocations one per transaction
  *
  * @author            : Dev4Clouds
@@ -63,7 +63,7 @@ public class SubscriptionServiceExecutorQueueable extends SubscriptionService im
     }
 
     /**
-     * Constructor for REMOVE_NPN_AFTER_UPDATE (bulk - queries fresh producers)
+     * Constructor for REMOVE_NPN_AFTER_UPDATE (bulk - queries fresh entitys)
      */
     public SubscriptionServiceExecutorQueueable(Set<String> npns, NIPREnums.SubscriptionOperation operationType) {
         this.npns = npns;
@@ -71,7 +71,7 @@ public class SubscriptionServiceExecutorQueueable extends SubscriptionService im
     }
 
     /**
-     * Constructor for REMOVE_NPN_AFTER_DELETE (bulk - uses deleted producer data, no query)
+     * Constructor for REMOVE_NPN_AFTER_DELETE (bulk - uses deleted entity data, no query)
      */
     public SubscriptionServiceExecutorQueueable(Map<String, Id> npnToSubscriptionMap, NIPREnums.SubscriptionOperation operationType) {
         this.npnToSubscriptionMap = npnToSubscriptionMap;
@@ -161,7 +161,7 @@ public class SubscriptionServiceExecutorQueueable extends SubscriptionService im
     }
 
     /**
-     * Removes NPNs from NIPR only (producers already deleted in SF)
+     * Removes NPNs from NIPR only (entitys already deleted in SF)
      * Synchronous - completes in single transaction
      */
     private void executeRemoveNPNAfterDelete() {
@@ -180,7 +180,7 @@ public class SubscriptionServiceExecutorQueueable extends SubscriptionService im
     }
 
     /**
-     * Moves producer from one subscription pool to another (exclude flag changed)
+     * Moves entity from one subscription pool to another (exclude flag changed)
      * Synchronous - completes in single transaction
      */
     private void executeResubscribeToDifferentPool() {
@@ -191,16 +191,16 @@ public class SubscriptionServiceExecutorQueueable extends SubscriptionService im
             return;
         }
 
-        List<d4c_Entity__c> producers = producerSelector.getEntitysByNPNs(new Set<String>{ npn });
-        if (producers.isEmpty()) {
+        List<d4c_Entity__c> entitys = entitySelector.getEntitysByNPNs(new Set<String>{ npn });
+        if (entitys.isEmpty()) {
             Logger.error(CLASS_NAME, methodName, 'Entity not found', 'NPN: ' + npn, null, null);
             return;
         }
 
-        Logger.info(CLASS_NAME, methodName, 'Resubscribing producer to different pool', 'NPN: ' + npn, null);
+        Logger.info(CLASS_NAME, methodName, 'Resubscribing entity to different pool', 'NPN: ' + npn, null);
 
-        // Set producer and call inherited service method
-        setEntity(producers[0]);
+        // Set entity and call inherited service method
+        setEntity(entitys[0]);
         resubscribeToDifferentPool();
     }
 
@@ -238,16 +238,16 @@ public class SubscriptionServiceExecutorQueueable extends SubscriptionService im
             return;
         }
 
-        List<d4c_Entity__c> producers = producerSelector.getEntitysByNPNs(new Set<String>{ npn });
-        if (producers.isEmpty()) {
+        List<d4c_Entity__c> entitys = entitySelector.getEntitysByNPNs(new Set<String>{ npn });
+        if (entitys.isEmpty()) {
             Logger.error(CLASS_NAME, methodName, 'Entity not found', 'NPN: ' + npn, null, null);
             return;
         }
 
         Logger.info(CLASS_NAME, methodName, 'Adding single NPN to subscription', 'NPN: ' + npn, null);
 
-        // Set producer and call inherited service method
-        setEntity(producers[0]);
+        // Set entity and call inherited service method
+        setEntity(entitys[0]);
         addNPNToSubscription();
     }
 

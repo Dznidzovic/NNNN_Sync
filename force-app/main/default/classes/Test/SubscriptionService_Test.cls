@@ -22,7 +22,7 @@ private class SubscriptionService_Test {
     // ==================== ADD_TO_SUBSCRIPTION TESTS ====================
 
     /**
-     * Test adding a producer to an existing subscription with available capacity
+     * Test adding a entity to an existing subscription with available capacity
      */
     @isTest
     static void testAddNPNToExistingSubscription() {
@@ -38,10 +38,10 @@ private class SubscriptionService_Test {
         Test.setMock(HttpCalloutMock.class, mockFactory);
 
         // Create test data
-        d4c_Entity__c producer = createTestEntity(TEST_NPN, SYNC_STATUS_ON, STATUS_ACTIVE);
+        d4c_Entity__c entity = createTestEntity(TEST_NPN, SYNC_STATUS_ON, STATUS_ACTIVE);
         d4c_Subscription__c subscription = TestDataFactory.createSubscription(true);
 
-        // Set the max producers per subscription for the test
+        // Set the max entitys per subscription for the test
         SubscriptionService.MAX_PRODUCERS_PER_SUBSCRIPTION = 500;
 
         // Execute orchestrator synchronously
@@ -54,7 +54,7 @@ private class SubscriptionService_Test {
         Test.stopTest();
 
         // Assert
-        assertEntityHasSubscription(producer.Id, subscription.Id);
+        assertEntityHasSubscription(entity.Id, subscription.Id);
     }
 
     /**
@@ -77,7 +77,7 @@ private class SubscriptionService_Test {
         d4c_Entity__c validEntity = createTestEntity(TEST_NPN, SYNC_STATUS_ON, STATUS_ACTIVE);
         d4c_Subscription__c subscription = TestDataFactory.createSubscription(true);
 
-        // Set the max producers per subscription
+        // Set the max entitys per subscription
         SubscriptionService.MAX_PRODUCERS_PER_SUBSCRIPTION = 500;
 
         // Execute orchestrator synchronously
@@ -89,7 +89,7 @@ private class SubscriptionService_Test {
         orchestrator.execute(null);
         Test.stopTest();
 
-        // Assert - valid producer should be linked to subscription
+        // Assert - valid entity should be linked to subscription
         assertEntityHasSubscription(validEntity.Id, subscription.Id);
     }
 
@@ -116,16 +116,16 @@ private class SubscriptionService_Test {
 
         Test.setMock(HttpCalloutMock.class, mockFactory);
 
-        // Create existing subscription with a producer (at capacity)
+        // Create existing subscription with a entity (at capacity)
         d4c_Subscription__c existingSub = TestDataFactory.createSubscription(true);
         d4c_Entity__c existingEntity = createTestEntity('99999999', SYNC_STATUS_ON, STATUS_ACTIVE);
         existingEntity.d4c_Subscription__c = existingSub.Id;
         update existingEntity;
 
-        // Create new producer to add
-        d4c_Entity__c producer = createTestEntity(TEST_NPN, SYNC_STATUS_ON, STATUS_ACTIVE);
+        // Create new entity to add
+        d4c_Entity__c entity = createTestEntity(TEST_NPN, SYNC_STATUS_ON, STATUS_ACTIVE);
 
-        // Set the max producers per subscription to 1 to force new subscription creation
+        // Set the max entitys per subscription to 1 to force new subscription creation
         SubscriptionService.MAX_PRODUCERS_PER_SUBSCRIPTION = 1;
 
         // Execute orchestrator synchronously
@@ -183,13 +183,13 @@ private class SubscriptionService_Test {
         System.assertEquals(1, settingsAfterFirst.d4c_Latest_Number__c, 'Counter should be 1 after first subscription');
         System.assertEquals('S-0001', sub1.d4c_Subscription_Name__c, 'First subscription name should be S-0001');
 
-        // Create producer to trigger new subscription creation
-        d4c_Entity__c producer1 = createTestEntity('11111111', SYNC_STATUS_ON, STATUS_ACTIVE);
-        producer1.d4c_Subscription__c = sub1.Id;
-        update producer1;
+        // Create entity to trigger new subscription creation
+        d4c_Entity__c entity1 = createTestEntity('11111111', SYNC_STATUS_ON, STATUS_ACTIVE);
+        entity1.d4c_Subscription__c = sub1.Id;
+        update entity1;
 
-        // Create second producer - should trigger new subscription since first is at capacity
-        d4c_Entity__c producer2 = createTestEntity(TEST_NPN, SYNC_STATUS_ON, STATUS_ACTIVE);
+        // Create second entity - should trigger new subscription since first is at capacity
+        d4c_Entity__c entity2 = createTestEntity(TEST_NPN, SYNC_STATUS_ON, STATUS_ACTIVE);
 
         // Set capacity to 1 to force new subscription creation
         SubscriptionService.MAX_PRODUCERS_PER_SUBSCRIPTION = 1;
@@ -249,8 +249,8 @@ private class SubscriptionService_Test {
         existingEntity.d4c_Subscription__c = existingSub.Id;
         update existingEntity;
 
-        // Create new producer to trigger subscription creation
-        d4c_Entity__c producer = createTestEntity(TEST_NPN, SYNC_STATUS_ON, STATUS_ACTIVE);
+        // Create new entity to trigger subscription creation
+        d4c_Entity__c entity = createTestEntity(TEST_NPN, SYNC_STATUS_ON, STATUS_ACTIVE);
 
         // Force new subscription creation
         SubscriptionService.MAX_PRODUCERS_PER_SUBSCRIPTION = 1;
@@ -297,8 +297,8 @@ private class SubscriptionService_Test {
 
         Test.setMock(HttpCalloutMock.class, mockFactory);
 
-        // Create producer and subscription
-        d4c_Entity__c producer = createTestEntity(TEST_NPN, SYNC_STATUS_ON, STATUS_ACTIVE);
+        // Create entity and subscription
+        d4c_Entity__c entity = createTestEntity(TEST_NPN, SYNC_STATUS_ON, STATUS_ACTIVE);
 
         // TestDataFactory.createSubscription() should initialize custom settings if null
         Test.startTest();
@@ -332,7 +332,7 @@ private class SubscriptionService_Test {
         Test.setMock(HttpCalloutMock.class, mockFactory);
 
         // Create test data
-        d4c_Entity__c producer = createTestEntity(TEST_NPN, SYNC_STATUS_ON, STATUS_ACTIVE);
+        d4c_Entity__c entity = createTestEntity(TEST_NPN, SYNC_STATUS_ON, STATUS_ACTIVE);
         TestDataFactory.createSubscription(true);
 
         // Execute orchestrator synchronously
@@ -348,12 +348,12 @@ private class SubscriptionService_Test {
         }
         Test.stopTest();
 
-        // Assert - producer should not be linked to subscription due to error
-        assertEntityNoSubscription(producer.Id);
+        // Assert - entity should not be linked to subscription due to error
+        assertEntityNoSubscription(entity.Id);
     }
 
     /**
-     * Test that large producer subscriptions (ExcludeCarrierAppointments) are separated from regular
+     * Test that large entity subscriptions (ExcludeCarrierAppointments) are separated from regular
      */
     @isTest
     static void testLargeEntitySubscriptionsSeparatedFromRegular() {
@@ -368,7 +368,7 @@ private class SubscriptionService_Test {
 
         Test.setMock(HttpCalloutMock.class, mockFactory);
 
-        // Create a subscription with a large producer (ONLY 1 producer - lowest count)
+        // Create a subscription with a large entity (ONLY 1 entity - lowest count)
         d4c_Subscription__c largeAgencySubscription = TestDataFactory.createSubscription(true);
         largeAgencySubscription.d4c_ExcludeCarrierAppointments__c = true;
         update largeAgencySubscription;
@@ -378,7 +378,7 @@ private class SubscriptionService_Test {
         largeEntity.d4c_Subscription__c = largeAgencySubscription.Id;
         update largeEntity;
 
-        // Create a regular subscription with 2 producers (higher count than large agency sub)
+        // Create a regular subscription with 2 entitys (higher count than large agency sub)
         d4c_Subscription__c regularSubscription = TestDataFactory.createSubscription(true);
         regularSubscription.d4c_ExcludeCarrierAppointments__c = false;
         update regularSubscription;
@@ -391,10 +391,10 @@ private class SubscriptionService_Test {
         regularEntity2.d4c_Subscription__c = regularSubscription.Id;
         update regularEntity2;
 
-        // Set max producers per subscription
+        // Set max entitys per subscription
         SubscriptionService.MAX_PRODUCERS_PER_SUBSCRIPTION = 500;
 
-        // Create a new regular producer to be added
+        // Create a new regular entity to be added
         d4c_Entity__c newRegularEntity = createTestEntity(TEST_NPN, SYNC_STATUS_ON, STATUS_ACTIVE);
 
         // Execute orchestrator synchronously
@@ -406,8 +406,8 @@ private class SubscriptionService_Test {
         orchestrator.execute(null);
         Test.stopTest();
 
-        // Assert - new regular producer should be added to regular subscription (with 2 producers)
-        // NOT to large agency subscription (with only 1 producer - which would normally be chosen as lowest count)
+        // Assert - new regular entity should be added to regular subscription (with 2 entitys)
+        // NOT to large agency subscription (with only 1 entity - which would normally be chosen as lowest count)
         d4c_Entity__c updatedEntity = [
             SELECT Id, d4c_Subscription__c
             FROM d4c_Entity__c
@@ -415,9 +415,9 @@ private class SubscriptionService_Test {
         ];
 
         System.assertNotEquals(largeAgencySubscription.Id, updatedEntity.d4c_Subscription__c,
-                              'Regular producer should NOT be added to large agency subscription (even though it has lowest count)');
+                              'Regular entity should NOT be added to large agency subscription (even though it has lowest count)');
         System.assertEquals(regularSubscription.Id, updatedEntity.d4c_Subscription__c,
-                          'Regular producer should be added to regular subscription (with higher count), proving large agency sub was excluded');
+                          'Regular entity should be added to regular subscription (with higher count), proving large agency sub was excluded');
     }
 
     // ==================== REMOVE_NPN_AFTER_UPDATE TESTS ====================
@@ -438,12 +438,12 @@ private class SubscriptionService_Test {
 
         Test.setMock(HttpCalloutMock.class, mockFactory);
 
-        // Create test data - a producer with a subscription
+        // Create test data - a entity with a subscription
         d4c_Subscription__c subscription = TestDataFactory.createSubscription(true);
 
-        d4c_Entity__c producer = createTestEntity(TEST_NPN, SYNC_STATUS_ON, STATUS_ACTIVE);
-        producer.d4c_Subscription__c = subscription.Id;
-        update producer;
+        d4c_Entity__c entity = createTestEntity(TEST_NPN, SYNC_STATUS_ON, STATUS_ACTIVE);
+        entity.d4c_Subscription__c = subscription.Id;
+        update entity;
 
         // Execute orchestrator synchronously (bulk remove)
         Test.startTest();
@@ -454,8 +454,8 @@ private class SubscriptionService_Test {
         orchestrator.execute(null);
         Test.stopTest();
 
-        // Assert subscription was removed from producer
-        assertEntityNoSubscription(producer.Id);
+        // Assert subscription was removed from entity
+        assertEntityNoSubscription(entity.Id);
     }
 
     /**
@@ -474,16 +474,16 @@ private class SubscriptionService_Test {
 
         Test.setMock(HttpCalloutMock.class, mockFactory);
 
-        // Create test data - two producers with same subscription
+        // Create test data - two entitys with same subscription
         d4c_Subscription__c subscription = TestDataFactory.createSubscription(true);
 
-        d4c_Entity__c producer1 = createTestEntity('11111111', SYNC_STATUS_ON, STATUS_ACTIVE);
-        producer1.d4c_Subscription__c = subscription.Id;
-        update producer1;
+        d4c_Entity__c entity1 = createTestEntity('11111111', SYNC_STATUS_ON, STATUS_ACTIVE);
+        entity1.d4c_Subscription__c = subscription.Id;
+        update entity1;
 
-        d4c_Entity__c producer2 = createTestEntity('22222222', SYNC_STATUS_ON, STATUS_ACTIVE);
-        producer2.d4c_Subscription__c = subscription.Id;
-        update producer2;
+        d4c_Entity__c entity2 = createTestEntity('22222222', SYNC_STATUS_ON, STATUS_ACTIVE);
+        entity2.d4c_Subscription__c = subscription.Id;
+        update entity2;
 
         // Execute orchestrator synchronously (bulk remove)
         Test.startTest();
@@ -494,9 +494,9 @@ private class SubscriptionService_Test {
         orchestrator.execute(null);
         Test.stopTest();
 
-        // Assert both producers had their subscriptions removed
-        assertEntityNoSubscription(producer1.Id);
-        assertEntityNoSubscription(producer2.Id);
+        // Assert both entitys had their subscriptions removed
+        assertEntityNoSubscription(entity1.Id);
+        assertEntityNoSubscription(entity2.Id);
     }
 
     /**
@@ -515,7 +515,7 @@ private class SubscriptionService_Test {
 
         Test.setMock(HttpCalloutMock.class, mockFactory);
 
-        // Create test data - two producers with subscriptions
+        // Create test data - two entitys with subscriptions
         d4c_Subscription__c subscription = TestDataFactory.createSubscription(true);
 
         d4c_Entity__c validEntity = createTestEntity(TEST_NPN, SYNC_STATUS_ON, STATUS_ACTIVE);
@@ -560,9 +560,9 @@ private class SubscriptionService_Test {
         // Create test data
         d4c_Subscription__c subscription = TestDataFactory.createSubscription(true);
 
-        d4c_Entity__c producer = createTestEntity(TEST_NPN, SYNC_STATUS_ON, STATUS_ACTIVE);
-        producer.d4c_Subscription__c = subscription.Id;
-        update producer;
+        d4c_Entity__c entity = createTestEntity(TEST_NPN, SYNC_STATUS_ON, STATUS_ACTIVE);
+        entity.d4c_Subscription__c = subscription.Id;
+        update entity;
 
         // Execute orchestrator synchronously (bulk remove)
         Test.startTest();
@@ -577,8 +577,8 @@ private class SubscriptionService_Test {
         }
         Test.stopTest();
 
-        // Assert subscription was not removed from producer due to error
-        assertEntityHasSubscription(producer.Id, subscription.Id);
+        // Assert subscription was not removed from entity due to error
+        assertEntityHasSubscription(entity.Id, subscription.Id);
     }
 
     /**
@@ -597,16 +597,16 @@ private class SubscriptionService_Test {
 
         Test.setMock(HttpCalloutMock.class, mockFactory);
 
-        // Create test data - two producers with subscriptions
+        // Create test data - two entitys with subscriptions
         d4c_Subscription__c subscription = TestDataFactory.createSubscription(true);
 
-        d4c_Entity__c producer1 = createTestEntity('11111111', SYNC_STATUS_ON, STATUS_ACTIVE);
-        producer1.d4c_Subscription__c = subscription.Id;
-        update producer1;
+        d4c_Entity__c entity1 = createTestEntity('11111111', SYNC_STATUS_ON, STATUS_ACTIVE);
+        entity1.d4c_Subscription__c = subscription.Id;
+        update entity1;
 
-        d4c_Entity__c producer2 = createTestEntity('22222222', SYNC_STATUS_ON, STATUS_ACTIVE);
-        producer2.d4c_Subscription__c = subscription.Id;
-        update producer2;
+        d4c_Entity__c entity2 = createTestEntity('22222222', SYNC_STATUS_ON, STATUS_ACTIVE);
+        entity2.d4c_Subscription__c = subscription.Id;
+        update entity2;
 
         // Execute orchestrator synchronously (bulk remove)
         Test.startTest();
@@ -617,9 +617,9 @@ private class SubscriptionService_Test {
         orchestrator.execute(null);
         Test.stopTest();
 
-        // Assert both producers had their subscriptions removed
-        assertEntityNoSubscription(producer1.Id);
-        assertEntityNoSubscription(producer2.Id);
+        // Assert both entitys had their subscriptions removed
+        assertEntityNoSubscription(entity1.Id);
+        assertEntityNoSubscription(entity2.Id);
     }
 
     /**
@@ -638,20 +638,20 @@ private class SubscriptionService_Test {
 
         Test.setMock(HttpCalloutMock.class, mockFactory);
 
-        // Create test data - multiple producers with subscriptions
+        // Create test data - multiple entitys with subscriptions
         d4c_Subscription__c subscription = TestDataFactory.createSubscription(true);
 
-        d4c_Entity__c producer1 = createTestEntity('11111111', SYNC_STATUS_ON, STATUS_ACTIVE);
-        producer1.d4c_Subscription__c = subscription.Id;
-        update producer1;
+        d4c_Entity__c entity1 = createTestEntity('11111111', SYNC_STATUS_ON, STATUS_ACTIVE);
+        entity1.d4c_Subscription__c = subscription.Id;
+        update entity1;
 
-        d4c_Entity__c producer2 = createTestEntity('22222222', SYNC_STATUS_ON, STATUS_ACTIVE);
-        producer2.d4c_Subscription__c = subscription.Id;
-        update producer2;
+        d4c_Entity__c entity2 = createTestEntity('22222222', SYNC_STATUS_ON, STATUS_ACTIVE);
+        entity2.d4c_Subscription__c = subscription.Id;
+        update entity2;
 
-        d4c_Entity__c producer3 = createTestEntity('33333333', SYNC_STATUS_ON, STATUS_ACTIVE);
-        producer3.d4c_Subscription__c = subscription.Id;
-        update producer3;
+        d4c_Entity__c entity3 = createTestEntity('33333333', SYNC_STATUS_ON, STATUS_ACTIVE);
+        entity3.d4c_Subscription__c = subscription.Id;
+        update entity3;
 
         // Execute orchestrator synchronously (bulk remove)
         Test.startTest();
@@ -662,10 +662,10 @@ private class SubscriptionService_Test {
         orchestrator.execute(null);
         Test.stopTest();
 
-        // Assert - all producers cleared (current implementation clears all)
-        assertEntityNoSubscription(producer1.Id);
-        assertEntityNoSubscription(producer2.Id);
-        assertEntityNoSubscription(producer3.Id);
+        // Assert - all entitys cleared (current implementation clears all)
+        assertEntityNoSubscription(entity1.Id);
+        assertEntityNoSubscription(entity2.Id);
+        assertEntityNoSubscription(entity3.Id);
     }
 
     /**
@@ -684,16 +684,16 @@ private class SubscriptionService_Test {
 
         Test.setMock(HttpCalloutMock.class, mockFactory);
 
-        // Create test data - two producers with subscriptions
+        // Create test data - two entitys with subscriptions
         d4c_Subscription__c subscription = TestDataFactory.createSubscription(true);
 
-        d4c_Entity__c producer1 = createTestEntity(TEST_NPN, SYNC_STATUS_ON, STATUS_ACTIVE);
-        producer1.d4c_Subscription__c = subscription.Id;
-        update producer1;
+        d4c_Entity__c entity1 = createTestEntity(TEST_NPN, SYNC_STATUS_ON, STATUS_ACTIVE);
+        entity1.d4c_Subscription__c = subscription.Id;
+        update entity1;
 
-        d4c_Entity__c producer2 = createTestEntity(TEST_NPN_INVALID, SYNC_STATUS_ON, STATUS_ACTIVE);
-        producer2.d4c_Subscription__c = subscription.Id;
-        update producer2;
+        d4c_Entity__c entity2 = createTestEntity(TEST_NPN_INVALID, SYNC_STATUS_ON, STATUS_ACTIVE);
+        entity2.d4c_Subscription__c = subscription.Id;
+        update entity2;
 
         // Execute orchestrator synchronously (bulk remove)
         Test.startTest();
@@ -704,9 +704,9 @@ private class SubscriptionService_Test {
         orchestrator.execute(null);
         Test.stopTest();
 
-        // Assert both producers had their subscriptions removed
-        assertEntityNoSubscription(producer1.Id);
-        assertEntityNoSubscription(producer2.Id);
+        // Assert both entitys had their subscriptions removed
+        assertEntityNoSubscription(entity1.Id);
+        assertEntityNoSubscription(entity2.Id);
     }
 
     /**
@@ -726,15 +726,15 @@ private class SubscriptionService_Test {
         Test.setMock(HttpCalloutMock.class, mockFactory);
 
         // Create test data
-        d4c_Entity__c producer1 = createTestEntity('12345678', SYNC_STATUS_ON, STATUS_ACTIVE);
-        d4c_Entity__c producer2 = createTestEntity('87654321', SYNC_STATUS_ON, STATUS_ACTIVE);
-        d4c_Entity__c producer3 = createTestEntity('56781234', SYNC_STATUS_ON, STATUS_ACTIVE);
+        d4c_Entity__c entity1 = createTestEntity('12345678', SYNC_STATUS_ON, STATUS_ACTIVE);
+        d4c_Entity__c entity2 = createTestEntity('87654321', SYNC_STATUS_ON, STATUS_ACTIVE);
+        d4c_Entity__c entity3 = createTestEntity('56781234', SYNC_STATUS_ON, STATUS_ACTIVE);
         d4c_Subscription__c subscription = TestDataFactory.createSubscription(true);
 
-        // Set the max producers per subscription for the test
+        // Set the max entitys per subscription for the test
         SubscriptionService.MAX_PRODUCERS_PER_SUBSCRIPTION = 500;
 
-        // Execute - test with one of the producers
+        // Execute - test with one of the entitys
         Test.startTest();
         SubscriptionServiceExecutorQueueable orchestrator = new SubscriptionServiceExecutorQueueable(
             '12345678',
@@ -743,8 +743,8 @@ private class SubscriptionService_Test {
         orchestrator.execute(null);
         Test.stopTest();
 
-        // Assert - producer should be linked to subscription (valid in response)
-        assertEntityHasSubscription(producer1.Id, subscription.Id);
+        // Assert - entity should be linked to subscription (valid in response)
+        assertEntityHasSubscription(entity1.Id, subscription.Id);
     }
 
     /**
@@ -763,16 +763,16 @@ private class SubscriptionService_Test {
 
         Test.setMock(HttpCalloutMock.class, mockFactory);
 
-        // Create existing subscription with a producer (at capacity)
+        // Create existing subscription with a entity (at capacity)
         d4c_Subscription__c existingSub = TestDataFactory.createSubscription(true);
         d4c_Entity__c existingEntity = createTestEntity('99999999', SYNC_STATUS_ON, STATUS_ACTIVE);
         existingEntity.d4c_Subscription__c = existingSub.Id;
         update existingEntity;
 
-        // Create new producer to add
-        d4c_Entity__c producer = createTestEntity(TEST_NPN, SYNC_STATUS_ON, STATUS_ACTIVE);
+        // Create new entity to add
+        d4c_Entity__c entity = createTestEntity(TEST_NPN, SYNC_STATUS_ON, STATUS_ACTIVE);
 
-        // Set the max producers per subscription to 1 to force new subscription creation
+        // Set the max entitys per subscription to 1 to force new subscription creation
         SubscriptionService.MAX_PRODUCERS_PER_SUBSCRIPTION = 1;
 
         // Execute
@@ -791,14 +791,14 @@ private class SubscriptionService_Test {
         }
         Test.stopTest();
 
-        // The producer should not be linked to a subscription since the creation failed
-        assertEntityNoSubscription(producer.Id);
+        // The entity should not be linked to a subscription since the creation failed
+        assertEntityNoSubscription(entity.Id);
     }
 
     // ==================== REMOVE_NPN_AFTER_DELETE TESTS ====================
 
     /**
-     * Test removing NPNs after producer deletion (no DML, only callout)
+     * Test removing NPNs after entity deletion (no DML, only callout)
      */
     @isTest
     static void testRemoveNPNAfterDelete_BulkDelete() {
@@ -813,11 +813,11 @@ private class SubscriptionService_Test {
 
         Test.setMock(HttpCalloutMock.class, mockFactory);
 
-        // Create test data - producers with subscriptions (simulating deleted producers)
+        // Create test data - entitys with subscriptions (simulating deleted entitys)
         d4c_Subscription__c subscription1 = TestDataFactory.createSubscription(true);
         d4c_Subscription__c subscription2 = TestDataFactory.createSubscription(true);
 
-        // Build map simulating deleted producers (NPN -> Subscription ID)
+        // Build map simulating deleted entitys (NPN -> Subscription ID)
         Map<String, Id> npnToSubscriptionMap = new Map<String, Id>{
             '11111111' => subscription1.Id,
             '22222222' => subscription1.Id,
@@ -834,7 +834,7 @@ private class SubscriptionService_Test {
         Test.stopTest();
 
         // Assert - no exceptions thrown, API called successfully
-        // (Cannot assert on producer records since they're "deleted" in this scenario)
+        // (Cannot assert on entity records since they're "deleted" in this scenario)
         System.assert(true, 'Remove after delete should execute without errors');
     }
 
@@ -863,7 +863,7 @@ private class SubscriptionService_Test {
         Test.setMock(HttpCalloutMock.class, mockFactory);
 
         // Create two subscription pools:
-        // 1. Regular subscription (exclude = false) with 1 producer
+        // 1. Regular subscription (exclude = false) with 1 entity
         d4c_Subscription__c regularSub = TestDataFactory.createSubscription(true);
         regularSub.d4c_ExcludeCarrierAppointments__c = false;
         update regularSub;
@@ -872,7 +872,7 @@ private class SubscriptionService_Test {
         regularEntity.d4c_Subscription__c = regularSub.Id;
         update regularEntity;
 
-        // 2. Exclude subscription (exclude = true) with 1 producer
+        // 2. Exclude subscription (exclude = true) with 1 entity
         d4c_Subscription__c excludeSub = TestDataFactory.createSubscription(true);
         excludeSub.d4c_ExcludeCarrierAppointments__c = true;
         update excludeSub;
@@ -882,17 +882,17 @@ private class SubscriptionService_Test {
         excludeEntity.d4c_Subscription__c = excludeSub.Id;
         update excludeEntity;
 
-        // Create the producer to re-subscribe (currently in regular pool)
-        d4c_Entity__c producerToReSubscribe = createTestEntity(TEST_NPN, SYNC_STATUS_ON, STATUS_ACTIVE);
-        producerToReSubscribe.d4c_ExcludeCarrierAppointments__c = false;
-        producerToReSubscribe.d4c_Subscription__c = regularSub.Id;
-        update producerToReSubscribe;
+        // Create the entity to re-subscribe (currently in regular pool)
+        d4c_Entity__c entityToReSubscribe = createTestEntity(TEST_NPN, SYNC_STATUS_ON, STATUS_ACTIVE);
+        entityToReSubscribe.d4c_ExcludeCarrierAppointments__c = false;
+        entityToReSubscribe.d4c_Subscription__c = regularSub.Id;
+        update entityToReSubscribe;
 
-        // Now change the producer's exclude flag from false to true
-        producerToReSubscribe.d4c_ExcludeCarrierAppointments__c = true;
-        update producerToReSubscribe;
+        // Now change the entity's exclude flag from false to true
+        entityToReSubscribe.d4c_ExcludeCarrierAppointments__c = true;
+        update entityToReSubscribe;
 
-        // Set max producers
+        // Set max entitys
         SubscriptionService.MAX_PRODUCERS_PER_SUBSCRIPTION = 500;
 
         // Execute orchestrator synchronously
@@ -904,11 +904,11 @@ private class SubscriptionService_Test {
         orchestrator.execute(null);
         Test.stopTest();
 
-        // Assert - producer should now be in the EXCLUDE subscription pool
+        // Assert - entity should now be in the EXCLUDE subscription pool
         d4c_Entity__c updatedEntity = [
             SELECT Id, d4c_Subscription__c, d4c_ExcludeCarrierAppointments__c
             FROM d4c_Entity__c
-            WHERE Id = :producerToReSubscribe.Id
+            WHERE Id = :entityToReSubscribe.Id
         ];
 
         System.assertNotEquals(regularSub.Id, updatedEntity.d4c_Subscription__c,
@@ -942,7 +942,7 @@ private class SubscriptionService_Test {
         Test.setMock(HttpCalloutMock.class, mockFactory);
 
         // Create two subscription pools:
-        // 1. Regular subscription (exclude = false) with 1 producer
+        // 1. Regular subscription (exclude = false) with 1 entity
         d4c_Subscription__c regularSub = TestDataFactory.createSubscription(true);
         regularSub.d4c_ExcludeCarrierAppointments__c = false;
         update regularSub;
@@ -951,7 +951,7 @@ private class SubscriptionService_Test {
         regularEntity.d4c_Subscription__c = regularSub.Id;
         update regularEntity;
 
-        // 2. Exclude subscription (exclude = true) with 1 producer
+        // 2. Exclude subscription (exclude = true) with 1 entity
         d4c_Subscription__c excludeSub = TestDataFactory.createSubscription(true);
         excludeSub.d4c_ExcludeCarrierAppointments__c = true;
         update excludeSub;
@@ -961,17 +961,17 @@ private class SubscriptionService_Test {
         excludeEntity.d4c_Subscription__c = excludeSub.Id;
         update excludeEntity;
 
-        // Create the producer to re-subscribe (currently in exclude pool)
-        d4c_Entity__c producerToReSubscribe = createTestEntity(TEST_NPN, SYNC_STATUS_ON, STATUS_ACTIVE);
-        producerToReSubscribe.d4c_ExcludeCarrierAppointments__c = true;
-        producerToReSubscribe.d4c_Subscription__c = excludeSub.Id;
-        update producerToReSubscribe;
+        // Create the entity to re-subscribe (currently in exclude pool)
+        d4c_Entity__c entityToReSubscribe = createTestEntity(TEST_NPN, SYNC_STATUS_ON, STATUS_ACTIVE);
+        entityToReSubscribe.d4c_ExcludeCarrierAppointments__c = true;
+        entityToReSubscribe.d4c_Subscription__c = excludeSub.Id;
+        update entityToReSubscribe;
 
-        // Now change the producer's exclude flag from true to false
-        producerToReSubscribe.d4c_ExcludeCarrierAppointments__c = false;
-        update producerToReSubscribe;
+        // Now change the entity's exclude flag from true to false
+        entityToReSubscribe.d4c_ExcludeCarrierAppointments__c = false;
+        update entityToReSubscribe;
 
-        // Set max producers
+        // Set max entitys
         SubscriptionService.MAX_PRODUCERS_PER_SUBSCRIPTION = 500;
 
         // Execute orchestrator synchronously
@@ -983,11 +983,11 @@ private class SubscriptionService_Test {
         orchestrator.execute(null);
         Test.stopTest();
 
-        // Assert - producer should now be in the REGULAR subscription pool
+        // Assert - entity should now be in the REGULAR subscription pool
         d4c_Entity__c updatedEntity = [
             SELECT Id, d4c_Subscription__c, d4c_ExcludeCarrierAppointments__c
             FROM d4c_Entity__c
-            WHERE Id = :producerToReSubscribe.Id
+            WHERE Id = :entityToReSubscribe.Id
         ];
 
         System.assertNotEquals(excludeSub.Id, updatedEntity.d4c_Subscription__c,
@@ -999,7 +999,7 @@ private class SubscriptionService_Test {
     }
 
     /**
-     * Test resubscription chooses subscription with lowest producer count in target pool
+     * Test resubscription chooses subscription with lowest entity count in target pool
      * TODO: Fix data ordering issue causing intermittent failures
      */
     // @isTest
@@ -1021,8 +1021,8 @@ private class SubscriptionService_Test {
 
         Test.setMock(HttpCalloutMock.class, mockFactory);
 
-        // Create two EXCLUDE subscription pools with different producer counts
-        // Pool 1: 3 producers
+        // Create two EXCLUDE subscription pools with different entity counts
+        // Pool 1: 3 entitys
         d4c_Subscription__c excludeSub1 = TestDataFactory.createSubscription(true);
         excludeSub1.d4c_ExcludeCarrierAppointments__c = true;
         update excludeSub1;
@@ -1042,7 +1042,7 @@ private class SubscriptionService_Test {
         excludeEntity3.d4c_Subscription__c = excludeSub1.Id;
         update excludeEntity3;
 
-        // Pool 2: 1 producer (lowest count)
+        // Pool 2: 1 entity (lowest count)
         d4c_Subscription__c excludeSub2 = TestDataFactory.createSubscription(true);
         excludeSub2.d4c_ExcludeCarrierAppointments__c = true;
         update excludeSub2;
@@ -1057,17 +1057,17 @@ private class SubscriptionService_Test {
         regularSub.d4c_ExcludeCarrierAppointments__c = false;
         update regularSub;
 
-        // Create the producer to re-subscribe (currently in regular pool, changing to exclude)
-        d4c_Entity__c producerToReSubscribe = createTestEntity(TEST_NPN, SYNC_STATUS_ON, STATUS_ACTIVE);
-        producerToReSubscribe.d4c_ExcludeCarrierAppointments__c = false;
-        producerToReSubscribe.d4c_Subscription__c = regularSub.Id;
-        update producerToReSubscribe;
+        // Create the entity to re-subscribe (currently in regular pool, changing to exclude)
+        d4c_Entity__c entityToReSubscribe = createTestEntity(TEST_NPN, SYNC_STATUS_ON, STATUS_ACTIVE);
+        entityToReSubscribe.d4c_ExcludeCarrierAppointments__c = false;
+        entityToReSubscribe.d4c_Subscription__c = regularSub.Id;
+        update entityToReSubscribe;
 
         // Change to exclude flag
-        producerToReSubscribe.d4c_ExcludeCarrierAppointments__c = true;
-        update producerToReSubscribe;
+        entityToReSubscribe.d4c_ExcludeCarrierAppointments__c = true;
+        update entityToReSubscribe;
 
-        // Set max producers
+        // Set max entitys
         SubscriptionService.MAX_PRODUCERS_PER_SUBSCRIPTION = 500;
 
         // Execute orchestrator synchronously
@@ -1079,11 +1079,11 @@ private class SubscriptionService_Test {
         orchestrator.execute(null);
         Test.stopTest();
 
-        // Assert - producer should be in excludeSub2 (lowest count exclude subscription)
+        // Assert - entity should be in excludeSub2 (lowest count exclude subscription)
         d4c_Entity__c updatedEntity = [
             SELECT Id, d4c_Subscription__c, d4c_ExcludeCarrierAppointments__c
             FROM d4c_Entity__c
-            WHERE Id = :producerToReSubscribe.Id
+            WHERE Id = :entityToReSubscribe.Id
         ];
 
         System.assertEquals(excludeSub2.Id, updatedEntity.d4c_Subscription__c,
@@ -1095,35 +1095,35 @@ private class SubscriptionService_Test {
     // ==================== HELPER METHODS ====================
 
     private static d4c_Entity__c createTestEntity(String npn, String syncStatus, String npnStatus) {
-        d4c_Entity__c producer = TestDataFactory.createEntity(npn);
-        producer.d4c_SyncRecordToNIPR__c = syncStatus;
-        producer.d4c_NPNStatus__c = npnStatus;
+        d4c_Entity__c entity = TestDataFactory.createEntity(npn);
+        entity.d4c_SyncRecordToNIPR__c = syncStatus;
+        entity.d4c_NPNStatus__c = npnStatus;
 
         EntityTriggerHandler.triggerDisabled = true;
-        insert producer;
+        insert entity;
         EntityTriggerHandler.triggerDisabled = false;
 
-        return producer;
+        return entity;
     }
 
     // ==================== ASSERTION METHODS ====================
 
-    private static void assertEntityHasSubscription(Id producerId, Id expectedSubscriptionId) {
+    private static void assertEntityHasSubscription(Id entityId, Id expectedSubscriptionId) {
         d4c_Entity__c updatedEntity = [
             SELECT Id, d4c_Subscription__c
             FROM d4c_Entity__c
-            WHERE Id = :producerId
+            WHERE Id = :entityId
         ];
 
         System.assertEquals(expectedSubscriptionId, updatedEntity.d4c_Subscription__c,
                           'Entity should be linked to the subscription');
     }
 
-    private static void assertEntityNoSubscription(Id producerId) {
+    private static void assertEntityNoSubscription(Id entityId) {
         d4c_Entity__c updatedEntity = [
             SELECT Id, d4c_Subscription__c
             FROM d4c_Entity__c
-            WHERE Id = :producerId
+            WHERE Id = :entityId
         ];
 
         System.assertEquals(null, updatedEntity.d4c_Subscription__c,
@@ -1141,12 +1141,12 @@ private class SubscriptionService_Test {
         d4c_Subscription__c sub1 = TestDataFactory.createSubscription(true);
         d4c_Subscription__c sub2 = TestDataFactory.createSubscription(true);
 
-        // Add some producers to sub1 to partially fill it
+        // Add some entitys to sub1 to partially fill it
         d4c_Entity__c prod1 = createTestEntity('11111111', SYNC_STATUS_ON, STATUS_ACTIVE);
         prod1.d4c_Subscription__c = sub1.Id;
         update prod1;
 
-        // Set max to 3 - sub1 has 1 producer, can take 2 more
+        // Set max to 3 - sub1 has 1 entity, can take 2 more
         SubscriptionService.MAX_PRODUCERS_PER_SUBSCRIPTION = 3;
 
         // Create list of 4 NPNs to allocate
@@ -1221,7 +1221,7 @@ private class SubscriptionService_Test {
     }
 
     /**
-     * Test processing a single allocation (create + add NPNs + update producers)
+     * Test processing a single allocation (create + add NPNs + update entitys)
      */
     @isTest
     static void testProcessAllocation_ExistingSubscription() {
@@ -1239,7 +1239,7 @@ private class SubscriptionService_Test {
         // Create existing subscription
         d4c_Subscription__c sub = TestDataFactory.createSubscription(true);
 
-        // Create producers that need subscriptions
+        // Create entitys that need subscriptions
         d4c_Entity__c prod1 = createTestEntity('22222222', SYNC_STATUS_ON, STATUS_ACTIVE);
         d4c_Entity__c prod2 = createTestEntity('33333333', SYNC_STATUS_ON, STATUS_ACTIVE);
 
@@ -1257,7 +1257,7 @@ private class SubscriptionService_Test {
         service.processAllocation(allocation);
         Test.stopTest();
 
-        // Assert producers were updated with subscription
+        // Assert entitys were updated with subscription
         assertEntityHasSubscription(prod1.Id, sub.Id);
         assertEntityHasSubscription(prod2.Id, sub.Id);
     }
@@ -1284,7 +1284,7 @@ private class SubscriptionService_Test {
 
         Test.setMock(HttpCalloutMock.class, mockFactory);
 
-        // Create producer that needs subscription
+        // Create entity that needs subscription
         d4c_Entity__c prod = createTestEntity('22222222', SYNC_STATUS_ON, STATUS_ACTIVE);
 
         // Create allocation requiring new subscription
@@ -1309,7 +1309,7 @@ private class SubscriptionService_Test {
         ];
         System.assertEquals(1, newSubs.size(), 'New subscription should be created');
 
-        // Assert producer was updated
+        // Assert entity was updated
         d4c_Entity__c updatedProd = [
             SELECT Id, d4c_Subscription__c
             FROM d4c_Entity__c
@@ -1338,7 +1338,7 @@ private class SubscriptionService_Test {
         // Create subscription
         d4c_Subscription__c sub = TestDataFactory.createSubscription(true);
 
-        // Create producers
+        // Create entitys
         d4c_Entity__c prod1 = createTestEntity('22222222', SYNC_STATUS_ON, STATUS_ACTIVE);
         d4c_Entity__c prod2 = createTestEntity('33333333', SYNC_STATUS_ON, STATUS_ACTIVE);
 
@@ -1367,7 +1367,7 @@ private class SubscriptionService_Test {
         executor.execute(null);
         Test.stopTest();
 
-        // Assert first producer was updated (second won't be due to no chaining in test)
+        // Assert first entity was updated (second won't be due to no chaining in test)
         assertEntityHasSubscription(prod1.Id, sub.Id);
     }
 
@@ -1466,14 +1466,14 @@ private class SubscriptionService_Test {
         excludeSub.d4c_ExcludeCarrierAppointments__c = true;
         update excludeSub;
 
-        // Create producers - some regular, some with exclude flag
+        // Create entitys - some regular, some with exclude flag
         d4c_Entity__c regularEntity1 = createTestEntity('11111111', SYNC_STATUS_ON, STATUS_ACTIVE);
         d4c_Entity__c regularEntity2 = createTestEntity('22222222', SYNC_STATUS_ON, STATUS_ACTIVE);
         d4c_Entity__c excludeEntity1 = createTestEntity('33333333', SYNC_STATUS_ON, STATUS_ACTIVE);
         excludeEntity1.d4c_ExcludeCarrierAppointments__c = true;
         update excludeEntity1;
 
-        // Set max producers
+        // Set max entitys
         SubscriptionService.MAX_PRODUCERS_PER_SUBSCRIPTION = 500;
 
         // Create list of NPNs with exclude flags
@@ -1534,11 +1534,11 @@ private class SubscriptionService_Test {
         regularSub.d4c_ExcludeCarrierAppointments__c = false;
         update regularSub;
 
-        // Create producers
-        d4c_Entity__c producer1 = createTestEntity('11111111', SYNC_STATUS_ON, STATUS_ACTIVE);
-        d4c_Entity__c producer2 = createTestEntity('22222222', SYNC_STATUS_ON, STATUS_ACTIVE);
+        // Create entitys
+        d4c_Entity__c entity1 = createTestEntity('11111111', SYNC_STATUS_ON, STATUS_ACTIVE);
+        d4c_Entity__c entity2 = createTestEntity('22222222', SYNC_STATUS_ON, STATUS_ACTIVE);
 
-        // Set max producers
+        // Set max entitys
         SubscriptionService.MAX_PRODUCERS_PER_SUBSCRIPTION = 500;
 
         // Create list of NPNs - all regular (excludeCarrierAppointments = false)
@@ -1578,16 +1578,16 @@ private class SubscriptionService_Test {
         excludeSub.d4c_ExcludeCarrierAppointments__c = true;
         update excludeSub;
 
-        // Create producers with exclude flag
-        d4c_Entity__c producer1 = createTestEntity('11111111', SYNC_STATUS_ON, STATUS_ACTIVE);
-        producer1.d4c_ExcludeCarrierAppointments__c = true;
-        update producer1;
+        // Create entitys with exclude flag
+        d4c_Entity__c entity1 = createTestEntity('11111111', SYNC_STATUS_ON, STATUS_ACTIVE);
+        entity1.d4c_ExcludeCarrierAppointments__c = true;
+        update entity1;
 
-        d4c_Entity__c producer2 = createTestEntity('22222222', SYNC_STATUS_ON, STATUS_ACTIVE);
-        producer2.d4c_ExcludeCarrierAppointments__c = true;
-        update producer2;
+        d4c_Entity__c entity2 = createTestEntity('22222222', SYNC_STATUS_ON, STATUS_ACTIVE);
+        entity2.d4c_ExcludeCarrierAppointments__c = true;
+        update entity2;
 
-        // Set max producers
+        // Set max entitys
         SubscriptionService.MAX_PRODUCERS_PER_SUBSCRIPTION = 500;
 
         // Create list of NPNs - all exclude (excludeCarrierAppointments = true)

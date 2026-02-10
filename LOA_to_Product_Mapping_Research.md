@@ -8,7 +8,7 @@
 - LOA Description (e.g., "Casualty", "Life", "Variable Life and Variable Annuity")
 
 **PDB State Offerings Excel** (updated monthly): Lists all valid State + LOA Code + Description combinations
-- [NIPR PDB State Offerings Documentation](https://nipr.com/producer-database-pdb)
+- [NIPR PDB State Offerings Documentation](https://nipr.com/entity-database-pdb)
 - File location: `/Users/stefannidzovic/Documents/NIPR/PDB State Offerings 01-06-2026.xlsx`
 - **Purpose**: Shows what LOA codes exist per state, NOT what products they map to
 

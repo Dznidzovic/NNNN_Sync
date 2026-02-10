@@ -70,17 +70,17 @@ private class TestDataFactory {
 
     @TestVisible
     private static List<d4c_Entity__c> createEntitys(Set<String> npns){
-        List<d4c_Entity__c> producers = new List<d4c_Entity__c>();
+        List<d4c_Entity__c> entitys = new List<d4c_Entity__c>();
         for (String npn : npns) {
-            producers.add(new d4c_Entity__c(d4c_NPN__c = npn));
+            entitys.add(new d4c_Entity__c(d4c_NPN__c = npn));
         }
-        return producers;
+        return entitys;
     }
 
     @TestVisible
     private static d4c_Entity__c createEntity(String npn) {
-        d4c_Entity__c producer = new d4c_Entity__c(d4c_NPN__c = npn);
-        return producer;
+        d4c_Entity__c entity = new d4c_Entity__c(d4c_NPN__c = npn);
+        return entity;
     }
 
 	@TestVisible
@@ -94,48 +94,48 @@ private class TestDataFactory {
 	}
 
     @TestVisible
-    private static d4c_EntityAddress__c createEntityAddress(Id producerId, String addressType, String addressLineText, String uniqueId) {
-		return new d4c_EntityAddress__c(
+    private static d4c_ProducerAddress__c createProducerAddress(Id entityId, String addressType, String addressLineText, String uniqueId) {
+		return new d4c_ProducerAddress__c(
 			d4c_UniqueIdentifier__c = uniqueId,
-			d4c_Entity__c = producerId,
+			d4c_Entity__c = entityId,
 			d4c_AddressType__c = addressType,
 			d4c_AddressLineOne__c= addressLineText
 		);
 	}
 
     @TestVisible
-    private static d4c_EntityCommunication__c createPhoneCommunication(Id producerId, String phoneNumber, String phoneType, String uniqueId ) {
-		return new d4c_EntityCommunication__c(
+    private static d4c_ProducerCommunication__c createPhoneCommunication(Id entityId, String phoneNumber, String phoneType, String uniqueId ) {
+		return new d4c_ProducerCommunication__c(
 			d4c_UniqueIdentifier__c = uniqueId,
-			d4c_Entity__c = producerId,
+			d4c_Entity__c = entityId,
 			d4c_PhoneNumber__c = phoneNumber,
 			d4c_PhoneType__c = phoneType
 		);
 	}
 
     @TestVisible
-    private static d4c_EntityCommunication__c createEmailCommunication(Id producerId, String emailAddress, String emailType, String uniqueId) {
-		return new d4c_EntityCommunication__c(
+    private static d4c_ProducerCommunication__c createEmailCommunication(Id entityId, String emailAddress, String emailType, String uniqueId) {
+		return new d4c_ProducerCommunication__c(
 			d4c_UniqueIdentifier__c = uniqueId,
-			d4c_Entity__c = producerId,
+			d4c_Entity__c = entityId,
 			d4c_EmailAddress__c = emailAddress,
 			d4c_EmailType__c = emailType
 		);
 	}
 
     @TestVisible
-    private static d4c_License__c createLicense(String licenseNumber, Id producerId) {
+    private static d4c_License__c createLicense(String licenseNumber, Id entityId) {
         return new d4c_License__c(
             d4c_LicenseNumber__c = licenseNumber,
-            d4c_Entity__c = producerId
+            d4c_Entity__c = entityId
         );
     }
 
     @TestVisible
-    private static d4c_CarrierAppointment__c createCarrierAppointment(String uid, Id producerId, Id carrierId, String state, String status) {
+    private static d4c_CarrierAppointment__c createCarrierAppointment(String uid, Id entityId, Id carrierId, String state, String status) {
         return new d4c_CarrierAppointment__c(
             d4c_UniqueIdentifier__c = uid,
-            d4c_Entity__c = producerId,
+            d4c_Entity__c = entityId,
             d4c_Carrier__c = carrierId,
             d4c_StateOrProvinceCode__c = state,
             d4c_StatusCode__c = status
@@ -190,17 +190,17 @@ private class TestDataFactory {
 	private static Map<String, List<SObject>> createNIPRPDBAlertTestData() {
 		Map<String, List<SObject>> createdRecords = new Map<String, List<SObject>>();
 
-		// Create producers
+		// Create entitys
 		Set<String> npns = new Set<String>{'22138233', '22138253', '22234021', '22166967', '22166100'};
-		List<d4c_Entity__c> producers = createEntitys(npns);
+		List<d4c_Entity__c> entitys = createEntitys(npns);
 
-		insert producers;
+		insert entitys;
 
-		createdRecords.put('d4c_Entity__c', producers);
+		createdRecords.put('d4c_Entity__c', entitys);
 
-		Map<String, Id> producerIds = new Map<String, Id>();
-		for (d4c_Entity__c producer : producers) {
-			producerIds.put(producer.d4c_NPN__c, producer.Id);
+		Map<String, Id> entityIds = new Map<String, Id>();
+		for (d4c_Entity__c entity : entitys) {
+			entityIds.put(entity.d4c_NPN__c, entity.Id);
 		}
 
 		// Create carriers
@@ -214,43 +214,43 @@ private class TestDataFactory {
 		Id carrierId = carriers[0].Id;
 
 		// Create Addresses
-		List<d4c_EntityAddress__c> addresses = new List<d4c_EntityAddress__c>{
-			createEntityAddress(producerIds.get('22138233'), 'Mailing', '245', '245FrancisLewisBlvd#9536GardenaCA90248U.S.A.Mailing22138233'),
-			createEntityAddress(producerIds.get('22138233'), 'Residential', '245', '245FrancisLewisBlvd#9536GardenaCA90248U.S.A.Residential22138233'),
-			createEntityAddress(producerIds.get('22138233'), 'Physical', '245', '245FrancisLewisBlvd#9536GardenaCA90248U.S.A.Physical22138233'),
-			createEntityAddress(producerIds.get('22138233'), 'Mailing', '7', '7SeBishopAve#9SanBernardinoCA92410U.S.A.Mailing22138233'),
-			createEntityAddress(producerIds.get('22166967'), 'Mailing', '7', '7SeBishopAve#9SanBernardinoCA92410U.S.A.Mailing22166967'),
-			createEntityAddress(producerIds.get('22166967'), 'Physical', '245', '245FrancisLewisBlvd#9536GardenaCA90248U.S.A.Physical22166967'),
-			createEntityAddress(producerIds.get('22166967'), 'Principal', '7', '7SeBishopAve#9SanBernardinoCA92410U.S.A.Principal22166967')
+		List<d4c_ProducerAddress__c> addresses = new List<d4c_ProducerAddress__c>{
+			createProducerAddress(entityIds.get('22138233'), 'Mailing', '245', '245FrancisLewisBlvd#9536GardenaCA90248U.S.A.Mailing22138233'),
+			createProducerAddress(entityIds.get('22138233'), 'Residential', '245', '245FrancisLewisBlvd#9536GardenaCA90248U.S.A.Residential22138233'),
+			createProducerAddress(entityIds.get('22138233'), 'Physical', '245', '245FrancisLewisBlvd#9536GardenaCA90248U.S.A.Physical22138233'),
+			createProducerAddress(entityIds.get('22138233'), 'Mailing', '7', '7SeBishopAve#9SanBernardinoCA92410U.S.A.Mailing22138233'),
+			createProducerAddress(entityIds.get('22166967'), 'Mailing', '7', '7SeBishopAve#9SanBernardinoCA92410U.S.A.Mailing22166967'),
+			createProducerAddress(entityIds.get('22166967'), 'Physical', '245', '245FrancisLewisBlvd#9536GardenaCA90248U.S.A.Physical22166967'),
+			createProducerAddress(entityIds.get('22166967'), 'Principal', '7', '7SeBishopAve#9SanBernardinoCA92410U.S.A.Principal22166967')
 		};
 
 		insert addresses;
 
-		createdRecords.put('d4c_EntityAddress__c', addresses);
+		createdRecords.put('d4c_ProducerAddress__c', addresses);
 
 		// Create Entity Communications
-		List<d4c_EntityCommunication__c> communications = new List<d4c_EntityCommunication__c>{
+		List<d4c_ProducerCommunication__c> communications = new List<d4c_ProducerCommunication__c>{
 			// Entity: 22138233
-			createPhoneCommunication(producerIds.get('22138233'), '+1-219-313-6379', 'Wired', '+1-219-313-6379Wired22138233'),
-			createPhoneCommunication(producerIds.get('22138233'), '+1-419-906-3223', 'Fax', '+1-419-906-3223Fax22138233'),
-			createPhoneCommunication(producerIds.get('22138233'), '+1-419-906-3221', 'Wired', '+1-419-906-3221Wired22138233'),
-			createEmailCommunication(producerIds.get('22138233'), 'silvana1.zapoticky@cblmaycfqw.com', 'Business', 'silvana1.zapoticky@cblmaycfqw.comBusiness22138233'),
-			createEmailCommunication(producerIds.get('22138233'), 'silvana2.zapoticky@cblmaycfqw.com', 'Personal', 'silvana2.zapoticky@cblmaycfqw.comPersonal22138233'),
-			createPhoneCommunication(producerIds.get('22138233'), '+1-219-313-6370', 'Wired', '+1-219-313-6370Wired22138233'),
-			createPhoneCommunication(producerIds.get('22138233'), '+1-419-906-3229', 'Fax', '+1-419-906-3229Fax22138233'),
-			createEmailCommunication(producerIds.get('22138233'), 'silvana3.zapoticky@cblmaycfqw.com', 'Business', 'silvana3.zapoticky@cblmaycfqw.comBusiness22138233'),
-			createEmailCommunication(producerIds.get('22138233'), 'silvana4.zapoticky@cblmaycfqw.com', 'Personal', 'silvana4.zapoticky@cblmaycfqw.comPersonal22138233'),
+			createPhoneCommunication(entityIds.get('22138233'), '+1-219-313-6379', 'Wired', '+1-219-313-6379Wired22138233'),
+			createPhoneCommunication(entityIds.get('22138233'), '+1-419-906-3223', 'Fax', '+1-419-906-3223Fax22138233'),
+			createPhoneCommunication(entityIds.get('22138233'), '+1-419-906-3221', 'Wired', '+1-419-906-3221Wired22138233'),
+			createEmailCommunication(entityIds.get('22138233'), 'silvana1.zapoticky@cblmaycfqw.com', 'Business', 'silvana1.zapoticky@cblmaycfqw.comBusiness22138233'),
+			createEmailCommunication(entityIds.get('22138233'), 'silvana2.zapoticky@cblmaycfqw.com', 'Personal', 'silvana2.zapoticky@cblmaycfqw.comPersonal22138233'),
+			createPhoneCommunication(entityIds.get('22138233'), '+1-219-313-6370', 'Wired', '+1-219-313-6370Wired22138233'),
+			createPhoneCommunication(entityIds.get('22138233'), '+1-419-906-3229', 'Fax', '+1-419-906-3229Fax22138233'),
+			createEmailCommunication(entityIds.get('22138233'), 'silvana3.zapoticky@cblmaycfqw.com', 'Business', 'silvana3.zapoticky@cblmaycfqw.comBusiness22138233'),
+			createEmailCommunication(entityIds.get('22138233'), 'silvana4.zapoticky@cblmaycfqw.com', 'Personal', 'silvana4.zapoticky@cblmaycfqw.comPersonal22138233'),
 		
 			// Entity: 22166967
-			createPhoneCommunication(producerIds.get('22166967'), '+1-219-313-6370', 'Wired', '+1-219-313-6370Wired22166967'),
-			createPhoneCommunication(producerIds.get('22166967'), '+1-419-906-3229', 'Fax', '+1-419-906-3229Fax22166967'),
-			createEmailCommunication(producerIds.get('22166967'), 'silvana3.zapoticky@cblmaycfqw.com', 'Business', 'silvana3.zapoticky@cblmaycfqw.comBusiness22166967'),
-			createEmailCommunication(producerIds.get('22166967'), 'silvana4.zapoticky@cblmaycfqw.com', 'Personal', 'silvana4.zapoticky@cblmaycfqw.comPersonal22166967')
+			createPhoneCommunication(entityIds.get('22166967'), '+1-219-313-6370', 'Wired', '+1-219-313-6370Wired22166967'),
+			createPhoneCommunication(entityIds.get('22166967'), '+1-419-906-3229', 'Fax', '+1-419-906-3229Fax22166967'),
+			createEmailCommunication(entityIds.get('22166967'), 'silvana3.zapoticky@cblmaycfqw.com', 'Business', 'silvana3.zapoticky@cblmaycfqw.comBusiness22166967'),
+			createEmailCommunication(entityIds.get('22166967'), 'silvana4.zapoticky@cblmaycfqw.com', 'Personal', 'silvana4.zapoticky@cblmaycfqw.comPersonal22166967')
 		};
 
 		insert communications;
 
-		createdRecords.put('d4c_EntityCommunication__c', communications);
+		createdRecords.put('d4c_ProducerCommunication__c', communications);
 
 		// Create Licenses with updated unique identifiers
 		Map<String, Map<String, String>> licenseData = new Map<String, Map<String, String>>{
@@ -274,7 +274,7 @@ private class TestDataFactory {
 			Map<String, String> data = licenseData.get(licenseNum);
 			d4c_License__c license = new d4c_License__c(
 				d4c_LicenseNumber__c = licenseNum,
-				d4c_Entity__c = producerIds.get(data.get('npn')),
+				d4c_Entity__c = entityIds.get(data.get('npn')),
 				d4c_StateOrProvinceCode__c = data.get('state'),
 				d4c_LicenseClassCode__c = data.get('class'),
 				d4c_UniqueIdentifier__c = data.get('uid')
@@ -313,7 +313,7 @@ private class TestDataFactory {
 			Map<String, String> def = appointmentDefs.get(key);
 			d4c_CarrierAppointment__c app = new d4c_CarrierAppointment__c(
 				d4c_UniqueIdentifier__c = key,
-				d4c_Entity__c = producerIds.get(def.get('npn')),
+				d4c_Entity__c = entityIds.get(def.get('npn')),
 				d4c_Carrier__c = carrierId,
 				d4c_StateOrProvinceCode__c = def.get('state'),
 				d4c_StatusCode__c = def.get('status'),
@@ -426,25 +426,25 @@ private class TestDataFactory {
 	private static Map<String, List<SObject>> createEntityInfoTestData() {
 		Map<String, List<SObject>> createdRecords = new Map<String, List<SObject>>();
 
-		// Create producer with the same NPN we'll be testing with
+		// Create entity with the same NPN we'll be testing with
 		Set<String> npns = new Set<String>{'12345678'};
-		List<d4c_Entity__c> producers = createEntitys(npns);
+		List<d4c_Entity__c> entitys = createEntitys(npns);
 		
-		// Customize the producer to match some of the XML data
-		producers[0].d4c_GivenName__c = 'Michael';
-		producers[0].d4c_MiddleName__c = 'R';
-		producers[0].d4c_SurName__c = 'Johnson';
-		producers[0].d4c_NameSuffix__c = 'JR';
-		producers[0].d4c_SSN__c = '123-45-6789';
-		producers[0].d4c_BirthDate__c = Date.newInstance(1980, 6, 15);
-		producers[0].d4c_Type__c = 'Agent';
+		// Customize the entity to match some of the XML data
+		entitys[0].d4c_GivenName__c = 'Michael';
+		entitys[0].d4c_MiddleName__c = 'R';
+		entitys[0].d4c_SurName__c = 'Johnson';
+		entitys[0].d4c_NameSuffix__c = 'JR';
+		entitys[0].d4c_SSN__c = '123-45-6789';
+		entitys[0].d4c_BirthDate__c = Date.newInstance(1980, 6, 15);
+		entitys[0].d4c_Type__c = 'Agent';
 
-		insert producers;
-		createdRecords.put('d4c_Entity__c', producers);
+		insert entitys;
+		createdRecords.put('d4c_Entity__c', entitys);
 
-		Map<String, Id> producerIds = new Map<String, Id>();
-		for (d4c_Entity__c producer : producers) {
-			producerIds.put(producer.d4c_NPN__c, producer.Id);
+		Map<String, Id> entityIds = new Map<String, Id>();
+		for (d4c_Entity__c entity : entitys) {
+			entityIds.put(entity.d4c_NPN__c, entity.Id);
 		}
 		
 		// Create carriers
@@ -462,38 +462,38 @@ private class TestDataFactory {
 		}
 
 		// Create Addresses - intentionally creating 2 instead of 3 that will come from XML
-		List<d4c_EntityAddress__c> addresses = new List<d4c_EntityAddress__c>{
-			createEntityAddress(producerIds.get('12345678'), 'Residential', '123 Main Street', '123MainStreetApt4BBuildingCLosAngelesCA90001U.S.A.Residential12345678'),
-			createEntityAddress(producerIds.get('12345678'), 'Mailing', '789 Broadway', '789BroadwayFloor10NewYorkNY10003U.S.A.Mailing12345678')
+		List<d4c_ProducerAddress__c> addresses = new List<d4c_ProducerAddress__c>{
+			createProducerAddress(entityIds.get('12345678'), 'Residential', '123 Main Street', '123MainStreetApt4BBuildingCLosAngelesCA90001U.S.A.Residential12345678'),
+			createProducerAddress(entityIds.get('12345678'), 'Mailing', '789 Broadway', '789BroadwayFloor10NewYorkNY10003U.S.A.Mailing12345678')
 		};
 
 		insert addresses;
-		createdRecords.put('d4c_EntityAddress__c', addresses);
+		createdRecords.put('d4c_ProducerAddress__c', addresses);
 
 		// Create Entity Communications - intentionally creating 5 instead of 8 that will come from XML
-		List<d4c_EntityCommunication__c> communications = new List<d4c_EntityCommunication__c>{
-			createPhoneCommunication(producerIds.get('12345678'), '+1-213-555-1234', 'Wired', '+1-213-555-1234Wired12345678'),
-			createPhoneCommunication(producerIds.get('12345678'), '+1-213-555-5678', 'Fax', '+1-213-555-5678Fax12345678'),
-			createEmailCommunication(producerIds.get('12345678'), 'mjohnson@example.com', 'Business', 'mjohnson@example.comBusiness12345678'),
-			createPhoneCommunication(producerIds.get('12345678'), '+1-212-555-9876', 'Wired', '+1-212-555-9876Wired12345678'),
-			createEmailCommunication(producerIds.get('12345678'), 'm.johnson.ny@example.com', 'Business', 'm.johnson.ny@example.comBusiness12345678')
+		List<d4c_ProducerCommunication__c> communications = new List<d4c_ProducerCommunication__c>{
+			createPhoneCommunication(entityIds.get('12345678'), '+1-213-555-1234', 'Wired', '+1-213-555-1234Wired12345678'),
+			createPhoneCommunication(entityIds.get('12345678'), '+1-213-555-5678', 'Fax', '+1-213-555-5678Fax12345678'),
+			createEmailCommunication(entityIds.get('12345678'), 'mjohnson@example.com', 'Business', 'mjohnson@example.comBusiness12345678'),
+			createPhoneCommunication(entityIds.get('12345678'), '+1-212-555-9876', 'Wired', '+1-212-555-9876Wired12345678'),
+			createEmailCommunication(entityIds.get('12345678'), 'm.johnson.ny@example.com', 'Business', 'm.johnson.ny@example.comBusiness12345678')
 		};
 
 		insert communications;
-		createdRecords.put('d4c_EntityCommunication__c', communications);
+		createdRecords.put('d4c_ProducerCommunication__c', communications);
 
 		// Create Licenses - intentionally creating 2 instead of 3 that will come from XML
 		List<d4c_License__c> licenses = new List<d4c_License__c>{
 			new d4c_License__c(
 				d4c_LicenseNumber__c = 'CA123456',
-				d4c_Entity__c = producerIds.get('12345678'),
+				d4c_Entity__c = entityIds.get('12345678'),
 				d4c_StateOrProvinceCode__c = 'CA',
 				d4c_LicenseClassCode__c = '3',
 				d4c_UniqueIdentifier__c = 'CA123456CA3'
 			),
 			new d4c_License__c(
 				d4c_LicenseNumber__c = 'NY789012',
-				d4c_Entity__c = producerIds.get('12345678'),
+				d4c_Entity__c = entityIds.get('12345678'),
 				d4c_StateOrProvinceCode__c = 'NY',
 				d4c_LicenseClassCode__c = '3',
 				d4c_UniqueIdentifier__c = 'NY789012NY3'
@@ -512,7 +512,7 @@ private class TestDataFactory {
 		List<d4c_CarrierAppointment__c> appointments = new List<d4c_CarrierAppointment__c>{
 			new d4c_CarrierAppointment__c(
 				d4c_UniqueIdentifier__c = '1234567854321123456789CA001Terminated12345678543211234567892026-02-012023-02-0100116',
-				d4c_Entity__c = producerIds.get('12345678'),
+				d4c_Entity__c = entityIds.get('12345678'),
 				d4c_Carrier__c = carrierIds.get('54321123456789'),
 				d4c_StateOrProvinceCode__c = 'CA',
 				d4c_CountyCode__c = '001',
@@ -520,7 +520,7 @@ private class TestDataFactory {
 			),
 			new d4c_CarrierAppointment__c(
 				d4c_UniqueIdentifier__c = '1234567898765987654321NY036Appointed12345678987659876543212026-03-152023-03-1503616',
-				d4c_Entity__c = producerIds.get('12345678'),
+				d4c_Entity__c = entityIds.get('12345678'),
 				d4c_Carrier__c = carrierIds.get('98765987654321'),
 				d4c_StateOrProvinceCode__c = 'NY',
 				d4c_CountyCode__c = '036',
@@ -528,7 +528,7 @@ private class TestDataFactory {
 			),
 			new d4c_CarrierAppointment__c(
 				d4c_UniqueIdentifier__c = '1234567898765987654321NY036Appointed12345678987659876543212026-03-152023-03-1503611',
-				d4c_Entity__c = producerIds.get('12345678'),
+				d4c_Entity__c = entityIds.get('12345678'),
 				d4c_Carrier__c = carrierIds.get('98765987654321'),
 				d4c_StateOrProvinceCode__c = 'NY',
 				d4c_CountyCode__c = '036',
@@ -589,23 +589,23 @@ private class TestDataFactory {
 
 	@TestVisible
 	private static d4c_Entity__c createEntityWithNPN(String npn, Boolean doInsert) {
-		d4c_Entity__c producer = new d4c_Entity__c(d4c_NPN__c = npn);
+		d4c_Entity__c entity = new d4c_Entity__c(d4c_NPN__c = npn);
 		if(doInsert) {
-			insert producer;
+			insert entity;
 		}
-		return producer;
+		return entity;
 	}
 
 	@TestVisible
 	private static List<d4c_Entity__c> createEntitysWithNPNs(List<String> npns, Boolean doInsert) {
-		List<d4c_Entity__c> producers = new List<d4c_Entity__c>();
+		List<d4c_Entity__c> entitys = new List<d4c_Entity__c>();
 		for(String npn : npns) {
-			producers.add(new d4c_Entity__c(d4c_NPN__c = npn));
+			entitys.add(new d4c_Entity__c(d4c_NPN__c = npn));
 		}
-		if(doInsert && !producers.isEmpty()) {
-			insert producers;
+		if(doInsert && !entitys.isEmpty()) {
+			insert entitys;
 		}
-		return producers;
+		return entitys;
 	}
 
 	@TestVisible
@@ -866,14 +866,14 @@ private class TestDataFactory {
 		Map<String, List<SObject>> createdRecords = new Map<String, List<SObject>>();
 
 		// Create Entity
-		d4c_Entity__c producer = createEntity('TEST123456');
-		insert producer;
-		createdRecords.put('d4c_Entity__c', new List<SObject>{ producer });
+		d4c_Entity__c entity = createEntity('TEST123456');
+		insert entity;
+		createdRecords.put('d4c_Entity__c', new List<SObject>{ entity });
 
 		// Create License
 		d4c_License__c license = new d4c_License__c(
 			d4c_LicenseNumber__c = 'LIC123456',
-			d4c_Entity__c = producer.Id,
+			d4c_Entity__c = entity.Id,
 			d4c_StateOrProvinceCode__c = 'CA',
 			d4c_LicenseClassCode__c = '3',
 			d4c_UniqueIdentifier__c = 'LIC123456CA3'

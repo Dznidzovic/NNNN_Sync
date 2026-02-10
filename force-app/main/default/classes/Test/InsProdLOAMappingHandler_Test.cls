@@ -25,11 +25,11 @@ private class InsProdLOAMappingHandler_Test {
         InsuranceProductLOAMappingTriggerHandler.triggerDisabled = true;
 
         // Create Entity
-        d4c_Entity__c producer = TestDataFactory.createEntity('1234567890');
-        insert producer;
+        d4c_Entity__c entity = TestDataFactory.createEntity('1234567890');
+        insert entity;
 
         // Create License
-        d4c_License__c license = TestDataFactory.createLicense('IPMTEST123', producer.Id);
+        d4c_License__c license = TestDataFactory.createLicense('IPMTEST123', entity.Id);
         license.d4c_StateOrProvinceCode__c = TEST_STATE;
         insert license;
 
@@ -430,12 +430,12 @@ private class InsProdLOAMappingHandler_Test {
         d4c_LOA_Insurance_Product_Mapping__c mapping1 = [SELECT Id FROM d4c_LOA_Insurance_Product_Mapping__c WHERE d4c_StateOrProvinceCode__c = :TEST_STATE LIMIT 1];
         d4c_LOA_Insurance_Product_Mapping__c mapping2 = [SELECT Id FROM d4c_LOA_Insurance_Product_Mapping__c WHERE d4c_StateOrProvinceCode__c = 'TX' LIMIT 1];
 
-        // Create multiple producers and licenses
-        d4c_Entity__c producer2 = TestDataFactory.createEntity('9876543210');
-        insert producer2;
+        // Create multiple entitys and licenses
+        d4c_Entity__c entity2 = TestDataFactory.createEntity('9876543210');
+        insert entity2;
 
         d4c_License__c license1 = [SELECT Id FROM d4c_License__c WHERE d4c_StateOrProvinceCode__c = :TEST_STATE LIMIT 1];
-        d4c_License__c license2 = TestDataFactory.createLicense('LIC456', producer2.Id);
+        d4c_License__c license2 = TestDataFactory.createLicense('LIC456', entity2.Id);
         license2.d4c_StateOrProvinceCode__c = 'TX';
         insert license2;
 

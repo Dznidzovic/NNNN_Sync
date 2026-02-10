@@ -39,13 +39,13 @@ public class EntityInfoDTO {
         public FIRM FIRM;
     }
 
-    // Represents an Individual (Agent) producer with biographical and licensing information
+    // Represents an Individual (Agent) entity with biographical and licensing information
     public class INDIVIDUAL {
         public ENTITY_BIOGRAPHIC ENTITY_BIOGRAPHIC;
         public PRODUCER_LICENSING PRODUCER_LICENSING;
     }
 
-    // Represents a Firm (Agency) producer with biographical and licensing information
+    // Represents a Firm (Agency) entity with biographical and licensing information
     public class FIRM {
         public ENTITY_BIOGRAPHIC ENTITY_BIOGRAPHIC;
         public PRODUCER_LICENSING PRODUCER_LICENSING;

@@ -107,7 +107,7 @@ public with sharing class CreateSubscription {
         DOM.XmlNode stateList = subscriptionInputData.addChildElement('ind:stateList', 'ind', '');
         stateList.addChildElement('ind:allStates', 'ind', '').addTextNode('true');
         
-        // Add alert type list - conditional based on producer size
+        // Add alert type list - conditional based on entity size
         DOM.XmlNode alertTypeList = subscriptionInputData.addChildElement('ind:alertTypeList', 'ind', '');
         alertTypeList.addChildElement('ind:alertTypeList', 'ind', '').addTextNode('LICENSING');
         

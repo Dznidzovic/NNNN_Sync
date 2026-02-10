@@ -417,13 +417,13 @@ private class LOAInsProdMappingTriggerHandler_Test {
 
     @isTest
     static void afterDelete_clearsIsProductMatchedOnRelatedLOAs() {
-        // Arrange: Create producer, license, mapping, and LOA
-        d4c_Entity__c producer = TestDataFactory.createEntity('1234567890');
-        insert producer;
+        // Arrange: Create entity, license, mapping, and LOA
+        d4c_Entity__c entity = TestDataFactory.createEntity('1234567890');
+        insert entity;
 
         d4c_License__c license = new d4c_License__c(
             d4c_LicenseNumber__c = 'AFTERDELLIC',
-            d4c_Entity__c = producer.Id,
+            d4c_Entity__c = entity.Id,
             d4c_StateOrProvinceCode__c = TEST_STATE,
             d4c_LicenseClassCode__c = '3',
             d4c_UniqueIdentifier__c = 'AFTERDELLIC' + TEST_STATE + '3'
@@ -458,13 +458,13 @@ private class LOAInsProdMappingTriggerHandler_Test {
 
     @isTest
     static void afterDelete_handlesBulkLOAUpdates() {
-        // Arrange: Create producer, license, mapping
-        d4c_Entity__c producer = TestDataFactory.createEntity('BULKDEL123');
-        insert producer;
+        // Arrange: Create entity, license, mapping
+        d4c_Entity__c entity = TestDataFactory.createEntity('BULKDEL123');
+        insert entity;
 
         d4c_License__c license = new d4c_License__c(
             d4c_LicenseNumber__c = 'BULKDELLIC',
-            d4c_Entity__c = producer.Id,
+            d4c_Entity__c = entity.Id,
             d4c_StateOrProvinceCode__c = TEST_STATE,
             d4c_LicenseClassCode__c = '3',
             d4c_UniqueIdentifier__c = 'BULKDELLIC' + TEST_STATE + '3'

@@ -16,13 +16,13 @@ private class LOAProductMappingService_Test {
     @TestSetup
     static void setupTestData() {
         // Create Entity with License using TestDataFactory
-        d4c_Entity__c producer = TestDataFactory.createEntity('12345678');
+        d4c_Entity__c entity = TestDataFactory.createEntity('12345678');
         EntityTriggerHandler.triggerDisabled = true;
-        insert producer;
+        insert entity;
         EntityTriggerHandler.triggerDisabled = false;
 
         // Create License
-        d4c_License__c license = TestDataFactory.createLicense('LIC123', producer.Id);
+        d4c_License__c license = TestDataFactory.createLicense('LIC123', entity.Id);
         license.d4c_StateOrProvinceCode__c = 'CA';
         insert license;
 

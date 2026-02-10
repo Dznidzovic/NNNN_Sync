@@ -40,7 +40,7 @@ public with sharing class RetrieveEntityInfoApiData {
                 'Entity NPN: ' + entityNPN, null);
 
         try {
-            // Query existing producer to check if user manually set exclude flag
+            // Query existing entity to check if user manually set exclude flag
             // Entity will always exist when this callout runs
             EntitySelector entitySelector = new EntitySelector();
             List<d4c_Entity__c> existingEntitys = entitySelector.getEntitysByNPNs(new Set<String>{ entityNPN });
@@ -122,7 +122,7 @@ public with sharing class RetrieveEntityInfoApiData {
             // Normalize entity biographic data
             normalizeEntityBiographic(entity);
             
-            // Normalize producer licensing data
+            // Normalize entity licensing data
             normalizeEntityLicensing(entity);
             
         } catch (Exception ex) {
@@ -143,13 +143,13 @@ public with sharing class RetrieveEntityInfoApiData {
      ********************************************************
      **/
     private Map<String, Object> getEntityMap(Map<String, Object> jsonMap) {
-        Map<String, Object> producer = (Map<String, Object>) jsonMap.get('PRODUCER');
-        if (producer == null) {
+        Map<String, Object> entity = (Map<String, Object>) jsonMap.get('PRODUCER');
+        if (entity == null) {
             return null;
         }
 
-        Map<String, Object> individual = (Map<String, Object>) producer.get('INDIVIDUAL');
-        Map<String, Object> firm = (Map<String, Object>) producer.get('FIRM');
+        Map<String, Object> individual = (Map<String, Object>) entity.get('INDIVIDUAL');
+        Map<String, Object> firm = (Map<String, Object>) entity.get('FIRM');
         
         if (individual != null) {
             return individual;
@@ -340,7 +340,7 @@ public with sharing class RetrieveEntityInfoApiData {
      * @Method Name    : normalizeLicenseInfo
      * @description    : Normalizes the LICENSE_INFORMATION section, ensuring STATE is always a list
      *                   and handling nested structures.
-     * @param          : licensing - The producer licensing data.
+     * @param          : licensing - The entity licensing data.
      ********************************************************
      **/
     private void normalizeLicenseInfo(Map<String, Object> licensing) {

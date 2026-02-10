@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
-    <description>Grants edit permissions for the NPN field on Account, Contact, and Lead objects. Users can manually edit NPN values. Producer lookup, NPN Status (formula), and NPN Sync Error (formula) fields remain read-only.</description>
+    <description>Grants edit permissions for the NPN field on Account, Contact, and Lead objects. Users can manually edit NPN values. Entity lookup, NPN Status (formula), and NPN Sync Error (formula) fields remain read-only.</description>
 
     <!-- Account - NPN Editable -->
     <fieldPermissions>
@@ -9,7 +9,7 @@
         <readable>true</readable>
     </fieldPermissions>
 
-    <!-- Account - Producer Read Only -->
+    <!-- Account - Entity Read Only -->
     <fieldPermissions>
         <editable>false</editable>
         <field>Account.d4c_Entity__c</field>
@@ -37,7 +37,7 @@
         <readable>true</readable>
     </fieldPermissions>
 
-    <!-- Contact - Producer Read Only -->
+    <!-- Contact - Entity Read Only -->
     <fieldPermissions>
         <editable>false</editable>
         <field>Contact.d4c_Entity__c</field>
@@ -65,7 +65,7 @@
         <readable>true</readable>
     </fieldPermissions>
 
-    <!-- Lead - Producer Read Only -->
+    <!-- Lead - Entity Read Only -->
     <fieldPermissions>
         <editable>false</editable>
         <field>Lead.d4c_Entity__c</field>

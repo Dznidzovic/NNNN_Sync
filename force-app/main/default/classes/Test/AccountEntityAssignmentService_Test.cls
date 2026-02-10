@@ -18,12 +18,12 @@ private class AccountEntityAssignmentService_Test {
     static void testBeforeInsert_ExistingEntitys() {
         // Setup mocks
         MockHelper.resetCounter();
-        d4c_Entity__c producer1 = MockHelper.createMockEntity('11111111');
-        d4c_Entity__c producer2 = MockHelper.createMockEntity('22222222');
+        d4c_Entity__c entity1 = MockHelper.createMockEntity('11111111');
+        d4c_Entity__c entity2 = MockHelper.createMockEntity('22222222');
 
         Map<String, d4c_Entity__c> mockEntitys = new Map<String, d4c_Entity__c>{
-            '11111111' => producer1,
-            '22222222' => producer2
+            '11111111' => entity1,
+            '22222222' => entity2
         };
 
         // Create mock accounts (no DML)
@@ -45,7 +45,7 @@ private class AccountEntityAssignmentService_Test {
         handler.beforeInsert(mockAccounts);
         Test.stopTest();
 
-        // Verify producers were assigned (in memory)
+        // Verify entitys were assigned (in memory)
         for (Account acc : mockAccounts) {
             System.assertNotEquals(null, acc.d4c_Entity__c,
                 'Entity should be assigned for NPN: ' + acc.d4c_NPN__c);
@@ -58,7 +58,7 @@ private class AccountEntityAssignmentService_Test {
 
     @isTest
     static void testBeforeInsert_NewEntitysCreated() {
-        // Setup - no existing producers
+        // Setup - no existing entitys
         MockHelper.resetCounter();
 
         List<Account> mockAccounts = new List<Account>{
@@ -67,7 +67,7 @@ private class AccountEntityAssignmentService_Test {
             MockHelper.createMockAccount('NewAcc3', '30003', null)
         };
 
-        // Enable mocks with empty producer map (simulates no existing producers)
+        // Enable mocks with empty entity map (simulates no existing entitys)
         EntityAssignmentService.useMocks = true;
         EntityAssignmentService.mockEntitysByNPN = new Map<String, d4c_Entity__c>();
 
@@ -79,15 +79,15 @@ private class AccountEntityAssignmentService_Test {
         handler.beforeInsert(mockAccounts);
         Test.stopTest();
 
-        // Verify producers were created and assigned
+        // Verify entitys were created and assigned
         for (Account acc : mockAccounts) {
             System.assertNotEquals(null, acc.d4c_Entity__c,
                 'Entity should be newly created and assigned for NPN: ' + acc.d4c_NPN__c);
         }
 
-        // Verify new producers were added to the mock map
+        // Verify new entitys were added to the mock map
         System.assertEquals(3, EntityAssignmentService.mockEntitysByNPN.size(),
-            'Three new producers should have been created');
+            'Three new entitys should have been created');
 
         // Cleanup
         EntityAssignmentService.useMocks = false;
@@ -147,7 +147,7 @@ private class AccountEntityAssignmentService_Test {
         handler.beforeInsert(new List<Account>{mockAccount});
         Test.stopTest();
 
-        // Verify producer was not assigned
+        // Verify entity was not assigned
         System.assertEquals(null, mockAccount.d4c_Entity__c,
             'Entity should not be assigned for blank NPN');
 
@@ -187,14 +187,14 @@ private class AccountEntityAssignmentService_Test {
         TriggerDispatcher.forceAfterUpdate = true;
 
         Test.startTest();
-        // Call beforeUpdate (assigns new producer)
+        // Call beforeUpdate (assigns new entity)
         handler.beforeUpdate(newMap, oldMap);
 
-        // Call afterUpdate (handles orphaned producer)
+        // Call afterUpdate (handles orphaned entity)
         handler.afterUpdate(newMap, oldMap);
         Test.stopTest();
 
-        // Verify producer was reassigned
+        // Verify entity was reassigned
         System.assertEquals(newEntity.Id, newAccount.d4c_Entity__c,
             'Entity should be reassigned to new NPN');
 
@@ -211,7 +211,7 @@ private class AccountEntityAssignmentService_Test {
         d4c_Entity__c oldEntity = MockHelper.createMockEntity('77777777');
         d4c_Entity__c newEntity = MockHelper.createMockEntity('88888888');
 
-        // IMPORTANT: mockEntitysByNPN needs BOTH producers for getEntitysByNPNs call
+        // IMPORTANT: mockEntitysByNPN needs BOTH entitys for getEntitysByNPNs call
         Map<String, d4c_Entity__c> mockEntitys = new Map<String, d4c_Entity__c>{
             '77777777' => oldEntity,
             '88888888' => newEntity
@@ -237,16 +237,16 @@ private class AccountEntityAssignmentService_Test {
         EntityAssignmentService service = new EntityAssignmentService();
 
         Test.startTest();
-        // First assign new producer
+        // First assign new entity
         service.assignEntitys(newList, oldMap);
 
-        // Then handle orphaned producers - this tests lines 96-110
+        // Then handle orphaned entitys - this tests lines 96-110
         service.handleOrphanedEntitys(newList, oldMap);
         Test.stopTest();
 
-        // Verify new producer assigned
+        // Verify new entity assigned
         System.assertEquals(newEntity.Id, newAccount.d4c_Entity__c,
-            'New producer should be assigned');
+            'New entity should be assigned');
 
         // Cleanup
         EntityAssignmentService.useMocks = false;
@@ -291,11 +291,11 @@ private class AccountEntityAssignmentService_Test {
         handler.afterUpdate(newMap, oldMap);
         Test.stopTest();
 
-        // Verify new producer assigned to account1
+        // Verify new entity assigned to account1
         System.assertEquals(newEntity.Id, newAccount1.d4c_Entity__c,
-            'New producer should be assigned');
+            'New entity should be assigned');
 
-        // Old producer should still exist (verified by not throwing error in handleOrphanedEntitys)
+        // Old entity should still exist (verified by not throwing error in handleOrphanedEntitys)
         System.assert(true, 'Entity with old NPN should not be deleted as it is still in use');
 
         // Cleanup

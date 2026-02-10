@@ -57,9 +57,9 @@ public with sharing class SubscriptionSelector {
     /**
      ********************************************************
      * @Method Name    : getSubscriptionsWithEntitysByExcludeFlag
-     * @description    : Returns subscriptions filtered by exclude carrier appointments flag with producer count
+     * @description    : Returns subscriptions filtered by exclude carrier appointments flag with entity count
      * @param          : excludeCarrierAppointments - Boolean flag to filter subscriptions
-     * @return         : List<d4c_Subscription__c> - List of subscription records with related producers
+     * @return         : List<d4c_Subscription__c> - List of subscription records with related entitys
      *******************************************************
      **/
     public List<d4c_Subscription__c> getSubscriptionsWithEntitysByExcludeFlag(Boolean excludeCarrierAppointments) {

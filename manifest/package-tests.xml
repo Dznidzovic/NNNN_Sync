@@ -3,7 +3,7 @@
     <!-- API Version -->
     <version>63.0</version>
 
-    <!-- Test Classes (excluding Account/Contact/Lead ProducerAssignmentService tests) -->
+    <!-- Test Classes (excluding Account/Contact/Lead EntityAssignmentService tests) -->
     <types>
         <members>BaseApiInvoker_Test</members>
         <members>CascadeDeletionLoa_Test</members>
@@ -17,7 +17,7 @@
         <members>Logger_Test</members>
         <members>PDBAlertReportSchedulable_Test</members>
         <members>ProcessEntityInfoApiService_Test</members>
-        <members>ProducerTriggerHandler_Test</members>
+        <members>EntityTriggerHandler_Test</members>
         <members>RemoveNPNFromSubscriptionQueueable_Test</members>
         <members>RunEntityInfoReportBatchable_Test</members>
         <members>RunPDBAlertReportBatchable_Test</members>

@@ -40,7 +40,7 @@ export default class EntityInfoAPISyncButton extends LightningElement {
             this.npn = getFieldValue(data, PRODUCER_NPN);
             this.lastSyncTime = getFieldValue(data, PRODUCER_LAST_SYNC);
         } else if (error) {
-            console.error('Error loading producer record:', error);
+            console.error('Error loading entity record:', error);
         }
     }
 
@@ -51,7 +51,7 @@ export default class EntityInfoAPISyncButton extends LightningElement {
                 showToast(
                     this,
                     'Missing NPN',
-                    'No NPN found for this producer. Please add an NPN before syncing.',
+                    'No NPN found for this entity. Please add an NPN before syncing.',
                     'warning'
                 );
                 return;
@@ -111,7 +111,7 @@ export default class EntityInfoAPISyncButton extends LightningElement {
             if (this.isSameDay(lastSync, nowDate)) {
                 const syncTimeFormatted = this.formatTime(lastSync);
                 const result = await LightningConfirm.open({
-                    message: `This producer was already synced today at ${syncTimeFormatted}. Are you sure you want to sync again?`,
+                    message: `This entity was already synced today at ${syncTimeFormatted}. Are you sure you want to sync again?`,
                     label: 'Confirm Sync',
                     theme: 'warning'
                 });
@@ -141,7 +141,7 @@ export default class EntityInfoAPISyncButton extends LightningElement {
     /**
     * Method calls the apex controller to enqueue the batch job
     * Shows info toast immediately - no waiting for results
-    * @param {string} npn - NPN of the producer to process
+    * @param {string} npn - NPN of the entity to process
     */
     async processNPN(npn) {
         try {

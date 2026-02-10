@@ -15,22 +15,22 @@
 private class RunEntityInfoReportSchedulable_Test {
 
     /**
-     * Test that the schedulable queries producers with 'Processing' status
-     * and executes the batch. Uses single producer to avoid governor limits.
+     * Test that the schedulable queries entitys with 'Processing' status
+     * and executes the batch. Uses single entity to avoid governor limits.
      */
     @isTest
     private static void execute_withProcessingEntitys_executesBatch() {
-        // Arrange: Create single producer with 'Processing' status
+        // Arrange: Create single entity with 'Processing' status
         DateTime scheduledSince = DateTime.now().addSeconds(-5);
 
-        d4c_Entity__c producer = new d4c_Entity__c(
+        d4c_Entity__c entity = new d4c_Entity__c(
             d4c_NPN__c = '123456780',
             d4c_SyncRecordToNIPR__c = 'On',
             d4c_NPNStatus__c = 'Processing'
         );
 
         EntityTriggerHandler.triggerDisabled = true;
-        insert producer;
+        insert entity;
         EntityTriggerHandler.triggerDisabled = false;
 
         // Act
@@ -45,26 +45,26 @@ private class RunEntityInfoReportSchedulable_Test {
     }
 
     /**
-     * Test that the schedulable does NOT execute batch when no producers
+     * Test that the schedulable does NOT execute batch when no entitys
      * have 'Processing' status
      */
     @isTest
     private static void execute_withNoProcessingEntitys_doesNotExecuteBatch() {
-        // Arrange: Create producers with 'Active' status (not 'Processing')
+        // Arrange: Create entitys with 'Active' status (not 'Processing')
         DateTime scheduledSince = DateTime.now().addSeconds(-5);
 
-        List<d4c_Entity__c> producers = new List<d4c_Entity__c>();
+        List<d4c_Entity__c> entitys = new List<d4c_Entity__c>();
         for (Integer i = 0; i < 3; i++) {
-            d4c_Entity__c producer = new d4c_Entity__c(
+            d4c_Entity__c entity = new d4c_Entity__c(
                 d4c_NPN__c = '98765432' + i,
                 d4c_SyncRecordToNIPR__c = 'On',
                 d4c_NPNStatus__c = 'Active'
             );
-            producers.add(producer);
+            entitys.add(entity);
         }
 
         EntityTriggerHandler.triggerDisabled = true;
-        insert producers;
+        insert entitys;
         EntityTriggerHandler.triggerDisabled = false;
 
         // Act
@@ -79,23 +79,23 @@ private class RunEntityInfoReportSchedulable_Test {
 
     /**
      * Test that the schedulable filters by LastModifiedDate >= scheduledSince
-     * Only producers modified after scheduledSince should be processed
+     * Only entitys modified after scheduledSince should be processed
      */
     @isTest
     private static void execute_filtersEntitysByLastModifiedDate() {
-        // Arrange: Create producers, then set scheduledSince to future (simulating old records)
-        List<d4c_Entity__c> producers = new List<d4c_Entity__c>();
+        // Arrange: Create entitys, then set scheduledSince to future (simulating old records)
+        List<d4c_Entity__c> entitys = new List<d4c_Entity__c>();
         for (Integer i = 0; i < 3; i++) {
-            d4c_Entity__c producer = new d4c_Entity__c(
+            d4c_Entity__c entity = new d4c_Entity__c(
                 d4c_NPN__c = '55566677' + i,
                 d4c_SyncRecordToNIPR__c = 'On',
                 d4c_NPNStatus__c = 'Processing'
             );
-            producers.add(producer);
+            entitys.add(entity);
         }
 
         EntityTriggerHandler.triggerDisabled = true;
-        insert producers;
+        insert entitys;
         EntityTriggerHandler.triggerDisabled = false;
 
         // Set scheduledSince to future - should filter out all records
@@ -107,32 +107,32 @@ private class RunEntityInfoReportSchedulable_Test {
         schedulable.execute(null);
         Test.stopTest();
 
-        // Assert: No batch should be executed because all producers were created before scheduledSince
-        System.assert(true, 'Schedulable should filter out old producers');
+        // Assert: No batch should be executed because all entitys were created before scheduledSince
+        System.assert(true, 'Schedulable should filter out old entitys');
     }
 
     /**
-     * Test that the schedulable only processes producers with SyncRecordToNIPR = 'On'
+     * Test that the schedulable only processes entitys with SyncRecordToNIPR = 'On'
      */
     @isTest
     private static void execute_filtersBySyncStatus() {
-        // Arrange: Create mix of sync On and Off producers
+        // Arrange: Create mix of sync On and Off entitys
         DateTime scheduledSince = DateTime.now().addSeconds(-5);
 
-        d4c_Entity__c producerSyncOn = new d4c_Entity__c(
+        d4c_Entity__c entitySyncOn = new d4c_Entity__c(
             d4c_NPN__c = '111111111',
             d4c_SyncRecordToNIPR__c = 'On',
             d4c_NPNStatus__c = 'Processing'
         );
 
-        d4c_Entity__c producerSyncOff = new d4c_Entity__c(
+        d4c_Entity__c entitySyncOff = new d4c_Entity__c(
             d4c_NPN__c = '222222222',
             d4c_SyncRecordToNIPR__c = 'Off',
             d4c_NPNStatus__c = 'Processing'
         );
 
         EntityTriggerHandler.triggerDisabled = true;
-        insert new List<d4c_Entity__c>{producerSyncOn, producerSyncOff};
+        insert new List<d4c_Entity__c>{entitySyncOn, entitySyncOff};
         EntityTriggerHandler.triggerDisabled = false;
 
         // Act
@@ -141,32 +141,32 @@ private class RunEntityInfoReportSchedulable_Test {
         schedulable.execute(null);
         Test.stopTest();
 
-        // Assert: Only sync 'On' producer should be processed
-        System.assert(true, 'Schedulable should only process sync On producers');
+        // Assert: Only sync 'On' entity should be processed
+        System.assert(true, 'Schedulable should only process sync On entitys');
     }
 
     /**
-     * Test that the schedulable only processes producers with non-null NPN
+     * Test that the schedulable only processes entitys with non-null NPN
      */
     @isTest
     private static void execute_filtersOutNullNPN() {
-        // Arrange: Create producer with null NPN
+        // Arrange: Create entity with null NPN
         DateTime scheduledSince = DateTime.now().addSeconds(-5);
 
-        d4c_Entity__c producerWithNPN = new d4c_Entity__c(
+        d4c_Entity__c entityWithNPN = new d4c_Entity__c(
             d4c_NPN__c = '333333333',
             d4c_SyncRecordToNIPR__c = 'On',
             d4c_NPNStatus__c = 'Processing'
         );
 
-        d4c_Entity__c producerNoNPN = new d4c_Entity__c(
+        d4c_Entity__c entityNoNPN = new d4c_Entity__c(
             d4c_NPN__c = null,
             d4c_SyncRecordToNIPR__c = 'On',
             d4c_NPNStatus__c = 'Processing'
         );
 
         EntityTriggerHandler.triggerDisabled = true;
-        insert new List<d4c_Entity__c>{producerWithNPN, producerNoNPN};
+        insert new List<d4c_Entity__c>{entityWithNPN, entityNoNPN};
         EntityTriggerHandler.triggerDisabled = false;
 
         // Act
@@ -175,8 +175,8 @@ private class RunEntityInfoReportSchedulable_Test {
         schedulable.execute(null);
         Test.stopTest();
 
-        // Assert: Only producer with NPN should be processed
-        System.assert(true, 'Schedulable should filter out null NPN producers');
+        // Assert: Only entity with NPN should be processed
+        System.assert(true, 'Schedulable should filter out null NPN entitys');
     }
 
     /**

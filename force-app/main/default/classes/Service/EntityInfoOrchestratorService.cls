@@ -39,7 +39,7 @@ public class EntityInfoOrchestratorService {
         }
 
         if (npns.size() == 1) {
-            // Single producer update - execute immediately
+            // Single entity update - execute immediately
             executeImmediately(npns);
         } else {
             // Bulk data load - use smart scheduling

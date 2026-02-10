@@ -2,7 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>d4c_MaxNPNCountPerSubscription__c</fullName>
     <defaultValue>350</defaultValue>
-    <description>Maximum number of producers allowed per NIPR subscription</description>
+    <description>Maximum number of entitys allowed per NIPR subscription</description>
     <externalId>false</externalId>
     <fieldManageability>SubscriberControlled</fieldManageability>
     <label>Max NPN Count Per Subscription</label>

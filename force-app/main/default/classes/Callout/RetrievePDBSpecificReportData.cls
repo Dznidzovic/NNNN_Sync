@@ -75,13 +75,13 @@ public class RetrievePDBSpecificReportData {
             pdbAlertsResponse.isSuccess = true;
             
             // Log the response summary
-            List<LicensingReportDTO.Person> producers = pdbAlertsResponse?.licensingReportProcessResult?.licensingReport?.personList;
-            Integer producerCount = producers != null ? producers.size() : 0;
+            List<LicensingReportDTO.Person> entitys = pdbAlertsResponse?.licensingReportProcessResult?.licensingReport?.personList;
+            Integer entityCount = entitys != null ? entitys.size() : 0;
             
             Logger.info(CLASS_NAME, methodName, 'Successfully processed PDB Alert data', 
                     'Report Date: ' + reportDate + 
                     ', Subscription: ' + subscriptionName + 
-                    ', Entity Count: ' + producerCount, 
+                    ', Entity Count: ' + entityCount, 
                     null);
         } catch(Exception ex) {
             // Process exception
@@ -107,7 +107,7 @@ public class RetrievePDBSpecificReportData {
                         errorDetails, null);
         }
 
-        List<LicensingReportDTO.Person> producers = pdbAlertsResponse?.licensingReportProcessResult?.licensingReport?.personList;
+        List<LicensingReportDTO.Person> entitys = pdbAlertsResponse?.licensingReportProcessResult?.licensingReport?.personList;
         
         Logger.debug(CLASS_NAME, methodName, 'PDB Alerts Response', 
             JSON.serialize(pdbAlertsResponse), null);
@@ -322,7 +322,7 @@ public class RetrievePDBSpecificReportData {
                 
                 // If no main identifier(NPN) but has FEIN, add directly to carriers list
                 // There are scenarios where in the response a carrier is returned without a CoCode value, but just the FEIN value.
-                // Here we make an assumption that nodes like that will always be carriers, as producers without an NPN do not make sense
+                // Here we make an assumption that nodes like that will always be carriers, as entitys without an NPN do not make sense
                 if (!hasMainIdentifier && feinId != null) {
                     // Create a simplified organization just for this FEIN carrier
                     organization.combinedKeys = new List<String> { organization.key };
@@ -339,7 +339,7 @@ public class RetrievePDBSpecificReportData {
         licensingReport.personList = mergeSameNPNPersonRecords(personRecordsByNpn);
         licensingReport.organizationList = mergeSameIdentifierOrganizations(organizationRecordsById);
 
-        licensingReport.producerList = new List<LicensingReportDTO.NIPREntity>();
+        licensingReport.entityList = new List<LicensingReportDTO.NIPREntity>();
 
         // After the Organization nodes have been merged to one single node, now we separate them into agencies and carriers for easier processing later on
         Map<String, List<LicensingReportDTO.Organization>> carriersAndAgentsSeparated = separateAgenciesAndCarriers(licensingReport.organizationList);
@@ -347,11 +347,11 @@ public class RetrievePDBSpecificReportData {
         List<LicensingReportDTO.Organization> carrierList = carriersAndAgentsSeparated.get('carriers');
                 
         if (licensingReport.personList != null && !licensingReport.personList.isEmpty()) {
-            licensingReport.producerList.addAll(licensingReport.personList);
+            licensingReport.entityList.addAll(licensingReport.personList);
         }
 
         if (agencyList != null && !agencyList.isEmpty()) {
-            licensingReport.producerList.addAll(agencyList);
+            licensingReport.entityList.addAll(agencyList);
         }
 
         licensingReport.carrierList = carrierList;
@@ -753,9 +753,9 @@ public class RetrievePDBSpecificReportData {
                 LicensingReportDTO.Email email = processEmail(personCommChildNode);
                 personCommunication.emailList.add(email);
             } else if (personCommChildNode.getName() == 'MailingAddress') {
-                personCommunication.mailingAddress = processEntityAddress(personCommChildNode);
+                personCommunication.mailingAddress = processProducerAddress(personCommChildNode);
             } else if (personCommChildNode.getName() == 'ResidentialAddress') {
-                personCommunication.residentialAddress = processEntityAddress(personCommChildNode);
+                personCommunication.residentialAddress = processProducerAddress(personCommChildNode);
             }
         }
 
@@ -786,9 +786,9 @@ public class RetrievePDBSpecificReportData {
                 LicensingReportDTO.Email email = processEmail(businessCommChildNode);
                 businessCommunication.emailList.add(email);
             } else if (businessCommChildName == 'MailingAddress') {
-                businessCommunication.mailingAddress = processEntityAddress(businessCommChildNode);
+                businessCommunication.mailingAddress = processProducerAddress(businessCommChildNode);
             } else if (businessCommChildName == 'PhysicalAddress') {
-                businessCommunication.physicalAddress = processEntityAddress(businessCommChildNode);
+                businessCommunication.physicalAddress = processProducerAddress(businessCommChildNode);
             }
         }
 
@@ -817,11 +817,11 @@ public class RetrievePDBSpecificReportData {
                 LicensingReportDTO.Email email = processEmail(orgCommChildNode);
                 orgCommunication.emailList.add(email);
             } else if (orgCommChildName == 'MailingAddress') {
-                orgCommunication.mailingAddress = processEntityAddress(orgCommChildNode);
+                orgCommunication.mailingAddress = processProducerAddress(orgCommChildNode);
             } else if (orgCommChildName == 'PhysicalAddress') {
-                orgCommunication.physicalAddress = processEntityAddress(orgCommChildNode);
+                orgCommunication.physicalAddress = processProducerAddress(orgCommChildNode);
             } else if (orgCommChildName == 'PrincipalAddress') {
-                orgCommunication.principalAddress = processEntityAddress(orgCommChildNode);
+                orgCommunication.principalAddress = processProducerAddress(orgCommChildNode);
             }
         }
 
@@ -864,19 +864,19 @@ public class RetrievePDBSpecificReportData {
 
     /**
      *********************************************************
-     * @methodName      : processEntityAddress
+     * @methodName      : processProducerAddress
      * @description     : Extracts and maps Entity Address details from the XML response. IMPORTANT !!! - Entity Adress just holds the reference and to the actual Address node which is processed in the beginning of the report and holds actual address data
      * @param addressNode : The XML node containing the entity address details.
-     * @return          : A populated EntityAddress DTO object.
+     * @return          : A populated ProducerAddress DTO object.
      *********************************************************
      **/
-    private LicensingReportDTO.EntityAddress processEntityAddress(DOM.XmlNode addressNode) {
-        LicensingReportDTO.EntityAddress entityAddress = new LicensingReportDTO.EntityAddress();
+    private LicensingReportDTO.ProducerAddress processProducerAddress(DOM.XmlNode addressNode) {
+        LicensingReportDTO.ProducerAddress producerAddress = new LicensingReportDTO.ProducerAddress();
 
-        entityAddress.asOfDate = XMLUtils.getNodeStringValue(addressNode, 'AsOfDate');
-        entityAddress.addressReferences = addressNode.getChildElement('AddressReferences', addressNode.getNamespace())?.getAttribute('addressReference', null);
+        producerAddress.asOfDate = XMLUtils.getNodeStringValue(addressNode, 'AsOfDate');
+        producerAddress.addressReferences = addressNode.getChildElement('AddressReferences', addressNode.getNamespace())?.getAttribute('addressReference', null);
 
-        return entityAddress;
+        return producerAddress;
     }
 
     /**
@@ -899,9 +899,9 @@ public class RetrievePDBSpecificReportData {
     /**
      *********************************************************
      * @methodName      : trackEligibleDeletion
-     * @description     : Tracks which producer+state combinations have license or appointment data in the payload.
+     * @description     : Tracks which entity+state combinations have license or appointment data in the payload.
      *                    This allows the service to only query and delete records that actually have data changes.
-     * @param producerKeyRef : The NIPR key reference (e.g., PersonPRI704070910)
+     * @param entityKeyRef : The NIPR key reference (e.g., PersonPRI704070910)
      * @param stateCode : The state code (e.g., VA, FL)
      * @param hasLicenses : Whether this state has license data in the payload
      * @param hasAppointments : Whether this state has appointment data in the payload
@@ -909,30 +909,30 @@ public class RetrievePDBSpecificReportData {
      *********************************************************
      **/
     private void trackEligibleDeletion(
-        String producerKeyRef,
+        String entityKeyRef,
         String stateCode,
         Boolean hasLicenses,
         Boolean hasAppointments,
         LicensingReportDTO.LicensingReport licensingReport
     ) {
-        if (String.isBlank(producerKeyRef) || String.isBlank(stateCode)) {
+        if (String.isBlank(entityKeyRef) || String.isBlank(stateCode)) {
             return;
         }
 
         // Track licenses - O(1) map lookup instead of looping
         if (hasLicenses) {
-            if (!licensingReport.eligibleRecordsForDeletion.eligibleLicenses.containsKey(producerKeyRef)) {
-                licensingReport.eligibleRecordsForDeletion.eligibleLicenses.put(producerKeyRef, new Set<String>());
+            if (!licensingReport.eligibleRecordsForDeletion.eligibleLicenses.containsKey(entityKeyRef)) {
+                licensingReport.eligibleRecordsForDeletion.eligibleLicenses.put(entityKeyRef, new Set<String>());
             }
-            licensingReport.eligibleRecordsForDeletion.eligibleLicenses.get(producerKeyRef).add(stateCode);
+            licensingReport.eligibleRecordsForDeletion.eligibleLicenses.get(entityKeyRef).add(stateCode);
         }
 
         // Track carrier appointments - O(1) map lookup instead of looping
         if (hasAppointments) {
-            if (!licensingReport.eligibleRecordsForDeletion.eligibleCarrierAppointments.containsKey(producerKeyRef)) {
-                licensingReport.eligibleRecordsForDeletion.eligibleCarrierAppointments.put(producerKeyRef, new Set<String>());
+            if (!licensingReport.eligibleRecordsForDeletion.eligibleCarrierAppointments.containsKey(entityKeyRef)) {
+                licensingReport.eligibleRecordsForDeletion.eligibleCarrierAppointments.put(entityKeyRef, new Set<String>());
             }
-            licensingReport.eligibleRecordsForDeletion.eligibleCarrierAppointments.get(producerKeyRef).add(stateCode);
+            licensingReport.eligibleRecordsForDeletion.eligibleCarrierAppointments.get(entityKeyRef).add(stateCode);
         }
     }
 
@@ -1005,8 +1005,8 @@ public class RetrievePDBSpecificReportData {
         jurisdictionReport.personReference = jurisdictionReportNode.getChildElement('PersonReferences', jurisdictionReportNode.getNamespace())?.getAttribute('personReference', null);
         jurisdictionReport.organizationReference = jurisdictionReportNode.getChildElement('OrganizationReferences', jurisdictionReportNode.getNamespace())?.getAttribute('organizationReference', null);
 
-        // Determine which producer key reference to use (Person or Organization)
-        String producerKeyRef = jurisdictionReport.personReference != null
+        // Determine which entity key reference to use (Person or Organization)
+        String entityKeyRef = jurisdictionReport.personReference != null
             ? jurisdictionReport.personReference
             : jurisdictionReport.organizationReference;
 
@@ -1023,14 +1023,14 @@ public class RetrievePDBSpecificReportData {
                     item.licensee = processLicensee(licenseeNode);
 
                     // NEW: Track eligibility for deletion based on what data exists
-                    if (item.licensee != null && producerKeyRef != null) {
+                    if (item.licensee != null && entityKeyRef != null) {
 
                         Boolean hasLicenseData = licenseeNode.getChildElement('InsuranceLicense', licenseeNode.getNamespace()) != null;
                         Boolean hasAppointmentData = licenseeNode.getChildElement('InsuranceAppointment', licenseeNode.getNamespace()) != null;
 
                         // Track this state as eligible if it has data OR a deletion marker
                         trackEligibleDeletion(
-                            producerKeyRef,
+                            entityKeyRef,
                             item.stateOrProvinceCode,
                             hasLicenseData,
                             hasAppointmentData,

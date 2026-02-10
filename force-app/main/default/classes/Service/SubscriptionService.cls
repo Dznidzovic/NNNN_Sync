@@ -22,7 +22,7 @@ public virtual with sharing class SubscriptionService {
     private final String CLASS_NAME = 'SubscriptionService';
 
     // PUBLIC PROPERTY - Set by orchestrator, used throughout service
-    public d4c_Entity__c producer { get; private set; }
+    public d4c_Entity__c entity { get; private set; }
 
     // Selectors and Callouts
     private final MetadataTypeSelector mtdSelector = new MetadataTypeSelector();
@@ -37,13 +37,13 @@ public virtual with sharing class SubscriptionService {
     /**
      *********************************************************
      * @Method Name    : setEntity
-     * @description    : Sets the producer for this service instance (called by orchestrator)
-     * @param producer : Fresh producer record from orchestrator (or deleted producer for afterDelete)
+     * @description    : Sets the entity for this service instance (called by orchestrator)
+     * @param entity : Fresh entity record from orchestrator (or deleted entity for afterDelete)
      * @return         : void
      *********************************************************
      **/
-    public void setEntity(d4c_Entity__c producer) {
-        this.producer = producer;
+    public void setEntity(d4c_Entity__c entity) {
+        this.entity = entity;
     }
 
     // ==================== PUBLIC METHODS ====================
@@ -59,19 +59,19 @@ public virtual with sharing class SubscriptionService {
     public void addNPNToSubscription() {
         String methodName = 'addNPNToSubscription';
 
-        if (producer == null) {
+        if (entity == null) {
             throw new SubscriptionServiceException('Entity not set in service. Call setEntity() first.');
         }
 
-        String npn = producer.d4c_NPN__c;
-        Boolean excludeFlag = producer.d4c_ExcludeCarrierAppointments__c;
+        String npn = entity.d4c_NPN__c;
+        Boolean excludeFlag = entity.d4c_ExcludeCarrierAppointments__c;
 
         loadMaxEntitysPerSubscription();
 
         // Find or create subscription and add NPN
         Id subscriptionId = findOrCreateAndAddNPN(excludeFlag);
 
-        // Update producer with subscription lookup
+        // Update entity with subscription lookup
         updateEntitySubscription(subscriptionId);
 
         Logger.commitAsync();
@@ -93,21 +93,21 @@ public virtual with sharing class SubscriptionService {
             return;
         }
 
-        // Query all producers with these NPNs
-        List<d4c_Entity__c> producers = entitySelector.getEntitysByNPNs(npns);
+        // Query all entitys with these NPNs
+        List<d4c_Entity__c> entitys = entitySelector.getEntitysByNPNs(npns);
 
-        if (producers.isEmpty()) {
-            Logger.warning(CLASS_NAME, methodName, 'No producers found for NPNs', 'NPNs: ' + npns, null);
+        if (entitys.isEmpty()) {
+            Logger.warning(CLASS_NAME, methodName, 'No entitys found for NPNs', 'NPNs: ' + npns, null);
             return;
         }
 
         // Group NPNs by subscription for efficient API calls
         Map<Id, List<String>> subscriptionToNPNsMap = new Map<Id, List<String>>();
-        List<d4c_Entity__c> producersToUpdate = new List<d4c_Entity__c>();
+        List<d4c_Entity__c> entitysToUpdate = new List<d4c_Entity__c>();
 
-        for (d4c_Entity__c prod : producers) {
+        for (d4c_Entity__c prod : entitys) {
             if (prod.d4c_Subscription__c == null) {
-                continue; // Skip producers without subscription
+                continue; // Skip entitys without subscription
             }
 
             if (!subscriptionToNPNsMap.containsKey(prod.d4c_Subscription__c)) {
@@ -115,7 +115,7 @@ public virtual with sharing class SubscriptionService {
             }
             subscriptionToNPNsMap.get(prod.d4c_Subscription__c).add(prod.d4c_NPN__c);
 
-            producersToUpdate.add(prod);
+            entitysToUpdate.add(prod);
         }
 
         // Step 1: Remove from NIPR (callouts) - grouped by subscription
@@ -132,12 +132,12 @@ public virtual with sharing class SubscriptionService {
             }
         }
 
-        // Step 2: Clear producer subscription lookups in Salesforce (DML after callouts)
-        for (d4c_Entity__c prod : producersToUpdate) {
+        // Step 2: Clear entity subscription lookups in Salesforce (DML after callouts)
+        for (d4c_Entity__c prod : entitysToUpdate) {
             prod.d4c_Subscription__c = null;
         }
 
-        update producersToUpdate;
+        update entitysToUpdate;
 
         Logger.commitAsync();
     }
@@ -146,9 +146,9 @@ public virtual with sharing class SubscriptionService {
      *********************************************************
      * @Method Name    : removeNPNFromNIPR (BULK)
      * @description    : Removes multiple NPNs from NIPR subscription (callout only, no DML)
-     *                   Used for afterDelete (producers already deleted, can't update SF)
+     *                   Used for afterDelete (entitys already deleted, can't update SF)
      *                   Bulkified version - groups NPNs by subscription for efficient API calls
-     * @param npnToSubscriptionMap : Map of NPN -> Subscription ID (from deleted producers)
+     * @param npnToSubscriptionMap : Map of NPN -> Subscription ID (from deleted entitys)
      * @return         : void
      *********************************************************
      **/
@@ -174,7 +174,7 @@ public virtual with sharing class SubscriptionService {
         // Query subscriptions
         List<d4c_Subscription__c> subscriptions = subscriptionSelector.getSubscriptionsByIds(subscriptionToNPNsMap.keySet());
 
-        // Execute remove callouts (no DML - producers already deleted)
+        // Execute remove callouts (no DML - entitys already deleted)
         for (d4c_Subscription__c sub : subscriptions) {
             String apiSubName = sub.d4c_Subscription_Name__c + '-' + UserInfo.getOrganizationId();
             List<String> npnsToRemove = subscriptionToNPNsMap.get(sub.Id);
@@ -201,12 +201,12 @@ public virtual with sharing class SubscriptionService {
     public void resubscribeToDifferentPool() {
         String methodName = 'resubscribeToDifferentPool';
 
-        if (producer == null) {
+        if (entity == null) {
             throw new SubscriptionServiceException('Entity not set in service. Call setEntity() first.');
         }
 
-        String npn = producer.d4c_NPN__c;
-        Boolean newExcludeFlag = producer.d4c_ExcludeCarrierAppointments__c;
+        String npn = entity.d4c_NPN__c;
+        Boolean newExcludeFlag = entity.d4c_ExcludeCarrierAppointments__c;
 
         Logger.info(CLASS_NAME, methodName,
             'Starting resubscription to different pool',
@@ -215,7 +215,7 @@ public virtual with sharing class SubscriptionService {
         loadMaxEntitysPerSubscription();
 
         // CALLOUT 1: Remove from current subscription in NIPR
-        d4c_Subscription__c oldSubscription = subscriptionSelector.getSubscriptionById(producer.d4c_Subscription__c);
+        d4c_Subscription__c oldSubscription = subscriptionSelector.getSubscriptionById(entity.d4c_Subscription__c);
         String oldApiSubName = oldSubscription.d4c_Subscription_Name__c + '-' + UserInfo.getOrganizationId();
         Boolean removeSuccess = executeRemoveNPNCallout(new List<String>{npn}, oldApiSubName);
 
@@ -226,7 +226,7 @@ public virtual with sharing class SubscriptionService {
         // Find or create new subscription and add NPN
         Id newSubscriptionId = findOrCreateAndAddNPN(newExcludeFlag);
 
-        // Update producer with new subscription lookup
+        // Update entity with new subscription lookup
         updateEntitySubscription(newSubscriptionId);
 
         Logger.info(CLASS_NAME, methodName,
@@ -239,7 +239,7 @@ public virtual with sharing class SubscriptionService {
     /**
      *********************************************************
      * @Method Name    : loadMaxEntitysPerSubscription
-     * @description    : Loads max producers per subscription from metadata
+     * @description    : Loads max entitys per subscription from metadata
      * @return         : void
      *********************************************************
      **/
@@ -256,12 +256,12 @@ public virtual with sharing class SubscriptionService {
      * @description    : Finds existing subscription with capacity or creates new one,
      *                   adds NPN via API, then creates/returns subscription ID for DML
      * @param excludeCarrierAppointments : Filter flag for subscription pool
-     * @return         : Id - Subscription ID for producer lookup update
+     * @return         : Id - Subscription ID for entity lookup update
      *********************************************************
      **/
     private Id findOrCreateAndAddNPN(Boolean excludeCarrierAppointments) {
         String methodName = 'findOrCreateAndAddNPN';
-        String npn = producer.d4c_NPN__c;
+        String npn = entity.d4c_NPN__c;
 
         // Step 1: Find existing subscription with capacity
         SubscriptionResult subResult = findSubscriptionWithCapacity(excludeCarrierAppointments);
@@ -323,8 +323,8 @@ public virtual with sharing class SubscriptionService {
         List<d4c_Subscription__c> subscriptions = subscriptionSelector.getSubscriptionsWithEntitysByExcludeFlag(excludeCarrierAppointments);
 
         for (d4c_Subscription__c sub : subscriptions) {
-            Integer producerCount = sub.Entitys__r != null ? sub.Entitys__r.size() : 0;
-            if (producerCount < MAX_PRODUCERS_PER_SUBSCRIPTION) {
+            Integer entityCount = sub.Entitys__r != null ? sub.Entitys__r.size() : 0;
+            if (entityCount < MAX_PRODUCERS_PER_SUBSCRIPTION) {
                 return new SubscriptionResult(sub.Id, sub.d4c_Subscription_Name__c);
             }
         }
@@ -461,18 +461,18 @@ public virtual with sharing class SubscriptionService {
     /**
      *********************************************************
      * @Method Name    : updateEntitySubscription
-     * @description    : Updates or clears producer subscription lookup using external ID upsert
+     * @description    : Updates or clears entity subscription lookup using external ID upsert
      * @param subscriptionId : Subscription ID (or null to clear)
      * @return         : void
      *********************************************************
      **/
     private void updateEntitySubscription(Id subscriptionId) {
-        d4c_Entity__c producerToUpdate = new d4c_Entity__c(
-            d4c_NPN__c = producer.d4c_NPN__c,
+        d4c_Entity__c entityToUpdate = new d4c_Entity__c(
+            d4c_NPN__c = entity.d4c_NPN__c,
             d4c_Subscription__c = subscriptionId
         );
 
-        upsert producerToUpdate d4c_NPN__c;
+        upsert entityToUpdate d4c_NPN__c;
     }
 
     // ==================== BULK SUBSCRIPTION METHODS ====================
@@ -633,20 +633,20 @@ public virtual with sharing class SubscriptionService {
                 'Subscription: ' + allocation.subscriptionName + ', ID: ' + subscriptionId, subscriptionId);
         }
 
-        // Step 4: Update producers with subscription lookup
-        List<d4c_Entity__c> producersToUpdate = new List<d4c_Entity__c>();
+        // Step 4: Update entitys with subscription lookup
+        List<d4c_Entity__c> entitysToUpdate = new List<d4c_Entity__c>();
         for (String npn : allocation.npnsToAdd) {
-            producersToUpdate.add(new d4c_Entity__c(
+            entitysToUpdate.add(new d4c_Entity__c(
                 d4c_NPN__c = npn,
                 d4c_Subscription__c = subscriptionId
             ));
         }
 
-        upsert producersToUpdate d4c_NPN__c;
+        upsert entitysToUpdate d4c_NPN__c;
 
         Logger.info(CLASS_NAME, methodName,
-            'Updated producers with subscription',
-            'Subscription: ' + allocation.subscriptionName + ', Entitys: ' + producersToUpdate.size(), subscriptionId);
+            'Updated entitys with subscription',
+            'Subscription: ' + allocation.subscriptionName + ', Entitys: ' + entitysToUpdate.size(), subscriptionId);
     }
 
     /**

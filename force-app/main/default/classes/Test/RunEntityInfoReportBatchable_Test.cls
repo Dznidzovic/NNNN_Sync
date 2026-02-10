@@ -57,7 +57,7 @@ public class RunEntityInfoReportBatchable_Test {
 
     @isTest
     static void testRunEntityInfoBatch_SuccessWithExistingEntity() {
-        // Set data - create producer with NPN that matches the mock response
+        // Set data - create entity with NPN that matches the mock response
         d4c_Entity__c prod = TestDataFactory.createEntity('535325');
         EntityTriggerHandler.triggerDisabled = true;
         insert prod;
@@ -74,11 +74,11 @@ public class RunEntityInfoReportBatchable_Test {
         Id batchId = Database.executeBatch(batchJob, 1);
         Test.stopTest();
 
-        // Assert - batch completed successfully and producer was queried without field errors
+        // Assert - batch completed successfully and entity was queried without field errors
         System.assertNotEquals(null, batchId, 'Batch Job ID should not be null.');
 
-        // Verify producer still exists and can be queried with all required fields
-        List<d4c_Entity__c> producers = [SELECT Id, d4c_NPN__c, d4c_NPNStatus__c, d4c_Subscription__c, d4c_ExcludeCarrierAppointments__c FROM d4c_Entity__c WHERE d4c_NPN__c = '535325'];
-        System.assertEquals(1, producers.size(), 'Entity should exist after batch execution.');
+        // Verify entity still exists and can be queried with all required fields
+        List<d4c_Entity__c> entitys = [SELECT Id, d4c_NPN__c, d4c_NPNStatus__c, d4c_Subscription__c, d4c_ExcludeCarrierAppointments__c FROM d4c_Entity__c WHERE d4c_NPN__c = '535325'];
+        System.assertEquals(1, entitys.size(), 'Entity should exist after batch execution.');
     }
 }

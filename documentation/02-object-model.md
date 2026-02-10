@@ -28,7 +28,7 @@
         |                          |         |           |
         v                          v         v           v
 +----------------+    +------------------+   |   +-------------------+
-|d4c_ProducerAddr |    |d4c_ProducerComm   |   |   | d4c_Subscription__c|
+|d4c_EntityAddr |    |d4c_EntityComm   |   |   | d4c_Subscription__c|
 |   ess__c       |    |   unication__c   |   |   |-------------------|
 |----------------|    |------------------|   |   | d4c_SubscriptionId |
 | d4c_Entity__c |    | d4c_Entity__c   |   |   | d4c_Status__c      |
@@ -144,13 +144,13 @@
 |-------------|     |-------------|     |-------------|
 | d4c_NPN__c   |     | d4c_NPN__c   |     | d4c_NPN__c   |
 | (Lookup to  |     | (Lookup to  |     | (Lookup to  |
-|  Producer)  |     |  Producer)  |     |  Producer)  |
+|  Entity)  |     |  Entity)  |     |  Entity)  |
 +-------------+     +-------------+     +-------------+
       |                   |                   |
       +-------------------+-------------------+
                           |
                           v
-              ProducerAssignmentService
+              EntityAssignmentService
               (Auto-link by NPN match)
 
 

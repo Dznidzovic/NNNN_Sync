@@ -56,13 +56,13 @@ public with sharing class RunEntityInfoReportBatchable implements Database.Batch
                           'NPN: ' + npn, null);
 
                 // Track successful NPN for subscription processing in finish()
-                // Query the producer to check its exclude flag
-                List<d4c_Entity__c> producers = producerSelector.getEntitysByNPNs(new Set<String>{ npn });
-                if (!producers.isEmpty()) {
-                    d4c_Entity__c producer = producers[0];
+                // Query the entity to check its exclude flag
+                List<d4c_Entity__c> entitys = entitySelector.getEntitysByNPNs(new Set<String>{ npn });
+                if (!entitys.isEmpty()) {
+                    d4c_Entity__c entity = entitys[0];
                     // Only add NPNs that are Active and don't already have a subscription
-                    if (producer.d4c_NPNStatus__c == 'Active' && producer.d4c_Subscription__c == null) {
-                        if (producer.d4c_ExcludeCarrierAppointments__c) {
+                    if (entity.d4c_NPNStatus__c == 'Active' && entity.d4c_Subscription__c == null) {
+                        if (entity.d4c_ExcludeCarrierAppointments__c) {
                             successfulExcludeNPNs.add(npn);
                         } else {
                             successfulRegularNPNs.add(npn);
@@ -75,42 +75,42 @@ public with sharing class RunEntityInfoReportBatchable implements Database.Batch
 
                 String exceptionMessage = e.getMessage();
 
-                List<d4c_Entity__c> producers = producerSelector.getEntitysByNPNs(new Set<String>{ npn });
+                List<d4c_Entity__c> entitys = entitySelector.getEntitysByNPNs(new Set<String>{ npn });
 
-                if (producers == null || producers.isEmpty()) {
+                if (entitys == null || entitys.isEmpty()) {
                     Logger.warning(CLASS_NAME, methodName, 'Entity with this NPN not yet created',
                                  'NPN: ' + npn, null);
                 } else {
-                    d4c_Entity__c producer = producers[0];
+                    d4c_Entity__c entity = entitys[0];
 
                     if (exceptionMessage.contains(NIPREnums.EntityInfoError.NO_PRODUCER_DATA.toString())) {
-                        producer.d4c_NPNStatus__c = 'Invalid NPN';
-                        producer.d4c_NPNSyncError__c = exceptionMessage.split(':')[0];
-                        producer.d4c_IntegrationError__c = '';
+                        entity.d4c_NPNStatus__c = 'Invalid NPN';
+                        entity.d4c_NPNSyncError__c = exceptionMessage.split(':')[0];
+                        entity.d4c_IntegrationError__c = '';
 
                         Logger.warning(CLASS_NAME, methodName, 'Invalid NPN detected',
-                                     'NPN: ' + npn + ', Error: ' + producer.d4c_NPNSyncError__c,
-                                     producer.Id);
+                                     'NPN: ' + npn + ', Error: ' + entity.d4c_NPNSyncError__c,
+                                     entity.Id);
                     } else {
-                        producer.d4c_NPNStatus__c = 'Error';
-                        producer.d4c_NPNSyncError__c = 'Integration Error';
-                        producer.d4c_IntegrationError__c = exceptionMessage;
+                        entity.d4c_NPNStatus__c = 'Error';
+                        entity.d4c_NPNSyncError__c = 'Integration Error';
+                        entity.d4c_IntegrationError__c = exceptionMessage;
 
                         Logger.error(CLASS_NAME, methodName,
                                    'Integration error for NPN',
                                    'NPN: ' + npn + ', Error: ' + exceptionMessage,
-                                   producer.Id);
+                                   entity.Id);
                     }
 
                     Logger.commitAsync();
 
                     try {
-                        update producer;
+                        update entity;
                     } catch (Exception updateEx) {
                         Logger.error(CLASS_NAME, methodName,
-                                   'Failed to update producer status',
+                                   'Failed to update entity status',
                                    'NPN: ' + npn + ', Error: ' + updateEx.getMessage(),
-                                   producer.Id);
+                                   entity.Id);
 
                         Logger.commitAsync();
 

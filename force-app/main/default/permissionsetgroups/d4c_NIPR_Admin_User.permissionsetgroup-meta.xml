@@ -3,7 +3,7 @@
     <description>Full administrative access to NIPR with all permissions including SSN visibility</description>
     <hasActivationRequired>false</hasActivationRequired>
     <label>NIPR Admin User</label>
-    <permissionSets>niprsync__d4c_Manage_Producer</permissionSets>
+    <permissionSets>niprsync__d4c_Manage_Entity</permissionSets>
     <permissionSets>niprsync__d4c_NIPR_View_Agent_SSN</permissionSets>
     <permissionSets>niprsync__NIPR_View_NIPR_Data</permissionSets>
     <permissionSets>niprsync__d4c_NIPR_API_Callout</permissionSets>

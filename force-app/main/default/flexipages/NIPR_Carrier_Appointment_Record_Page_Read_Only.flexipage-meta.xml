@@ -61,7 +61,7 @@
                     <value>required</value>
                 </fieldInstanceProperties>
                 <fieldItem>Record.d4c_Entity__c</fieldItem>
-                <identifier>Recordd4c_Producer_cField</identifier>
+                <identifier>Recordd4c_Entity_cField</identifier>
             </fieldInstance>
         </itemInstances>
         <itemInstances>

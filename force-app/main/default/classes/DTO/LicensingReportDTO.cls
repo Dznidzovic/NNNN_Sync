@@ -52,7 +52,7 @@ public class LicensingReportDTO {
         // List that holds only agent records(Organization nodes in NIPR response of type NAICEntityCode). Used for easier processing later on
         public List<Organization> agencyList;
         // List of agents and agencies
-        public List<NIPREntity> producerList;
+        public List<NIPREntity> entityList;
         // List that holds only agent records(Organization nodes in NIPR response of type NAICInsurerCode). Used for easier processing later on
         public List<Organization> carrierList;
         // list of agencies and carriers
@@ -61,7 +61,7 @@ public class LicensingReportDTO {
         public String typeCode;
         public List<JurisdictionReport> jurisdictionReportList;
 
-        // NEW: Tracks which producer+state combinations have data in the payload (eligible for deletion logic)
+        // NEW: Tracks which entity+state combinations have data in the payload (eligible for deletion logic)
         public EligibleRecordsForDeletion eligibleRecordsForDeletion;
 
         public LicensingReport() {
@@ -110,19 +110,19 @@ public class LicensingReportDTO {
     }
 
     /**
-     * Tracks which producer+state combinations are eligible for deletion logic.
+     * Tracks which entity+state combinations are eligible for deletion logic.
      * Uses Maps for O(1) lookup performance instead of looping through lists.
      * Structure: Map<EntityKeyReference, Set<StateCodes>>
      *
      * This allows the service to only query and compare records that actually have data in the NIPR payload.
      */
     public class EligibleRecordsForDeletion {
-        // Map of producer key reference -> states with license data
+        // Map of entity key reference -> states with license data
         // Key: PersonPRI704070910 or OrgPRI123456789
         // Value: Set of state codes (e.g., {'CA', 'NY', 'TX'})
         public Map<String, Set<String>> eligibleLicenses;
 
-        // Map of producer key reference -> states with carrier appointment data
+        // Map of entity key reference -> states with carrier appointment data
         public Map<String, Set<String>> eligibleCarrierAppointments;
 
         public EligibleRecordsForDeletion() {
@@ -276,23 +276,23 @@ public class LicensingReportDTO {
     }
     
     // All Communication Nodes represent Agent, Agency and Carrier data. They all extend the same node as the processing for all of them is overlapping and we can utilize the same methods later on
-    public virtual class EntityCommunication {
+    public virtual class ProducerCommunication {
         public List<Telephone> telephoneList;
         public List<Email> emailList;
-        public EntityAddress mailingAddress;
+        public ProducerAddress mailingAddress;
     }
 
-    public class PersonCommunication extends EntityCommunication {
-        public EntityAddress residentialAddress;
+    public class PersonCommunication extends ProducerCommunication {
+        public ProducerAddress residentialAddress;
     }
     
-    public class BusinessCommunication extends EntityCommunication {
-        public EntityAddress physicalAddress;
+    public class BusinessCommunication extends ProducerCommunication {
+        public ProducerAddress physicalAddress;
     }
 
-    public class OrganizationCommunication extends EntityCommunication {
-        public EntityAddress principalAddress;
-        public EntityAddress physicalAddress;
+    public class OrganizationCommunication extends ProducerCommunication {
+        public ProducerAddress principalAddress;
+        public ProducerAddress physicalAddress;
     }
     
     // Represents phone data for multiple entities
@@ -308,7 +308,7 @@ public class LicensingReportDTO {
     }
     
     // Represents data that connects a NIPR entity(agent, agency and carrier) to an Address node which contains the actual data
-    public class EntityAddress {
+    public class ProducerAddress {
         public String asOfDate;
         public String addressReferences;
     }

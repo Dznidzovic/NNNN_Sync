@@ -1,19 +1,19 @@
 /*********************************************************
- * Apex Class Name    : ProducerTriggerHandler
+ * Apex Class Name    : EntityTriggerHandler
  * Created Date       : 04-15-2025
  * @description       : Trigger handler class that gets invoked from the d4c_Entity__c trigger and covers all DML Operation scenarios
- *                    : Invokes the Entity Info API to download NIPR data for producers and if successfull invokes the Add Target Subscription service of the NIPR API
+ *                    : Invokes the Entity Info API to download NIPR data for entitys and if successfull invokes the Add Target Subscription service of the NIPR API
  * @author            : Dev4Clouds
  * Modification Log:
  * Ver   Date         Author                   Modification
  * 1.0   03-30-2025   Dev4Clouds          Initial Version
  * 1.1   04-25-2025   Dev4Clouds          Added support for removing NPNs from subscriptions
- * 1.2   04-25-2025   Dev4Clouds          Added handler for deleted producers
+ * 1.2   04-25-2025   Dev4Clouds          Added handler for deleted entitys
  * 1.3   10-24-2025   Dev4Clouds          Added re-subscription logic for Exclude Carrier Appointments flag changes
  * 2.0   10-24-2025   Dev4Clouds          Complete refactor - SubscriptionOrchestratorQueueable architecture
  *********************************************************
  **/
-public with sharing class ProducerTriggerHandler extends BaseTriggerHandler {
+public with sharing class EntityTriggerHandler extends BaseTriggerHandler {
     @TestVisible
     private static Boolean triggerDisabled = false;
 
@@ -23,9 +23,9 @@ public with sharing class ProducerTriggerHandler extends BaseTriggerHandler {
 
     // Properties used only for asserting from withing the test class to test the business logic
     @TestVisible
-    private static Set<String> producerNPNsForEntityInfoAPIForTest;
+    private static Set<String> entityNPNsForEntityInfoAPIForTest;
     @TestVisible
-    private static List<d4c_Entity__c> deletedProducersForTest;
+    private static List<d4c_Entity__c> deletedEntitysForTest;
 
     // NEW: Properties for testing subscription operations (afterUpdate)
     @TestVisible
@@ -35,7 +35,7 @@ public with sharing class ProducerTriggerHandler extends BaseTriggerHandler {
 
     // NEW: Property for testing bulk delete subscription operations (afterDelete)
     @TestVisible
-    private static Map<String, Id> deletedProducerNPNToSubscriptionMapForTest;
+    private static Map<String, Id> deletedEntityNPNToSubscriptionMapForTest;
 
     // Property to disable subscription validation for bulk data import tests
     @TestVisible
@@ -48,14 +48,14 @@ public with sharing class ProducerTriggerHandler extends BaseTriggerHandler {
 
     public override void beforeInsert(List<SObject> newItems) {
         for (SObject obj : newItems) {
-            d4c_Entity__c producer = (d4c_Entity__c) obj;
+            d4c_Entity__c entity = (d4c_Entity__c) obj;
 
-            String producerNPN = producer.d4c_NPN__c;
-            Boolean producerSyncStatus = producer.d4c_SyncRecordToNIPR__c == 'On' ? true : false;
+            String entityNPN = entity.d4c_NPN__c;
+            Boolean entitySyncStatus = entity.d4c_SyncRecordToNIPR__c == 'On' ? true : false;
 
-            // NPN must not be empty and producer sync status must be "ON"
-            if (!String.isBlank(producerNPN) && producerSyncStatus && producer.d4c_NPNStatus__c != 'Active') {
-                producer.d4c_NPNStatus__c = 'Processing';
+            // NPN must not be empty and entity sync status must be "ON"
+            if (!String.isBlank(entityNPN) && entitySyncStatus && entity.d4c_NPNStatus__c != 'Active') {
+                entity.d4c_NPNStatus__c = 'Processing';
             }
         }
     }
@@ -64,136 +64,136 @@ public with sharing class ProducerTriggerHandler extends BaseTriggerHandler {
         // Validation: Prevent bulk updates of Exclude Carrier Appointments flag
         Integer excludeFlagChanges = 0;
 
-        for (Id producerId : newItems.keySet()) {
-            d4c_Entity__c oldProducer = (d4c_Entity__c) oldItems.get(producerId);
-            d4c_Entity__c newProducer = (d4c_Entity__c) newItems.get(producerId);
+        for (Id entityId : newItems.keySet()) {
+            d4c_Entity__c oldEntity = (d4c_Entity__c) oldItems.get(entityId);
+            d4c_Entity__c newEntity = (d4c_Entity__c) newItems.get(entityId);
 
             // Check if exclude flag changed
-            if (oldProducer.d4c_ExcludeCarrierAppointments__c != newProducer.d4c_ExcludeCarrierAppointments__c) {
+            if (oldEntity.d4c_ExcludeCarrierAppointments__c != newEntity.d4c_ExcludeCarrierAppointments__c) {
                 excludeFlagChanges++;
             }
         }
 
-        // If more than 1 producer is changing the exclude flag, block the transaction
+        // If more than 1 entity is changing the exclude flag, block the transaction
         if (excludeFlagChanges > 1) {
-            for (Id producerId : newItems.keySet()) {
-                d4c_Entity__c oldProducer = (d4c_Entity__c) oldItems.get(producerId);
-                d4c_Entity__c newProducer = (d4c_Entity__c) newItems.get(producerId);
+            for (Id entityId : newItems.keySet()) {
+                d4c_Entity__c oldEntity = (d4c_Entity__c) oldItems.get(entityId);
+                d4c_Entity__c newEntity = (d4c_Entity__c) newItems.get(entityId);
 
-                if (oldProducer.d4c_ExcludeCarrierAppointments__c != newProducer.d4c_ExcludeCarrierAppointments__c) {
-                    newProducer.addError('You cannot change the "Exclude Carrier Appointments" setting for more than 1 producer in the same transaction. Please update producers individually.');
+                if (oldEntity.d4c_ExcludeCarrierAppointments__c != newEntity.d4c_ExcludeCarrierAppointments__c) {
+                    newEntity.addError('You cannot change the "Exclude Carrier Appointments" setting for more than 1 entity in the same transaction. Please update entitys individually.');
                 }
             }
             return; // Exit early to prevent further processing
         }
 
-        for (Id producerId : newItems.keySet()) {
-            d4c_Entity__c oldProducer = (d4c_Entity__c) oldItems.get(producerId);
-            d4c_Entity__c newProducer = (d4c_Entity__c) newItems.get(producerId);
+        for (Id entityId : newItems.keySet()) {
+            d4c_Entity__c oldEntity = (d4c_Entity__c) oldItems.get(entityId);
+            d4c_Entity__c newEntity = (d4c_Entity__c) newItems.get(entityId);
 
-            String oldProducerNPN = oldProducer.d4c_NPN__c;
-            String newProducerNPN = newProducer.d4c_NPN__c;
-            Boolean oldProducerSyncStatus = oldProducer.d4c_SyncRecordToNIPR__c == 'On' ? true : false;
-            Boolean producerSyncStatus = newProducer.d4c_SyncRecordToNIPR__c == 'On' ? true : false;
+            String oldEntityNPN = oldEntity.d4c_NPN__c;
+            String newEntityNPN = newEntity.d4c_NPN__c;
+            Boolean oldEntitySyncStatus = oldEntity.d4c_SyncRecordToNIPR__c == 'On' ? true : false;
+            Boolean entitySyncStatus = newEntity.d4c_SyncRecordToNIPR__c == 'On' ? true : false;
 
-            // NPN must not be empty, must be different from the previous NPN value and producer sync status must be "ON"
-            if (!String.isBlank(newProducerNPN) && (newProducerNPN != oldProducerNPN) && producerSyncStatus &&  newProducer.d4c_NPNStatus__c != 'Active') {
-                newProducer.d4c_NPNStatus__c = 'Processing';
+            // NPN must not be empty, must be different from the previous NPN value and entity sync status must be "ON"
+            if (!String.isBlank(newEntityNPN) && (newEntityNPN != oldEntityNPN) && entitySyncStatus &&  newEntity.d4c_NPNStatus__c != 'Active') {
+                newEntity.d4c_NPNStatus__c = 'Processing';
             }
 
-            if (oldProducerSyncStatus && !producerSyncStatus) {
-                newProducer.d4c_NPNStatus__c = 'Sync Disabled';
-                newProducer.d4c_NPNSyncError__c = '';
+            if (oldEntitySyncStatus && !entitySyncStatus) {
+                newEntity.d4c_NPNStatus__c = 'Sync Disabled';
+                newEntity.d4c_NPNSyncError__c = '';
             }
         }
     }
 
     public override void afterInsert(Map<Id, SObject> newItems) {
         // Stores npn values which the full EntityInfoAPI report will be downloaded for
-        Set<String> producerNpnsForEntityInfoAPI = new Set<String>();
+        Set<String> entityNpnsForEntityInfoAPI = new Set<String>();
 
 
-        for (Id producerId : newItems.keySet()) {
-            d4c_Entity__c producer = (d4c_Entity__c) newItems.get(producerId);
+        for (Id entityId : newItems.keySet()) {
+            d4c_Entity__c entity = (d4c_Entity__c) newItems.get(entityId);
 
-            String producerNPN = producer.d4c_NPN__c;
-            Boolean producerSyncStatus = producer.d4c_SyncRecordToNIPR__c == 'On' ? true : false;
+            String entityNPN = entity.d4c_NPN__c;
+            Boolean entitySyncStatus = entity.d4c_SyncRecordToNIPR__c == 'On' ? true : false;
 
-            // NPN must not be empty, producer sync status must be "ON", and status must not already be Active
-            // (Producers created with Active status come from PDB Alert and don't need Entity Info API sync)
-            if (!String.isBlank(producerNPN) && producerSyncStatus && producer.d4c_NPNStatus__c != 'Active') {
-                producerNpnsForEntityInfoAPI.add(producerNPN);
+            // NPN must not be empty, entity sync status must be "ON", and status must not already be Active
+            // (Entitys created with Active status come from PDB Alert and don't need Entity Info API sync)
+            if (!String.isBlank(entityNPN) && entitySyncStatus && entity.d4c_NPNStatus__c != 'Active') {
+                entityNpnsForEntityInfoAPI.add(entityNPN);
             }
         }
 
         // Do not allow Queuable classes to execute from within the Test, their logic will be tested in their appropriate test classes
         if (!Test.isRunningTest() || forceProductionLogic) {
-            if (!producerNpnsForEntityInfoAPI.isEmpty()) {
+            if (!entityNpnsForEntityInfoAPI.isEmpty()) {
                 // Use orchestrator service to decide whether to execute immediately or schedule
-                EntityInfoOrchestratorService.execute(producerNpnsForEntityInfoAPI);
+                EntityInfoOrchestratorService.execute(entityNpnsForEntityInfoAPI);
             }
         } else {
-            producerNPNsForEntityInfoAPIForTest = producerNpnsForEntityInfoAPI;
+            entityNPNsForEntityInfoAPIForTest = entityNpnsForEntityInfoAPI;
         }
     }
 
     public override void afterUpdate(Map<Id, SObject> newItems, Map<Id, SObject> oldItems) {
         // Stores npn values which the full EntityInfoAPI report will be downloaded for
-        Set<String> producerNpnsForEntityInfoAPI = new Set<String>();
+        Set<String> entityNpnsForEntityInfoAPI = new Set<String>();
 
         // Track subscription operations
         String subscriptionNPN = null;
         NIPREnums.SubscriptionOperation subscriptionOperation = null;
         Integer subscriptionOperationCount = 0;
 
-        for (Id producerId : newItems.keySet()) {
-            d4c_Entity__c oldProducer = (d4c_Entity__c) oldItems.get(producerId);
-            d4c_Entity__c newProducer = (d4c_Entity__c) newItems.get(producerId);
+        for (Id entityId : newItems.keySet()) {
+            d4c_Entity__c oldEntity = (d4c_Entity__c) oldItems.get(entityId);
+            d4c_Entity__c newEntity = (d4c_Entity__c) newItems.get(entityId);
 
-            String oldProducerNPN = oldProducer.d4c_NPN__c;
-            String newProducerNPN = newProducer.d4c_NPN__c;
-            Boolean oldProducerSyncStatus = oldProducer.d4c_SyncRecordToNIPR__c == 'On' ? true : false;
-            Boolean producerSyncStatus = newProducer.d4c_SyncRecordToNIPR__c == 'On' ? true : false;
-            Boolean statusChangedToActive = oldProducer.d4c_NPNStatus__c != 'Active' && newProducer.d4c_NPNStatus__c == 'Active';
-            Boolean statusActiveStatic = oldProducer.d4c_NPNStatus__c == 'Active' && newProducer.d4c_NPNStatus__c == 'Active';
-            Boolean syncDisabled = oldProducerSyncStatus && !producerSyncStatus && newProducer.d4c_NPNStatus__c == 'Sync Disabled';
-            Boolean excludeFlagChanged = oldProducer.d4c_ExcludeCarrierAppointments__c != newProducer.d4c_ExcludeCarrierAppointments__c;
-            Boolean isActiveAndSubscribed = newProducer.d4c_NPNStatus__c == 'Active' && newProducer.d4c_Subscription__c != null;
+            String oldEntityNPN = oldEntity.d4c_NPN__c;
+            String newEntityNPN = newEntity.d4c_NPN__c;
+            Boolean oldEntitySyncStatus = oldEntity.d4c_SyncRecordToNIPR__c == 'On' ? true : false;
+            Boolean entitySyncStatus = newEntity.d4c_SyncRecordToNIPR__c == 'On' ? true : false;
+            Boolean statusChangedToActive = oldEntity.d4c_NPNStatus__c != 'Active' && newEntity.d4c_NPNStatus__c == 'Active';
+            Boolean statusActiveStatic = oldEntity.d4c_NPNStatus__c == 'Active' && newEntity.d4c_NPNStatus__c == 'Active';
+            Boolean syncDisabled = oldEntitySyncStatus && !entitySyncStatus && newEntity.d4c_NPNStatus__c == 'Sync Disabled';
+            Boolean excludeFlagChanged = oldEntity.d4c_ExcludeCarrierAppointments__c != newEntity.d4c_ExcludeCarrierAppointments__c;
+            Boolean isActiveAndSubscribed = newEntity.d4c_NPNStatus__c == 'Active' && newEntity.d4c_Subscription__c != null;
 
             // EntityInfo API logic (unchanged)
-            if ((!String.isBlank(newProducerNPN) && (newProducerNPN != oldProducerNPN) && producerSyncStatus) || (!oldProducerSyncStatus && producerSyncStatus && newProducer.d4c_NPNStatus__c != 'Active')) {
-                producerNpnsForEntityInfoAPI.add(newProducer.d4c_NPN__c);
+            if ((!String.isBlank(newEntityNPN) && (newEntityNPN != oldEntityNPN) && entitySyncStatus) || (!oldEntitySyncStatus && entitySyncStatus && newEntity.d4c_NPNStatus__c != 'Active')) {
+                entityNpnsForEntityInfoAPI.add(newEntity.d4c_NPN__c);
             }
 
 
             // REMOVE_NPN_AFTER_UPDATE
-            if (syncDisabled && !String.isBlank(newProducerNPN) && newProducer.d4c_Subscription__c != null) {
+            if (syncDisabled && !String.isBlank(newEntityNPN) && newEntity.d4c_Subscription__c != null) {
                 subscriptionOperationCount++;
-                subscriptionNPN = newProducerNPN;
+                subscriptionNPN = newEntityNPN;
                 subscriptionOperation = NIPREnums.SubscriptionOperation.REMOVE_NPN_AFTER_UPDATE;
             }
             // RESUBSCRIBE_TO_DIFFERENT_POOL
             else if (isActiveAndSubscribed && excludeFlagChanged) {
                 subscriptionOperationCount++;
-                subscriptionNPN = newProducerNPN;
+                subscriptionNPN = newEntityNPN;
                 subscriptionOperation = NIPREnums.SubscriptionOperation.RESUBSCRIBE_TO_DIFFERENT_POOL;
             }
         }
 
-        // Validate that only 1 producer can have subscription operation in same transaction
+        // Validate that only 1 entity can have subscription operation in same transaction
         // Skip validation if disabled for bulk data import tests
         if (!disableSubscriptionValidation && subscriptionOperationCount > 1) {
-            for (Id producerId : newItems.keySet()) {
-                d4c_Entity__c newProducer = (d4c_Entity__c) newItems.get(producerId);
-                newProducer.addError('You cannot perform subscription operations for more than 1 producer in the same transaction. Please update producers individually.');
+            for (Id entityId : newItems.keySet()) {
+                d4c_Entity__c newEntity = (d4c_Entity__c) newItems.get(entityId);
+                newEntity.addError('You cannot perform subscription operations for more than 1 entity in the same transaction. Please update entitys individually.');
             }
         }
 
         // Execute queueables after validation
         if (!Test.isRunningTest() || forceProductionLogic) {
             // Use orchestrator service to decide whether to execute immediately or schedule
-            if (!producerNpnsForEntityInfoAPI.isEmpty()) {
-                EntityInfoOrchestratorService.execute(producerNpnsForEntityInfoAPI);
+            if (!entityNpnsForEntityInfoAPI.isEmpty()) {
+                EntityInfoOrchestratorService.execute(entityNpnsForEntityInfoAPI);
             }
 
             // Execute subscription operation if needed (not in test mode)
@@ -201,7 +201,7 @@ public with sharing class ProducerTriggerHandler extends BaseTriggerHandler {
                 System.enqueueJob(new SubscriptionServiceExecutorQueueable(subscriptionNPN, subscriptionOperation));
             }
         } else {
-            producerNPNsForEntityInfoAPIForTest = producerNpnsForEntityInfoAPI;
+            entityNPNsForEntityInfoAPIForTest = entityNpnsForEntityInfoAPI;
             subscriptionNPNForTest = subscriptionNPN;
             subscriptionOperationForTest = subscriptionOperation;
         }
@@ -210,38 +210,38 @@ public with sharing class ProducerTriggerHandler extends BaseTriggerHandler {
      /**
      ********************************************************
      * @Method Name    : afterDelete
-     * @description    : Handles producers after they've been deleted from the database
-     *                   BULKIFIED - collects all eligible producers and makes single orchestrator call
-     * @param          : oldItems - Map of producer records that were deleted
+     * @description    : Handles entitys after they've been deleted from the database
+     *                   BULKIFIED - collects all eligible entitys and makes single orchestrator call
+     * @param          : oldItems - Map of entity records that were deleted
      * @return         : void
      ********************************************************
      **/
     public override void afterDelete(Map<Id, SObject> oldItems) {
-        List<d4c_Entity__c> oldProducers = (List<d4c_Entity__c>) oldItems.values();
+        List<d4c_Entity__c> oldEntitys = (List<d4c_Entity__c>) oldItems.values();
 
         // BULKIFIED - collect all NPNs and their subscriptions for single orchestrator call
         Map<String, Id> npnToSubscriptionMap = new Map<String, Id>();
 
-        for (d4c_Entity__c producer : oldProducers) {
-            // Only remove from subscription if producer was active and subscribed
-            if (producer.d4c_NPNStatus__c == 'Active' && producer.d4c_Subscription__c != null && String.isNotBlank(producer.d4c_NPN__c)) {
-                npnToSubscriptionMap.put(producer.d4c_NPN__c, producer.d4c_Subscription__c);
+        for (d4c_Entity__c entity : oldEntitys) {
+            // Only remove from subscription if entity was active and subscribed
+            if (entity.d4c_NPNStatus__c == 'Active' && entity.d4c_Subscription__c != null && String.isNotBlank(entity.d4c_NPN__c)) {
+                npnToSubscriptionMap.put(entity.d4c_NPN__c, entity.d4c_Subscription__c);
             }
         }
 
         if (!Test.isRunningTest()) {
-            // Single enqueue for ALL deleted producers (bulkified)
+            // Single enqueue for ALL deleted entitys (bulkified)
             if (!npnToSubscriptionMap.isEmpty()) {
                 System.enqueueJob(new SubscriptionServiceExecutorQueueable(npnToSubscriptionMap, NIPREnums.SubscriptionOperation.REMOVE_NPN_AFTER_DELETE));
             }
         } else {
-            deletedProducersForTest = new List<d4c_Entity__c>();
-            for (d4c_Entity__c producer : oldProducers) {
-                if (producer.d4c_NPNStatus__c == 'Active' && producer.d4c_Subscription__c != null) {
-                    deletedProducersForTest.add(producer);
+            deletedEntitysForTest = new List<d4c_Entity__c>();
+            for (d4c_Entity__c entity : oldEntitys) {
+                if (entity.d4c_NPNStatus__c == 'Active' && entity.d4c_Subscription__c != null) {
+                    deletedEntitysForTest.add(entity);
                 }
             }
-            deletedProducerNPNToSubscriptionMapForTest = npnToSubscriptionMap;
+            deletedEntityNPNToSubscriptionMapForTest = npnToSubscriptionMap;
         }
     }
 }

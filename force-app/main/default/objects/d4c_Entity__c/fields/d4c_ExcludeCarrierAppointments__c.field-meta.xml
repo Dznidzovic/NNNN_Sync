@@ -2,7 +2,7 @@
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
     <fullName>d4c_ExcludeCarrierAppointments__c</fullName>
     <defaultValue>false</defaultValue>
-    <description>When checked, carrier appointments will be excluded from NIPR sync and this producer will be added to subscriptions that exclude carrier appointments. Can be set automatically for large payloads or manually by users.</description>
+    <description>When checked, carrier appointments will be excluded from NIPR sync and this entity will be added to subscriptions that exclude carrier appointments. Can be set automatically for large payloads or manually by users.</description>
     <label>Exclude Carrier Appointments</label>
     <trackTrending>false</trackTrending>
     <type>Checkbox</type>

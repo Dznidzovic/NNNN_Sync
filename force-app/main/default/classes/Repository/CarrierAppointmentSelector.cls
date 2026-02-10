@@ -36,7 +36,7 @@ public with sharing class CarrierAppointmentSelector {
      * *******************************************************
      * @Method Name    : getCarrierAppointmentsByEntityNpnAndStates
      * @description    : Returns list of d4c_CarrierAppointment__c by d4c_NPN__c and d4c_StateOrProvinceCode__c
-     *                   Used for deletion logic to only query appointments for producer+state combinations
+     *                   Used for deletion logic to only query appointments for entity+state combinations
      *                   that have data in the NIPR payload
      * @param          : npns - Set of unique NPN values
      * @param          : states - Set of state/province codes

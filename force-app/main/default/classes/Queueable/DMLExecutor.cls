@@ -268,9 +268,9 @@ public class DMLExecutor implements Queueable {
             } else if (objType == 'd4c_License__c' || objType == 'd4c_CarrierAppointment__c') {
                 Set<String> npns = new Set<String>();
                 for(SObject rec : upsertRecords) {
-                    SObject producer = rec.getSObject('d4c_Entity__r');
-                    if(producer != null && producer.get('d4c_NPN__c') != null) {
-                        npns.add((String)producer.get('d4c_NPN__c'));
+                    SObject entity = rec.getSObject('d4c_Entity__r');
+                    if(entity != null && entity.get('d4c_NPN__c') != null) {
+                        npns.add((String)entity.get('d4c_NPN__c'));
                     }
                 }
                 if(!npns.isEmpty()) npnContext = ' | NPNs: ' + String.join(new List<String>(npns), ', ');

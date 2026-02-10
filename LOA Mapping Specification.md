@@ -484,12 +484,12 @@ All pages follow naming convention: `NCC_[Object]_Record_Page_Read_Only`
 1. Accounts
 2. Contacts
 3. Leads
-4. Producers
+4. Entitys
 5. Licenses
 6. Lines of Authority
 7. Carrier Appointments
-8. Producer Addresses
-9. Producer Communications
+8. Entity Addresses
+9. Entity Communications
 10. Carriers
 11. Subscriptions
 12. **Product Categories** ← New
@@ -662,7 +662,7 @@ for each d4c_LineOfAuthority__c loa in Trigger.new {
 
 #### License Example: LIC-2867
 **License Number**: 675353522
-**Producer**: (Sample from org)
+**Entity**: (Sample from org)
 
 #### Lines of Authority (4 LOAs)
 
@@ -757,8 +757,8 @@ An abstract class in the NIPR codebase that all trigger handlers extend. Provide
 **Repository Pattern**
 A design pattern where all SOQL queries are centralized in Selector classes. Enables easy mocking in tests and query reuse across services.
 
-**NIPR (National Insurance Producer Registry)**
-External system that provides insurance agent licensing data via SOAP APIs. Source of truth for Producer, License, and LOA data.
+**NIPR (National Insurance Entity Registry)**
+External system that provides insurance agent licensing data via SOAP APIs. Source of truth for Entity, License, and LOA data.
 
 **Carrier Appointment**
 A relationship between an insurance agent and an insurance carrier that authorizes the agent to sell the carrier's products. Eligibility is determined by Product Categories.

@@ -4,7 +4,7 @@
     <deleteConstraint>SetNull</deleteConstraint>
     <label>Subscription</label>
     <referenceTo>d4c_Subscription__c</referenceTo>
-    <relationshipName>Producers</relationshipName>
+    <relationshipName>Entitys</relationshipName>
     <required>false</required>
     <trackTrending>false</trackTrending>
     <type>Lookup</type>

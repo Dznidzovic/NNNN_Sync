@@ -11,7 +11,7 @@
 |    +-------------------+                      +------------------------+    |
 |    |       NIPR        |                      |     Salesforce Org     |    |
 |    |  (National Ins.   |<------ SOAP -------->|                        |    |
-|    |  Producer Reg.)   |       API            |   [This Application]   |    |
+|    |  Entity Reg.)   |       API            |   [This Application]   |    |
 |    +-------------------+                      +------------------------+    |
 |                                                                             |
 +-----------------------------------------------------------------------------+
@@ -24,10 +24,10 @@
  User Action                     System Processing                    Result
 +----------+    +------------------------------------------------+   +--------+
 |          |    |                                                |   |        |
-| Create   |--->| ProducerTrigger                                |-->| Producer|
-| Producer |    |      |                                         |   | Created |
+| Create   |--->| EntityTrigger                                |-->| Entity|
+| Entity |    |      |                                         |   | Created |
 | Record   |    |      v                                         |   |        |
-| (NPN)    |    | ProducerTriggerHandler.afterInsert()           |   +--------+
+| (NPN)    |    | EntityTriggerHandler.afterInsert()           |   +--------+
 |          |    |      |                                         |
 +----------+    |      | Check: d4c_SyncRecordToNIPR__c = 'On'    |
                 |      | Check: d4c_NPNStatus__c != 'Active'      |
@@ -48,7 +48,7 @@
                 |                 v                              |
                 |      ProcessEntityInfoApiService               |
                 |           |                                    |
-                |           +---> Create/Update Producer         |
+                |           +---> Create/Update Entity         |
                 |           +---> Create/Update Licenses         |
                 |           +---> Create/Update LOAs             |
                 |           +---> Create/Update Appointments     |
@@ -89,7 +89,7 @@
 |     |                        |                        |                     |
 |     v                        v                        v                     |
 | Create New              Update Existing         Update Carrier              |
-| Producer Records        License/LOA Data        Appointments                |
+| Entity Records        License/LOA Data        Appointments                |
 |                              |                                              |
 |                              v                                              |
 |                 Set d4c_LastNIPRSync__c on Subscription                      |
@@ -126,7 +126,7 @@
 |                                                v                            |
 |                                       +---------------------------+         |
 |                                       | License Insurance Product |         |
-|                                       | (Producer can sell this)  |         |
+|                                       | (Entity can sell this)  |         |
 |                                       +---------------------------+         |
 |                                                                             |
 +-----------------------------------------------------------------------------+
@@ -174,12 +174,12 @@
    | if capacity |           | new subscr. |           | if capacity |
    +-------------+           +-------------+           +-------------+
 
-   SubscriptionService.addProducerToSubscription()
+   SubscriptionService.addEntityToSubscription()
    ================================================
    1. Find subscription with capacity (< 500 NPNs)
    2. If none found, create new subscription
    3. Call AddNPNToSubscription SOAP API
-   4. Update d4c_Subscription__c lookup on Producer
+   4. Update d4c_Subscription__c lookup on Entity
 
 
 ==============================================================================

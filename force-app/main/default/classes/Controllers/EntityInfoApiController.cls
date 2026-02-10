@@ -24,7 +24,7 @@ public with sharing class EntityInfoApiController {
      @author         : Dev4Clouds
      @description    : Enqueues the Entity Info batch job to process the NPN asynchronously.
                        Returns immediately - user will see results after refresh.
-     @param          : npn - NPN of the producer to process data for
+     @param          : npn - NPN of the entity to process data for
      @return         : void
      *******************************************************
      **/

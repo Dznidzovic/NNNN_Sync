@@ -40,15 +40,15 @@ public class MockHelper {
     @description    : Creates a mock Account with optional Entity relationship
     @param          : name - Account name
     @param          : npn - NPN value
-    @param          : producerId - Entity ID (optional)
+    @param          : entityId - Entity ID (optional)
     @return         : Account - Mock account with fields set
     *********************************************************/
-    public static Account createMockAccount(String name, String npn, Id producerId) {
+    public static Account createMockAccount(String name, String npn, Id entityId) {
         Account acc = new Account();
         acc.Id = generateId(Account.SObjectType);
         acc.Name = name;
         acc.d4c_NPN__c = npn;
-        acc.d4c_Entity__c = producerId;
+        acc.d4c_Entity__c = entityId;
         return acc;
     }
 
@@ -58,16 +58,16 @@ public class MockHelper {
     @param          : firstName - Contact first name
     @param          : lastName - Contact last name
     @param          : npn - NPN value
-    @param          : producerId - Entity ID (optional)
+    @param          : entityId - Entity ID (optional)
     @return         : Contact - Mock contact with fields set
     *********************************************************/
-    public static Contact createMockContact(String firstName, String lastName, String npn, Id producerId) {
+    public static Contact createMockContact(String firstName, String lastName, String npn, Id entityId) {
         Contact con = new Contact();
         con.Id = generateId(Contact.SObjectType);
         con.FirstName = firstName;
         con.LastName = lastName;
         con.d4c_NPN__c = npn;
-        con.d4c_Entity__c = producerId;
+        con.d4c_Entity__c = entityId;
         return con;
     }
 
@@ -77,17 +77,17 @@ public class MockHelper {
     @param          : firstName - Lead first name
     @param          : lastName - Lead last name
     @param          : npn - NPN value
-    @param          : producerId - Entity ID (optional)
+    @param          : entityId - Entity ID (optional)
     @return         : Lead - Mock lead with fields set
     *********************************************************/
-    public static Lead createMockLead(String firstName, String lastName, String npn, Id producerId) {
+    public static Lead createMockLead(String firstName, String lastName, String npn, Id entityId) {
         Lead ld = new Lead();
         ld.Id = generateId(Lead.SObjectType);
         ld.FirstName = firstName;
         ld.LastName = lastName;
         ld.Company = 'Test Company';
         ld.d4c_NPN__c = npn;
-        ld.d4c_Entity__c = producerId;
+        ld.d4c_Entity__c = entityId;
         return ld;
     }
 
@@ -95,7 +95,7 @@ public class MockHelper {
     @Method Name    : createMockEntity
     @description    : Creates a mock Entity with NPN
     @param          : npn - NPN value
-    @return         : d4c_Entity__c - Mock producer with fields set
+    @return         : d4c_Entity__c - Mock entity with fields set
     *********************************************************/
     public static d4c_Entity__c createMockEntity(String npn) {
         d4c_Entity__c prod = new d4c_Entity__c();

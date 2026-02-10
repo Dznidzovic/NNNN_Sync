@@ -19,16 +19,16 @@ private class DMLExecutor_Test {
             npns.add(String.valueOf(i));
         }
 
-        List<d4c_Entity__c> producers = TestDataFactory.createEntitys(npns);
+        List<d4c_Entity__c> entitys = TestDataFactory.createEntitys(npns);
 
         // Execute
         Test.startTest();
-        new DMLExecutor(producers, d4c_Entity__c.d4c_NPN__c, null).execute(null);
+        new DMLExecutor(entitys, d4c_Entity__c.d4c_NPN__c, null).execute(null);
         Test.stopTest();
 
         // Assert
         List<d4c_Entity__c> inserted = [SELECT Id, d4c_NPN__c FROM d4c_Entity__c];
-        System.assertEquals(100, inserted.size(), 'Should insert 100 producers');
+        System.assertEquals(100, inserted.size(), 'Should insert 100 entitys');
     }
 
     @isTest
@@ -39,15 +39,15 @@ private class DMLExecutor_Test {
             npns.add('npn' + i);
         }
 
-        List<d4c_Entity__c> producers = TestDataFactory.createEntitys(npns);
+        List<d4c_Entity__c> entitys = TestDataFactory.createEntitys(npns);
 
         // Execute
         Test.startTest();
-        new DMLExecutor(producers, d4c_Entity__c.d4c_NPN__c, null).execute(null);
+        new DMLExecutor(entitys, d4c_Entity__c.d4c_NPN__c, null).execute(null);
         Test.stopTest();
 
         // Assert
-        System.assertEquals(9000, [SELECT count() FROM d4c_Entity__c], 'Should upsert 9k producers');
+        System.assertEquals(9000, [SELECT count() FROM d4c_Entity__c], 'Should upsert 9k entitys');
     }
 
     @isTest
@@ -72,7 +72,7 @@ private class DMLExecutor_Test {
         Test.stopTest();
 
         // Assert
-        System.assertEquals(0, [SELECT count() FROM d4c_Entity__c WHERE Id IN :idsToDelete], 'Should delete all producers');
+        System.assertEquals(0, [SELECT count() FROM d4c_Entity__c WHERE Id IN :idsToDelete], 'Should delete all entitys');
     }
 
     @isTest
@@ -83,11 +83,11 @@ private class DMLExecutor_Test {
             npns.add('delete' + i);
         }
 
-        List<d4c_Entity__c> producers = TestDataFactory.createEntitys(npns);
-        insert producers;
+        List<d4c_Entity__c> entitys = TestDataFactory.createEntitys(npns);
+        insert entitys;
 
         List<Id> idsToDelete = new List<Id>();
-        for (d4c_Entity__c p : producers) {
+        for (d4c_Entity__c p : entitys) {
             idsToDelete.add(p.Id);
         }
 
@@ -114,9 +114,9 @@ private class DMLExecutor_Test {
 
     @isTest
     static void execute_testUpsertExceptionWithNIPRServiceLogging() {
-        // Prepare Data - create producers to upsert
+        // Prepare Data - create entitys to upsert
         Set<String> npns = new Set<String>{ '11111111', '22222222' };
-        List<d4c_Entity__c> producers = TestDataFactory.createEntitys(npns);
+        List<d4c_Entity__c> entitys = TestDataFactory.createEntitys(npns);
 
         // Force exception
         DMLExecutor.forceException = true;
@@ -124,7 +124,7 @@ private class DMLExecutor_Test {
         // Execute with ProcessPDBAlertReportService caller to trigger logNIPRServiceError
         Test.startTest();
         DMLExecutor executor = new DMLExecutor(
-            producers,
+            entitys,
             d4c_Entity__c.d4c_NPN__c,
             null,
             'ProcessPDBAlertReportService'
@@ -136,6 +136,6 @@ private class DMLExecutor_Test {
         DMLExecutor.forceException = false;
 
         // Assert - exception should be handled gracefully (no records inserted)
-        System.assertEquals(0, [SELECT count() FROM d4c_Entity__c], 'No producers should be inserted due to exception');
+        System.assertEquals(0, [SELECT count() FROM d4c_Entity__c], 'No entitys should be inserted due to exception');
     }
 }

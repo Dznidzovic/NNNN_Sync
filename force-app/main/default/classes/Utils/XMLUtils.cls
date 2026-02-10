@@ -163,7 +163,7 @@ public with sharing class XMLUtils {
      *********************************************************
      * @methodName      : filterCarrierAppointments
      * @description     : Removes all APPOINTMENT_INFORMATION nodes and their children from XML response
-     *                    to reduce payload size for large producers. Uses memory-efficient approach
+     *                    to reduce payload size for large entitys. Uses memory-efficient approach
      *                    to avoid heap size issues with large payloads.
      * @param xmlResponse : The XML response string containing APPOINTMENT_INFORMATION nodes
      * @return          : XML string with all APPOINTMENT_INFORMATION nodes completely removed

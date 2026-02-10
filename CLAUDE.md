@@ -71,7 +71,7 @@ sf package install --package "<version-id>" --target-org "NIPR Package Test" --w
 ---
 
 ## Repository Overview
-This is a Salesforce DX project that integrates with the National Insurance Producer Registry (NIPR) to manage insurance agent licensing and carrier appointments. The codebase follows enterprise architectural patterns with clear separation of concerns across service, repository, and controller layers.
+This is a Salesforce DX project that integrates with the National Insurance Entity Registry (NIPR) to manage insurance agent licensing and carrier appointments. The codebase follows enterprise architectural patterns with clear separation of concerns across service, repository, and controller layers.
 
 ## Key Commands
 
@@ -149,7 +149,7 @@ The codebase follows a strict layered architecture:
 
 **Async Processing**:
 - Queueable jobs for API callouts with retry logic
-- Batch classes with size=1 for producer isolation during processing
+- Batch classes with size=1 for entity isolation during processing
 - Schedulable jobs for daily PDB Alert processing
 - **Important**: When chaining queueables, set `AsyncOptions.MaximumQueueableStackDepth` on the INITIAL enqueue only (default is 5, often need 100). Chained jobs inherit this limit.
 
@@ -187,26 +187,26 @@ The codebase follows a strict layered architecture:
 ### Change 1: Many-to-Many Relationships
 
 #### Current State (Before Refactoring)
-- `d4c_ProducerAddress__c` - Master-Detail to Producer (non-reparentable)
-- `d4c_ProducerCommunication__c` - Master-Detail to Producer (reparentable)
-- Each address/communication belongs to exactly ONE producer
+- `d4c_ProducerAddress__c` - Master-Detail to Entity (non-reparentable)
+- `d4c_ProducerCommunication__c` - Master-Detail to Entity (reparentable)
+- Each address/communication belongs to exactly ONE entity
 
 #### Target State (After Refactoring)
 - `d4c_ProducerAddress__c` - **Standalone object** (no parent relationship)
 - `d4c_ProducerCommunication__c` - **Standalone object** (no parent relationship)
 
 **NEW Junction Objects** (2):
-1. **`d4c_Producer_Address_Junction__c`**
+1. **`d4c_Entity_Address_Junction__c`**
    - Master-Detail to `d4c_Entity__c`
    - Master-Detail to `d4c_ProducerAddress__c`
-   - External ID: `d4c_UniqueIdentifier__c` (Producer NPN + Address UniqueIdentifier)
-   - Enables many-to-many: One address shared by multiple producers
+   - External ID: `d4c_UniqueIdentifier__c` (Entity NPN + Address UniqueIdentifier)
+   - Enables many-to-many: One address shared by multiple entitys
 
-2. **`d4c_Producer_Communication_Junction__c`**
+2. **`d4c_Entity_Communication_Junction__c`**
    - Master-Detail to `d4c_Entity__c`
    - Master-Detail to `d4c_ProducerCommunication__c`
-   - External ID: `d4c_UniqueIdentifier__c` (Producer NPN + Communication UniqueIdentifier)
-   - Enables many-to-many: One communication shared by multiple producers
+   - External ID: `d4c_UniqueIdentifier__c` (Entity NPN + Communication UniqueIdentifier)
+   - Enables many-to-many: One communication shared by multiple entitys
 
 **Benefits**:
 - ✅ Reduces database clutter (no duplicate addresses/communications)
@@ -288,7 +288,7 @@ Fields:
 **Purpose**: Rename core objects for better clarity and flexibility
 
 **Objects to Rename**:
-1. **Producer → Entity**: `d4c_Entity__c` → `d4c_Entity__c` (Label: "NIPR Entity")
+1. **Entity → Entity**: `d4c_Entity__c` → `d4c_Entity__c` (Label: "NIPR Entity")
 2. **ProducerAddress → NIPR_Address**: `d4c_ProducerAddress__c` → `d4c_NIPR_Address__c` (Label: "NIPR Address")
 3. **ProducerCommunication → NIPR_Communication**: `d4c_ProducerCommunication__c` → `d4c_NIPR_Communication__c` (Label: "NIPR Communication")
 4. **Logger → Log**: `d4c_Logger__c` → `d4c_Log__c` (Label: "NIPR Log")
@@ -331,7 +331,7 @@ Fields:
 ### Implementation Status
 
 **Phase 1 - Metadata Changes**:
-- [ ] Create junction objects (Producer → Address, Producer → Communication)
+- [ ] Create junction objects (Entity → Address, Entity → Communication)
 - [ ] Remove Master-Detail fields from ProducerAddress/Communication
 - [ ] Delete 4 LOA mapping objects
 - [ ] Remove fields from LineOfAuthority and License
@@ -358,9 +358,9 @@ Fields:
 
 ### Key Business Flows
 
-**Producer Import Flow**:
+**Entity Import Flow**:
 1. ProcessPDBAlertReportService orchestrates the process
-2. RetrieveEntityInfoAPIDetails fetches producer data from NIPR
+2. RetrieveEntityInfoAPIDetails fetches entity data from NIPR
 3. Data is mapped via DTOs and upserted using external IDs
 4. Related objects (licenses, appointments) are processed in sequence
 
@@ -368,12 +368,12 @@ Fields:
 1. ScheduledGetPDBAlert runs daily at 2 AM
 2. Fetches alerts for all active subscriptions
 3. QueueGetPDBSpecificReportData processes each alert
-4. Updates are applied to existing producer records
+4. Updates are applied to existing entity records
 
 **Subscription Management**:
-1. Auto-subscription for new producers without subscriptions
-2. 500 producer limit per subscription (NIPR constraint)
-3. Large producers get dedicated subscriptions
+1. Auto-subscription for new entitys without subscriptions
+2. 500 entity limit per subscription (NIPR constraint)
+3. Large entitys get dedicated subscriptions
 4. Reassignment logic for capacity management
 
 **LOA Mapping Flow** (Line of Authority → Insurance Product matching):
@@ -392,12 +392,12 @@ Fields:
 
 ## Important Business Rules
 
-1. **Subscription Limits**: Maximum 500 producers per NIPR subscription
-2. **Batch Processing**: Process producers individually (batch size=1) to isolate errors
+1. **Subscription Limits**: Maximum 500 entitys per NIPR subscription
+2. **Batch Processing**: Process entitys individually (batch size=1) to isolate errors
 3. **Retry Logic**: Failed API calls retry up to 3 times with exponential backoff
 4. **License States**: Only active licenses are synchronized
 5. **Carrier Appointments**: Can be excluded via d4c_ExcludeCarrierAppointments__c flag
-6. **NPN Field**: Producer NPN (`d4c_NPN__c`) has max length of 10 characters
+6. **NPN Field**: Entity NPN (`d4c_NPN__c`) has max length of 10 characters
 7. **LastNIPRSync**: `d4c_LastNIPRSync__c` field tracks last successful sync - ONLY set AFTER successful HTTP request, never before
 
 ## Common Development Tasks
@@ -666,8 +666,8 @@ The `niprsync` namespace affects how metadata is referenced:
 #### In Your Code (Inside Namespace)
 ```apex
 // ✅ CORRECT - No namespace prefix needed in your code
-d4c_Entity__c producer = new d4c_Entity__c();
-producer.d4c_NPN__c = '12345';
+d4c_Entity__c entity = new d4c_Entity__c();
+entity.d4c_NPN__c = '12345';
 Account acc = new Account();
 acc.d4c_NPN__c = '12345'; // Custom field on standard object
 ```
