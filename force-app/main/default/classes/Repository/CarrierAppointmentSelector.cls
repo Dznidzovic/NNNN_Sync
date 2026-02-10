@@ -13,13 +13,13 @@ public with sharing class CarrierAppointmentSelector {
 
     /**
      * *******************************************************
-     * @Method Name    : getCarrierAppointmentsByProducerNpn
+     * @Method Name    : getCarrierAppointmentsByEntityNpn
      * @description    : Returns list of d4c_Carrier by d4c_NPN__c of d4c_Entity__c object field
      * @param          : npns - Set of unique NPN values
-     * @return         : List<d4c_CarrierAppointment__c> - list of Producer records
+     * @return         : List<d4c_CarrierAppointment__c> - list of Entity records
      *******************************************************
      **/
-    public List<d4c_CarrierAppointment__c> getCarrierAppointmentsByProducerNpn(Set<String> npns) {
+    public List<d4c_CarrierAppointment__c> getCarrierAppointmentsByEntityNpn(Set<String> npns) {
         return [
             SELECT
                 Id,
@@ -34,7 +34,7 @@ public with sharing class CarrierAppointmentSelector {
 
     /**
      * *******************************************************
-     * @Method Name    : getCarrierAppointmentsByProducerNpnAndStates
+     * @Method Name    : getCarrierAppointmentsByEntityNpnAndStates
      * @description    : Returns list of d4c_CarrierAppointment__c by d4c_NPN__c and d4c_StateOrProvinceCode__c
      *                   Used for deletion logic to only query appointments for producer+state combinations
      *                   that have data in the NIPR payload
@@ -43,7 +43,7 @@ public with sharing class CarrierAppointmentSelector {
      * @return         : List<d4c_CarrierAppointment__c> - list of Carrier Appointment records
      *******************************************************
      **/
-    public List<d4c_CarrierAppointment__c> getCarrierAppointmentsByProducerNpnAndStates(Set<String> npns, Set<String> states) {
+    public List<d4c_CarrierAppointment__c> getCarrierAppointmentsByEntityNpnAndStates(Set<String> npns, Set<String> states) {
         return [
             SELECT
                 Id,

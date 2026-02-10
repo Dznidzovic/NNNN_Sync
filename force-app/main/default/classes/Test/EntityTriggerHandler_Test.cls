@@ -1,9 +1,9 @@
 /**
  *********************************************************
- * Apex Class Name    : ProducerTriggerHandler_Test
+ * Apex Class Name    : EntityTriggerHandler_Test
  * Created Date       : 04-15-2025
- * @description       : Test Class used for ProducerTriggerHandler class.
- *                      Tests only the business logic found in the Producer Trigger Handler and mocks any other services called from inside
+ * @description       : Test Class used for EntityTriggerHandler class.
+ *                      Tests only the business logic found in the Entity Trigger Handler and mocks any other services called from inside
  * @author            : Dev4Clouds
  * Modification Log:
  * Ver   Date         Author                   Modification
@@ -15,12 +15,12 @@
  *********************************************************
  **/
 @isTest
-private class ProducerTriggerHandler_Test {
+private class EntityTriggerHandler_Test {
     @isTest
-    private static void afterInsert_testEligibleProducers() {
+    private static void afterInsert_testEligibleEntitys() {
         // Create Data
         Set<String> npns = new Set<String>{'123456789', '987654321'};
-        List<d4c_Entity__c> producers = TestDataFactory.createProducers(npns);
+        List<d4c_Entity__c> producers = TestDataFactory.createEntitys(npns);
         
         // Set SyncRecordToNIPR__c to 'On' to make them eligible
         for (d4c_Entity__c producer : producers) {
@@ -33,19 +33,19 @@ private class ProducerTriggerHandler_Test {
         Test.stopTest();
         
         // Assert
-        List<d4c_Entity__c> insertedProducers = queryProducers(npns);
+        List<d4c_Entity__c> insertedEntitys = queryEntitys(npns);
 
-        System.assertEquals(2, insertedProducers.size(), 'Should have inserted 2 producers');
-        System.assertEquals(2, ProducerTriggerHandler.producerNPNsForEntityInfoAPIForTest.size(), 'Should have collected 2 NPNs');
-        System.assert(ProducerTriggerHandler.producerNPNsForEntityInfoAPIForTest.contains('123456789'), 'Should contain NPN 123456789');
-        System.assert(ProducerTriggerHandler.producerNPNsForEntityInfoAPIForTest.contains('987654321'), 'Should contain NPN 987654321');
+        System.assertEquals(2, insertedEntitys.size(), 'Should have inserted 2 producers');
+        System.assertEquals(2, EntityTriggerHandler.producerNPNsForEntityInfoAPIForTest.size(), 'Should have collected 2 NPNs');
+        System.assert(EntityTriggerHandler.producerNPNsForEntityInfoAPIForTest.contains('123456789'), 'Should contain NPN 123456789');
+        System.assert(EntityTriggerHandler.producerNPNsForEntityInfoAPIForTest.contains('987654321'), 'Should contain NPN 987654321');
     }
     
     @isTest
-    private static void afterInsert_testIneligibleProducers() {
+    private static void afterInsert_testIneligibleEntitys() {
         // Create Data
         Set<String> npns = new Set<String>{'123456789', '987654321', ''};
-        List<d4c_Entity__c> producers = TestDataFactory.createProducers(npns);
+        List<d4c_Entity__c> producers = TestDataFactory.createEntitys(npns);
         
         // Mix of On, Off and empty NPN scenarios
         producers[0].d4c_SyncRecordToNIPR__c = 'On';
@@ -58,30 +58,30 @@ private class ProducerTriggerHandler_Test {
         Test.stopTest();
         
         // Assert
-        System.assertEquals(1, ProducerTriggerHandler.producerNPNsForEntityInfoAPIForTest.size(), 'Should have collected 1 NPN');
-        System.assert(ProducerTriggerHandler.producerNPNsForEntityInfoAPIForTest.contains('123456789'), 'Should contain NPN 123456789');
-        System.assert(!ProducerTriggerHandler.producerNPNsForEntityInfoAPIForTest.contains('987654321'), 'Should not contain NPN 987654321');
+        System.assertEquals(1, EntityTriggerHandler.producerNPNsForEntityInfoAPIForTest.size(), 'Should have collected 1 NPN');
+        System.assert(EntityTriggerHandler.producerNPNsForEntityInfoAPIForTest.contains('123456789'), 'Should contain NPN 123456789');
+        System.assert(!EntityTriggerHandler.producerNPNsForEntityInfoAPIForTest.contains('987654321'), 'Should not contain NPN 987654321');
     }
     
     @isTest
     private static void afterUpdate_testNPNChanges() {
         // Create Data
         Set<String> npns = new Set<String>{'123456789', '987654321'};
-        List<d4c_Entity__c> producers = TestDataFactory.createProducers(npns);
+        List<d4c_Entity__c> producers = TestDataFactory.createEntitys(npns);
         
         // Set initial state
         for (d4c_Entity__c producer : producers) {
             producer.d4c_SyncRecordToNIPR__c = 'On';
         }
         
-        ProducerTriggerHandler.triggerDisabled = true;
+        EntityTriggerHandler.triggerDisabled = true;
         insert producers;
         
         // Update the NPNs for testing update scenario
         producers[0].d4c_NPN__c = '111222333';
         producers[1].d4c_SyncRecordToNIPR__c = 'Off';
         
-        ProducerTriggerHandler.triggerDisabled = false;
+        EntityTriggerHandler.triggerDisabled = false;
 
         // Execute
         Test.startTest();
@@ -89,17 +89,17 @@ private class ProducerTriggerHandler_Test {
         Test.stopTest();
         
         // Assert
-        System.assertEquals(1, ProducerTriggerHandler.producerNPNsForEntityInfoAPIForTest.size(), 'Should have collected 1 changed NPN');
-        System.assert(ProducerTriggerHandler.producerNPNsForEntityInfoAPIForTest.contains('111222333'), 'Should contain updated NPN 111222333');
+        System.assertEquals(1, EntityTriggerHandler.producerNPNsForEntityInfoAPIForTest.size(), 'Should have collected 1 changed NPN');
+        System.assert(EntityTriggerHandler.producerNPNsForEntityInfoAPIForTest.contains('111222333'), 'Should contain updated NPN 111222333');
     }
 
     @isTest
     private static void afterUpdate_testSubscriptionEligibility() {
         // Create Data
         Set<String> npns = new Set<String>{'123456789', '987654321', '555666777'};
-        List<d4c_Entity__c> producers = TestDataFactory.createProducers(npns);
+        List<d4c_Entity__c> producers = TestDataFactory.createEntitys(npns);
 
-        ProducerTriggerHandler.triggerDisabled = true;
+        EntityTriggerHandler.triggerDisabled = true;
 
         insert producers;
 
@@ -112,7 +112,7 @@ private class ProducerTriggerHandler_Test {
         producers[2].d4c_SyncRecordToNIPR__c = 'Off';
         producers[2].d4c_NPNStatus__c = 'Active';
 
-        ProducerTriggerHandler.triggerDisabled = false;
+        EntityTriggerHandler.triggerDisabled = false;
 
         // Execute
         Test.startTest();
@@ -121,18 +121,18 @@ private class ProducerTriggerHandler_Test {
 
         // Assert - ADD_TO_SUBSCRIPTION is now handled in RunEntityInfoReportBatchable.finish()
         // The trigger no longer handles ADD_TO_SUBSCRIPTION, so no subscription operation should be set
-        System.assertEquals(null, ProducerTriggerHandler.subscriptionNPNForTest, 'Subscription NPN should be null - ADD_TO_SUBSCRIPTION moved to batch finish');
-        System.assertEquals(null, ProducerTriggerHandler.subscriptionOperationForTest, 'Subscription operation should be null - ADD_TO_SUBSCRIPTION moved to batch finish');
+        System.assertEquals(null, EntityTriggerHandler.subscriptionNPNForTest, 'Subscription NPN should be null - ADD_TO_SUBSCRIPTION moved to batch finish');
+        System.assertEquals(null, EntityTriggerHandler.subscriptionOperationForTest, 'Subscription operation should be null - ADD_TO_SUBSCRIPTION moved to batch finish');
     }
     
     @isTest
     private static void isDisabled_testTriggerDisabled() {
         // Set trigger disabled flag
-        ProducerTriggerHandler.triggerDisabled = true;
+        EntityTriggerHandler.triggerDisabled = true;
         
         // Execute
         Test.startTest();
-        Boolean isDisabled = new ProducerTriggerHandler().isDisabled();
+        Boolean isDisabled = new EntityTriggerHandler().isDisabled();
         Test.stopTest();
         
         // Assert
@@ -143,13 +143,13 @@ private class ProducerTriggerHandler_Test {
     private static void testCombinedScenarios() {
         // Create Data
         Set<String> npns = new Set<String>{'123456789', '987654321', '555666777'};
-        List<d4c_Entity__c> producers = TestDataFactory.createProducers(npns);
+        List<d4c_Entity__c> producers = TestDataFactory.createEntitys(npns);
 
         for (d4c_Entity__c producer : producers) {
             producer.d4c_SyncRecordToNIPR__c = 'Off';
         }
 
-        ProducerTriggerHandler.triggerdisabled = true;
+        EntityTriggerHandler.triggerdisabled = true;
 
         insert producers;
 
@@ -161,7 +161,7 @@ private class ProducerTriggerHandler_Test {
 
         producers[2].d4c_NPN__c = '999888777';
 
-        ProducerTriggerHandler.triggerDisabled = false;
+        EntityTriggerHandler.triggerDisabled = false;
 
         // Execute
         Test.startTest();
@@ -169,18 +169,18 @@ private class ProducerTriggerHandler_Test {
         Test.stopTest();
 
         // Assert
-        System.assertEquals(1, ProducerTriggerHandler.producerNPNsForEntityInfoAPIForTest.size(), 'Wrong amount of NPNs');
+        System.assertEquals(1, EntityTriggerHandler.producerNPNsForEntityInfoAPIForTest.size(), 'Wrong amount of NPNs');
         // ADD_TO_SUBSCRIPTION is now handled in RunEntityInfoReportBatchable.finish()
         // The trigger no longer handles ADD_TO_SUBSCRIPTION, so no subscription operation should be set
-        System.assertEquals(null, ProducerTriggerHandler.subscriptionNPNForTest, 'Subscription NPN should be null - ADD_TO_SUBSCRIPTION moved to batch finish');
-        System.assertEquals(null, ProducerTriggerHandler.subscriptionOperationForTest, 'Subscription operation should be null - ADD_TO_SUBSCRIPTION moved to batch finish');
+        System.assertEquals(null, EntityTriggerHandler.subscriptionNPNForTest, 'Subscription NPN should be null - ADD_TO_SUBSCRIPTION moved to batch finish');
+        System.assertEquals(null, EntityTriggerHandler.subscriptionOperationForTest, 'Subscription operation should be null - ADD_TO_SUBSCRIPTION moved to batch finish');
     }
     
     @isTest
     private static void beforeInsert_testNPNStatusChanges() {
         // Create Data
         Set<String> npns = new Set<String>{'123456789', '987654321', '555666777'};
-        List<d4c_Entity__c> producers = TestDataFactory.createProducers(npns);
+        List<d4c_Entity__c> producers = TestDataFactory.createEntitys(npns);
         
         // Test different scenarios
         producers[0].d4c_SyncRecordToNIPR__c = 'On';
@@ -198,22 +198,22 @@ private class ProducerTriggerHandler_Test {
         Test.stopTest();
         
         // Assert
-        List<d4c_Entity__c> insertedProducers = queryProducers(npns);
+        List<d4c_Entity__c> insertedEntitys = queryEntitys(npns);
         
-        System.assertEquals('Processing', insertedProducers[0].d4c_NPNStatus__c, 'First producer should have NPNStatus set to Processing');
-        System.assertNotEquals('Processing', insertedProducers[1].d4c_NPNStatus__c, 'Second producer should not have NPNStatus set to Processing');
-        System.assertEquals('Active', insertedProducers[2].d4c_NPNStatus__c, 'Third producer should maintain Active status');
+        System.assertEquals('Processing', insertedEntitys[0].d4c_NPNStatus__c, 'First producer should have NPNStatus set to Processing');
+        System.assertNotEquals('Processing', insertedEntitys[1].d4c_NPNStatus__c, 'Second producer should not have NPNStatus set to Processing');
+        System.assertEquals('Active', insertedEntitys[2].d4c_NPNStatus__c, 'Third producer should maintain Active status');
     }
     
     @isTest
     private static void beforeUpdate_testNPNStatusChanges() {
         // Create Data
         Set<String> npns = new Set<String>{'123456789', '987654321', '555666777'};
-        List<d4c_Entity__c> producers = TestDataFactory.createProducers(npns);
+        List<d4c_Entity__c> producers = TestDataFactory.createEntitys(npns);
         
-        ProducerTriggerHandler.triggerDisabled = true;
+        EntityTriggerHandler.triggerDisabled = true;
         insert producers;
-        ProducerTriggerHandler.triggerDisabled = false;
+        EntityTriggerHandler.triggerDisabled = false;
         
         // Test different update scenarios
         producers[0].d4c_NPN__c = '111222333';
@@ -232,14 +232,14 @@ private class ProducerTriggerHandler_Test {
         Test.stopTest();
         
         // Assert
-        List<d4c_Entity__c> updatedProducers = queryProducers(new Set<String>{'111222333', '987654321', '999888777'});
+        List<d4c_Entity__c> updatedEntitys = queryEntitys(new Set<String>{'111222333', '987654321', '999888777'});
         
         // Find each producer by its NPN
         d4c_Entity__c producer1 = null;
         d4c_Entity__c producer2 = null;
         d4c_Entity__c producer3 = null;
         
-        for (d4c_Entity__c p : updatedProducers) {
+        for (d4c_Entity__c p : updatedEntitys) {
             if (p.d4c_NPN__c == '111222333') producer1 = p;
             if (p.d4c_NPN__c == '987654321') producer2 = p;
             if (p.d4c_NPN__c == '999888777') producer3 = p;
@@ -254,7 +254,7 @@ private class ProducerTriggerHandler_Test {
     private static void beforeUpdate_testSyncDisabled() {
         // Create Data
         Set<String> npns = new Set<String>{'123456789', '987654321'};
-        List<d4c_Entity__c> producers = TestDataFactory.createProducers(npns);
+        List<d4c_Entity__c> producers = TestDataFactory.createEntitys(npns);
         
         // Set initial state - both with Sync On
         producers[0].d4c_SyncRecordToNIPR__c = 'On';
@@ -265,9 +265,9 @@ private class ProducerTriggerHandler_Test {
         producers[1].d4c_NPNStatus__c = 'Processing';
         producers[1].d4c_NPNSyncError__c = 'Another error message';
         
-        ProducerTriggerHandler.triggerDisabled = true;
+        EntityTriggerHandler.triggerDisabled = true;
         insert producers;
-        ProducerTriggerHandler.triggerDisabled = false;
+        EntityTriggerHandler.triggerDisabled = false;
         
         // Update scenario - turning sync off
         producers[0].d4c_SyncRecordToNIPR__c = 'Off';
@@ -278,27 +278,27 @@ private class ProducerTriggerHandler_Test {
         Test.stopTest();
         
         // Assert
-        List<d4c_Entity__c> updatedProducers = queryProducers(npns);
+        List<d4c_Entity__c> updatedEntitys = queryEntitys(npns);
         
-        System.assertEquals('Sync Disabled', updatedProducers[0].d4c_NPNStatus__c, 'First producer should have NPNStatus set to Sync Disabled');
-        System.assertEquals(null, updatedProducers[0].d4c_NPNSyncError__c, 'First producer should have error message cleared');
-        System.assertNotEquals('Sync Disabled', updatedProducers[1].d4c_NPNStatus__c, 'Second producer should not have NPNStatus changed to Sync Disabled');
+        System.assertEquals('Sync Disabled', updatedEntitys[0].d4c_NPNStatus__c, 'First producer should have NPNStatus set to Sync Disabled');
+        System.assertEquals(null, updatedEntitys[0].d4c_NPNSyncError__c, 'First producer should have error message cleared');
+        System.assertNotEquals('Sync Disabled', updatedEntitys[1].d4c_NPNStatus__c, 'Second producer should not have NPNStatus changed to Sync Disabled');
     }
     
     @isTest
     private static void afterUpdate_testSyncStatusChange() {
         // Create Data
         Set<String> npns = new Set<String>{'123456789', '987654321'};
-        List<d4c_Entity__c> producers = TestDataFactory.createProducers(npns);
+        List<d4c_Entity__c> producers = TestDataFactory.createEntitys(npns);
         
         // Set initial state - both with Sync Off
         for (d4c_Entity__c producer : producers) {
             producer.d4c_SyncRecordToNIPR__c = 'Off';
         }
         
-        ProducerTriggerHandler.triggerDisabled = true;
+        EntityTriggerHandler.triggerDisabled = true;
         insert producers;
-        ProducerTriggerHandler.triggerDisabled = false;
+        EntityTriggerHandler.triggerDisabled = false;
         
         // Update to turn sync on
         producers[0].d4c_SyncRecordToNIPR__c = 'On';
@@ -310,9 +310,9 @@ private class ProducerTriggerHandler_Test {
         Test.stopTest();
         
         // Assert
-        System.assertEquals(2, ProducerTriggerHandler.producerNPNsForEntityInfoAPIForTest.size(), 'Should have collected 2 NPNs');
-        System.assert(ProducerTriggerHandler.producerNPNsForEntityInfoAPIForTest.contains('123456789'), 'Should contain NPN 123456789');
-        System.assert(ProducerTriggerHandler.producerNPNsForEntityInfoAPIForTest.contains('987654321'), 'Should contain NPN 987654321');
+        System.assertEquals(2, EntityTriggerHandler.producerNPNsForEntityInfoAPIForTest.size(), 'Should have collected 2 NPNs');
+        System.assert(EntityTriggerHandler.producerNPNsForEntityInfoAPIForTest.contains('123456789'), 'Should contain NPN 123456789');
+        System.assert(EntityTriggerHandler.producerNPNsForEntityInfoAPIForTest.contains('987654321'), 'Should contain NPN 987654321');
     }
     
     /**
@@ -323,7 +323,7 @@ private class ProducerTriggerHandler_Test {
     @isTest
     private static void afterUpdate_testNPNRemovalEligibility() {
         // Create Data - producer with subscription and Active status
-        d4c_Entity__c producer = TestDataFactory.createProducer('123456789');
+        d4c_Entity__c producer = TestDataFactory.createEntity('123456789');
 
         // Create a mock subscription record
         d4c_Subscription__c subscription = TestDataFactory.createSubscription(false);
@@ -334,9 +334,9 @@ private class ProducerTriggerHandler_Test {
         producer.d4c_NPNStatus__c = 'Active';
         producer.d4c_Subscription__c = subscription.Id;
 
-        ProducerTriggerHandler.triggerDisabled = true;
+        EntityTriggerHandler.triggerDisabled = true;
         insert producer;
-        ProducerTriggerHandler.triggerDisabled = false;
+        EntityTriggerHandler.triggerDisabled = false;
 
         // Update scenario - turning sync off (triggers REMOVE_NPN_AFTER_UPDATE)
         producer.d4c_SyncRecordToNIPR__c = 'Off';
@@ -347,58 +347,58 @@ private class ProducerTriggerHandler_Test {
         Test.stopTest();
 
         // Assert - NEW: Use subscriptionNPNForTest and subscriptionOperationForTest
-        System.assertNotEquals(null, ProducerTriggerHandler.subscriptionNPNForTest, 'Subscription NPN should be set');
-        System.assertEquals('123456789', ProducerTriggerHandler.subscriptionNPNForTest, 'Should have NPN 123456789 for removal');
-        System.assertEquals(NIPREnums.SubscriptionOperation.REMOVE_NPN_AFTER_UPDATE, ProducerTriggerHandler.subscriptionOperationForTest, 'Operation should be REMOVE_NPN_AFTER_UPDATE');
+        System.assertNotEquals(null, EntityTriggerHandler.subscriptionNPNForTest, 'Subscription NPN should be set');
+        System.assertEquals('123456789', EntityTriggerHandler.subscriptionNPNForTest, 'Should have NPN 123456789 for removal');
+        System.assertEquals(NIPREnums.SubscriptionOperation.REMOVE_NPN_AFTER_UPDATE, EntityTriggerHandler.subscriptionOperationForTest, 'Operation should be REMOVE_NPN_AFTER_UPDATE');
     }
     
     /**
      * Test for the afterDelete method to verify producers are correctly identified for NPN removal
-     * NEW: Tests bulkified Map<String, Id> deletedProducerNPNToSubscriptionMapForTest
+     * NEW: Tests bulkified Map<String, Id> deletedEntityNPNToSubscriptionMapForTest
      */
     @isTest
-    private static void afterDelete_testNPNRemovalFromDeletedProducers() {
+    private static void afterDelete_testNPNRemovalFromDeletedEntitys() {
         // Create Data - producers with subscriptions and Active status
         Set<String> npns = new Set<String>{'123456789', '987654321', '555666777'};
-        List<d4c_Entity__c> producers = TestDataFactory.createProducers(npns);
+        List<d4c_Entity__c> producers = TestDataFactory.createEntitys(npns);
 
         // Create a mock subscription record
         d4c_Subscription__c subscription = TestDataFactory.createSubscription(false);
         insert subscription;
 
         // Set producers with different statuses
-        // Producer 0: Active with subscription - should be eligible for removal
+        // Entity 0: Active with subscription - should be eligible for removal
         producers[0].d4c_NPNStatus__c = 'Active';
         producers[0].d4c_Subscription__c = subscription.Id;
 
-        // Producer 1: Not Active but with subscription - should not be eligible
+        // Entity 1: Not Active but with subscription - should not be eligible
         producers[1].d4c_NPNStatus__c = 'Inactive';
         producers[1].d4c_Subscription__c = subscription.Id;
 
-        // Producer 2: Active but no subscription - should not be eligible
+        // Entity 2: Active but no subscription - should not be eligible
         producers[2].d4c_NPNStatus__c = 'Active';
         producers[2].d4c_Subscription__c = null;
 
-        ProducerTriggerHandler.triggerDisabled = true;
+        EntityTriggerHandler.triggerDisabled = true;
         insert producers;
-        ProducerTriggerHandler.triggerDisabled = false;
+        EntityTriggerHandler.triggerDisabled = false;
 
         // Execute - delete the producers
         Test.startTest();
         delete producers;
         Test.stopTest();
 
-        // Assert - NEW: Use deletedProducerNPNToSubscriptionMapForTest
-        System.assertEquals(1, ProducerTriggerHandler.deletedProducersForTest.size(),
+        // Assert - NEW: Use deletedEntityNPNToSubscriptionMapForTest
+        System.assertEquals(1, EntityTriggerHandler.deletedEntitysForTest.size(),
                           'Should have collected 1 producer for NPN removal after delete');
 
-        System.assertEquals('123456789', ProducerTriggerHandler.deletedProducersForTest[0].d4c_NPN__c,
+        System.assertEquals('123456789', EntityTriggerHandler.deletedEntitysForTest[0].d4c_NPN__c,
                           'The eligible producer should have NPN 123456789');
 
         // NEW: Assert the bulkified Map property
-        System.assertNotEquals(null, ProducerTriggerHandler.deletedProducerNPNToSubscriptionMapForTest, 'Map should be populated');
-        System.assertEquals(1, ProducerTriggerHandler.deletedProducerNPNToSubscriptionMapForTest.size(), 'Map should have 1 entry');
-        System.assertEquals(subscription.Id, ProducerTriggerHandler.deletedProducerNPNToSubscriptionMapForTest.get('123456789'), 'NPN should map to subscription ID');
+        System.assertNotEquals(null, EntityTriggerHandler.deletedEntityNPNToSubscriptionMapForTest, 'Map should be populated');
+        System.assertEquals(1, EntityTriggerHandler.deletedEntityNPNToSubscriptionMapForTest.size(), 'Map should have 1 entry');
+        System.assertEquals(subscription.Id, EntityTriggerHandler.deletedEntityNPNToSubscriptionMapForTest.get('123456789'), 'NPN should map to subscription ID');
     }
     
     /**
@@ -411,19 +411,19 @@ private class ProducerTriggerHandler_Test {
         d4c_Subscription__c subscription = TestDataFactory.createSubscription(false);
         insert subscription;
 
-        d4c_Entity__c producer1 = TestDataFactory.createProducer('123456789');
+        d4c_Entity__c producer1 = TestDataFactory.createEntity('123456789');
         producer1.d4c_SyncRecordToNIPR__c = 'On';
         producer1.d4c_NPNStatus__c = 'Active';
         producer1.d4c_Subscription__c = subscription.Id;
 
-        d4c_Entity__c producer2 = TestDataFactory.createProducer('987654321');
+        d4c_Entity__c producer2 = TestDataFactory.createEntity('987654321');
         producer2.d4c_SyncRecordToNIPR__c = 'On';
         producer2.d4c_NPNStatus__c = 'Active';
         producer2.d4c_Subscription__c = subscription.Id;
 
-        ProducerTriggerHandler.triggerDisabled = true;
+        EntityTriggerHandler.triggerDisabled = true;
         insert new List<d4c_Entity__c>{producer1, producer2};
-        ProducerTriggerHandler.triggerDisabled = false;
+        EntityTriggerHandler.triggerDisabled = false;
 
         // Try to trigger subscription operations on both (should fail)
         producer1.d4c_SyncRecordToNIPR__c = 'Off'; // Trigger REMOVE_NPN_AFTER_UPDATE
@@ -451,7 +451,7 @@ private class ProducerTriggerHandler_Test {
         subscription.d4c_ExcludeCarrierAppointments__c = false;
         update subscription;
 
-        d4c_Entity__c producer = TestDataFactory.createProducer('12345678');
+        d4c_Entity__c producer = TestDataFactory.createEntity('12345678');
         producer.d4c_SyncRecordToNIPR__c = 'On';
         producer.d4c_NPNStatus__c = 'Active';
         producer.d4c_ExcludeCarrierAppointments__c = false;
@@ -467,9 +467,9 @@ private class ProducerTriggerHandler_Test {
         Test.stopTest();
 
         // Assert - NEW: Use subscriptionNPNForTest and subscriptionOperationForTest
-        System.assertNotEquals(null, ProducerTriggerHandler.subscriptionNPNForTest, 'Subscription NPN should be set');
-        System.assertEquals('12345678', ProducerTriggerHandler.subscriptionNPNForTest, 'Should have NPN 12345678');
-        System.assertEquals(NIPREnums.SubscriptionOperation.RESUBSCRIBE_TO_DIFFERENT_POOL, ProducerTriggerHandler.subscriptionOperationForTest, 'Operation should be RESUBSCRIBE_TO_DIFFERENT_POOL');
+        System.assertNotEquals(null, EntityTriggerHandler.subscriptionNPNForTest, 'Subscription NPN should be set');
+        System.assertEquals('12345678', EntityTriggerHandler.subscriptionNPNForTest, 'Should have NPN 12345678');
+        System.assertEquals(NIPREnums.SubscriptionOperation.RESUBSCRIBE_TO_DIFFERENT_POOL, EntityTriggerHandler.subscriptionOperationForTest, 'Operation should be RESUBSCRIBE_TO_DIFFERENT_POOL');
     }
 
     @isTest
@@ -479,7 +479,7 @@ private class ProducerTriggerHandler_Test {
         subscription.d4c_ExcludeCarrierAppointments__c = true;
         update subscription;
 
-        d4c_Entity__c producer = TestDataFactory.createProducer('87654321');
+        d4c_Entity__c producer = TestDataFactory.createEntity('87654321');
         producer.d4c_SyncRecordToNIPR__c = 'On';
         producer.d4c_NPNStatus__c = 'Active';
         producer.d4c_ExcludeCarrierAppointments__c = true;
@@ -495,9 +495,9 @@ private class ProducerTriggerHandler_Test {
         Test.stopTest();
 
         // Assert - NEW: Use subscriptionNPNForTest and subscriptionOperationForTest
-        System.assertNotEquals(null, ProducerTriggerHandler.subscriptionNPNForTest, 'Subscription NPN should be set');
-        System.assertEquals('87654321', ProducerTriggerHandler.subscriptionNPNForTest, 'Should have NPN 87654321');
-        System.assertEquals(NIPREnums.SubscriptionOperation.RESUBSCRIBE_TO_DIFFERENT_POOL, ProducerTriggerHandler.subscriptionOperationForTest, 'Operation should be RESUBSCRIBE_TO_DIFFERENT_POOL');
+        System.assertNotEquals(null, EntityTriggerHandler.subscriptionNPNForTest, 'Subscription NPN should be set');
+        System.assertEquals('87654321', EntityTriggerHandler.subscriptionNPNForTest, 'Should have NPN 87654321');
+        System.assertEquals(NIPREnums.SubscriptionOperation.RESUBSCRIBE_TO_DIFFERENT_POOL, EntityTriggerHandler.subscriptionOperationForTest, 'Operation should be RESUBSCRIBE_TO_DIFFERENT_POOL');
     }
 
     @isTest
@@ -505,7 +505,7 @@ private class ProducerTriggerHandler_Test {
         // Test that producers not active or not subscribed are NOT flagged for re-subscription
 
         // Create producer 1 - Not Active
-        d4c_Entity__c producer1 = TestDataFactory.createProducer('11111111');
+        d4c_Entity__c producer1 = TestDataFactory.createEntity('11111111');
         producer1.d4c_SyncRecordToNIPR__c = 'On';
         producer1.d4c_NPNStatus__c = 'Processing'; // Not Active
         producer1.d4c_ExcludeCarrierAppointments__c = false;
@@ -513,7 +513,7 @@ private class ProducerTriggerHandler_Test {
         insert producer1;
 
         // Create producer 2 - Active but not subscribed
-        d4c_Entity__c producer2 = TestDataFactory.createProducer('22222222');
+        d4c_Entity__c producer2 = TestDataFactory.createEntity('22222222');
         producer2.d4c_SyncRecordToNIPR__c = 'On';
         producer2.d4c_NPNStatus__c = 'Active'; // Active but not subscribed
         producer2.d4c_ExcludeCarrierAppointments__c = false;
@@ -528,7 +528,7 @@ private class ProducerTriggerHandler_Test {
         update producer1;
 
         // Assert - producer1 should NOT be flagged for re-subscription (not active)
-        System.assertEquals(null, ProducerTriggerHandler.subscriptionNPNForTest, 'No subscription operation should be triggered for inactive producer');
+        System.assertEquals(null, EntityTriggerHandler.subscriptionNPNForTest, 'No subscription operation should be triggered for inactive producer');
 
         // Update producer 2 to change exclude flag (active but no subscription, should not be flagged)
         producer2.d4c_ExcludeCarrierAppointments__c = true;
@@ -536,7 +536,7 @@ private class ProducerTriggerHandler_Test {
         Test.stopTest();
 
         // Assert - producer2 should NOT be flagged for re-subscription (no subscription)
-        System.assertEquals(null, ProducerTriggerHandler.subscriptionNPNForTest, 'No subscription operation should be triggered for producer without subscription');
+        System.assertEquals(null, EntityTriggerHandler.subscriptionNPNForTest, 'No subscription operation should be triggered for producer without subscription');
     }
 
     @isTest
@@ -545,7 +545,7 @@ private class ProducerTriggerHandler_Test {
 
         d4c_Subscription__c subscription = TestDataFactory.createSubscription(true);
 
-        d4c_Entity__c producer = TestDataFactory.createProducer('99999999');
+        d4c_Entity__c producer = TestDataFactory.createEntity('99999999');
         producer.d4c_SyncRecordToNIPR__c = 'On';
         producer.d4c_NPNStatus__c = 'Active';
         producer.d4c_ExcludeCarrierAppointments__c = false;
@@ -561,7 +561,7 @@ private class ProducerTriggerHandler_Test {
         Test.stopTest();
 
         // Assert - producer should NOT be flagged for re-subscription (sync was turned off, triggers REMOVE operation instead)
-        System.assertEquals(NIPREnums.SubscriptionOperation.REMOVE_NPN_AFTER_UPDATE, ProducerTriggerHandler.subscriptionOperationForTest, 'Should trigger REMOVE_NPN_AFTER_UPDATE since sync was disabled');
+        System.assertEquals(NIPREnums.SubscriptionOperation.REMOVE_NPN_AFTER_UPDATE, EntityTriggerHandler.subscriptionOperationForTest, 'Should trigger REMOVE_NPN_AFTER_UPDATE since sync was disabled');
     }
 
     @isTest
@@ -569,13 +569,13 @@ private class ProducerTriggerHandler_Test {
         // Test that bulk updates of exclude flag are blocked
 
         // Create 3 producers
-        d4c_Entity__c producer1 = TestDataFactory.createProducer('11111111');
+        d4c_Entity__c producer1 = TestDataFactory.createEntity('11111111');
         producer1.d4c_ExcludeCarrierAppointments__c = false;
 
-        d4c_Entity__c producer2 = TestDataFactory.createProducer('22222222');
+        d4c_Entity__c producer2 = TestDataFactory.createEntity('22222222');
         producer2.d4c_ExcludeCarrierAppointments__c = false;
 
-        d4c_Entity__c producer3 = TestDataFactory.createProducer('33333333');
+        d4c_Entity__c producer3 = TestDataFactory.createEntity('33333333');
         producer3.d4c_ExcludeCarrierAppointments__c = false;
 
         insert new List<d4c_Entity__c>{producer1, producer2, producer3};
@@ -599,15 +599,15 @@ private class ProducerTriggerHandler_Test {
         Test.stopTest();
 
         // Verify producers were not updated
-        List<d4c_Entity__c> updatedProducers = [
+        List<d4c_Entity__c> updatedEntitys = [
             SELECT Id, d4c_ExcludeCarrierAppointments__c
             FROM d4c_Entity__c
             WHERE Id IN :new List<Id>{producer1.Id, producer2.Id}
         ];
 
-        for (d4c_Entity__c p : updatedProducers) {
+        for (d4c_Entity__c p : updatedEntitys) {
             System.assertEquals(false, p.d4c_ExcludeCarrierAppointments__c,
-                              'Producers should not have been updated due to validation error');
+                              'Entitys should not have been updated due to validation error');
         }
     }
 
@@ -616,10 +616,10 @@ private class ProducerTriggerHandler_Test {
         // Test that single producer exclude flag change is allowed
 
         // Create 2 producers
-        d4c_Entity__c producer1 = TestDataFactory.createProducer('44444444');
+        d4c_Entity__c producer1 = TestDataFactory.createEntity('44444444');
         producer1.d4c_ExcludeCarrierAppointments__c = false;
 
-        d4c_Entity__c producer2 = TestDataFactory.createProducer('55555555');
+        d4c_Entity__c producer2 = TestDataFactory.createEntity('55555555');
         producer2.d4c_ExcludeCarrierAppointments__c = false;
 
         insert new List<d4c_Entity__c>{producer1, producer2};
@@ -633,13 +633,13 @@ private class ProducerTriggerHandler_Test {
         Test.stopTest();
 
         // Verify producer was updated
-        d4c_Entity__c updatedProducer = [
+        d4c_Entity__c updatedEntity = [
             SELECT Id, d4c_ExcludeCarrierAppointments__c
             FROM d4c_Entity__c
             WHERE Id = :producer1.Id
         ];
 
-        System.assertEquals(true, updatedProducer.d4c_ExcludeCarrierAppointments__c,
+        System.assertEquals(true, updatedEntity.d4c_ExcludeCarrierAppointments__c,
                           'Single producer should be allowed to update exclude flag');
     }
 
@@ -664,9 +664,9 @@ private class ProducerTriggerHandler_Test {
         Test.stopTest();
 
         // Assert: NPN should be collected for EntityInfoOrchestratorService
-        System.assertEquals(1, ProducerTriggerHandler.producerNPNsForEntityInfoAPIForTest.size(),
+        System.assertEquals(1, EntityTriggerHandler.producerNPNsForEntityInfoAPIForTest.size(),
             'Should have collected 1 NPN for orchestrator');
-        System.assert(ProducerTriggerHandler.producerNPNsForEntityInfoAPIForTest.contains('777888999'),
+        System.assert(EntityTriggerHandler.producerNPNsForEntityInfoAPIForTest.contains('777888999'),
             'Should contain the correct NPN');
     }
 
@@ -681,9 +681,9 @@ private class ProducerTriggerHandler_Test {
             d4c_SyncRecordToNIPR__c = 'Off'
         );
 
-        ProducerTriggerHandler.triggerDisabled = true;
+        EntityTriggerHandler.triggerDisabled = true;
         insert producer;
-        ProducerTriggerHandler.triggerDisabled = false;
+        EntityTriggerHandler.triggerDisabled = false;
 
         // Update to turn sync on
         producer.d4c_SyncRecordToNIPR__c = 'On';
@@ -694,9 +694,9 @@ private class ProducerTriggerHandler_Test {
         Test.stopTest();
 
         // Assert: NPN should be collected for EntityInfoOrchestratorService
-        System.assertEquals(1, ProducerTriggerHandler.producerNPNsForEntityInfoAPIForTest.size(),
+        System.assertEquals(1, EntityTriggerHandler.producerNPNsForEntityInfoAPIForTest.size(),
             'Should have collected 1 NPN for orchestrator');
-        System.assert(ProducerTriggerHandler.producerNPNsForEntityInfoAPIForTest.contains('888999000'),
+        System.assert(EntityTriggerHandler.producerNPNsForEntityInfoAPIForTest.contains('888999000'),
             'Should contain the correct NPN');
     }
 
@@ -728,13 +728,13 @@ private class ProducerTriggerHandler_Test {
         Test.stopTest();
 
         // Assert: All 3 NPNs should be collected for processing
-        System.assertEquals(3, ProducerTriggerHandler.producerNPNsForEntityInfoAPIForTest.size(),
+        System.assertEquals(3, EntityTriggerHandler.producerNPNsForEntityInfoAPIForTest.size(),
                           'Should have collected 3 NPNs');
-        System.assert(ProducerTriggerHandler.producerNPNsForEntityInfoAPIForTest.contains('111000111'),
+        System.assert(EntityTriggerHandler.producerNPNsForEntityInfoAPIForTest.contains('111000111'),
                      'Should contain NPN 111000111');
-        System.assert(ProducerTriggerHandler.producerNPNsForEntityInfoAPIForTest.contains('222000222'),
+        System.assert(EntityTriggerHandler.producerNPNsForEntityInfoAPIForTest.contains('222000222'),
                      'Should contain NPN 222000222');
-        System.assert(ProducerTriggerHandler.producerNPNsForEntityInfoAPIForTest.contains('333000333'),
+        System.assert(EntityTriggerHandler.producerNPNsForEntityInfoAPIForTest.contains('333000333'),
                      'Should contain NPN 333000333');
     }
 
@@ -742,7 +742,7 @@ private class ProducerTriggerHandler_Test {
     // SELECTOR METHODS
     // ==========================================
 
-    private static List<d4c_Entity__c> queryProducers(Set<String> npns) {
+    private static List<d4c_Entity__c> queryEntitys(Set<String> npns) {
         return [
             SELECT
                 Id,

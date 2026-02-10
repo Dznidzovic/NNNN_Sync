@@ -23,8 +23,8 @@ private class LineOfAuthorityTriggerHandler_Test {
         // Disable trigger during setup to insert base data
         LineOfAuthorityTriggerHandler.triggerDisabled = true;
 
-        // Create Producer
-        d4c_Entity__c producer = TestDataFactory.createProducer('TEST123456');
+        // Create Entity
+        d4c_Entity__c producer = TestDataFactory.createEntity('TEST123456');
         insert producer;
 
         // Create License

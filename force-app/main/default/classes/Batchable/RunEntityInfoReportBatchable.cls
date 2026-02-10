@@ -5,7 +5,7 @@
  * @description       : Batchable class that triggers the NIPR Entity Info API integration
  *                      for each provided NPN. Replaces queueable chaining to avoid the
  *                      "Too many queueable jobs" issue. Handles errors and updates
- *                      Producer status fields as needed.
+ *                      Entity status fields as needed.
  *                      Uses Database.Stateful to collect successful NPNs and process
  *                      subscription additions in finish() via SubscriptionServiceExecutorQueueable.
  * @author            : Dev4Clouds
@@ -57,7 +57,7 @@ public with sharing class RunEntityInfoReportBatchable implements Database.Batch
 
                 // Track successful NPN for subscription processing in finish()
                 // Query the producer to check its exclude flag
-                List<d4c_Entity__c> producers = producerSelector.getProducersByNPNs(new Set<String>{ npn });
+                List<d4c_Entity__c> producers = producerSelector.getEntitysByNPNs(new Set<String>{ npn });
                 if (!producers.isEmpty()) {
                     d4c_Entity__c producer = producers[0];
                     // Only add NPNs that are Active and don't already have a subscription
@@ -75,10 +75,10 @@ public with sharing class RunEntityInfoReportBatchable implements Database.Batch
 
                 String exceptionMessage = e.getMessage();
 
-                List<d4c_Entity__c> producers = producerSelector.getProducersByNPNs(new Set<String>{ npn });
+                List<d4c_Entity__c> producers = producerSelector.getEntitysByNPNs(new Set<String>{ npn });
 
                 if (producers == null || producers.isEmpty()) {
-                    Logger.warning(CLASS_NAME, methodName, 'Producer with this NPN not yet created',
+                    Logger.warning(CLASS_NAME, methodName, 'Entity with this NPN not yet created',
                                  'NPN: ' + npn, null);
                 } else {
                     d4c_Entity__c producer = producers[0];

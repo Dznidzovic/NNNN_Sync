@@ -19,7 +19,7 @@ private class RunEntityInfoReportSchedulable_Test {
      * and executes the batch. Uses single producer to avoid governor limits.
      */
     @isTest
-    private static void execute_withProcessingProducers_executesBatch() {
+    private static void execute_withProcessingEntitys_executesBatch() {
         // Arrange: Create single producer with 'Processing' status
         DateTime scheduledSince = DateTime.now().addSeconds(-5);
 
@@ -29,9 +29,9 @@ private class RunEntityInfoReportSchedulable_Test {
             d4c_NPNStatus__c = 'Processing'
         );
 
-        ProducerTriggerHandler.triggerDisabled = true;
+        EntityTriggerHandler.triggerDisabled = true;
         insert producer;
-        ProducerTriggerHandler.triggerDisabled = false;
+        EntityTriggerHandler.triggerDisabled = false;
 
         // Act
         Test.startTest();
@@ -49,7 +49,7 @@ private class RunEntityInfoReportSchedulable_Test {
      * have 'Processing' status
      */
     @isTest
-    private static void execute_withNoProcessingProducers_doesNotExecuteBatch() {
+    private static void execute_withNoProcessingEntitys_doesNotExecuteBatch() {
         // Arrange: Create producers with 'Active' status (not 'Processing')
         DateTime scheduledSince = DateTime.now().addSeconds(-5);
 
@@ -63,9 +63,9 @@ private class RunEntityInfoReportSchedulable_Test {
             producers.add(producer);
         }
 
-        ProducerTriggerHandler.triggerDisabled = true;
+        EntityTriggerHandler.triggerDisabled = true;
         insert producers;
-        ProducerTriggerHandler.triggerDisabled = false;
+        EntityTriggerHandler.triggerDisabled = false;
 
         // Act
         Test.startTest();
@@ -82,7 +82,7 @@ private class RunEntityInfoReportSchedulable_Test {
      * Only producers modified after scheduledSince should be processed
      */
     @isTest
-    private static void execute_filtersProducersByLastModifiedDate() {
+    private static void execute_filtersEntitysByLastModifiedDate() {
         // Arrange: Create producers, then set scheduledSince to future (simulating old records)
         List<d4c_Entity__c> producers = new List<d4c_Entity__c>();
         for (Integer i = 0; i < 3; i++) {
@@ -94,9 +94,9 @@ private class RunEntityInfoReportSchedulable_Test {
             producers.add(producer);
         }
 
-        ProducerTriggerHandler.triggerDisabled = true;
+        EntityTriggerHandler.triggerDisabled = true;
         insert producers;
-        ProducerTriggerHandler.triggerDisabled = false;
+        EntityTriggerHandler.triggerDisabled = false;
 
         // Set scheduledSince to future - should filter out all records
         DateTime scheduledSince = DateTime.now().addMinutes(10);
@@ -131,9 +131,9 @@ private class RunEntityInfoReportSchedulable_Test {
             d4c_NPNStatus__c = 'Processing'
         );
 
-        ProducerTriggerHandler.triggerDisabled = true;
+        EntityTriggerHandler.triggerDisabled = true;
         insert new List<d4c_Entity__c>{producerSyncOn, producerSyncOff};
-        ProducerTriggerHandler.triggerDisabled = false;
+        EntityTriggerHandler.triggerDisabled = false;
 
         // Act
         Test.startTest();
@@ -165,9 +165,9 @@ private class RunEntityInfoReportSchedulable_Test {
             d4c_NPNStatus__c = 'Processing'
         );
 
-        ProducerTriggerHandler.triggerDisabled = true;
+        EntityTriggerHandler.triggerDisabled = true;
         insert new List<d4c_Entity__c>{producerWithNPN, producerNoNPN};
-        ProducerTriggerHandler.triggerDisabled = false;
+        EntityTriggerHandler.triggerDisabled = false;
 
         // Act
         Test.startTest();

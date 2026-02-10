@@ -56,16 +56,16 @@ public with sharing class SubscriptionSelector {
 
     /**
      ********************************************************
-     * @Method Name    : getSubscriptionsWithProducersByExcludeFlag
+     * @Method Name    : getSubscriptionsWithEntitysByExcludeFlag
      * @description    : Returns subscriptions filtered by exclude carrier appointments flag with producer count
      * @param          : excludeCarrierAppointments - Boolean flag to filter subscriptions
      * @return         : List<d4c_Subscription__c> - List of subscription records with related producers
      *******************************************************
      **/
-    public List<d4c_Subscription__c> getSubscriptionsWithProducersByExcludeFlag(Boolean excludeCarrierAppointments) {
+    public List<d4c_Subscription__c> getSubscriptionsWithEntitysByExcludeFlag(Boolean excludeCarrierAppointments) {
         return [
             SELECT Id, Name, d4c_Subscription_Name__c, d4c_ExcludeCarrierAppointments__c,
-                (SELECT Id FROM Producers__r)
+                (SELECT Id FROM Entitys__r)
             FROM d4c_Subscription__c
             WHERE d4c_ExcludeCarrierAppointments__c = :excludeCarrierAppointments
             ORDER BY CreatedDate ASC

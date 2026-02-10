@@ -50,13 +50,13 @@ private class ProcessEntityInfoApiService_Test {
     }
 
     @isTest
-    static void processData_testAgencyDataLargeProducer() {
+    static void processData_testAgencyDataLargeEntity() {
         // Set Mock - same as regular agency test
         HttpMockFactory mockFactory = new HttpMockFactory(200, TestDataFactory.getEntityInfoAPIFirmlXmlResponse(), false);
         Test.setMock(HttpCalloutMock.class, mockFactory);
         
         // Set the static test flag to simulate large producer behavior
-        RetrieveEntityInfoApiData.testLargeProducer = true;
+        RetrieveEntityInfoApiData.testLargeEntity = true;
         
         // Execute
         Test.startTest();
@@ -65,10 +65,10 @@ private class ProcessEntityInfoApiService_Test {
         Test.stopTest();
         
         // Reset the flag
-        RetrieveEntityInfoApiData.testLargeProducer = false;
+        RetrieveEntityInfoApiData.testLargeEntity = false;
         
         // Assert record counts - same as regular agency test but 0 carrier appointments
-        assertRecordCountsFirmNodeLargeProducer();
+        assertRecordCountsFirmNodeLargeEntity();
     }
 
     @isTest
@@ -111,9 +111,9 @@ private class ProcessEntityInfoApiService_Test {
     }
 
     @isTest
-    static void processData_testNoProducerData() {
+    static void processData_testNoEntityData() {
         // Set Mock
-        HttpMockFactory mockFactory = new HttpMockFactory(200, TestDataFactory.getEntityInfoAPINoProducerData(), false);
+        HttpMockFactory mockFactory = new HttpMockFactory(200, TestDataFactory.getEntityInfoAPINoEntityData(), false);
         Test.setMock(HttpCalloutMock.class, mockFactory);
 
         // Execute
@@ -130,9 +130,9 @@ private class ProcessEntityInfoApiService_Test {
     // ASSERT METHODS
 
     private static void assertInitialRecordCounts() {
-        System.assertEquals(1, getCount('d4c_Entity__c'), 'Should have one initial Producer');
-        System.assertEquals(2, getCount('d4c_ProducerAddress__c'), 'Should have two initial Producer Addresses');
-        System.assertEquals(5, getCount('d4c_ProducerCommunication__c'), 'Should have five initial Producer Communications');
+        System.assertEquals(1, getCount('d4c_Entity__c'), 'Should have one initial Entity');
+        System.assertEquals(2, getCount('d4c_EntityAddress__c'), 'Should have two initial Entity Addresses');
+        System.assertEquals(5, getCount('d4c_EntityCommunication__c'), 'Should have five initial Entity Communications');
         System.assertEquals(2, getCount('d4c_License__c'), 'Should have two initial Licenses');
         System.assertEquals(3, getCount('d4c_LineOfAuthority__c', 'WHERE d4c_License__c != NULL'), 'Should have three initial License Lines of Authority');
         System.assertEquals(2, getCount('d4c_Carrier__c'), 'Should have two initial Carriers');
@@ -141,9 +141,9 @@ private class ProcessEntityInfoApiService_Test {
     }
     
     private static void assertRecordCountsIndividualNode() {
-        System.assertEquals(1, getCount('d4c_Entity__c'), 'Should create one Producer');
-        System.assertEquals(3, getCount('d4c_ProducerAddress__c'), 'Should create three Producer Addresses');
-        System.assertEquals(8, getCount('d4c_ProducerCommunication__c'), 'Should create eight Producer Communications');
+        System.assertEquals(1, getCount('d4c_Entity__c'), 'Should create one Entity');
+        System.assertEquals(3, getCount('d4c_EntityAddress__c'), 'Should create three Entity Addresses');
+        System.assertEquals(8, getCount('d4c_EntityCommunication__c'), 'Should create eight Entity Communications');
         System.assertEquals(3, getCount('d4c_License__c'), 'Should create three Licenses');
         System.assertEquals(5, getCount('d4c_LineOfAuthority__c', 'WHERE d4c_License__c != NULL'), 'Should create five License Lines of Authority');
         System.assertEquals(2, getCount('d4c_Carrier__c'), 'Should create two Carriers');
@@ -152,9 +152,9 @@ private class ProcessEntityInfoApiService_Test {
     }
 
     private static void assertRecordCountsFirmNode() {
-        System.assertEquals(1, getCount('d4c_Entity__c'), 'Should create one Producer');
-        System.assertEquals(3, getCount('d4c_ProducerAddress__c'), 'Should create three Producer Addresses');
-        System.assertEquals(8, getCount('d4c_ProducerCommunication__c'), 'Should create five Producer Communications');
+        System.assertEquals(1, getCount('d4c_Entity__c'), 'Should create one Entity');
+        System.assertEquals(3, getCount('d4c_EntityAddress__c'), 'Should create three Entity Addresses');
+        System.assertEquals(8, getCount('d4c_EntityCommunication__c'), 'Should create five Entity Communications');
         System.assertEquals(3, getCount('d4c_License__c'), 'Should create three Licenses');
         System.assertEquals(5, getCount('d4c_LineOfAuthority__c', 'WHERE d4c_License__c != NULL'), 'Should create five License Lines of Authority');
         System.assertEquals(2, getCount('d4c_Carrier__c'), 'Should create two Carriers');
@@ -163,8 +163,8 @@ private class ProcessEntityInfoApiService_Test {
     }
 
     private static void assertRecordCountsPerParentObject() {
-        System.assertEquals(8, getCount('d4c_ProducerCommunication__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'' + AGENT_NPN + '\''), 'Should have 8 communications for producer ' + AGENT_NPN);
-        System.assertEquals(3, getCount('d4c_ProducerAddress__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'' + AGENT_NPN + '\''), 'Should have 3 addresses for producer ' + AGENT_NPN);
+        System.assertEquals(8, getCount('d4c_EntityCommunication__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'' + AGENT_NPN + '\''), 'Should have 8 communications for producer ' + AGENT_NPN);
+        System.assertEquals(3, getCount('d4c_EntityAddress__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'' + AGENT_NPN + '\''), 'Should have 3 addresses for producer ' + AGENT_NPN);
         System.assertEquals(3, getCount('d4c_License__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'' + AGENT_NPN + '\''), 'Should have 3 licenses for producer ' + AGENT_NPN);
         System.assertEquals(1, getCount('d4c_LineOfAuthority__c', 'WHERE d4c_License__r.d4c_LicenseNumber__c = \'CA123456\''), 'Should have 1 LOA for license CA123456');
         System.assertEquals(3, getCount('d4c_LineOfAuthority__c', 'WHERE d4c_License__r.d4c_LicenseNumber__c = \'NY789012\''), 'Should have 3 LOAs for license NY789012');
@@ -180,41 +180,41 @@ private class ProcessEntityInfoApiService_Test {
     }
 
     private static void assertExternalIdsIndividualNode() {
-        assertIndividualProducerNPNs();
-        assertIndividualProducerAddressIds();
-        assertIndividualProducerCommunicationIds();
+        assertIndividualEntityNPNs();
+        assertIndividualEntityAddressIds();
+        assertIndividualEntityCommunicationIds();
         assertIndividualCarrierIds();
         assertIndividualLicenseIds();
         assertIndividualLineOfAuthorityIds();
         assertIndividualCarrierAppointmentIds();
     }
 
-    private static void assertIndividualProducerNPNs() {
+    private static void assertIndividualEntityNPNs() {
         Set<String> expectedNPNs = new Set<String>{'12345678'};
-        Set<String> actualNPNs = queryProducerNPNs();
+        Set<String> actualNPNs = queryEntityNPNs();
         
-        System.assertEquals(expectedNPNs.size(), actualNPNs.size(), 'Number of Producer NPNs does not match');
+        System.assertEquals(expectedNPNs.size(), actualNPNs.size(), 'Number of Entity NPNs does not match');
         for (String npn : expectedNPNs) {
-            System.assert(actualNPNs.contains(npn), 'Producer NPN not found: ' + npn);
+            System.assert(actualNPNs.contains(npn), 'Entity NPN not found: ' + npn);
         }
     }
 
-    private static void assertIndividualProducerAddressIds() {
+    private static void assertIndividualEntityAddressIds() {
         Set<String> expectedIds = new Set<String>{
             '123MainStreetApt4BBuildingCLosAngelesCA90001U.S.A.Residential12345678',
             '456ParkAvenueSuite789NewYorkNY10022U.S.A.Business12345678',
             '789BroadwayFloor10NewYorkNY10003U.S.A.Mailing12345678'
         };
         
-        Set<String> actualIds = queryProducerAddressIds();
+        Set<String> actualIds = queryEntityAddressIds();
         
-        System.assertEquals(expectedIds.size(), actualIds.size(), 'Number of Producer Address IDs does not match');
+        System.assertEquals(expectedIds.size(), actualIds.size(), 'Number of Entity Address IDs does not match');
         for (String id : expectedIds) {
-            System.assert(actualIds.contains(id), 'Producer Address ID not found: ' + id);
+            System.assert(actualIds.contains(id), 'Entity Address ID not found: ' + id);
         }
     }
 
-    private static void assertIndividualProducerCommunicationIds() {
+    private static void assertIndividualEntityCommunicationIds() {
         Set<String> expectedIds = new Set<String>{
             '+1-213-555-1234Wired12345678',
             '+1-213-555-5678Fax12345678',
@@ -226,11 +226,11 @@ private class ProcessEntityInfoApiService_Test {
             'm.johnson.ny@example.comBusiness12345678'
         };
         
-        Set<String> actualIds = queryProducerCommunicationIds();
+        Set<String> actualIds = queryEntityCommunicationIds();
         
-        System.assertEquals(expectedIds.size(), actualIds.size(), 'Number of Producer Communication IDs does not match');
+        System.assertEquals(expectedIds.size(), actualIds.size(), 'Number of Entity Communication IDs does not match');
         for (String id : expectedIds) {
-            System.assert(actualIds.contains(id), 'Producer Communication ID not found: ' + id);
+            System.assert(actualIds.contains(id), 'Entity Communication ID not found: ' + id);
         }
     }
 
@@ -298,9 +298,9 @@ private class ProcessEntityInfoApiService_Test {
     }
 
     private static void assertFieldMappingsIndividualNode() {
-        assertIndividualProducerFields();
-        assertIndividualProducerAddressFields();
-        assertIndividualProducerCommunicationFields();
+        assertIndividualEntityFields();
+        assertIndividualEntityAddressFields();
+        assertIndividualEntityCommunicationFields();
         assertIndividualLicenseFields();
         assertIndividualLineOfAuthorityFields();
         assertIndividualCarrierFields();
@@ -310,11 +310,11 @@ private class ProcessEntityInfoApiService_Test {
 
     // Most of the fields are the same as in the INDIVIDUAL node, so no need to assert them again except for the producer node
     private static void assertFieldMappingsFirmNode() {
-        assertFirmProducerFields();
+        assertFirmEntityFields();
     }
 
-    private static void assertIndividualProducerFields() {
-        d4c_Entity__c producer = queryProducer(AGENT_NPN);
+    private static void assertIndividualEntityFields() {
+        d4c_Entity__c producer = queryEntity(AGENT_NPN);
         
         System.assertEquals(AGENT_NPN, producer.d4c_NPN__c, 'NPN should match');
         System.assertEquals('Active', producer.d4c_NPNStatus__c, 'NPN Status should be Active');
@@ -328,8 +328,8 @@ private class ProcessEntityInfoApiService_Test {
         System.assertEquals('Primary', producer.d4c_NameTypeCode__c, 'Name type code should match');
     }
 
-    private static void assertFirmProducerFields() {
-        d4c_Entity__c producer = queryProducer(AGENCY_NPN);
+    private static void assertFirmEntityFields() {
+        d4c_Entity__c producer = queryEntity(AGENCY_NPN);
 
         System.assertEquals(AGENCY_NPN, producer.d4c_NPN__c, 'NPN should match');
         System.assertEquals('Active', producer.d4c_NPNStatus__c, 'NPN Status should be Active');
@@ -341,8 +341,8 @@ private class ProcessEntityInfoApiService_Test {
         System.assertEquals('Agency', producer.d4c_Type__c, 'Type should be Agency');
     }
 
-    private static void assertIndividualProducerAddressFields() {
-        d4c_ProducerAddress__c address = queryProducerAddress();
+    private static void assertIndividualEntityAddressFields() {
+        d4c_EntityAddress__c address = queryEntityAddress();
         
         System.assertEquals('Residential', address.d4c_AddressType__c, 'Address type should be Residential');
         System.assertEquals('123 Main Street', address.d4c_AddressLineOne__c, 'Address line 1 should match');
@@ -355,12 +355,12 @@ private class ProcessEntityInfoApiService_Test {
         System.assertEquals(Date.newInstance(2025, 3, 15), address.d4c_AsOfDate__c, 'As of date should match');
     }
 
-    private static void assertIndividualProducerCommunicationFields() {
-        d4c_ProducerCommunication__c phone = queryProducerPhone();
+    private static void assertIndividualEntityCommunicationFields() {
+        d4c_EntityCommunication__c phone = queryEntityPhone();
         System.assertEquals('Wired', phone.d4c_PhoneType__c, 'Phone type should be Wired');
         System.assertEquals('+1-213-555-1234', phone.d4c_PhoneNumber__c, 'Phone number should match');
         
-        d4c_ProducerCommunication__c email = queryProducerEmail();
+        d4c_EntityCommunication__c email = queryEntityEmail();
         System.assertEquals('Business', email.d4c_EmailType__c, 'Email type should be Business');
         System.assertEquals('mjohnson@example.com', email.d4c_EmailAddress__c, 'Email address should match');
     }
@@ -371,11 +371,11 @@ private class ProcessEntityInfoApiService_Test {
         System.assertEquals('CA123456', license.d4c_LicenseNumber__c, 'License number should match');
         System.assertEquals('CA', license.d4c_StateOrProvinceCode__c, 'State code should match');
         System.assertEquals('CA', license.d4c_StateOrProvinceName__c, 'State name should match');
-        System.assertEquals('Insurance Producer', license.d4c_LicenseClassDescription__c, 'License class should match');
+        System.assertEquals('Insurance Entity', license.d4c_LicenseClassDescription__c, 'License class should match');
         System.assertEquals('3', license.d4c_LicenseClassCode__c, 'License class code should match');
         System.assertEquals('Active', license.d4c_StatusCode__c, 'Status code should match');
         System.assertEquals(true, license.d4c_ResidentLicenseIndicator__c, 'Resident indicator should be true');
-        System.assertEquals('Producer', license.d4c_TypeCode__c, 'Type code should match');
+        System.assertEquals('Entity', license.d4c_TypeCode__c, 'Type code should match');
         System.assertEquals(Date.newInstance(2023, 1, 15), license.d4c_IssueDate__c, 'Issue date should match');
         System.assertEquals(Date.newInstance(2026, 1, 15), license.d4c_EndDate__c, 'End date should match');
         System.assertEquals(Date.newInstance(2025, 4, 1), license.d4c_AsOfDate__c, 'As of date should match');
@@ -427,10 +427,10 @@ private class ProcessEntityInfoApiService_Test {
     }
     
     // ASSERT METHODS FOR LARGE PRODUCER TESTS
-    private static void assertRecordCountsFirmNodeLargeProducer() {
-        System.assertEquals(1, getCount('d4c_Entity__c'), 'Should create one Producer');
-        System.assertEquals(3, getCount('d4c_ProducerAddress__c'), 'Should create three Producer Addresses');
-        System.assertEquals(8, getCount('d4c_ProducerCommunication__c'), 'Should create five Producer Communications');
+    private static void assertRecordCountsFirmNodeLargeEntity() {
+        System.assertEquals(1, getCount('d4c_Entity__c'), 'Should create one Entity');
+        System.assertEquals(3, getCount('d4c_EntityAddress__c'), 'Should create three Entity Addresses');
+        System.assertEquals(8, getCount('d4c_EntityCommunication__c'), 'Should create five Entity Communications');
         System.assertEquals(3, getCount('d4c_License__c'), 'Should create three Licenses');
         System.assertEquals(5, getCount('d4c_LineOfAuthority__c', 'WHERE d4c_License__c != NULL'), 'Should create five License Lines of Authority');
         System.assertEquals(0, getCount('d4c_Carrier__c'), 'Should create 0 Carriers');
@@ -449,7 +449,7 @@ private class ProcessEntityInfoApiService_Test {
         return Database.countQuery(queryString);
     }
     
-    private static Set<String> queryProducerNPNs() {
+    private static Set<String> queryEntityNPNs() {
         Set<String> npns = new Set<String>();
         for (d4c_Entity__c producer : [SELECT d4c_NPN__c FROM d4c_Entity__c]) {
             npns.add(producer.d4c_NPN__c);
@@ -457,17 +457,17 @@ private class ProcessEntityInfoApiService_Test {
         return npns;
     }
     
-    private static Set<String> queryProducerAddressIds() {
+    private static Set<String> queryEntityAddressIds() {
         Set<String> ids = new Set<String>();
-        for (d4c_ProducerAddress__c address : [SELECT d4c_UniqueIdentifier__c FROM d4c_ProducerAddress__c]) {
+        for (d4c_EntityAddress__c address : [SELECT d4c_UniqueIdentifier__c FROM d4c_EntityAddress__c]) {
             ids.add(address.d4c_UniqueIdentifier__c);
         }
         return ids;
     }
     
-    private static Set<String> queryProducerCommunicationIds() {
+    private static Set<String> queryEntityCommunicationIds() {
         Set<String> ids = new Set<String>();
-        for (d4c_ProducerCommunication__c comm : [SELECT d4c_UniqueIdentifier__c FROM d4c_ProducerCommunication__c]) {
+        for (d4c_EntityCommunication__c comm : [SELECT d4c_UniqueIdentifier__c FROM d4c_EntityCommunication__c]) {
             ids.add(comm.d4c_UniqueIdentifier__c);
         }
         return ids;
@@ -505,7 +505,7 @@ private class ProcessEntityInfoApiService_Test {
         return ids;
     }
     
-    private static d4c_Entity__c queryProducer(String npn) {
+    private static d4c_Entity__c queryEntity(String npn) {
         return [
             SELECT
                 d4c_NPN__c, 
@@ -531,7 +531,7 @@ private class ProcessEntityInfoApiService_Test {
         ];
     }
     
-    private static d4c_ProducerAddress__c queryProducerAddress() {
+    private static d4c_EntityAddress__c queryEntityAddress() {
         return [
             SELECT 
                 d4c_AddressType__c, 
@@ -544,7 +544,7 @@ private class ProcessEntityInfoApiService_Test {
                 d4c_CountryCode__c, 
                 d4c_AsOfDate__c
             FROM 
-                d4c_ProducerAddress__c
+                d4c_EntityAddress__c
             WHERE 
                 d4c_Entity__r.d4c_NPN__c = :AGENT_NPN 
             AND 
@@ -553,13 +553,13 @@ private class ProcessEntityInfoApiService_Test {
         ];
     }
     
-    private static d4c_ProducerCommunication__c queryProducerPhone() {
+    private static d4c_EntityCommunication__c queryEntityPhone() {
         return [
             SELECT 
                 d4c_PhoneType__c, 
                 d4c_PhoneNumber__c
             FROM 
-                d4c_ProducerCommunication__c
+                d4c_EntityCommunication__c
             WHERE 
                 d4c_Entity__r.d4c_NPN__c = :AGENT_NPN
             AND 
@@ -568,13 +568,13 @@ private class ProcessEntityInfoApiService_Test {
         ];
     }
     
-    private static d4c_ProducerCommunication__c queryProducerEmail() {
+    private static d4c_EntityCommunication__c queryEntityEmail() {
         return [
             SELECT 
                 d4c_EmailType__c, 
                 d4c_EmailAddress__c
             FROM 
-                d4c_ProducerCommunication__c
+                d4c_EntityCommunication__c
             WHERE 
                 d4c_Entity__r.d4c_NPN__c = :AGENT_NPN
             AND 

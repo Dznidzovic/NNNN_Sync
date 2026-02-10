@@ -191,16 +191,16 @@ public class SubscriptionServiceExecutorQueueable extends SubscriptionService im
             return;
         }
 
-        List<d4c_Entity__c> producers = producerSelector.getProducersByNPNs(new Set<String>{ npn });
+        List<d4c_Entity__c> producers = producerSelector.getEntitysByNPNs(new Set<String>{ npn });
         if (producers.isEmpty()) {
-            Logger.error(CLASS_NAME, methodName, 'Producer not found', 'NPN: ' + npn, null, null);
+            Logger.error(CLASS_NAME, methodName, 'Entity not found', 'NPN: ' + npn, null, null);
             return;
         }
 
         Logger.info(CLASS_NAME, methodName, 'Resubscribing producer to different pool', 'NPN: ' + npn, null);
 
         // Set producer and call inherited service method
-        setProducer(producers[0]);
+        setEntity(producers[0]);
         resubscribeToDifferentPool();
     }
 
@@ -238,16 +238,16 @@ public class SubscriptionServiceExecutorQueueable extends SubscriptionService im
             return;
         }
 
-        List<d4c_Entity__c> producers = producerSelector.getProducersByNPNs(new Set<String>{ npn });
+        List<d4c_Entity__c> producers = producerSelector.getEntitysByNPNs(new Set<String>{ npn });
         if (producers.isEmpty()) {
-            Logger.error(CLASS_NAME, methodName, 'Producer not found', 'NPN: ' + npn, null, null);
+            Logger.error(CLASS_NAME, methodName, 'Entity not found', 'NPN: ' + npn, null, null);
             return;
         }
 
         Logger.info(CLASS_NAME, methodName, 'Adding single NPN to subscription', 'NPN: ' + npn, null);
 
         // Set producer and call inherited service method
-        setProducer(producers[0]);
+        setEntity(producers[0]);
         addNPNToSubscription();
     }
 
@@ -299,7 +299,7 @@ public class SubscriptionServiceExecutorQueueable extends SubscriptionService im
 
             if (!Test.isRunningTest()) {
                 // Note: MaximumQueueableStackDepth was already set by the initial enqueueJob call
-                // from ProducerTriggerHandler/RunEntityInfoReportBatchable - we just chain normally here
+                // from EntityTriggerHandler/RunEntityInfoReportBatchable - we just chain normally here
                 System.enqueueJob(new SubscriptionServiceExecutorQueueable(allAllocations, NIPREnums.SubscriptionOperation.ADD_NPNS_BULK));
             }
         } else {

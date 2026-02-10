@@ -19,7 +19,7 @@ private class DMLExecutor_Test {
             npns.add(String.valueOf(i));
         }
 
-        List<d4c_Entity__c> producers = TestDataFactory.createProducers(npns);
+        List<d4c_Entity__c> producers = TestDataFactory.createEntitys(npns);
 
         // Execute
         Test.startTest();
@@ -39,7 +39,7 @@ private class DMLExecutor_Test {
             npns.add('npn' + i);
         }
 
-        List<d4c_Entity__c> producers = TestDataFactory.createProducers(npns);
+        List<d4c_Entity__c> producers = TestDataFactory.createEntitys(npns);
 
         // Execute
         Test.startTest();
@@ -58,7 +58,7 @@ private class DMLExecutor_Test {
             npns.add('del' + i);
         }
 
-        List<d4c_Entity__c> toDelete = TestDataFactory.createProducers(npns);
+        List<d4c_Entity__c> toDelete = TestDataFactory.createEntitys(npns);
         insert toDelete;
 
         List<Id> idsToDelete = new List<Id>();
@@ -83,7 +83,7 @@ private class DMLExecutor_Test {
             npns.add('delete' + i);
         }
 
-        List<d4c_Entity__c> producers = TestDataFactory.createProducers(npns);
+        List<d4c_Entity__c> producers = TestDataFactory.createEntitys(npns);
         insert producers;
 
         List<Id> idsToDelete = new List<Id>();
@@ -116,7 +116,7 @@ private class DMLExecutor_Test {
     static void execute_testUpsertExceptionWithNIPRServiceLogging() {
         // Prepare Data - create producers to upsert
         Set<String> npns = new Set<String>{ '11111111', '22222222' };
-        List<d4c_Entity__c> producers = TestDataFactory.createProducers(npns);
+        List<d4c_Entity__c> producers = TestDataFactory.createEntitys(npns);
 
         // Force exception
         DMLExecutor.forceException = true;

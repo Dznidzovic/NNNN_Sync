@@ -34,7 +34,7 @@ private class LOAProductCategorizationIntegration_Test {
         LicenseInsuranceProductTriggerHandler.triggerDisabled = true;
         InsuranceProductLOAMappingTriggerHandler.triggerDisabled = true;
 
-        // Create 5 Producers (simulating NPN import)
+        // Create 5 Entitys (simulating NPN import)
         // NPN max length is 10 characters
         List<d4c_Entity__c> producers = new List<d4c_Entity__c>();
         for (Integer i = 1; i <= 5; i++) {
@@ -42,7 +42,7 @@ private class LOAProductCategorizationIntegration_Test {
         }
         insert producers;
 
-        // Create 2 Licenses per Producer (10 total)
+        // Create 2 Licenses per Entity (10 total)
         List<d4c_License__c> licenses = new List<d4c_License__c>();
         for (d4c_Entity__c producer : producers) {
             licenses.add(new d4c_License__c(
@@ -281,7 +281,7 @@ private class LOAProductCategorizationIntegration_Test {
         LicenseInsuranceProductTriggerHandler.triggerDisabled = true;
         InsuranceProductLOAMappingTriggerHandler.triggerDisabled = true;
 
-        // Create Producer (NPN max length is 10)
+        // Create Entity (NPN max length is 10)
         d4c_Entity__c producer = new d4c_Entity__c(d4c_NPN__c = 'PDB1234567');
         insert producer;
 
@@ -408,7 +408,7 @@ private class LOAProductCategorizationIntegration_Test {
     // ============================================================
 
     @isTest
-    static void scenario3_multipleProducersSameLOAType_eachGetsCorrectProducts() {
+    static void scenario3_multipleEntitysSameLOAType_eachGetsCorrectProducts() {
         // Arrange: Create 3 producers with same LOA type
         LineOfAuthorityTriggerHandler.triggerDisabled = true;
         LicenseInsuranceProductTriggerHandler.triggerDisabled = true;

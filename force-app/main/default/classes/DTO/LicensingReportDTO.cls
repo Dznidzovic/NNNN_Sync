@@ -49,7 +49,7 @@ public class LicensingReportDTO {
         public List<Address> addressList;
         // List that holds only agent records(Person nodes in NIPR response). Used for easier processing later on
         public List<Person> personList;
-        // List that holds only agent records(Organization nodes in NIPR response of type NAICProducerCode). Used for easier processing later on
+        // List that holds only agent records(Organization nodes in NIPR response of type NAICEntityCode). Used for easier processing later on
         public List<Organization> agencyList;
         // List of agents and agencies
         public List<NIPREntity> producerList;
@@ -112,7 +112,7 @@ public class LicensingReportDTO {
     /**
      * Tracks which producer+state combinations are eligible for deletion logic.
      * Uses Maps for O(1) lookup performance instead of looping through lists.
-     * Structure: Map<ProducerKeyReference, Set<StateCodes>>
+     * Structure: Map<EntityKeyReference, Set<StateCodes>>
      *
      * This allows the service to only query and compare records that actually have data in the NIPR payload.
      */
@@ -246,8 +246,8 @@ public class LicensingReportDTO {
     }
 
     // IMPORTANT!!! - Contains unique identifiers for All Enities in the PDB Alerts Report.
-    // Represents the person’s NPN if contained within the Person tag and the TypeCode attribute is “NAICProducerCode”.
-    // Represents the Organization NPN (Agency on NIPR XML) if contained within the Organization tag and the TypeCode attribute is “NAICProducerCode”.
+    // Represents the person’s NPN if contained within the Person tag and the TypeCode attribute is “NAICEntityCode”.
+    // Represents the Organization NPN (Agency on NIPR XML) if contained within the Organization tag and the TypeCode attribute is “NAICEntityCode”.
     // Represents the Organization FEIN (Agency on NIPR XML) if contained within the Organization tag and the TypeCode attribute is “FEINId”.
     // Represents the Organization COCODE (Insurer on NIPR XML) if contained within the Organization tag and the TypeCode attribute is “NAICInsurerCode”.
     // Represents the Organization FEIN (Insurer on NIPR XML) if contained within the Organization tag and the TypeCode attribute is “FEINId”.
@@ -276,21 +276,21 @@ public class LicensingReportDTO {
     }
     
     // All Communication Nodes represent Agent, Agency and Carrier data. They all extend the same node as the processing for all of them is overlapping and we can utilize the same methods later on
-    public virtual class ProducerCommunication {
+    public virtual class EntityCommunication {
         public List<Telephone> telephoneList;
         public List<Email> emailList;
         public EntityAddress mailingAddress;
     }
 
-    public class PersonCommunication extends ProducerCommunication {
+    public class PersonCommunication extends EntityCommunication {
         public EntityAddress residentialAddress;
     }
     
-    public class BusinessCommunication extends ProducerCommunication {
+    public class BusinessCommunication extends EntityCommunication {
         public EntityAddress physicalAddress;
     }
 
-    public class OrganizationCommunication extends ProducerCommunication {
+    public class OrganizationCommunication extends EntityCommunication {
         public EntityAddress principalAddress;
         public EntityAddress physicalAddress;
     }

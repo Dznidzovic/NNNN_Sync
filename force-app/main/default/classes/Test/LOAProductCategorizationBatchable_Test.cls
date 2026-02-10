@@ -24,8 +24,8 @@ private class LOAProductCategorizationBatchable_Test {
         LineOfAuthorityTriggerHandler.triggerDisabled = true;
         LicenseInsuranceProductTriggerHandler.triggerDisabled = true;
 
-        // Create Producer
-        d4c_Entity__c producer = TestDataFactory.createProducer('1234567890');
+        // Create Entity
+        d4c_Entity__c producer = TestDataFactory.createEntity('1234567890');
         insert producer;
 
         // Create License

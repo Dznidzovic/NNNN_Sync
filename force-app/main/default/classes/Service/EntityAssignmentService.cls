@@ -2,7 +2,7 @@
 *********************************************************
 Apex Class Name    : EntityAssignmentService
 Created Date       : 2025-04-08
-@description       : Service class for assigning Producer__c based on d4c_NPN__c for any SObject
+@description       : Service class for assigning Entity__c based on d4c_NPN__c for any SObject
 @author            : Dev4Clouds
 Modification Log:
 Ver   Date         Author          Modification
@@ -16,7 +16,7 @@ public with sharing class EntityAssignmentService {
     private static final String CLASS_NAME = 'EntityAssignmentService';
 
     // Test-visible mock properties for unit testing without DML
-    @TestVisible private static Map<String, d4c_Entity__c> mockProducersByNPN;
+    @TestVisible private static Map<String, d4c_Entity__c> mockEntitysByNPN;
     @TestVisible private static List<Account> mockAccountsByNPN;
     @TestVisible private static List<Contact> mockContactsByNPN;
     @TestVisible private static List<Lead> mockLeadsByNPN;
@@ -30,36 +30,36 @@ public with sharing class EntityAssignmentService {
 
     /*
     *********************************************************
-    @Method Name    : assignProducers
+    @Method Name    : assignEntitys
     @author         : Dev4Clouds
-    @description    : Main entry method to assign Producer__c based on d4c_NPN__c field
+    @description    : Main entry method to assign Entity__c based on d4c_NPN__c field
     @param          : records - List of incoming SObject records
     @param          : oldRecords - Map of old SObject records (for update comparison)
     @return         : void
     ********************************************************
     */
-    public void assignProducers(List<SObject> records, Map<Id, SObject> oldRecords) {
+    public void assignEntitys(List<SObject> records, Map<Id, SObject> oldRecords) {
         List<SObject> recordsToProcess = filterChangedAndValidRecords(records, oldRecords);
 
         if (recordsToProcess.isEmpty()) return;
 
         // Handle new NPNs - assign or create producers for these NPNs
         Set<String> newNpns = extractUniqueNPNs(recordsToProcess);
-        List<d4c_Entity__c> existingProducers = useMocks && mockProducersByNPN != null
-            ? mockProducersByNPN.values()
-            : entitySelector.getProducersByNPNs(newNpns);
-        Map<String, d4c_Entity__c> producerMap = buildProducerMapByNPN(existingProducers);
+        List<d4c_Entity__c> existingEntitys = useMocks && mockEntitysByNPN != null
+            ? mockEntitysByNPN.values()
+            : entitySelector.getEntitysByNPNs(newNpns);
+        Map<String, d4c_Entity__c> producerMap = buildEntityMapByNPN(existingEntitys);
 
-        Boolean upsertFailed = upsertMissingProducers(newNpns, producerMap, recordsToProcess);
+        Boolean upsertFailed = upsertMissingEntitys(newNpns, producerMap, recordsToProcess);
 
         if (upsertFailed) return;
 
-        assignProducersToRecords(recordsToProcess, producerMap);
+        assignEntitysToRecords(recordsToProcess, producerMap);
     }
 
     /*
     *********************************************************
-    @Method Name    : handleOrphanedProducers
+    @Method Name    : handleOrphanedEntitys
     @author         : Dev4Clouds
     @description    : Handles producers that may need to be deleted when NPNs are changed
     @param          : newRecords - List of new SObject records
@@ -67,7 +67,7 @@ public with sharing class EntityAssignmentService {
     @return         : void
     ********************************************************
     */
-    public void handleOrphanedProducers(List<SObject> newRecords, Map<Id, SObject> oldRecords) {
+    public void handleOrphanedEntitys(List<SObject> newRecords, Map<Id, SObject> oldRecords) {
         // Collect old NPNs that are different from new NPNs (potential orphans)
         Set<String> potentialOrphanedNpns = new Set<String>();
         
@@ -88,18 +88,18 @@ public with sharing class EntityAssignmentService {
         if (potentialOrphanedNpns.isEmpty()) return;
 
         // Get producers with these NPNs
-        List<d4c_Entity__c> potentialOrphanedProducers = useMocks && mockProducersByNPN != null
-            ? getProducersFromMockByNPNs(potentialOrphanedNpns)
-            : entitySelector.getProducersByNPNs(potentialOrphanedNpns);
+        List<d4c_Entity__c> potentialOrphanedEntitys = useMocks && mockEntitysByNPN != null
+            ? getEntitysFromMockByNPNs(potentialOrphanedNpns)
+            : entitySelector.getEntitysByNPNs(potentialOrphanedNpns);
         
-        if (potentialOrphanedProducers.isEmpty()) return;
+        if (potentialOrphanedEntitys.isEmpty()) return;
         
         // Find which NPNs are still in use by any Account, Contact, or Lead
         Set<String> npnsStillInUse = checkForRelatedRecords(potentialOrphanedNpns);
         
         // Collect producers whose NPNs are no longer in use
         List<d4c_Entity__c> producersToDelete = new List<d4c_Entity__c>();
-        for (d4c_Entity__c producer : potentialOrphanedProducers) {
+        for (d4c_Entity__c producer : potentialOrphanedEntitys) {
             if (!npnsStillInUse.contains(producer.d4c_NPN__c)) {
                 producersToDelete.add(producer);
             }
@@ -115,7 +115,7 @@ public with sharing class EntityAssignmentService {
             try {
                 delete producersToDelete;
             } catch (Exception e) {
-                Logger.error(CLASS_NAME, 'handleOrphanedProducers',
+                Logger.error(CLASS_NAME, 'handleOrphanedEntitys',
                     'Failed to delete orphaned producers',
                     e.getMessage(),
                     e.getStackTraceString());
@@ -127,18 +127,18 @@ public with sharing class EntityAssignmentService {
     
     /*
     *********************************************************
-    @Method Name    : getProducersFromMockByNPNs
+    @Method Name    : getEntitysFromMockByNPNs
     @author         : Dev4Clouds
     @description    : Helper method to get producers from mock map by NPNs
     @param          : npns - Set of NPNs to search for
     @return         : List<d4c_Entity__c> - List of producers matching the NPNs
     ********************************************************
     */
-    private List<d4c_Entity__c> getProducersFromMockByNPNs(Set<String> npns) {
+    private List<d4c_Entity__c> getEntitysFromMockByNPNs(Set<String> npns) {
         List<d4c_Entity__c> result = new List<d4c_Entity__c>();
         for (String npn : npns) {
-            if (mockProducersByNPN.containsKey(npn)) {
-                result.add(mockProducersByNPN.get(npn));
+            if (mockEntitysByNPN.containsKey(npn)) {
+                result.add(mockEntitysByNPN.get(npn));
             }
         }
         return result;
@@ -267,14 +267,14 @@ public with sharing class EntityAssignmentService {
 
     /*
     *********************************************************
-    @Method Name    : buildProducerMapByNPN
+    @Method Name    : buildEntityMapByNPN
     @description    : Builds map of d4c_Entity__c records by d4c_NPN__c
     @author         : Dev4Clouds
-    @param          : producerList - List of Producer records
+    @param          : producerList - List of Entity records
     @return         : Map<String, d4c_Entity__c>
     ********************************************************
     */
-    private Map<String, d4c_Entity__c> buildProducerMapByNPN(List<d4c_Entity__c> producerList) {
+    private Map<String, d4c_Entity__c> buildEntityMapByNPN(List<d4c_Entity__c> producerList) {
         Map<String, d4c_Entity__c> producerMap = new Map<String, d4c_Entity__c>();
         for (d4c_Entity__c p : producerList) {
             producerMap.put(p.d4c_NPN__c, p);
@@ -284,15 +284,15 @@ public with sharing class EntityAssignmentService {
 
     /*
     *********************************************************
-    @Method Name    : upsertMissingProducers
-    @description    : Performs upsert on new Producers and updates the map
+    @Method Name    : upsertMissingEntitys
+    @description    : Performs upsert on new Entitys and updates the map
     @param          : npns - Set of unique NPNs
     @param          : producerMap - Existing producer map (will be updated)
     @param          : recordsToProcess - Records needing producer assignment
     @return         : Boolean - true if error occurred, false otherwise
     ********************************************************
     */
-    private Boolean upsertMissingProducers(Set<String> npns, Map<String, d4c_Entity__c> producerMap, List<SObject> recordsToProcess) {
+    private Boolean upsertMissingEntitys(Set<String> npns, Map<String, d4c_Entity__c> producerMap, List<SObject> recordsToProcess) {
         List<d4c_Entity__c> producersToUpsert = new List<d4c_Entity__c>();
         for (String npn : npns) {
             if (!producerMap.containsKey(npn)) {
@@ -306,19 +306,19 @@ public with sharing class EntityAssignmentService {
         if (useMocks) {
             // In mock mode, create producers with proper mock IDs using dynamic key prefix
             String keyPrefix = d4c_Entity__c.SObjectType.getDescribe().getKeyPrefix();
-            Integer counter = mockProducersByNPN != null ? mockProducersByNPN.size() : 0;
+            Integer counter = mockEntitysByNPN != null ? mockEntitysByNPN.size() : 0;
             for (d4c_Entity__c p : producersToUpsert) {
-                if (mockProducersByNPN == null) {
-                    mockProducersByNPN = new Map<String, d4c_Entity__c>();
+                if (mockEntitysByNPN == null) {
+                    mockEntitysByNPN = new Map<String, d4c_Entity__c>();
                 }
                 // Create a new producer with proper ID using dynamic key prefix
                 counter++;
                 String fakeId = keyPrefix + '0'.repeat(12 - String.valueOf(counter).length()) + counter;
-                d4c_Entity__c mockProducer = new d4c_Entity__c();
-                mockProducer.Id = Id.valueOf(fakeId);
-                mockProducer.d4c_NPN__c = p.d4c_NPN__c;
-                mockProducersByNPN.put(mockProducer.d4c_NPN__c, mockProducer);
-                producerMap.put(mockProducer.d4c_NPN__c, mockProducer);
+                d4c_Entity__c mockEntity = new d4c_Entity__c();
+                mockEntity.Id = Id.valueOf(fakeId);
+                mockEntity.d4c_NPN__c = p.d4c_NPN__c;
+                mockEntitysByNPN.put(mockEntity.d4c_NPN__c, mockEntity);
+                producerMap.put(mockEntity.d4c_NPN__c, mockEntity);
             }
             return false;
         }
@@ -330,7 +330,7 @@ public with sharing class EntityAssignmentService {
                 record.addError('Failed to assign producer. Contact your administrator.');
             }
 
-            Logger.error(CLASS_NAME, 'upsertMissingProducers',
+            Logger.error(CLASS_NAME, 'upsertMissingEntitys',
                 'Failed to upsert producer records',
                 e.getMessage(),
                 e.getStackTraceString());
@@ -341,24 +341,24 @@ public with sharing class EntityAssignmentService {
         }
 
         // Refresh map after successful upsert
-        List<d4c_Entity__c> updatedProducers = entitySelector.getProducersByNPNs(npns);
+        List<d4c_Entity__c> updatedEntitys = entitySelector.getEntitysByNPNs(npns);
         producerMap.clear();
-        producerMap.putAll(buildProducerMapByNPN(updatedProducers));
+        producerMap.putAll(buildEntityMapByNPN(updatedEntitys));
 
         return false;
     }
 
     /*
     *********************************************************
-    @Method Name    : assignProducersToRecords
-    @description    : Assigns Producer__c lookup to record based on d4c_NPN__c match
+    @Method Name    : assignEntitysToRecords
+    @description    : Assigns Entity__c lookup to record based on d4c_NPN__c match
     @author         : Dev4Clouds
     @param          : records - List of filtered SObject records
     @param          : producerMap - Map of NPN to d4c_Entity__c records
     @return         : void
     ********************************************************
     */
-    private void assignProducersToRecords(List<SObject> records, Map<String, d4c_Entity__c> producerMap) {
+    private void assignEntitysToRecords(List<SObject> records, Map<String, d4c_Entity__c> producerMap) {
         for (SObject record : records) {
             String npn = (String) record.get('d4c_NPN__c');
             if (producerMap.containsKey(npn)) {

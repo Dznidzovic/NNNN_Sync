@@ -59,7 +59,7 @@ private class ProcessPDBAlertReportService_Test {
         Test.setMock(HttpCalloutMock.class, mockFactory);
 
         // Disable subscription validation for bulk data import
-        ProducerTriggerHandler.disableSubscriptionValidation = true;
+        EntityTriggerHandler.disableSubscriptionValidation = true;
 
         // Execute
         Test.startTest();
@@ -85,7 +85,7 @@ private class ProcessPDBAlertReportService_Test {
         Test.setMock(HttpCalloutMock.class, mockFactory);
 
         // Disable subscription validation for bulk data import
-        ProducerTriggerHandler.disableSubscriptionValidation = true;
+        EntityTriggerHandler.disableSubscriptionValidation = true;
 
         // Execute - First import
         ProcessPDBAlertReportService service = new ProcessPDBAlertReportService();
@@ -139,9 +139,9 @@ private class ProcessPDBAlertReportService_Test {
 
     // ASSERT METHODS
     private static void assertRecordCounts() {
-        System.assertEquals(5, getCount('d4c_Entity__c'), 'Producer count mismatch');
-        System.assertEquals(7, getCount('d4c_ProducerAddress__c'), 'Address count mismatch');
-        System.assertEquals(13, getCount('d4c_ProducerCommunication__c'), 'Communications count mismatch');
+        System.assertEquals(5, getCount('d4c_Entity__c'), 'Entity count mismatch');
+        System.assertEquals(7, getCount('d4c_EntityAddress__c'), 'Address count mismatch');
+        System.assertEquals(13, getCount('d4c_EntityCommunication__c'), 'Communications count mismatch');
         System.assertEquals(1, getCount('d4c_Carrier__c'), 'Carrier count mismatch');
         System.assertEquals(12, getCount('d4c_License__c'), 'License count mismatch');
         System.assertEquals(36, getCount('d4c_LineOfAuthority__c'), 'LOA count mismatch - only License LOAs, no Carrier Appointment LOAs');
@@ -151,28 +151,28 @@ private class ProcessPDBAlertReportService_Test {
 
     // ASSERT METHODS
     private static void assertRecordCountsMixedDelete() {
-        System.assertEquals(5, getCount('d4c_Entity__c'), 'Producer count mismatch');
-        System.assertEquals(7, getCount('d4c_ProducerAddress__c'), 'Address count mismatch');
-        System.assertEquals(13, getCount('d4c_ProducerCommunication__c'), 'Communications count mismatch');
+        System.assertEquals(5, getCount('d4c_Entity__c'), 'Entity count mismatch');
+        System.assertEquals(7, getCount('d4c_EntityAddress__c'), 'Address count mismatch');
+        System.assertEquals(13, getCount('d4c_EntityCommunication__c'), 'Communications count mismatch');
         System.assertEquals(1, getCount('d4c_Carrier__c'), 'Carrier count mismatch');
         System.assertEquals(9, getCount('d4c_License__c'), 'License count mismatch');
         System.assertEquals(3, getCount('d4c_CarrierAppointment__c'), 'Appointment count mismatch');
     }
 
     private static void assertRecordCountsPerParentObject() {
-        System.assertEquals(9, getCount('d4c_ProducerCommunication__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'22138233\''));
-        System.assertEquals(4, getCount('d4c_ProducerCommunication__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'22166967\''));
-        System.assertEquals(4, getCount('d4c_ProducerAddress__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'22138233\''));
-        System.assertEquals(3, getCount('d4c_ProducerAddress__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'22166967\''));
+        System.assertEquals(9, getCount('d4c_EntityCommunication__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'22138233\''));
+        System.assertEquals(4, getCount('d4c_EntityCommunication__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'22166967\''));
+        System.assertEquals(4, getCount('d4c_EntityAddress__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'22138233\''));
+        System.assertEquals(3, getCount('d4c_EntityAddress__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'22166967\''));
         System.assertEquals(4, getCount('d4c_LineOfAuthority__c', 'WHERE d4c_License__r.d4c_UniqueIdentifier__c = \'675353522CA3\''));
         System.assertEquals(2, getCount('d4c_CarrierAppointment__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'22138233\''));
         System.assertEquals(1, getCount('d4c_CarrierAppointment__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'22166967\''));
     }
 
     private static void assertRecordCountsInvalidResponse() {
-        System.assertEquals(0, getCount('d4c_Entity__c'), 'Producer count mismatch');
-        System.assertEquals(0, getCount('d4c_ProducerAddress__c'), 'Address count mismatch');
-        System.assertEquals(0, getCount('d4c_ProducerCommunication__c'), 'Communications count mismatch');
+        System.assertEquals(0, getCount('d4c_Entity__c'), 'Entity count mismatch');
+        System.assertEquals(0, getCount('d4c_EntityAddress__c'), 'Address count mismatch');
+        System.assertEquals(0, getCount('d4c_EntityCommunication__c'), 'Communications count mismatch');
         System.assertEquals(0, getCount('d4c_Carrier__c'), 'Carrier count mismatch');
         System.assertEquals(0, getCount('d4c_License__c'), 'License count mismatch');
         System.assertEquals(0, getCount('d4c_LineOfAuthority__c'), 'LOA count mismatch - only License LOAs');
@@ -180,41 +180,41 @@ private class ProcessPDBAlertReportService_Test {
     }
 
     private static void assertMixedScenarioRecordCountsPerParentObject() {
-        // Producer 22138233 - CA: Both present, NE: No licenses, CT: No appointments
+        // Entity 22138233 - CA: Both present, NE: No licenses, CT: No appointments
         System.assertEquals(2, getCount('d4c_License__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'22138233\' AND d4c_StateOrProvinceCode__c = \'CA\''),
-            'Producer 22138233 should have 2 CA licenses (has license nodes)');
+            'Entity 22138233 should have 2 CA licenses (has license nodes)');
         System.assertEquals(2, getCount('d4c_CarrierAppointment__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'22138233\' AND d4c_StateOrProvinceCode__c = \'CA\''),
-            'Producer 22138233 should have 2 CA appointments (has appointment nodes)');
+            'Entity 22138233 should have 2 CA appointments (has appointment nodes)');
         System.assertEquals(1, getCount('d4c_License__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'22138233\' AND d4c_StateOrProvinceCode__c = \'NE\''),
-            'Producer 22138233 should still have 1 NE license (NO license nodes in payload = no deletion)');
+            'Entity 22138233 should still have 1 NE license (NO license nodes in payload = no deletion)');
         System.assertEquals(1, getCount('d4c_License__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'22138233\' AND d4c_StateOrProvinceCode__c = \'CT\''),
-            'Producer 22138233 should have 1 CT license (has license nodes)');
+            'Entity 22138233 should have 1 CT license (has license nodes)');
 
-        // Producer 22138253 - GA: No appointments, CT: No licenses
+        // Entity 22138253 - GA: No appointments, CT: No licenses
         System.assertEquals(2, getCount('d4c_License__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'22138253\' AND d4c_StateOrProvinceCode__c = \'GA\''),
-            'Producer 22138253 should have 2 GA licenses (has license nodes)');
+            'Entity 22138253 should have 2 GA licenses (has license nodes)');
         System.assertEquals(2, getCount('d4c_CarrierAppointment__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'22138253\' AND d4c_StateOrProvinceCode__c = \'CT\''),
-            'Producer 22138253 should have 2 CT appointments (has appointment nodes)');
+            'Entity 22138253 should have 2 CT appointments (has appointment nodes)');
 
-        // Producer 22166967 - SC: No appointments, CA: Neither, TN: No licenses
+        // Entity 22166967 - SC: No appointments, CA: Neither, TN: No licenses
         System.assertEquals(2, getCount('d4c_License__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'22166967\' AND d4c_StateOrProvinceCode__c = \'SC\''),
-            'Producer 22166967 should have 2 SC licenses (has license nodes)');
+            'Entity 22166967 should have 2 SC licenses (has license nodes)');
         System.assertEquals(1, getCount('d4c_License__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'22166967\' AND d4c_StateOrProvinceCode__c = \'CA\''),
-            'Producer 22166967 should still have 1 CA license (NO nodes in payload = no deletion)');
+            'Entity 22166967 should still have 1 CA license (NO nodes in payload = no deletion)');
         System.assertEquals(1, getCount('d4c_CarrierAppointment__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'22166967\' AND d4c_StateOrProvinceCode__c = \'TN\''),
-            'Producer 22166967 should have 1 TN appointment (has appointment nodes)');
+            'Entity 22166967 should have 1 TN appointment (has appointment nodes)');
 
-        // Producer 22166100 - ID: No appointments, TN: Neither, SC: No licenses
+        // Entity 22166100 - ID: No appointments, TN: Neither, SC: No licenses
         System.assertEquals(1, getCount('d4c_License__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'22166100\' AND d4c_StateOrProvinceCode__c = \'ID\''),
-            'Producer 22166100 should have 1 ID license (has license nodes)');
+            'Entity 22166100 should have 1 ID license (has license nodes)');
         System.assertEquals(1, getCount('d4c_License__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'22166100\' AND d4c_StateOrProvinceCode__c = \'TN\''),
-            'Producer 22166100 should still have 1 TN license (NO nodes in payload = no deletion)');
+            'Entity 22166100 should still have 1 TN license (NO nodes in payload = no deletion)');
         System.assertEquals(1, getCount('d4c_CarrierAppointment__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'22166100\' AND d4c_StateOrProvinceCode__c = \'SC\''),
-            'Producer 22166100 should have 1 SC appointment (has appointment nodes)');
+            'Entity 22166100 should have 1 SC appointment (has appointment nodes)');
 
-        // Producer 22234021 - GA: No appointments
+        // Entity 22234021 - GA: No appointments
         System.assertEquals(1, getCount('d4c_License__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'22234021\' AND d4c_StateOrProvinceCode__c = \'GA\''),
-            'Producer 22234021 should have 1 GA license (has license nodes)');
+            'Entity 22234021 should have 1 GA license (has license nodes)');
 
         // Verify LOA counts remain stable
         System.assertEquals(43, getCount('d4c_LineOfAuthority__c'), 'Total LOA count should remain 43');
@@ -225,25 +225,25 @@ private class ProcessPDBAlertReportService_Test {
     }
 
     private static void assertDeletionMarkerRecordCounts() {
-        // Producer 22138233 - TX licenses and appointments should be DELETED
+        // Entity 22138233 - TX licenses and appointments should be DELETED
         System.assertEquals(0, getCount('d4c_License__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'22138233\' AND d4c_StateOrProvinceCode__c = \'TX\''),
-            'Producer 22138233 TX licenses should be deleted via deletion marker');
+            'Entity 22138233 TX licenses should be deleted via deletion marker');
         System.assertEquals(0, getCount('d4c_CarrierAppointment__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'22138233\' AND d4c_StateOrProvinceCode__c = \'TX\''),
-            'Producer 22138233 TX appointments should be deleted via deletion marker');
+            'Entity 22138233 TX appointments should be deleted via deletion marker');
 
-        // Producer 22138233 - CA data should remain untouched
+        // Entity 22138233 - CA data should remain untouched
         System.assertEquals(2, getCount('d4c_License__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'22138233\' AND d4c_StateOrProvinceCode__c = \'CA\''),
-            'Producer 22138233 CA licenses should remain (normal data in payload)');
+            'Entity 22138233 CA licenses should remain (normal data in payload)');
         System.assertEquals(2, getCount('d4c_CarrierAppointment__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'22138233\' AND d4c_StateOrProvinceCode__c = \'CA\''),
-            'Producer 22138233 CA appointments should remain (normal data in payload)');
+            'Entity 22138233 CA appointments should remain (normal data in payload)');
 
-        // Producer 22166967 - FL appointments should be DELETED
+        // Entity 22166967 - FL appointments should be DELETED
         System.assertEquals(0, getCount('d4c_CarrierAppointment__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'22166967\' AND d4c_StateOrProvinceCode__c = \'FL\''),
-            'Producer 22166967 FL appointments should be deleted via deletion marker');
+            'Entity 22166967 FL appointments should be deleted via deletion marker');
 
-        // Producer 22166967 - SC data should remain
+        // Entity 22166967 - SC data should remain
         System.assertEquals(2, getCount('d4c_License__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'22166967\' AND d4c_StateOrProvinceCode__c = \'SC\''),
-            'Producer 22166967 SC licenses should remain (normal data in payload)');
+            'Entity 22166967 SC licenses should remain (normal data in payload)');
 
         // Verify total counts match expected (12 licenses initially + 2 TX added - 2 TX deleted = 12)
         System.assertEquals(12, getCount('d4c_License__c'), 'Total license count after deletion marker should be 12');
@@ -252,19 +252,19 @@ private class ProcessPDBAlertReportService_Test {
 
         // Verify other producers unaffected
         System.assertEquals(1, getCount('d4c_License__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'22138253\' AND d4c_StateOrProvinceCode__c = \'CT\''),
-            'Producer 22138253 CT license should remain');
+            'Entity 22138253 CT license should remain');
         System.assertEquals(2, getCount('d4c_CarrierAppointment__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'22138253\' AND d4c_StateOrProvinceCode__c = \'CT\''),
-            'Producer 22138253 CT appointments should remain');
+            'Entity 22138253 CT appointments should remain');
         System.assertEquals(1, getCount('d4c_CarrierAppointment__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'22166100\' AND d4c_StateOrProvinceCode__c = \'SC\''),
-            'Producer 22166100 SC appointment should remain');
+            'Entity 22166100 SC appointment should remain');
         System.assertEquals(1, getCount('d4c_License__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'22234021\' AND d4c_StateOrProvinceCode__c = \'GA\''),
-            'Producer 22234021 GA license should remain');
+            'Entity 22234021 GA license should remain');
     }
 
     private static void assertExternalIds() {
-        assertProducerNPNs();
-        assertProducerCommunicationIds();
-        assertProducerAddressIds();
+        assertEntityNPNs();
+        assertEntityCommunicationIds();
+        assertEntityAddressIds();
         assertCarrierCoCodes();
         assertLicenseNumbers();
         assertLineOfAuthorityIds();
@@ -272,8 +272,8 @@ private class ProcessPDBAlertReportService_Test {
     }
     
     private static void assertFieldValues() {
-        assertProducerFields();
-        assertProducerCommunicationFields();
+        assertEntityFields();
+        assertEntityCommunicationFields();
         assertCarrierFields();
         assertLicenseFields();
         assertLineOfAuthorityFields();
@@ -291,12 +291,12 @@ private class ProcessPDBAlertReportService_Test {
         return Database.countQuery(queryString);
     }
     
-    private static void assertProducerNPNs() {
+    private static void assertEntityNPNs() {
         Set<String> producerNPNs = new Set<String>{
             '22138253', '22138233', '22234021', '22166967', '22166100'
         };
 
-        List<d4c_Entity__c> producers = getAllProducers();
+        List<d4c_Entity__c> producers = getAllEntitys();
 
         for (d4c_Entity__c producer : producers) {
             System.assert(producerNPNs.contains(producer.d4c_NPN__c), 
@@ -304,7 +304,7 @@ private class ProcessPDBAlertReportService_Test {
         }
     }
     
-private static void assertProducerCommunicationIds() {
+private static void assertEntityCommunicationIds() {
         Set<String> producerCommunicationIds = new Set<String>{
             '+1-219-313-6379Wired22138233',
             '+1-419-906-3223Fax22138233',
@@ -321,15 +321,15 @@ private static void assertProducerCommunicationIds() {
             'silvana4.zapoticky@cblmaycfqw.comPersonal22166967'
         };
     
-        List<d4c_ProducerCommunication__c> communications = getAllProducerCommunications();
+        List<d4c_EntityCommunication__c> communications = getAllEntityCommunications();
 
-        for (d4c_ProducerCommunication__c comm : communications) {
+        for (d4c_EntityCommunication__c comm : communications) {
             System.assert(producerCommunicationIds.contains(comm.d4c_UniqueIdentifier__c),
                 'Unexpected producer communication ID: ' + comm.d4c_UniqueIdentifier__c);
         }
     }
     
-    private static void assertProducerAddressIds() {
+    private static void assertEntityAddressIds() {
         Set<String> producerAddressIds = new Set<String>{
             '245FrancisLewisBlvd#9536GardenaCA90248U.S.A.Mailing22138233',
             '245FrancisLewisBlvd#9536GardenaCA90248U.S.A.Residential22138233',
@@ -340,9 +340,9 @@ private static void assertProducerCommunicationIds() {
             '7SeBishopAve#9SanBernardinoCA92410U.S.A.Principal22166967'
         };
 
-        List<d4c_ProducerAddress__c> addresses = getAllProducerAddresses();
+        List<d4c_EntityAddress__c> addresses = getAllEntityAddresses();
 
-        for (d4c_ProducerAddress__c address : addresses) {
+        for (d4c_EntityAddress__c address : addresses) {
             System.assert(producerAddressIds.contains(address.d4c_UniqueIdentifier__c),
                 'Unexpected producer address ID: ' + address.d4c_UniqueIdentifier__c);
         }
@@ -416,8 +416,8 @@ private static void assertProducerCommunicationIds() {
     
     // Methods for asserting field values
     
-    private static void assertProducerFields() {
-        d4c_Entity__c producer = getProducerByNPN('22138233');
+    private static void assertEntityFields() {
+        d4c_Entity__c producer = getEntityByNPN('22138233');
         
         System.assertEquals('22138233', producer.d4c_NPN__c, 'Incorrect NPN');
         System.assertEquals(Date.newInstance(1950, 4, 22), producer.d4c_BirthDate__c, 'Incorrect Date of Birth');
@@ -431,24 +431,24 @@ private static void assertProducerCommunicationIds() {
         System.assertEquals('Agent', producer.d4c_Type__c);
     }
     
-    private static void assertProducerCommunicationFields() {
-        d4c_Entity__c producer = getProducerByNPN('22138233');
+    private static void assertEntityCommunicationFields() {
+        d4c_Entity__c producer = getEntityByNPN('22138233');
         
         // Assert Phone communication data
-        d4c_ProducerCommunication__c phoneComm = getProducerCommunicationByIdentifier('+1-219-313-6379Wired22138233');
+        d4c_EntityCommunication__c phoneComm = getEntityCommunicationByIdentifier('+1-219-313-6379Wired22138233');
         
         System.assertEquals('+1-219-313-6379Wired22138233', phoneComm.d4c_UniqueIdentifier__c, 'Incorrect Unique Identifier for Phone Communication');
         System.assertEquals('Wired', phoneComm.d4c_PhoneType__c, 'Incorrect Phone Type');
         System.assertEquals('+1-219-313-6379', phoneComm.d4c_PhoneNumber__c, 'Incorrect Phone Number');
-        System.assertEquals(producer.Id, phoneComm.d4c_Entity__c, 'Incorrect Producer');
+        System.assertEquals(producer.Id, phoneComm.d4c_Entity__c, 'Incorrect Entity');
         
         // Assert Email Communication data
-        d4c_ProducerCommunication__c emailComm = getProducerCommunicationByIdentifier('silvana1.zapoticky@cblmaycfqw.comBusiness22138233');
+        d4c_EntityCommunication__c emailComm = getEntityCommunicationByIdentifier('silvana1.zapoticky@cblmaycfqw.comBusiness22138233');
         
         System.assertEquals('silvana1.zapoticky@cblmaycfqw.comBusiness22138233', emailComm.d4c_UniqueIdentifier__c, 'Incorrect Unique Identifier for Email Communication');
         System.assertEquals('Business', emailComm.d4c_EmailType__c, 'Incorrect Email Type');
         System.assertEquals('silvana1.zapoticky@cblmaycfqw.com', emailComm.d4c_EmailAddress__c, 'Incorrect Email Address');
-        System.assertEquals(producer.Id, emailComm.d4c_Entity__c, 'Incorrect Producer');
+        System.assertEquals(producer.Id, emailComm.d4c_Entity__c, 'Incorrect Entity');
     }
     
     private static void assertCarrierFields() {
@@ -462,12 +462,12 @@ private static void assertProducerCommunicationIds() {
     
     private static void assertLicenseFields() {
         d4c_License__c license = getLicenseByNumber('675353522');
-        d4c_Entity__c producer = getProducerByNPN('22138233');
+        d4c_Entity__c producer = getEntityByNPN('22138233');
         
         // Basic license fields
         System.assertEquals(true, license.d4c_ResidentLicenseIndicator__c, 'Incorrect Resident License Indicator');
         System.assertEquals(true, license.d4c_QualifyingInsuranceLicenseIndicator__c, 'Incorrect Qualifying Insurance License Indicator');
-        System.assertEquals('Producer', license.d4c_TypeCode__c, 'Incorrect License TypeCode');
+        System.assertEquals('Entity', license.d4c_TypeCode__c, 'Incorrect License TypeCode');
         System.assertEquals('675353522', license.d4c_LicenseNumber__c, 'Incorrect License Number');
         System.assertEquals(Date.valueOf('2024-03-29'), license.d4c_StartDate__c, 'Incorrect License Start Date');
         System.assertEquals(Date.valueOf('2025-03-29'), license.d4c_EndDate__c, 'Incorrect License End Date');
@@ -475,7 +475,7 @@ private static void assertProducerCommunicationIds() {
         System.assertEquals('Test description', license.d4c_StatusDescription__c, 'Incorrect License Status Description');
         System.assertEquals(Date.valueOf('2023-10-10'), license.d4c_IssueDate__c, 'Incorrect License Issue Date');
         System.assertEquals('3', license.d4c_LicenseClassCode__c, 'Incorrect License Class Code');
-        System.assertEquals('Insurance Producer', license.d4c_LicenseClassDescription__c, 'Incorrect License Class Description');
+        System.assertEquals('Insurance Entity', license.d4c_LicenseClassDescription__c, 'Incorrect License Class Description');
         System.assertEquals('CA', license.d4c_StateOrProvinceCode__c, 'Incorrect License StateOrProvinceCode');
         System.assertEquals('CA', license.d4c_StateOrProvinceName__c, 'Incorrect License StateOrProvinceName');
         System.assertEquals(Date.valueOf('2025-03-28'), license.d4c_AsOfDate__c, 'Incorrect License As Of Date');
@@ -489,8 +489,8 @@ private static void assertProducerCommunicationIds() {
         System.assertEquals(1, license.d4c_PeriodDuration__c, 'Incorrect CE Period Duration');
         System.assertEquals('Test measure', license.d4c_CEUnitsRequiredMeasure__c, 'Incorrect CE Units Required Measure');
         
-        // Verify the License is linked to the correct Producer
-        System.assertEquals(producer.Id, license.d4c_Entity__c, 'License linked to incorrect Producer');
+        // Verify the License is linked to the correct Entity
+        System.assertEquals(producer.Id, license.d4c_Entity__c, 'License linked to incorrect Entity');
     }
     
     private static void assertLineOfAuthorityFields() {
@@ -520,7 +520,7 @@ private static void assertProducerCommunicationIds() {
         String carrierAppUniqueIdentifier = '2213823319232360719665CATerminated221382332213823319232360719665CATerminated2025-04-3011';
 
         d4c_CarrierAppointment__c carrierApp = getCarrierAppointmentByIdentifierPattern(carrierAppUniqueIdentifier);
-        d4c_Entity__c producer = getProducerByNPN('22138233');
+        d4c_Entity__c producer = getEntityByNPN('22138233');
         d4c_Carrier__c carrier = getCarrierByCoCode('19232');
         
         // Assertions for Carrier Appointment fields
@@ -533,8 +533,8 @@ private static void assertProducerCommunicationIds() {
         System.assertEquals(Date.valueOf('2025-03-29'), carrierApp.d4c_TerminationEffectiveDate__c, 'Incorrect Termination Effective Date');
         System.assertEquals(Date.valueOf('2025-03-28'), carrierApp.d4c_AsOfDate__c, 'Incorrect As Of Date');
         
-        // Assertions to verify related Producer and Carrier Ids
-        System.assertEquals(producer.Id, carrierApp.d4c_Entity__c, 'Carrier Appointment linked to incorrect Producer');
+        // Assertions to verify related Entity and Carrier Ids
+        System.assertEquals(producer.Id, carrierApp.d4c_Entity__c, 'Carrier Appointment linked to incorrect Entity');
         System.assertEquals(carrier.Id, carrierApp.d4c_Carrier__c, 'Carrier Appointment linked to incorrect Carrier');
     }
     
@@ -549,7 +549,7 @@ private static void assertProducerCommunicationIds() {
     }
     
     // QUERY METHODS
-    private static List<d4c_Entity__c> getAllProducers() {
+    private static List<d4c_Entity__c> getAllEntitys() {
         return [
             SELECT 
                 Id,
@@ -558,7 +558,7 @@ private static void assertProducerCommunicationIds() {
         ];
     }
     
-    private static d4c_Entity__c getProducerByNPN(String npn) {
+    private static d4c_Entity__c getEntityByNPN(String npn) {
         return [
             SELECT 
                 Id, 
@@ -580,16 +580,16 @@ private static void assertProducerCommunicationIds() {
         ];
     }
     
-    private static List<d4c_ProducerCommunication__c> getAllProducerCommunications() {
+    private static List<d4c_EntityCommunication__c> getAllEntityCommunications() {
         return [
             SELECT 
                 Id, 
                 d4c_UniqueIdentifier__c 
-            FROM d4c_ProducerCommunication__c
+            FROM d4c_EntityCommunication__c
         ];
     }
     
-    private static d4c_ProducerCommunication__c getProducerCommunicationByIdentifier(String identifier) {
+    private static d4c_EntityCommunication__c getEntityCommunicationByIdentifier(String identifier) {
         return [
             SELECT 
                 Id, 
@@ -599,18 +599,18 @@ private static void assertProducerCommunicationIds() {
                 d4c_EmailType__c, 
                 d4c_EmailAddress__c, 
                 d4c_Entity__c
-            FROM d4c_ProducerCommunication__c
+            FROM d4c_EntityCommunication__c
             WHERE d4c_UniqueIdentifier__c = :identifier
             LIMIT 1
         ];
     }
     
-    private static List<d4c_ProducerAddress__c> getAllProducerAddresses() {
+    private static List<d4c_EntityAddress__c> getAllEntityAddresses() {
         return [
             SELECT 
                 Id, 
                 d4c_UniqueIdentifier__c 
-            FROM d4c_ProducerAddress__c
+            FROM d4c_EntityAddress__c
         ];
     }
     

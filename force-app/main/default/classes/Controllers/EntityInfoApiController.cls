@@ -31,7 +31,7 @@ public with sharing class EntityInfoApiController {
     @AuraEnabled(cacheable=false)
     public static void processNPN(String npn) {
         if (String.isBlank(npn)) {
-            throw new AuraHandledException('Producer NPN is required.');
+            throw new AuraHandledException('Entity NPN is required.');
         }
 
         try {

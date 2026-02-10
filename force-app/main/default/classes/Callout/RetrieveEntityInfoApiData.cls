@@ -21,7 +21,7 @@ public with sharing class RetrieveEntityInfoApiData {
     public Boolean shouldExcludeCarrierAppointments = false;
     
     @TestVisible
-    private static Boolean testLargeProducer = false;
+    private static Boolean testLargeEntity = false;
 
     /**
      *********************************************************
@@ -41,12 +41,12 @@ public with sharing class RetrieveEntityInfoApiData {
 
         try {
             // Query existing producer to check if user manually set exclude flag
-            // Producer will always exist when this callout runs
+            // Entity will always exist when this callout runs
             EntitySelector entitySelector = new EntitySelector();
-            List<d4c_Entity__c> existingProducers = entitySelector.getProducersByNPNs(new Set<String>{ entityNPN });
+            List<d4c_Entity__c> existingEntitys = entitySelector.getEntitysByNPNs(new Set<String>{ entityNPN });
             Boolean existingExcludeValue = false;
-            if (!existingProducers.isEmpty()) {
-                existingExcludeValue = existingProducers[0].d4c_ExcludeCarrierAppointments__c;
+            if (!existingEntitys.isEmpty()) {
+                existingExcludeValue = existingEntitys[0].d4c_ExcludeCarrierAppointments__c;
             }
 
             // Build the HTTP Request
@@ -67,7 +67,7 @@ public with sharing class RetrieveEntityInfoApiData {
             // Determine if carrier appointments should be excluded
             // If user has manually set exclude flag to true, always exclude
             // Otherwise, only exclude if payload exceeds threshold
-            if (existingExcludeValue || (apiResponse.length() > CARRIER_APPT_FILTER_THRESHOLD) || (testLargeProducer && test.isRunningTest())) {
+            if (existingExcludeValue || (apiResponse.length() > CARRIER_APPT_FILTER_THRESHOLD) || (testLargeEntity && test.isRunningTest())) {
                 this.shouldExcludeCarrierAppointments = true;
                 apiResponse = XMLUtils.filterCarrierAppointments(apiResponse);
             }
@@ -123,7 +123,7 @@ public with sharing class RetrieveEntityInfoApiData {
             normalizeEntityBiographic(entity);
             
             // Normalize producer licensing data
-            normalizeProducerLicensing(entity);
+            normalizeEntityLicensing(entity);
             
         } catch (Exception ex) {
             // Replace with Logger.error call
@@ -320,12 +320,12 @@ public with sharing class RetrieveEntityInfoApiData {
     
     /**
      ********************************************************
-     * @Method Name    : normalizeProducerLicensing
+     * @Method Name    : normalizeEntityLicensing
      * @description    : Normalizes the PRODUCER_LICENSING section, including LICENSE_INFORMATION and REGULATORY_ACTION.
      * @param          : entity - The entity map (INDIVIDUAL or FIRM).
      ********************************************************
      **/
-    private void normalizeProducerLicensing(Map<String, Object> entity) {
+    private void normalizeEntityLicensing(Map<String, Object> entity) {
         Map<String, Object> licensing = (Map<String, Object>) entity.get('PRODUCER_LICENSING');
         if (licensing == null) {
             return;

@@ -2,7 +2,7 @@
  *******************************************************************
  * Apex Class Name    : AddNPNToSubscription
  * Created Date       : 04-23-2025
- * @description       : Handles the addition of National Producer Numbers (NPNs) to NIPR subscriptions
+ * @description       : Handles the addition of National Entity Numbers (NPNs) to NIPR subscriptions
  *                      through the NIPR API service
  * @author            : Dev4Clouds
  * Modification Log:
@@ -20,7 +20,7 @@ public with sharing class AddNPNToSubscription {
      * @Method Name    : addNPN
      * @description    : Sends the request to add NPNs to an existing NIPR subscription
      *                   using BaseApiInvoker to handle the API callout
-     * @param          : npnList - List of National Producer Numbers to add to subscription
+     * @param          : npnList - List of National Entity Numbers to add to subscription
      * @param          : subscriptionName - Name of the subscription to add NPNs to
      * @return         : AddNPNToSubscriptionDTO - The parsed response from the API
      ********************************************************

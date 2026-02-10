@@ -12,7 +12,7 @@ Ver   Date         Author          Modification
 */
 public with sharing class LeadTriggerHandler extends BaseTriggerHandler {
 
-    private final ProducerAssignmentService assignmentService = new ProducerAssignmentService();
+    private final EntityAssignmentService assignmentService = new EntityAssignmentService();
 
     @TestVisible
     private static Boolean triggerDisabled = false;
@@ -24,15 +24,15 @@ public with sharing class LeadTriggerHandler extends BaseTriggerHandler {
 
 
     public override void beforeInsert(List<SObject> newItems) {
-        assignmentService.assignProducers(newItems, null);
+        assignmentService.assignEntitys(newItems, null);
     }
 
     public override void beforeUpdate(Map<Id, SObject> newItems, Map<Id, SObject> oldItems) {
-        assignmentService.assignProducers(newItems.values(), oldItems);
+        assignmentService.assignEntitys(newItems.values(), oldItems);
     }
     
     public override void afterUpdate(Map<Id, SObject> newItems, Map<Id, SObject> oldItems) {
         // Handle orphaned producer cleanup after the update is complete
-        assignmentService.handleOrphanedProducers(newItems.values(), oldItems);
+        assignmentService.handleOrphanedEntitys(newItems.values(), oldItems);
     }
 }

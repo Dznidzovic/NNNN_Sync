@@ -12,13 +12,13 @@
 public with sharing class LicenseSelector {
     /**
      ********************************************************
-     * @Method Name    : getCarrierAppointmentsByProducerNpn
+     * @Method Name    : getCarrierAppointmentsByEntityNpn
      * @description    : Returns list of d4c_License__c by d4c_NPN__c of d4c_Entity__c object field
      * @param          : npns - Set of unique NPN values
-     * @return         : List<d4c_License__c> - list of Producer records
+     * @return         : List<d4c_License__c> - list of Entity records
      *******************************************************
      **/
-    public List<d4c_License__c> getLicensesByProducerNpn(Set<String> npns) {
+    public List<d4c_License__c> getLicensesByEntityNpn(Set<String> npns) {
         return [
             SELECT
                 Id,
@@ -34,7 +34,7 @@ public with sharing class LicenseSelector {
 
     /**
      ********************************************************
-     * @Method Name    : getLicensesByProducerNpnAndStates
+     * @Method Name    : getLicensesByEntityNpnAndStates
      * @description    : Returns list of d4c_License__c by d4c_NPN__c and d4c_StateOrProvinceCode__c
      *                   Used for deletion logic to only query licenses for producer+state combinations
      *                   that have data in the NIPR payload
@@ -43,7 +43,7 @@ public with sharing class LicenseSelector {
      * @return         : List<d4c_License__c> - list of License records
      *******************************************************
      **/
-    public List<d4c_License__c> getLicensesByProducerNpnAndStates(Set<String> npns, Set<String> states) {
+    public List<d4c_License__c> getLicensesByEntityNpnAndStates(Set<String> npns, Set<String> states) {
         return [
             SELECT
                 Id,

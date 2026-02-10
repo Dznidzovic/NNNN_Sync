@@ -81,7 +81,7 @@ public class RetrievePDBSpecificReportData {
             Logger.info(CLASS_NAME, methodName, 'Successfully processed PDB Alert data', 
                     'Report Date: ' + reportDate + 
                     ', Subscription: ' + subscriptionName + 
-                    ', Producer Count: ' + producerCount, 
+                    ', Entity Count: ' + producerCount, 
                     null);
         } catch(Exception ex) {
             // Process exception
@@ -300,13 +300,13 @@ public class RetrievePDBSpecificReportData {
                 // Process Organization node
                 LicensingReportDTO.Organization organization = processLicensingOrganization(childNode);
                 
-                // Track if this organization has a NAICProducerCode or NAICInsurerCode
+                // Track if this organization has a NAICEntityCode or NAICInsurerCode
                 Boolean hasMainIdentifier = false;
                 String feinId = null;
                 
-                // First pass: look for NAICProducerCode, NAICInsurerCode, and collect FEIN
+                // First pass: look for NAICEntityCode, NAICInsurerCode, and collect FEIN
                 for (LicensingReportDTO.ExternalIdentifier extId : organization.externalIdentifierList) {
-                    if (extId.typeCode == 'NAICProducerCode' || extId.typeCode == 'NAICInsurerCode') {
+                    if (extId.typeCode == 'NAICEntityCode' || extId.typeCode == 'NAICInsurerCode') {
                         hasMainIdentifier = true;
                         String orgIdentifier = extId.id;
             
@@ -486,8 +486,8 @@ public class RetrievePDBSpecificReportData {
         List<LicensingReportDTO.Organization> carrierList = new List<LicensingReportDTO.Organization>();
 
         for (LicensingReportDTO.Organization org : orgList) {
-            // NAICProducerCode - Agency | NAICInsurerCode - Carrier
-            if (org.mainIdentifierType == 'NAICProducerCode') {
+            // NAICEntityCode - Agency | NAICInsurerCode - Carrier
+            if (org.mainIdentifierType == 'NAICEntityCode') {
                 agencyList.add(org);
 
                 continue;
@@ -604,9 +604,9 @@ public class RetrievePDBSpecificReportData {
                 // Go through External Id for each Organization - (They have multiple, NPN/CoCode, Fein BranchId etc...)
                 for (LicensingReportDTO.ExternalIdentifier extId : org.externalIdentifierList) {
                     // Conditions to find out if the node is with/without info
-                    Boolean filterNodeWithInfoCond = (extid.typeCode == 'NAICInsurerCode' || extId.typeCode == 'NAICProducerCode') && org.organizationNameList != null && !org.organizationNameList.isEmpty();
+                    Boolean filterNodeWithInfoCond = (extid.typeCode == 'NAICInsurerCode' || extId.typeCode == 'NAICEntityCode') && org.organizationNameList != null && !org.organizationNameList.isEmpty();
                    
-                    Boolean filterNodeWithoutInfoCond = (extid.typeCode == 'NAICInsurerCode' || extId.typeCode == 'NAICProducerCode') && (org.organizationNameList == null || org.organizationNameList.isEmpty());
+                    Boolean filterNodeWithoutInfoCond = (extid.typeCode == 'NAICInsurerCode' || extId.typeCode == 'NAICEntityCode') && (org.organizationNameList == null || org.organizationNameList.isEmpty());
 
                     if (filterNodeWithInfoCond) {
                         // When going through all organization nodes, some NPNs will have duplicate nodes where only difference will be Name Type, we want to prioritize the name type = 'Primary'
@@ -653,7 +653,7 @@ public class RetrievePDBSpecificReportData {
      *********************************************************
      * @methodName      : createFeinOnlyCarrier
      * @description     : Creates a carrier organization record from an organization that only has a FEIN identifier.
-     *                    This helps handle cases where an organization doesn't have NAICProducerCode or NAICInsurerCode.
+     *                    This helps handle cases where an organization doesn't have NAICEntityCode or NAICInsurerCode.
      * @param organization : The original organization DTO containing FEIN identifier
      * @param feinId       : The FEIN identifier to use as the main identifier
      * @return           : A new Organization DTO configured as a carrier with FEIN as the main identifier
@@ -965,7 +965,7 @@ public class RetrievePDBSpecificReportData {
                 
 
                 // Deletion marker: has TypeCode but no License node
-                if (typeCode == 'Producer' && licenseNode == null) {
+                if (typeCode == 'Entity' && licenseNode == null) {
                     result.put('hasLicenseDeletion', true);
                 }
             }
@@ -1121,9 +1121,9 @@ public class RetrievePDBSpecificReportData {
         // Process License
         DOM.XmlNode licenseNode = insuranceLicenseNode.getChildElement('License', insuranceLicenseNode.getNamespace());
 
-        // NEW: Check for deletion marker - if TypeCode is 'Producer' and no License node, this is a deletion marker
+        // NEW: Check for deletion marker - if TypeCode is 'Entity' and no License node, this is a deletion marker
         // Return null to avoid creating a DTO object, but the state will still be tracked as eligible for deletion
-        if (insuranceLicense.typeCode == 'Producer' && licenseNode == null) {
+        if (insuranceLicense.typeCode == 'Entity' && licenseNode == null) {
             return null;
         }
 

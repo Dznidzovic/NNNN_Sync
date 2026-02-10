@@ -37,7 +37,7 @@ public class RunPDBAlertReportBatchable implements Database.Batchable<SObject>, 
                 Id,
                 Name,
                 d4c_Subscription_Name__c,
-                (SELECT Id FROM Producers__r LIMIT 1)
+                (SELECT Id FROM Entitys__r LIMIT 1)
             FROM d4c_Subscription__c
             ORDER BY Id
         ]);
@@ -54,7 +54,7 @@ public class RunPDBAlertReportBatchable implements Database.Batchable<SObject>, 
         
         d4c_Subscription__c subscription = subscriptions[0];
         
-        if (subscription.Producers__r == null || subscription.Producers__r.isEmpty()) {
+        if (subscription.Entitys__r == null || subscription.Entitys__r.isEmpty()) {
             return;
         }
         

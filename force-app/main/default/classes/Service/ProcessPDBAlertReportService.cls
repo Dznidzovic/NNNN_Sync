@@ -18,10 +18,10 @@ public with sharing class ProcessPDBAlertReportService {
     private Map<String, LicensingReportDTO.Address> niprAddressesByKeys;
     // Store values in a a map that will be used if License records from NIPR have an existing NPN__c value in Salesforce database
     private Map<String, String> producerIdsByNpns = new Map<String, String>();
-    // Store values in a map that will be used to easily retrieve existing Licenses by Producer NPN
-    private Map<String, List<d4c_License__c>> existingLicensesByProducer = new Map<String, List<d4c_License__c>>();
-    // Store values in a map that will be used to easily retrieve existing Carrier Appointments by Producer NPN
-    private Map<String, List<d4c_CarrierAppointment__c>> existingCarrierAppointmentsByProducer = new Map<String, List<d4c_CarrierAppointment__c>>();
+    // Store values in a map that will be used to easily retrieve existing Licenses by Entity NPN
+    private Map<String, List<d4c_License__c>> existingLicensesByEntity = new Map<String, List<d4c_License__c>>();
+    // Store values in a map that will be used to easily retrieve existing Carrier Appointments by Entity NPN
+    private Map<String, List<d4c_CarrierAppointment__c>> existingCarrierAppointmentsByEntity = new Map<String, List<d4c_CarrierAppointment__c>>();
     // Store values in a map that will be used to easily retrieve existing LOA by a License Number
     private Map<String, List<d4c_LineOfAuthority__c>> existingLOAByLicense = new Map<String, List<d4c_LineOfAuthority__c>>();
     // Store main nipr entity Identifier (Agencies can have multiple identifiers but NPN is main one) by Refs (Keys) from PDB Alert
@@ -29,9 +29,9 @@ public with sharing class ProcessPDBAlertReportService {
     // Stores new or updated producer (agent) records before DML operation.
     private List<d4c_Entity__c> producers = new List<d4c_Entity__c>();
     // Stores new or updated producer communication records (Phone, Email).
-    private List<d4c_ProducerCommunication__c> producerCommunications = new List<d4c_ProducerCommunication__c>();
+    private List<d4c_EntityCommunication__c> producerCommunications = new List<d4c_EntityCommunication__c>();
     // Stores new or updated producer to be upserted to Salesforce
-    private List<d4c_ProducerAddress__c> producerAddresses = new List<d4c_ProducerAddress__c>();
+    private List<d4c_EntityAddress__c> producerAddresses = new List<d4c_EntityAddress__c>();
     // Stores new or updated carriers to be upserted to Salesforce
     private List<d4c_Carrier__c> carriers = new List<d4c_Carrier__c>();
     // Stores new or updated licenses to be upserted to Salesforce
@@ -45,7 +45,7 @@ public with sharing class ProcessPDBAlertReportService {
     private Set<Id> producerCommunicationIdsForDeletion = new Set<Id>();
     // Stores IDs of producerAddress records that need to be deleted.
     private Set<Id> producerAddressIdsForDeletion = new Set<Id>();
-    // Stores IDs of Producer License records that need to be deleted;
+    // Stores IDs of Entity License records that need to be deleted;
     private Set<Id> licenseIdsForDeletion = new Set<Id>();
     // Stores IDs of Lines Of Authority records that need to be deleted;
     private Set<Id> licenseLineOfAuthorityIdsForDeletion = new Set<Id>();
@@ -108,7 +108,7 @@ public with sharing class ProcessPDBAlertReportService {
 
             // Process producers - agents and agencies
             if (!licensingReport?.producerList?.isEmpty()) {
-                processProducers(licensingReport.producerList);
+                processEntitys(licensingReport.producerList);
             }
 
             // Process carriers
@@ -131,7 +131,7 @@ public with sharing class ProcessPDBAlertReportService {
             // Log completion with subscription context for searchability
             Logger.info(CLASS_NAME, methodName, CorrelationIdUtils.formatLogMessage('PDB Alert Complete - ' + subscriptionName),
                 'CorrelationId: ' + CorrelationIdUtils.getCurrentCorrelationId() +
-                ' | Subscription: ' + subscriptionName + ' | Producers: ' + producers.size() +
+                ' | Subscription: ' + subscriptionName + ' | Entitys: ' + producers.size() +
                 ' | Licenses: ' + licenses.size() + ' | Appointments: ' + carrierAppointments.size(),
                 null);
 
@@ -152,36 +152,36 @@ public with sharing class ProcessPDBAlertReportService {
 
     /**
      *********************************************************
-     * @methodName      : processProducers
+     * @methodName      : processEntitys
      * @description     : Processes a list of NIPR producers, retrieves existing related data 
      *                    (communications, addresses, licenses, and carrier appointments),
      *                    and maps each producer into a Salesforce d4c_Entity__c record.
-     * @param niprProducers : List of NIPR producer DTOs to process.
+     * @param niprEntitys : List of NIPR producer DTOs to process.
      *********************************************************     
      */
-    private void processProducers(List<LicensingReportDTO.NIPREntity> niprProducers) {
+    private void processEntitys(List<LicensingReportDTO.NIPREntity> niprEntitys) {
         Set<String> producerNpns = new Set<String>();
 
-        // Collects unique producer NPNs (National Producer Numbers).
-        for (LicensingReportDTO.NIPREntity niprProducer : niprProducers) {
+        // Collects unique producer NPNs (National Entity Numbers).
+        for (LicensingReportDTO.NIPREntity niprEntity : niprEntitys) {
             // Put producer
-            setNIPREntityIdentifierByReferenceKey(niprProducer);
+            setNIPREntityIdentifierByReferenceKey(niprEntity);
 
-            String producerNPN = niprProducer.mainIdentifier;
+            String producerNPN = niprEntity.mainIdentifier;
             producerNpns.add(producerNPN);
         }
 
         // Fetch existing producer communication records by producer NPN we will later on need when deciding which licenses we need to delete
-        Map<String, List<d4c_ProducerCommunication__c>> existingProducerCommsByProducer = getProducerCommunicationsByProducer(producerNpns);
+        Map<String, List<d4c_EntityCommunication__c>> existingEntityCommsByEntity = getEntityCommunicationsByEntity(producerNpns);
 
         // Fetch existing producer communication records from Salesforce we will later on need when deciding which licenses we need to delete
-        Map<String, List<d4c_ProducerAddress__c>> existingProducerAddressesByProducer = getProducerAddressesByProducer(producerNpns);
+        Map<String, List<d4c_EntityAddress__c>> existingEntityAddressesByEntity = getEntityAddressesByEntity(producerNpns);
 
         // Go through each producr and do all the necessary data mapping from DTOs to Salesforce objects in order to import data into Salesforce
-        for (LicensingReportDTO.NIPREntity niprProducer : niprProducers) {
-            String extIdentifier = niprProducer.mainIdentifier;
+        for (LicensingReportDTO.NIPREntity niprEntity : niprEntitys) {
+            String extIdentifier = niprEntity.mainIdentifier;
 
-            d4c_Entity__c producerToUpsert = processProducer(niprProducer, existingProducerCommsByProducer.get(extIdentifier), existingProducerAddressesByProducer.get(extIdentifier));
+            d4c_Entity__c producerToUpsert = processEntity(niprEntity, existingEntityCommsByEntity.get(extIdentifier), existingEntityAddressesByEntity.get(extIdentifier));
             
             if (producerToUpsert != null) {
                 producers.add(producerToUpsert);
@@ -227,11 +227,11 @@ public with sharing class ProcessPDBAlertReportService {
     ) {
         System.debug(eligibleRecords);
         // Query licenses and carrier appointments only for producer+state combinations that have data in the payload
-        existingLicensesByProducer = getEligibleLicensesForDeletionByProducersAndStates(eligibleRecords.eligibleLicenses);
-        existingCarrierAppointmentsByProducer = getEligibleCarrierAppointmentsForDeletionByProducersAndStates(eligibleRecords.eligibleCarrierAppointments);
+        existingLicensesByEntity = getEligibleLicensesForDeletionByEntitysAndStates(eligibleRecords.eligibleLicenses);
+        existingCarrierAppointmentsByEntity = getEligibleCarrierAppointmentsForDeletionByEntitysAndStates(eligibleRecords.eligibleCarrierAppointments);
 
-        System.debug('existingCarrierAppointmentsByProducer');
-        for (List<d4c_CarrierAppointment__c> ca : existingCarrierAppointmentsByProducer.values()) {
+        System.debug('existingCarrierAppointmentsByEntity');
+        for (List<d4c_CarrierAppointment__c> ca : existingCarrierAppointmentsByEntity.values()) {
             System.debug(ca);
         }
 
@@ -251,10 +251,10 @@ public with sharing class ProcessPDBAlertReportService {
         Map<String, List<d4c_LineOfAuthority__c>> existingLOAByLicense = getLOAByUniqueIdentifier(licenseUniqueIdentifiers);
 
         // Get Ids of Licenses that are not in the report anymore
-        licenseIdsForDeletion = getRecordIdsForDeletion(existingLicensesByProducer, licenses, 'd4c_Entity__r.d4c_NPN__c', 'd4c_UniqueIdentifier__c');
+        licenseIdsForDeletion = getRecordIdsForDeletion(existingLicensesByEntity, licenses, 'd4c_Entity__r.d4c_NPN__c', 'd4c_UniqueIdentifier__c');
 
         // Get Ids of Carrier Appointments that are not in the report anymore
-        carrierAppointmentIdsForDeletion = getRecordIdsForDeletion(existingCarrierAppointmentsByProducer, carrierAppointments, 'd4c_Entity__r.d4c_NPN__c', 'd4c_UniqueIdentifier__c');
+        carrierAppointmentIdsForDeletion = getRecordIdsForDeletion(existingCarrierAppointmentsByEntity, carrierAppointments, 'd4c_Entity__r.d4c_NPN__c', 'd4c_UniqueIdentifier__c');
 
         // Get Ids of LOA that are not in the report anymore
         licenseLineOfAuthorityIdsForDeletion = getRecordIdsForDeletion(existingLOAByLicense, linesOfAuthority, 'd4c_License__r.d4c_UniqueIdentifier__c', 'd4c_UniqueIdentifier__c');
@@ -262,42 +262,42 @@ public with sharing class ProcessPDBAlertReportService {
 
     /**
      *********************************************************
-     * @methodName      : processProducer
+     * @methodName      : processEntity
      * @description     : Processes a single NIPR producer entity (either a Person or Organization),
      *                    maps it into a `d4c_Entity__c` Salesforce record, and also prepares related
      *                    communication and address records. Also identifies which of the existing
      *                    records should be deleted based on what's missing from the current API response.
-     * @param niprProducer : The producer entity to process (can be a Person or Organization).
+     * @param niprEntity : The producer entity to process (can be a Person or Organization).
      * @param existingProdComms : Previously existing communication records for the producer.
      * @param existingProdAddr  : Previously existing address records for the producer.
      * @return          : A new or updated `d4c_Entity__c` record for upsert.
      *********************************************************
      */
-    private d4c_Entity__c processProducer(LicensingReportDTO.NIPREntity niprProducer, List<d4c_ProducerCommunication__c> existingProdComms, List<d4c_ProducerAddress__c> existingProdAddr) {
+    private d4c_Entity__c processEntity(LicensingReportDTO.NIPREntity niprEntity, List<d4c_EntityCommunication__c> existingProdComms, List<d4c_EntityAddress__c> existingProdAddr) {
         d4c_Entity__c producer;
 
-        if (niprProducer instanceOf LicensingReportDTO.Person) {
-            LicensingReportDTO.Person agentProducer = (LicensingReportDTO.Person) niprProducer;
+        if (niprEntity instanceOf LicensingReportDTO.Person) {
+            LicensingReportDTO.Person agentEntity = (LicensingReportDTO.Person) niprEntity;
 
-            producer = createProducerRecord(agentProducer);
+            producer = createEntityRecord(agentEntity);
 
             // Process person communication record from nipr (Every person has at most one person and one business communication record)
-            processProducerCommunication(agentProducer.personCommunication, agentProducer.mainIdentifier);
+            processEntityCommunication(agentEntity.personCommunication, agentEntity.mainIdentifier);
             // Process Business communication record from nipr (Every person at most one person and one business communication record)
-            processProducerCommunication(agentProducer.businessCommunication, agentProducer.mainIdentifier);
+            processEntityCommunication(agentEntity.businessCommunication, agentEntity.mainIdentifier);
         } else {
-            LicensingReportDTO.Organization agencyProducer = (LicensingReportDTO.Organization) niprProducer;
+            LicensingReportDTO.Organization agencyEntity = (LicensingReportDTO.Organization) niprEntity;
 
-            producer = createProducerRecord(agencyProducer);
+            producer = createEntityRecord(agencyEntity);
 
             // Process person communication record from nipr (Every person has at most one person and one business communication record)
-            processProducerCommunication(agencyProducer.organizationCommunication, agencyProducer.mainIdentifier);
+            processEntityCommunication(agencyEntity.organizationCommunication, agencyEntity.mainIdentifier);
         }
         
-        // Get all existing Producer Communication record Ids for deletion
+        // Get all existing Entity Communication record Ids for deletion
         producerCommunicationIdsForDeletion.addAll(getRecordIdsForDeletion(existingProdComms, producerCommunications, 'd4c_UniqueIdentifier__c'));
 
-        // Get all existing Producer Adress record Ids for deletion
+        // Get all existing Entity Adress record Ids for deletion
         producerAddressIdsForDeletion.addAll(getRecordIdsForDeletion(existingProdAddr, producerAddresses, 'd4c_UniqueIdentifier__c'));
 
         return producer;
@@ -319,72 +319,72 @@ public with sharing class ProcessPDBAlertReportService {
     }
 
     /**
-     * @methodName      : processProducerCommunication
+     * @methodName      : processEntityCommunication
      * @description     : Processes the communication section of a producer record (person, business, or organization).
-     *                    Converts phone and email DTOs into `d4c_ProducerCommunication__c` records, and address DTOs
-     *                    into `d4c_ProducerAddress__c` records, appending them to respective instance lists.
+     *                    Converts phone and email DTOs into `d4c_EntityCommunication__c` records, and address DTOs
+     *                    into `d4c_EntityAddress__c` records, appending them to respective instance lists.
      * @param comms     : The communication DTO (can be Person, Business, or Organization).
      * @param producerExtId : External NPN identifier used to relate communications to the producer.
      */
-    private void processProducerCommunication(LicensingReportDTO.ProducerCommunication comms, String producerExtId) {
+    private void processEntityCommunication(LicensingReportDTO.EntityCommunication comms, String producerExtId) {
         Set<String> emailAndPhoneUniqueIds = new Set<String>();
 
-        // Process all NIPR Phones into Producer Communication Records
-        producerCommunications.addAll(processProducerPhoneRecords(comms?.telephoneList, producerExtId));
-        // Process all NIPR Emails into Producer Communication Records
-        producerCommunications.addAll(processProducerEmailRecords(comms?.emailList, producerExtId));
+        // Process all NIPR Phones into Entity Communication Records
+        producerCommunications.addAll(processEntityPhoneRecords(comms?.telephoneList, producerExtId));
+        // Process all NIPR Emails into Entity Communication Records
+        producerCommunications.addAll(processEntityEmailRecords(comms?.emailList, producerExtId));
 
-        // Process NIPR Address records belonging to this Producer Communication
-        producerAddresses.addAll(processProducerAddressRecords(comms, producerExtId));
+        // Process NIPR Address records belonging to this Entity Communication
+        producerAddresses.addAll(processEntityAddressRecords(comms, producerExtId));
     }
 
     /**
      *********************************************************
-     * @methodName      : processProducerAddressRecords
+     * @methodName      : processEntityAddressRecords
      * @description     : Extracts and processes address records from the communication DTO.
      *                    Depending on the type of communication (Person, Business, or Organization),
      *                    it maps residential, mailing, physical, and principal addresses into Salesforce.
      * @param comms     : Communication object (Person, Business, or Organization) with address references.
      * @param producerExtId : NPN identifier of the producer.
-     * @return          : List of `d4c_ProducerAddress__c` records to be created or upserted.
+     * @return          : List of `d4c_EntityAddress__c` records to be created or upserted.
      *********************************************************
      */
-    private List<d4c_ProducerAddress__c> processProducerAddressRecords(LicensingReportDTO.ProducerCommunication comms, String producerExtId) {
+    private List<d4c_EntityAddress__c> processEntityAddressRecords(LicensingReportDTO.EntityCommunication comms, String producerExtId) {
         Set<String> addressUniqueIds = new Set<String>();
-        List<d4c_ProducerAddress__c> prodAddresses = new List<d4c_ProducerAddress__c>();
+        List<d4c_EntityAddress__c> prodAddresses = new List<d4c_EntityAddress__c>();
 
-        d4c_ProducerAddress__c mailingProducerAddress = processProducerAddress(comms?.mailingAddress, producerExtId, 'Mailing');
-        if (mailingProducerAddress != null) {
-            prodAddresses.add(mailingProducerAddress);
+        d4c_EntityAddress__c mailingEntityAddress = processEntityAddress(comms?.mailingAddress, producerExtId, 'Mailing');
+        if (mailingEntityAddress != null) {
+            prodAddresses.add(mailingEntityAddress);
         }
 
         if (comms instanceOf LicensingReportDTO.PersonCommunication) {
             LicensingReportDTO.PersonCommunication personComms = (LicensingReportDTO.PersonCommunication) comms;
-            d4c_ProducerAddress__c residentialProducerAddress = processProducerAddress(personComms?.residentialAddress, producerExtId, 'Residential');
+            d4c_EntityAddress__c residentialEntityAddress = processEntityAddress(personComms?.residentialAddress, producerExtId, 'Residential');
             
-            if (residentialProducerAddress != null) {
-                prodAddresses.add(residentialProducerAddress);
+            if (residentialEntityAddress != null) {
+                prodAddresses.add(residentialEntityAddress);
             }
             
         } else if (comms instanceOf LicensingReportDTO.BusinessCommunication) {
             LicensingReportDTO.BusinessCommunication businessComms = (LicensingReportDTO.BusinessCommunication) comms;
-            d4c_ProducerAddress__c physicalProducerAddress = processProducerAddress(businessComms?.physicalAddress, producerExtId, 'Physical');
+            d4c_EntityAddress__c physicalEntityAddress = processEntityAddress(businessComms?.physicalAddress, producerExtId, 'Physical');
 
-            if (physicalProducerAddress != null) {
-                prodAddresses.add(physicalProducerAddress);
+            if (physicalEntityAddress != null) {
+                prodAddresses.add(physicalEntityAddress);
             }
 
         } else if (comms instanceOf LicensingReportDTO.OrganizationCommunication) {
             LicensingReportDTO.OrganizationCommunication orgComms = (LicensingReportDTO.OrganizationCommunication) comms;
-            d4c_ProducerAddress__c physicalProducerAddress = processProducerAddress(orgComms?.physicalAddress, producerExtId, 'Physical');
-            d4c_ProducerAddress__c principalProducerAddress = processProducerAddress(orgComms?.principalAddress, producerExtId, 'Principal');
+            d4c_EntityAddress__c physicalEntityAddress = processEntityAddress(orgComms?.physicalAddress, producerExtId, 'Physical');
+            d4c_EntityAddress__c principalEntityAddress = processEntityAddress(orgComms?.principalAddress, producerExtId, 'Principal');
 
-            if (physicalProducerAddress != null) {
-                prodAddresses.add(physicalProducerAddress);
+            if (physicalEntityAddress != null) {
+                prodAddresses.add(physicalEntityAddress);
             }
 
-            if (principalProducerAddress != null) {
-                prodAddresses.add(principalProducerAddress);
+            if (principalEntityAddress != null) {
+                prodAddresses.add(principalEntityAddress);
             }
         }
 
@@ -394,16 +394,16 @@ public with sharing class ProcessPDBAlertReportService {
 
     /**
      *********************************************************
-     * @methodName      : processProducerPhoneRecords
-     * @description     : Converts a list of telephone DTOs into Salesforce `d4c_ProducerCommunication__c` records
+     * @methodName      : processEntityPhoneRecords
+     * @description     : Converts a list of telephone DTOs into Salesforce `d4c_EntityCommunication__c` records
      *                    of type phone, assigning them to the specified producer.
      * @param telephoneList : List of telephone DTOs from NIPR.
      * @param producerExtId : NPN identifier of the producer.
      * @return           : List of new phone communication records.
      *********************************************************
      */
-    private List<d4c_ProducerCommunication__c> processProducerPhoneRecords(List<LicensingReportDTO.Telephone> telephoneList, String producerExtId) {
-        List<d4c_ProducerCommunication__c> producerPhones = new List<d4c_ProducerCommunication__c>();
+    private List<d4c_EntityCommunication__c> processEntityPhoneRecords(List<LicensingReportDTO.Telephone> telephoneList, String producerExtId) {
+        List<d4c_EntityCommunication__c> producerPhones = new List<d4c_EntityCommunication__c>();
 
         // Process phone records and store them in a map to track uniqueness.
         if (telephoneList != null && !telephoneList.isEmpty()) {
@@ -412,13 +412,13 @@ public with sharing class ProcessPDBAlertReportService {
                 
                 String phoneKey = formattedPhoneNumber + (phone.typeCode != null ? phone.typeCode : '') + producerExtId;
 
-                d4c_ProducerCommunication__c phoneProducerCommunication = createPhoneCommunicationRecord(phoneKey, phone);
+                d4c_EntityCommunication__c phoneEntityCommunication = createPhoneCommunicationRecord(phoneKey, phone);
 
-                phoneProducerCommunication.d4c_Entity__r = new d4c_Entity__c (
+                phoneEntityCommunication.d4c_Entity__r = new d4c_Entity__c (
                     d4c_NPN__c = producerExtId
                 );
                 
-                producerPhones.add(phoneProducerCommunication);
+                producerPhones.add(phoneEntityCommunication);
             }
         }
 
@@ -427,30 +427,30 @@ public with sharing class ProcessPDBAlertReportService {
 
     /**
      *********************************************************
-     * @methodName      : processProducerEmailRecords
-     * @description     : Converts a list of email DTOs into Salesforce `d4c_ProducerCommunication__c` records
+     * @methodName      : processEntityEmailRecords
+     * @description     : Converts a list of email DTOs into Salesforce `d4c_EntityCommunication__c` records
      *                    of type email, assigning them to the specified producer.
      * @param emailList     : List of email DTOs from NIPR.
      * @param producerExtId : NPN identifier of the producer.
      * @return              : List of new email communication records.
      *********************************************************
      */
-    private List<d4c_ProducerCommunication__c> processProducerEmailRecords(List<LicensingReportDTO.Email> emailList, String producerExtId) {
-        List<d4c_ProducerCommunication__c> producerEmails = new List<d4c_ProducerCommunication__c>();
+    private List<d4c_EntityCommunication__c> processEntityEmailRecords(List<LicensingReportDTO.Email> emailList, String producerExtId) {
+        List<d4c_EntityCommunication__c> producerEmails = new List<d4c_EntityCommunication__c>();
 
         // Process email records and store them in a map to track uniqueness.
         if (emailList != null && !emailList.isEmpty()) {
             for (LicensingReportDTO.Email email : emailList) {
                 String emailKey = email.emailAddress + (email.typeCode != null ? email.typeCode : '') + producerExtId;
 
-                d4c_ProducerCommunication__c emailProducerCommunication = createEmailCommunicationRecord(emailKey, email);
+                d4c_EntityCommunication__c emailEntityCommunication = createEmailCommunicationRecord(emailKey, email);
 
-                if (emailProducerCommunication != null) {
-                    emailProducerCommunication.d4c_Entity__r = new d4c_Entity__c (
+                if (emailEntityCommunication != null) {
+                    emailEntityCommunication.d4c_Entity__r = new d4c_Entity__c (
                     d4c_NPN__c = producerExtId
                 );
 
-                    producerEmails.add(emailProducerCommunication);
+                    producerEmails.add(emailEntityCommunication);
                 }
             }
         }
@@ -460,24 +460,24 @@ public with sharing class ProcessPDBAlertReportService {
 
     /**
      *********************************************************
-     * @methodName      : processProducerAddress
+     * @methodName      : processEntityAddress
      * @description     : Maps a single EntityAddress DTO (reference + asOfDate) to a
-     *                    `d4c_ProducerAddress__c` Salesforce record using the global address map.
+     *                    `d4c_EntityAddress__c` Salesforce record using the global address map.
      * @param address        : The EntityAddress DTO with reference key and asOfDate.
      * @param producerExtId  : NPN identifier of the producer.
      * @param addressType    : Type of address (Mailing, Residential, Physical, Principal).
      * @return               : Populated producer address record.
      *********************************************************
      */
-    private d4c_ProducerAddress__c processProducerAddress(LicensingReportDTO.EntityAddress address, String producerExtId, String addressType) {
-        d4c_ProducerAddress__c producerAddress;
+    private d4c_EntityAddress__c processEntityAddress(LicensingReportDTO.EntityAddress address, String producerExtId, String addressType) {
+        d4c_EntityAddress__c producerAddress;
         d4c_Entity__c producerForExtId =  new d4c_Entity__c(
                 d4c_NPN__c = producerExtId
         );
 
         if (address != null) {
 
-            producerAddress = createProducerAddressRecord(address);
+            producerAddress = createEntityAddressRecord(address);
 
             producerAddress.d4c_Entity__r = producerForExtId;
             producerAddress.d4c_UniqueIdentifier__c = address.addressReferences + addressType + producerExtId;
@@ -559,7 +559,7 @@ public with sharing class ProcessPDBAlertReportService {
                 if (licenseeRefs == null || licenseeRefs.isEmpty()) {
                     // Fall back to person/organization reference
                     if (personReference != null) {
-                        d4c_License__c clonedLicense = cloneLicenseWithProducer(baseLicense, personReference);
+                        d4c_License__c clonedLicense = cloneLicenseWithEntity(baseLicense, personReference);
 
                         if (clonedLicense.d4c_Entity__r.d4c_NPN__c != null) {
                             processedLicenses.add(clonedLicense);
@@ -568,7 +568,7 @@ public with sharing class ProcessPDBAlertReportService {
                         }
                     }
                     if (organizationReference != null) {
-                        d4c_License__c clonedLicense = cloneLicenseWithProducer(baseLicense, organizationReference);
+                        d4c_License__c clonedLicense = cloneLicenseWithEntity(baseLicense, organizationReference);
 
                         if (clonedLicense.d4c_Entity__r.d4c_NPN__c != null) {
                             processedLicenses.add(clonedLicense);
@@ -579,7 +579,7 @@ public with sharing class ProcessPDBAlertReportService {
                     }
                 } else {
                     for (String licenseeRef : licenseeRefs) {
-                        d4c_License__c clonedLicense = cloneLicenseWithProducer(baseLicense, licenseeRef);
+                        d4c_License__c clonedLicense = cloneLicenseWithEntity(baseLicense, licenseeRef);
 
                         if (clonedLicense.d4c_Entity__r.d4c_NPN__c != null) {
                             processedLicenses.add(clonedLicense);
@@ -681,13 +681,13 @@ public with sharing class ProcessPDBAlertReportService {
 
     /**
      *********************************************************
-     * @methodName      : createProducerRecord
+     * @methodName      : createEntityRecord
      * @description     : Creates a new producer (Agent) record from NIPR API response.
      * @param niprAgent : The agent data received from NIPR API.
      * @return          : A populated d4c_Entity__c record.
      *********************************************************
      */
-    private d4c_Entity__c createProducerRecord(LicensingReportDTO.Person niprAgent) {
+    private d4c_Entity__c createEntityRecord(LicensingReportDTO.Person niprAgent) {
         d4c_Entity__c agent = new d4c_Entity__c();
 
         agent.d4c_NPN__c = niprAgent.mainIdentifier;
@@ -721,13 +721,13 @@ public with sharing class ProcessPDBAlertReportService {
 
     /**
      *********************************************************
-     * @methodName      : createProducerRecord
+     * @methodName      : createEntityRecord
      * @description     : Creates a new producer (Agency) record from NIPR API response.
      * @param niprAgency : The agent data received from NIPR API.
      * @return          : A populated d4c_Entity__c record.
      *********************************************************
      **/
-    private d4c_Entity__c createProducerRecord(LicensingReportDTO.Organization niprAgency) {
+    private d4c_Entity__c createEntityRecord(LicensingReportDTO.Organization niprAgency) {
         d4c_Entity__c agency = new d4c_Entity__c();
 
         agency.d4c_NPN__c = niprAgency.mainIdentifier;
@@ -803,20 +803,20 @@ public with sharing class ProcessPDBAlertReportService {
 
     /**
      *********************************************************
-     * @methodName      : createProducerAddress
-     * @description     : Creates a Producer Address record based on provided producer Address object(only reference and as of date) and based on global map of all address info
-     * @param niprProducerAddress : Unique identifier for the phone record.
-     * @return      : A new d4c_ProducerAddress__c record.
+     * @methodName      : createEntityAddress
+     * @description     : Creates a Entity Address record based on provided producer Address object(only reference and as of date) and based on global map of all address info
+     * @param niprEntityAddress : Unique identifier for the phone record.
+     * @return      : A new d4c_EntityAddress__c record.
      *********************************************************
      **/
-    private d4c_ProducerAddress__c createProducerAddressRecord(LicensingReportDTO.EntityAddress niprProducerAddress) {
-        d4c_ProducerAddress__c producerAddress = new d4c_ProducerAddress__c();
+    private d4c_EntityAddress__c createEntityAddressRecord(LicensingReportDTO.EntityAddress niprEntityAddress) {
+        d4c_EntityAddress__c producerAddress = new d4c_EntityAddress__c();
 
-        if (niprProducerAddress != null) {
-            LicensingReportDTO.Address niprAddress = niprAddressesByKeys.get(niprProducerAddress.addressReferences);
+        if (niprEntityAddress != null) {
+            LicensingReportDTO.Address niprAddress = niprAddressesByKeys.get(niprEntityAddress.addressReferences);
 
             if (niprAddress != null) {
-                producerAddress.d4c_AsOfDate__c = DateUtils.safeParseDateFromString(niprProducerAddress.asOfDate);
+                producerAddress.d4c_AsOfDate__c = DateUtils.safeParseDateFromString(niprEntityAddress.asOfDate);
                 producerAddress.d4c_AddressLineOne__c = niprAddress.lineOne;
                 producerAddress.d4c_AddressLineTwo__c = niprAddress.lineTwo;
                 producerAddress.d4c_AddressLineThree__c = niprAddress.lineThree;
@@ -836,11 +836,11 @@ public with sharing class ProcessPDBAlertReportService {
      * @description     : Creates a communication record for a phone number.
      * @param key : Unique identifier for the phone record.
      * @param phone : The phone details from the API response.
-     * @return      : A new d4c_ProducerCommunication__c record.
+     * @return      : A new d4c_EntityCommunication__c record.
      *********************************************************
      **/
-    private d4c_ProducerCommunication__c createPhoneCommunicationRecord(String key, LicensingReportDTO.Telephone phone) {
-        d4c_ProducerCommunication__c prodComm = new d4c_ProducerCommunication__c();
+    private d4c_EntityCommunication__c createPhoneCommunicationRecord(String key, LicensingReportDTO.Telephone phone) {
+        d4c_EntityCommunication__c prodComm = new d4c_EntityCommunication__c();
 
         prodComm.d4c_UniqueIdentifier__c = key;
         prodComm.d4c_PhoneType__c = phone.typeCode;
@@ -855,15 +855,15 @@ public with sharing class ProcessPDBAlertReportService {
      * @description     : Creates a communication record for an email.
      * @param key : Unique identifier for the email record.
      * @param email : The email details from the API response.
-     * @return      : A new d4c_ProducerCommunication__c record.
+     * @return      : A new d4c_EntityCommunication__c record.
      *********************************************************
      **/
-    private d4c_ProducerCommunication__c createEmailCommunicationRecord(String key, LicensingReportDTO.Email email) {
+    private d4c_EntityCommunication__c createEmailCommunicationRecord(String key, LicensingReportDTO.Email email) {
         if(!StringUtils.isValidEmail(email.emailAddress)) {
             return null;
         }
 
-        d4c_ProducerCommunication__c prodComm = new d4c_ProducerCommunication__c();
+        d4c_EntityCommunication__c prodComm = new d4c_EntityCommunication__c();
 
         prodComm.d4c_UniqueIdentifier__c = key;
         prodComm.d4c_EmailType__c = email.typeCode;
@@ -874,14 +874,14 @@ public with sharing class ProcessPDBAlertReportService {
 
     /**
      *********************************************************
-     * @methodName      : cloneLicenseWithProducer
+     * @methodName      : cloneLicenseWithEntity
      * @description     : Creates a deep copy of a base license and assigns the producer reference to it.
      * @param baseLicense : The license to clone.
-     * @param licenseeRef : Producer reference key used to link the license to the producer.
+     * @param licenseeRef : Entity reference key used to link the license to the producer.
      * @return            : Cloned license with producer relationship assigned.
      *********************************************************
      */
-    private d4c_License__c cloneLicenseWithProducer(d4c_License__c baseLicense, String licenseeRef) {
+    private d4c_License__c cloneLicenseWithEntity(d4c_License__c baseLicense, String licenseeRef) {
         d4c_License__c cloned = baseLicense.clone(false, true, false, false);
         String producerNPN;
 
@@ -1153,110 +1153,110 @@ private List<d4c_LineOfAuthority__c> createLineOfAuthorityRecords(LicensingRepor
 
     /**
      *********************************************************
-     * @methodName      : getProducerCommunicationsByProducer
+     * @methodName      : getEntityCommunicationsByEntity
      * @description     : Retrieves existing producer communications from Salesforce.
      * @param producerNpns : Set of NPNs for which existing communications are fetched.
      * @return          : Map of existing producer communications grouped by NPN.
      *********************************************************
      **/
-    private Map<String, List<d4c_ProducerCommunication__c>> getProducerCommunicationsByProducer(Set<String> producerNpns) {
-        Map<String, List<d4c_ProducerCommunication__c>> existingProducerCommsByProducer = new Map<String, List<d4c_ProducerCommunication__c>>();
+    private Map<String, List<d4c_EntityCommunication__c>> getEntityCommunicationsByEntity(Set<String> producerNpns) {
+        Map<String, List<d4c_EntityCommunication__c>> existingEntityCommsByEntity = new Map<String, List<d4c_EntityCommunication__c>>();
 
-        ProducerCommunicationSelector prodCommSelector = new ProducerCommunicationSelector();
-        List<d4c_ProducerCommunication__c> existingProducerComms = prodCommSelector.getProducerCommsByProducerNPNs(producerNpns);
+        EntityCommunicationSelector prodCommSelector = new EntityCommunicationSelector();
+        List<d4c_EntityCommunication__c> existingEntityComms = prodCommSelector.getEntityCommsByEntityNPNs(producerNpns);
 
-        for (d4c_ProducerCommunication__c producerComm : existingProducerComms) {
-            if (existingProducerCommsByProducer.containsKey(producerComm.d4c_Entity__r.d4c_NPN__c)) {
-                existingProducerCommsByProducer.get(producerComm.d4c_Entity__r.d4c_NPN__c).add(producerComm);
+        for (d4c_EntityCommunication__c producerComm : existingEntityComms) {
+            if (existingEntityCommsByEntity.containsKey(producerComm.d4c_Entity__r.d4c_NPN__c)) {
+                existingEntityCommsByEntity.get(producerComm.d4c_Entity__r.d4c_NPN__c).add(producerComm);
 
                 continue;
             }
 
-            existingProducerCommsByProducer.put(producerComm.d4c_Entity__r.d4c_NPN__c, new List<d4c_ProducerCommunication__c> { producerComm });
+            existingEntityCommsByEntity.put(producerComm.d4c_Entity__r.d4c_NPN__c, new List<d4c_EntityCommunication__c> { producerComm });
         }
 
-        return existingProducerCommsByProducer;
+        return existingEntityCommsByEntity;
     }
 
     /**
      *********************************************************
-     * @methodName      : getProducerAddressesByProducer
+     * @methodName      : getEntityAddressesByEntity
      * @description     : Retrieves existing producer addresses from Salesforce.
      * @param producerNpns : Set of NPNs for which existing addresses are fetched.
      * @return          : Map of existing producer addresses grouped by NPN.
      *********************************************************
      **/
-    private Map<String, List<d4c_ProducerAddress__c>> getProducerAddressesByProducer(Set<String> producerNpns) {
-        Map<String, List<d4c_ProducerAddress__c>> existingProducerAddressesByProducer = new Map<String, List<d4c_ProducerAddress__c>>();
+    private Map<String, List<d4c_EntityAddress__c>> getEntityAddressesByEntity(Set<String> producerNpns) {
+        Map<String, List<d4c_EntityAddress__c>> existingEntityAddressesByEntity = new Map<String, List<d4c_EntityAddress__c>>();
 
-        ProducerAddressSelector prodAddressSelector = new ProducerAddressSelector();
-        List<d4c_ProducerAddress__c> existingProducerAddresses = prodAddressSelector.getProducerAddressByProducerNPNs(producerNpns);
+        EntityAddressSelector prodAddressSelector = new EntityAddressSelector();
+        List<d4c_EntityAddress__c> existingEntityAddresses = prodAddressSelector.getEntityAddressByEntityNPNs(producerNpns);
 
-        for (d4c_ProducerAddress__c producerAddr : existingProducerAddresses) {
-            if (existingProducerAddressesByProducer.containsKey(producerAddr.d4c_Entity__r.d4c_NPN__c)) {
-                existingProducerAddressesByProducer.get(producerAddr.d4c_Entity__r.d4c_NPN__c).add(producerAddr);
+        for (d4c_EntityAddress__c producerAddr : existingEntityAddresses) {
+            if (existingEntityAddressesByEntity.containsKey(producerAddr.d4c_Entity__r.d4c_NPN__c)) {
+                existingEntityAddressesByEntity.get(producerAddr.d4c_Entity__r.d4c_NPN__c).add(producerAddr);
 
                 continue;
             }
 
-            existingProducerAddressesByProducer.put(producerAddr.d4c_Entity__r.d4c_NPN__c, new List<d4c_ProducerAddress__c> { producerAddr });
+            existingEntityAddressesByEntity.put(producerAddr.d4c_Entity__r.d4c_NPN__c, new List<d4c_EntityAddress__c> { producerAddr });
         }
 
-        return existingProducerAddressesByProducer;
+        return existingEntityAddressesByEntity;
     }
 
     /**
      *********************************************************
-     * @methodName      : getLicensesByProducer
+     * @methodName      : getLicensesByEntity
      * @description     : Retrieves existing licenses from Salesforce grouped by producer NPN.
      * @param producerNpns : Set of producer NPNs.
      * @return           : Map of license records grouped by NPN.
      *********************************************************
      */
-    private Map<String, List<d4c_License__c>> getLicensesByProducer(Set<String> producerNpns) {
-        Map<String, List<d4c_License__c>> existingLicensesByProducer = new Map<String, List<d4c_License__c>>();
+    private Map<String, List<d4c_License__c>> getLicensesByEntity(Set<String> producerNpns) {
+        Map<String, List<d4c_License__c>> existingLicensesByEntity = new Map<String, List<d4c_License__c>>();
 
         LicenseSelector licenseSelector = new LicenseSelector();
-        List<d4c_License__c> existingLicenses = licenseSelector.getLicensesByProducerNpn(producerNpns);
+        List<d4c_License__c> existingLicenses = licenseSelector.getLicensesByEntityNpn(producerNpns);
 
         for (d4c_License__c license : existingLicenses) {
-            if (existingLicensesByProducer.containsKey(license.d4c_Entity__r.d4c_NPN__c)) {
-                existingLicensesByProducer.get(license.d4c_Entity__r.d4c_NPN__c).add(license);
+            if (existingLicensesByEntity.containsKey(license.d4c_Entity__r.d4c_NPN__c)) {
+                existingLicensesByEntity.get(license.d4c_Entity__r.d4c_NPN__c).add(license);
 
                 continue;
             }
 
-            existingLicensesByProducer.put(license.d4c_Entity__r.d4c_NPN__c, new List<d4c_License__c> { license });
+            existingLicensesByEntity.put(license.d4c_Entity__r.d4c_NPN__c, new List<d4c_License__c> { license });
         }
 
-        return existingLicensesByProducer;
+        return existingLicensesByEntity;
     }
 
     /**
      *********************************************************
-     * @methodName      : getCarrierAppointmentsByProducer
+     * @methodName      : getCarrierAppointmentsByEntity
      * @description     : Retrieves existing carrier appointments from Salesforce grouped by producer NPN.
      * @param producerNpns : Set of producer NPNs.
      * @return           : Map of carrier appointments grouped by NPN.
      *********************************************************
      */
-    private Map<String, List<d4c_CarrierAppointment__c>> getCarrierAppointmentsByProducer(Set<String> producerNpns) {
-        Map<String, List<d4c_CarrierAppointment__c>> existingCarrierApoointmentsByProducer = new Map<String, List<d4c_CarrierAppointment__c>>();
+    private Map<String, List<d4c_CarrierAppointment__c>> getCarrierAppointmentsByEntity(Set<String> producerNpns) {
+        Map<String, List<d4c_CarrierAppointment__c>> existingCarrierApoointmentsByEntity = new Map<String, List<d4c_CarrierAppointment__c>>();
 
         CarrierAppointmentSelector carrierAppSelector = new CarrierAppointmentSelector();
-        List<d4c_CarrierAppointment__c> existingCarrierApoointments = carrierAppSelector.getCarrierAppointmentsByProducerNpn(producerNpns);
+        List<d4c_CarrierAppointment__c> existingCarrierApoointments = carrierAppSelector.getCarrierAppointmentsByEntityNpn(producerNpns);
 
         for (d4c_CarrierAppointment__c carApp : existingCarrierApoointments) {
-            if (existingCarrierApoointmentsByProducer.containsKey(carApp.d4c_Entity__r.d4c_NPN__c)) {
-                existingCarrierApoointmentsByProducer.get(carApp.d4c_Entity__r.d4c_NPN__c).add(carApp);
+            if (existingCarrierApoointmentsByEntity.containsKey(carApp.d4c_Entity__r.d4c_NPN__c)) {
+                existingCarrierApoointmentsByEntity.get(carApp.d4c_Entity__r.d4c_NPN__c).add(carApp);
 
                 continue;
             }
 
-            existingCarrierApoointmentsByProducer.put(carApp.d4c_Entity__r.d4c_NPN__c, new List<d4c_CarrierAppointment__c> { carApp });
+            existingCarrierApoointmentsByEntity.put(carApp.d4c_Entity__r.d4c_NPN__c, new List<d4c_CarrierAppointment__c> { carApp });
         }
 
-        return existingCarrierApoointmentsByProducer;
+        return existingCarrierApoointmentsByEntity;
     }
 
     /**
@@ -1354,7 +1354,7 @@ private List<d4c_LineOfAuthority__c> createLineOfAuthorityRecords(LicensingRepor
 
     /**
      *********************************************************
-     * @methodName      : getEligibleLicensesForDeletionByProducersAndStates
+     * @methodName      : getEligibleLicensesForDeletionByEntitysAndStates
      * @description     : Wrapper method that queries licenses for producer+state combinations
      *                    that have license data in the NIPR payload. Only these licenses are
      *                    eligible for deletion via delta comparison.
@@ -1362,10 +1362,10 @@ private List<d4c_LineOfAuthority__c> createLineOfAuthorityRecords(LicensingRepor
      * @return          : Map of licenses grouped by producer NPN, filtered to eligible pairs only.
      *********************************************************
      */
-    private Map<String, List<d4c_License__c>> getEligibleLicensesForDeletionByProducersAndStates(
+    private Map<String, List<d4c_License__c>> getEligibleLicensesForDeletionByEntitysAndStates(
         Map<String, Set<String>> eligibleLicensesMap
     ) {
-        return getEligibleRecordsForDeletionByProducersAndStates(
+        return getEligibleRecordsForDeletionByEntitysAndStates(
             eligibleLicensesMap,
             'License'
         );
@@ -1373,7 +1373,7 @@ private List<d4c_LineOfAuthority__c> createLineOfAuthorityRecords(LicensingRepor
 
     /**
      *********************************************************
-     * @methodName      : getEligibleCarrierAppointmentsForDeletionByProducersAndStates
+     * @methodName      : getEligibleCarrierAppointmentsForDeletionByEntitysAndStates
      * @description     : Wrapper method that queries carrier appointments for producer+state combinations
      *                    that have appointment data in the NIPR payload. Only these appointments are
      *                    eligible for deletion via delta comparison.
@@ -1381,10 +1381,10 @@ private List<d4c_LineOfAuthority__c> createLineOfAuthorityRecords(LicensingRepor
      * @return          : Map of carrier appointments grouped by producer NPN, filtered to eligible pairs only.
      *********************************************************
      */
-    private Map<String, List<d4c_CarrierAppointment__c>> getEligibleCarrierAppointmentsForDeletionByProducersAndStates(
+    private Map<String, List<d4c_CarrierAppointment__c>> getEligibleCarrierAppointmentsForDeletionByEntitysAndStates(
         Map<String, Set<String>> eligibleAppointmentsMap
     ) {
-        return getEligibleRecordsForDeletionByProducersAndStates(
+        return getEligibleRecordsForDeletionByEntitysAndStates(
             eligibleAppointmentsMap,
             'CarrierAppointment'
         );
@@ -1392,7 +1392,7 @@ private List<d4c_LineOfAuthority__c> createLineOfAuthorityRecords(LicensingRepor
 
     /**
      *********************************************************
-     * @methodName      : getEligibleRecordsForDeletionByProducersAndStates
+     * @methodName      : getEligibleRecordsForDeletionByEntitysAndStates
      * @description     : Generic method that queries licenses or carrier appointments for specific
      *                    producer+state combinations, then filters results to only include records
      *                    where the producer+state pair is eligible (has data in NIPR payload).
@@ -1402,7 +1402,7 @@ private List<d4c_LineOfAuthority__c> createLineOfAuthorityRecords(LicensingRepor
      * @return          : Map of records grouped by producer NPN, filtered to eligible pairs only.
      *********************************************************
      */
-    private Map<String, List<SObject>> getEligibleRecordsForDeletionByProducersAndStates(
+    private Map<String, List<SObject>> getEligibleRecordsForDeletionByEntitysAndStates(
         Map<String, Set<String>> eligibleRecordsMap,
         String recordType
     ) {
@@ -1428,10 +1428,10 @@ private List<d4c_LineOfAuthority__c> createLineOfAuthorityRecords(LicensingRepor
         List<SObject> queriedRecords;
         if (recordType == 'License') {
             LicenseSelector licenseSelector = new LicenseSelector();
-            queriedRecords = licenseSelector.getLicensesByProducerNpnAndStates(producerNpns, states);
+            queriedRecords = licenseSelector.getLicensesByEntityNpnAndStates(producerNpns, states);
         } else if (recordType == 'CarrierAppointment') {
             CarrierAppointmentSelector carrierAppSelector = new CarrierAppointmentSelector();
-            queriedRecords = carrierAppSelector.getCarrierAppointmentsByProducerNpnAndStates(producerNpns, states);
+            queriedRecords = carrierAppSelector.getCarrierAppointmentsByEntityNpnAndStates(producerNpns, states);
         } else {
             return new Map<String, List<SObject>>();
         }
@@ -1441,19 +1441,19 @@ private List<d4c_LineOfAuthority__c> createLineOfAuthorityRecords(LicensingRepor
         List<SObject> filteredRecords = filterRecordsByEligiblePairs(queriedRecords, eligibleRecordsMap);
 
         // Group filtered records by producer NPN
-        Map<String, List<SObject>> recordsByProducer = new Map<String, List<SObject>>();
+        Map<String, List<SObject>> recordsByEntity = new Map<String, List<SObject>>();
         for (SObject record : filteredRecords) {
             SObject producerRelation = record.getSObject('d4c_Entity__r');
             String npn = String.valueOf(producerRelation.get('d4c_NPN__c'));
 
-            if (!recordsByProducer.containsKey(npn)) {
-                recordsByProducer.put(npn, new List<SObject>());
+            if (!recordsByEntity.containsKey(npn)) {
+                recordsByEntity.put(npn, new List<SObject>());
             }
-            recordsByProducer.get(npn).add(record);
+            recordsByEntity.get(npn).add(record);
         }
 
 
-        return recordsByProducer;
+        return recordsByEntity;
     }
 
     /**
@@ -1543,9 +1543,9 @@ private List<d4c_LineOfAuthority__c> createLineOfAuthorityRecords(LicensingRepor
 
         // Log after deduplication
         String upsertDetails =
-            'Producers: ' + producers.size() + '\n' +
-            'Producer Communications: ' + producerCommunications.size() + '\n' +
-            'Producer Addresses: ' + producerAddresses.size() + '\n' +
+            'Entitys: ' + producers.size() + '\n' +
+            'Entity Communications: ' + producerCommunications.size() + '\n' +
+            'Entity Addresses: ' + producerAddresses.size() + '\n' +
             'Carriers: ' + carriers.size() + '\n' +
             'Licenses: ' + licenses.size() + '\n' +
             'License LOAs: ' + linesOfAuthority.size() + '\n' +
@@ -1585,14 +1585,14 @@ private List<d4c_LineOfAuthority__c> createLineOfAuthorityRecords(LicensingRepor
     
         DMLExecutor producerAddrUpsert = new DMLExecutor(
             producerAddresses,
-            d4c_ProducerAddress__c.d4c_UniqueIdentifier__c,
+            d4c_EntityAddress__c.d4c_UniqueIdentifier__c,
             carrierUpsert,
             CLASS_NAME
         );
     
         DMLExecutor producerCommsUpsert = new DMLExecutor(
             producerCommunications,
-            d4c_ProducerCommunication__c.d4c_UniqueIdentifier__c,
+            d4c_EntityCommunication__c.d4c_UniqueIdentifier__c,
             producerAddrUpsert,
             CLASS_NAME
         );
@@ -1606,8 +1606,8 @@ private List<d4c_LineOfAuthority__c> createLineOfAuthorityRecords(LicensingRepor
 
         // Consolidate record counts in a single detailed log
         String deletionDetails =
-            'Producer Communications: ' + producerCommunicationIdsForDeletion.size() + '\n' +
-            'Producer Addresses: ' + producerAddressIdsForDeletion.size() + '\n' +
+            'Entity Communications: ' + producerCommunicationIdsForDeletion.size() + '\n' +
+            'Entity Addresses: ' + producerAddressIdsForDeletion.size() + '\n' +
             'Licenses: ' + licenseIdsForDeletion.size() + '\n' +
             'License LOAs: ' + licenseLineOfAuthorityIdsForDeletion.size() + '\n' +
             'Carrier Appointments: ' + carrierAppointmentIdsForDeletion.size();
@@ -1653,8 +1653,8 @@ private List<d4c_LineOfAuthority__c> createLineOfAuthorityRecords(LicensingRepor
         Database.delete(new List<Id>(carrierAppointmentIdsForDeletion));
 
         Database.upsert(producers, d4c_Entity__c.d4c_NPN__c, true);
-        Database.upsert(producerCommunications, d4c_ProducerCommunication__c.d4c_UniqueIdentifier__c, true);
-        Database.upsert(producerAddresses, d4c_ProducerAddress__c.d4c_UniqueIdentifier__c, true);
+        Database.upsert(producerCommunications, d4c_EntityCommunication__c.d4c_UniqueIdentifier__c, true);
+        Database.upsert(producerAddresses, d4c_EntityAddress__c.d4c_UniqueIdentifier__c, true);
         Database.upsert(carriers, d4c_Carrier__c.d4c_CoCode__c, true);
         Database.upsert(licenses, d4c_License__c.d4c_UniqueIdentifier__c, true);
         Database.upsert(linesOfAuthority, d4c_LineOfAuthority__c.d4c_UniqueIdentifier__c, true);

@@ -4,7 +4,7 @@
  * Created Date       : 04-08-2025
  * @description       : Imports data from the NIPR Entity Info API and maps it to Salesforce records.
  *                      This class processes the EntityInfoDTO structure and generates records for
- *                      d4c_Entity__c, d4c_ProducerCommunication__c, d4c_ProducerAddress__c, d4c_License__c,
+ *                      d4c_Entity__c, d4c_EntityCommunication__c, d4c_EntityAddress__c, d4c_License__c,
  *                      d4c_LineOfAuthority__c, and d4c_CarrierAppointment__c.
  * @author            : Dev4Clouds
  * Modification Log:
@@ -19,9 +19,9 @@ public with sharing class ProcessEntityInfoApiService {
     // Stores the producer record to be upserted
     private d4c_Entity__c producer;
     // Stores new or updated producer communication records (Phone, Email)
-    private List<d4c_ProducerCommunication__c> producerCommunications = new List<d4c_ProducerCommunication__c>();
+    private List<d4c_EntityCommunication__c> producerCommunications = new List<d4c_EntityCommunication__c>();
     // Stores new or updated producer address records
-    private List<d4c_ProducerAddress__c> producerAddresses = new List<d4c_ProducerAddress__c>();
+    private List<d4c_EntityAddress__c> producerAddresses = new List<d4c_EntityAddress__c>();
     // Stores new or updated license records
     private List<d4c_License__c> licenses = new List<d4c_License__c>();
     // Stores new or updated Line of Authority records for licenses
@@ -40,7 +40,7 @@ public with sharing class ProcessEntityInfoApiService {
      *********************************************************
      * @methodName      : processData
      * @description     : Main entry point for importing a single EntityInfoDTO record into Salesforce.
-     * @param npn       : The National Producer Number to retrieve and process.
+     * @param npn       : The National Entity Number to retrieve and process.
      *********************************************************
      **/
     public void processData(String npn) {
@@ -71,9 +71,9 @@ public with sharing class ProcessEntityInfoApiService {
 
         // Process producer data if available (either Individual or Firm)
         if (entityInfoDTO?.PRODUCER?.INDIVIDUAL != null) {
-            processProducer(entityInfoDTO.PRODUCER.INDIVIDUAL);
+            processEntity(entityInfoDTO.PRODUCER.INDIVIDUAL);
         } else if (entityInfoDTO?.PRODUCER?.FIRM != null) {
-            processProducer(entityInfoDTO.PRODUCER.FIRM);
+            processEntity(entityInfoDTO.PRODUCER.FIRM);
         }
 
         producer.d4c_NPNSyncError__c = null;
@@ -103,29 +103,29 @@ public with sharing class ProcessEntityInfoApiService {
 
     /**
      *********************************************************
-     * @methodName      : processProducer
+     * @methodName      : processEntity
      * @description     : Maps the INDIVIDUAL(AGENT) node to a d4c_Entity__c record and queues
      *                    related communications for upsert.
      * @param individual : INDIVIDUAL node from the DTO.
      *********************************************************
      **/
-    private void processProducer(EntityInfoDTO.INDIVIDUAL individual) {
+    private void processEntity(EntityInfoDTO.INDIVIDUAL individual) {
         if (individual == null || individual.ENTITY_BIOGRAPHIC == null || individual.ENTITY_BIOGRAPHIC.BIOGRAPHIC == null) {
             return;
         }
 
         EntityInfoDTO.BIOGRAPHIC bio = individual.ENTITY_BIOGRAPHIC.BIOGRAPHIC;
         
-        producer = createProducerRecord(bio);
+        producer = createEntityRecord(bio);
         producer.d4c_Type__c = 'Agent';
 
         // Process communications if available
         if (individual.ENTITY_BIOGRAPHIC?.CONTACT_INFOS != null) {
-            processProducerCommunications(individual.ENTITY_BIOGRAPHIC.CONTACT_INFOS);
+            processEntityCommunications(individual.ENTITY_BIOGRAPHIC.CONTACT_INFOS);
         }
 
         if (individual.ENTITY_BIOGRAPHIC?.ADDRESSES != null) {
-            processProducerAddresses(individual.ENTITY_BIOGRAPHIC.ADDRESSES);
+            processEntityAddresses(individual.ENTITY_BIOGRAPHIC.ADDRESSES);
         }
 
         if (individual.PRODUCER_LICENSING?.LICENSE_INFORMATION != null) {
@@ -135,29 +135,29 @@ public with sharing class ProcessEntityInfoApiService {
 
     /**
      *********************************************************
-     * @methodName      : processProducer
+     * @methodName      : processEntity
      * @description     : Maps the FIRM(AGENCY) node to a d4c_Entity__c record and queues
      *                    related communications for upsert.
      * @param firm      : FIRM node from the DTO.
      *********************************************************
      **/
-    private void processProducer(EntityInfoDTO.FIRM firm) {
+    private void processEntity(EntityInfoDTO.FIRM firm) {
         if (firm == null || firm.ENTITY_BIOGRAPHIC == null || firm.ENTITY_BIOGRAPHIC.BIOGRAPHIC == null) {
             return;
         }
 
         EntityInfoDTO.BIOGRAPHIC bio = firm.ENTITY_BIOGRAPHIC.BIOGRAPHIC;
         
-        producer = createProducerRecord(bio, true);
+        producer = createEntityRecord(bio, true);
         producer.d4c_Type__c = 'Agency';
 
         // Process communications if available
         if (firm.ENTITY_BIOGRAPHIC?.CONTACT_INFOS != null) {
-            processProducerCommunications(firm.ENTITY_BIOGRAPHIC.CONTACT_INFOS);
+            processEntityCommunications(firm.ENTITY_BIOGRAPHIC.CONTACT_INFOS);
         }
 
         if (firm.ENTITY_BIOGRAPHIC?.ADDRESSES != null) {
-            processProducerAddresses(firm.ENTITY_BIOGRAPHIC.ADDRESSES);
+            processEntityAddresses(firm.ENTITY_BIOGRAPHIC.ADDRESSES);
         }
 
         if (firm.PRODUCER_LICENSING?.LICENSE_INFORMATION != null) {
@@ -167,13 +167,13 @@ public with sharing class ProcessEntityInfoApiService {
 
     /**
      *********************************************************
-     * @methodName      : processProducerCommunications
+     * @methodName      : processEntityCommunications
      * @description     : Extracts business phones, faxes, and emails from CONTACT_INFOS and
-     *                    stores them as `d4c_ProducerCommunication__c` records for the given NPN.
+     *                    stores them as `d4c_EntityCommunication__c` records for the given NPN.
      * @param contactInfos : Contact info section of the EntityInfoDTO.
      *********************************************************
      **/
-    private void processProducerCommunications(EntityInfoDTO.CONTACT_INFOS contactInfos) {
+    private void processEntityCommunications(EntityInfoDTO.CONTACT_INFOS contactInfos) {
         if (contactInfos == null || contactInfos.STATE == null) {
             return;
         }
@@ -222,7 +222,7 @@ public with sharing class ProcessEntityInfoApiService {
             String uniqueId = formattedPhone + phoneType + producerNPN;
             
             if (!uniqueRecordIds.contains(uniqueId)) {
-                d4c_ProducerCommunication__c comm = new d4c_ProducerCommunication__c();
+                d4c_EntityCommunication__c comm = new d4c_EntityCommunication__c();
 
                 comm.d4c_Entity__r = new d4c_Entity__c(d4c_NPN__c = producerNPN);
                 comm.d4c_PhoneType__c = phoneType;
@@ -252,7 +252,7 @@ public with sharing class ProcessEntityInfoApiService {
         String uniqueId = email + emailType + producerNPN;
         
         if (!uniqueRecordIds.contains(uniqueId)) {
-            d4c_ProducerCommunication__c emailComm = new d4c_ProducerCommunication__c();
+            d4c_EntityCommunication__c emailComm = new d4c_EntityCommunication__c();
 
             emailComm.d4c_Entity__r = new d4c_Entity__c(d4c_NPN__c = producerNPN);
             emailComm.d4c_EmailType__c = emailType;
@@ -266,12 +266,12 @@ public with sharing class ProcessEntityInfoApiService {
 
     /**
      *********************************************************
-     * @methodName      : processProducerAddresses
+     * @methodName      : processEntityAddresses
      * @description     : Processes addresses from the entity biography and creates producer address records.
      * @param addresses : Addresses from the Entity Info DTO.
      *********************************************************
      **/
-    private void processProducerAddresses(EntityInfoDTO.ADDRESSES addresses) {
+    private void processEntityAddresses(EntityInfoDTO.ADDRESSES addresses) {
         if (addresses == null || addresses.STATE == null) {
             return;
         }
@@ -298,7 +298,7 @@ public with sharing class ProcessEntityInfoApiService {
                 continue;
             }
             
-            d4c_ProducerAddress__c producerAddress = createProducerAddressRecord(address);
+            d4c_EntityAddress__c producerAddress = createEntityAddressRecord(address);
 
             if (producerAddress != null && !uniqueRecordIds.contains(producerAddress.d4c_UniqueIdentifier__c)) {
                 producerAddresses.add(producerAddress);
@@ -455,19 +455,19 @@ public with sharing class ProcessEntityInfoApiService {
 
     /**
      *********************************************************
-     * @methodName      : createProducerRecord
+     * @methodName      : createEntityRecord
      * @description     : Creates a producer (Individual) record with data from the biographic section.
      * @param bio       : Biographic data from the Entity Info DTO.
      * @return          : Populated d4c_Entity__c record.
      *********************************************************
      **/
-    private d4c_Entity__c createProducerRecord(EntityInfoDTO.BIOGRAPHIC bio) {
-        return createProducerRecord(bio, false);
+    private d4c_Entity__c createEntityRecord(EntityInfoDTO.BIOGRAPHIC bio) {
+        return createEntityRecord(bio, false);
     }
 
     /**
      *********************************************************
-     * @methodName      : createProducerRecord
+     * @methodName      : createEntityRecord
      * @description     : Creates a producer record with data from the biographic section.
      *                    Can create either an Individual (Agent) or Firm (Agency) record.
      * @param bio       : Biographic data from the Entity Info DTO.
@@ -475,7 +475,7 @@ public with sharing class ProcessEntityInfoApiService {
      * @return          : Populated d4c_Entity__c record.
      *********************************************************
      **/
-    private d4c_Entity__c createProducerRecord(EntityInfoDTO.BIOGRAPHIC bio, Boolean isFirm) {
+    private d4c_Entity__c createEntityRecord(EntityInfoDTO.BIOGRAPHIC bio, Boolean isFirm) {
         d4c_Entity__c producerRecord = new d4c_Entity__c();
         
         producerRecord.d4c_NPN__c = producerNPN;
@@ -519,14 +519,14 @@ public with sharing class ProcessEntityInfoApiService {
 
     /**
      *********************************************************
-     * @methodName      : createProducerAddressRecord
-     * @description     : Creates a Producer Address record based on provided address information.
+     * @methodName      : createEntityAddressRecord
+     * @description     : Creates a Entity Address record based on provided address information.
      * @param address   : Address information from the Entity Info DTO.
-     * @return          : A new d4c_ProducerAddress__c record.
+     * @return          : A new d4c_EntityAddress__c record.
      *********************************************************
      **/
-    private d4c_ProducerAddress__c createProducerAddressRecord(EntityInfoDTO.ADDRESS address) {
-        d4c_ProducerAddress__c producerAddress = new d4c_ProducerAddress__c();
+    private d4c_EntityAddress__c createEntityAddressRecord(EntityInfoDTO.ADDRESS address) {
+        d4c_EntityAddress__c producerAddress = new d4c_EntityAddress__c();
         
         if (address != null) {
             // Format and parse as of date
@@ -729,7 +729,7 @@ public with sharing class ProcessEntityInfoApiService {
         licenseRecord.d4c_LicenseClassDescription__c = StringUtils.truncateField(license.LICENSE_CLASS, 255);
         licenseRecord.d4c_StatusCode__c = license.ACTIVE == 'Yes' ? 'Active' : 'Inactive';
         licenseRecord.d4c_ResidentLicenseIndicator__c = license.RESIDENCY_STATUS == 'R' ? true: false;
-        licenseRecord.d4c_TypeCode__c = 'Producer';
+        licenseRecord.d4c_TypeCode__c = 'Entity';
         
         // Format and parse dates
         String formattedIssueDate = StringUtils.convertToISODateFormat(
@@ -766,10 +766,10 @@ public with sharing class ProcessEntityInfoApiService {
             Set<String> npnSet = new Set<String>{ producerNPN };
             
             // Delete existing producer communications
-            deleteExistingProducerCommunications(npnSet);
+            deleteExistingEntityCommunications(npnSet);
             
             // Delete existing producer addresses
-            deleteExistingProducerAddresses(npnSet);
+            deleteExistingEntityAddresses(npnSet);
 
             // Delete existing producer licenses
             deleteExistingLicenses(npnSet);
@@ -783,18 +783,18 @@ public with sharing class ProcessEntityInfoApiService {
 
     /**
      *********************************************************
-     * @methodName      : deleteExistingProducerCommunications
+     * @methodName      : deleteExistingEntityCommunications
      * @description     : Deletes existing producer communications associated with the NPNs.
      * @param npnSet    : Set of producer NPNs to query for related communications.
      *********************************************************
      **/
-    private void deleteExistingProducerCommunications(Set<String> npnSet) {
+    private void deleteExistingEntityCommunications(Set<String> npnSet) {
         // Query for existing producer communications
-        ProducerCommunicationSelector communicationSelector = new ProducerCommunicationSelector();
-        List<d4c_ProducerCommunication__c> existingCommunications = communicationSelector.getProducerCommsByProducerNPNs(npnSet);
+        EntityCommunicationSelector communicationSelector = new EntityCommunicationSelector();
+        List<d4c_EntityCommunication__c> existingCommunications = communicationSelector.getEntityCommsByEntityNPNs(npnSet);
         
         if (!existingCommunications.isEmpty()) {
-            Logger.debug(CLASS_NAME, 'DeleteExistingProducerCommunication', 'Deleting ' + existingCommunications.size() + ' existing Producer Communication records for NPN: ' + producerNPN,
+            Logger.debug(CLASS_NAME, 'DeleteExistingEntityCommunication', 'Deleting ' + existingCommunications.size() + ' existing Entity Communication records for NPN: ' + producerNPN,
                 null,
                 null);
 
@@ -804,18 +804,18 @@ public with sharing class ProcessEntityInfoApiService {
 
     /**
      *********************************************************
-     * @methodName      : deleteExistingProducerAddresses
+     * @methodName      : deleteExistingEntityAddresses
      * @description     : Deletes existing producer addresses associated with the NPNs.
      * @param npnSet    : Set of producer NPNs to query for related addresses.
      *********************************************************
      **/
-    private void deleteExistingProducerAddresses(Set<String> npnSet) {
+    private void deleteExistingEntityAddresses(Set<String> npnSet) {
         // Query for existing producer addresses
-        ProducerAddressSelector addressSelector = new ProducerAddressSelector();
-        List<d4c_ProducerAddress__c> existingAddresses = addressSelector.getProducerAddressByProducerNPNs(npnSet);
+        EntityAddressSelector addressSelector = new EntityAddressSelector();
+        List<d4c_EntityAddress__c> existingAddresses = addressSelector.getEntityAddressByEntityNPNs(npnSet);
         
         if (!existingAddresses.isEmpty()) {
-            Logger.debug(CLASS_NAME, 'deleteExistingProducerAddresses', 'Deleting ' + existingAddresses.size() + ' existing Producer Address records for NPN: ' + producerNPN,
+            Logger.debug(CLASS_NAME, 'deleteExistingEntityAddresses', 'Deleting ' + existingAddresses.size() + ' existing Entity Address records for NPN: ' + producerNPN,
                 null,
                 null);
 
@@ -833,10 +833,10 @@ public with sharing class ProcessEntityInfoApiService {
     private void deleteExistingLicenses(Set<String> npnSet) {
         // Query for existing producer addresses
         LicenseSelector LicenseSelector = new LicenseSelector();
-        List<d4c_License__c> existinglicenses = LicenseSelector.getLicensesByProducerNpn(npnSet);
+        List<d4c_License__c> existinglicenses = LicenseSelector.getLicensesByEntityNpn(npnSet);
         
         if (!existinglicenses.isEmpty()) {
-            Logger.debug(CLASS_NAME, 'deleteExistingProducerAddresses', 'Deleting ' + existinglicenses.size() + ' existing Producer Licenses records for NPN: ' + producerNPN,
+            Logger.debug(CLASS_NAME, 'deleteExistingEntityAddresses', 'Deleting ' + existinglicenses.size() + ' existing Entity Licenses records for NPN: ' + producerNPN,
                 null,
                 null);
             
@@ -854,10 +854,10 @@ public with sharing class ProcessEntityInfoApiService {
     private void deleteExistingCarrierAppointments(Set<String> npnSet) {
         // Query for existing carrier appointments
         CarrierAppointmentSelector appointmentSelector = new CarrierAppointmentSelector();
-        List<d4c_CarrierAppointment__c> existingAppointments = appointmentSelector.getCarrierAppointmentsByProducerNpn(npnSet);
+        List<d4c_CarrierAppointment__c> existingAppointments = appointmentSelector.getCarrierAppointmentsByEntityNpn(npnSet);
         
         if (!existingAppointments.isEmpty()) {
-            Logger.debug(CLASS_NAME, 'deleteExistingProducerAddresses', 'Deleting ' + existingAppointments.size() + ' existing Carrier Appointment records for NPN: ' + producerNPN,
+            Logger.debug(CLASS_NAME, 'deleteExistingEntityAddresses', 'Deleting ' + existingAppointments.size() + ' existing Carrier Appointment records for NPN: ' + producerNPN,
                 null,
                 null);
             
@@ -892,12 +892,12 @@ public with sharing class ProcessEntityInfoApiService {
             
             upsert producer d4c_NPN__c;
             
-            Logger.info(CLASS_NAME, methodName, 'Producer Communication records for Upsert', 
+            Logger.info(CLASS_NAME, methodName, 'Entity Communication records for Upsert', 
                     'Count: ' + producerCommunications.size() + ', NPN: ' + producerNPN, null);
             
             upsert producerCommunications d4c_UniqueIdentifier__c;
             
-            Logger.info(CLASS_NAME, methodName, 'Producer Address records for Upsert', 
+            Logger.info(CLASS_NAME, methodName, 'Entity Address records for Upsert', 
                     'Count: ' + producerAddresses.size() + ', NPN: ' + producerNPN, null);
             
             upsert producerAddresses d4c_UniqueIdentifier__c;
@@ -907,7 +907,7 @@ public with sharing class ProcessEntityInfoApiService {
             
             upsert carriers d4c_UniqueIdentifier__c;
             
-            Logger.info(CLASS_NAME, methodName, 'Producer License records for Upsert', 
+            Logger.info(CLASS_NAME, methodName, 'Entity License records for Upsert', 
                     'Count: ' + licenses.size() + ', NPN: ' + producerNPN, null);
             
             upsert licenses d4c_UniqueIdentifier__c;

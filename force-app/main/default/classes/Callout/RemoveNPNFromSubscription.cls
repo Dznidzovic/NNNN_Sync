@@ -2,7 +2,7 @@
  *******************************************************************
  * Apex Class Name    : RemoveNPNFromSubscription
  * Created Date       : 04-25-2025
- * @description       : Handles the removal of National Producer Numbers (NPNs) from NIPR subscriptions
+ * @description       : Handles the removal of National Entity Numbers (NPNs) from NIPR subscriptions
  *                      through the NIPR API service
  * @author            : Dev4Clouds
  * Modification Log:
@@ -20,7 +20,7 @@ public with sharing class RemoveNPNFromSubscription {
      * @Method Name    : removeNPN
      * @description    : Sends the request to remove NPNs from an existing NIPR subscription
      *                   using BaseApiInvoker to handle the API callout
-     * @param          : npnList - List of National Producer Numbers to remove from subscription
+     * @param          : npnList - List of National Entity Numbers to remove from subscription
      * @param          : subscriptionName - Name of the subscription to remove NPNs from
      * @return         : RemoveNPNFromSubscriptionDTO - The parsed response from the API
      ********************************************************

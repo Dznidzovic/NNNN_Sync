@@ -30,7 +30,7 @@ public with sharing class CreateSubscription {
      ********************************************************
      * @Method Name    : setExcludeCarrierAppointmentsMode
      * @description    : Sets the flag for excluding carrier appointments
-     *                   Producers with this flag get licensing-only subscriptions (no appointments)
+     *                   Entitys with this flag get licensing-only subscriptions (no appointments)
      * @param          : exclude - true if this subscription should exclude carrier appointments
      ********************************************************
      **/
