@@ -3,7 +3,7 @@
     <description>Read-only access to NIPR data with API callout permissions</description>
     <hasActivationRequired>false</hasActivationRequired>
     <label>NIPR Read Only User</label>
-    <permissionSets>niprsync__NIPR_View_NIPR_Data</permissionSets>
+    <permissionSets>niprsync__d4c_NIPR_View_All_Data</permissionSets>
     <permissionSets>niprsync__d4c_NIPR_API_Callout</permissionSets>
     <status>Updated</status>
 </PermissionSetGroup>
