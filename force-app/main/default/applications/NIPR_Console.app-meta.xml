@@ -19,8 +19,6 @@
     <tabs>d4c_License__c</tabs>
     <tabs>d4c_Carrier__c</tabs>
     <tabs>d4c_CarrierAppointment__c</tabs>
-    <tabs>d4c_Insurance_Product__c</tabs>
-    <tabs>d4c_LOA_Insurance_Product_Mapping__c</tabs>
     <tabs>d4c_Log__c</tabs>
     <uiType>Lightning</uiType>
     <utilityBar>NIPR_Console_UtilityBar</utilityBar>
@@ -32,10 +30,8 @@
             <tab>d4c_Carrier__c</tab>
         </mappings>
         <mappings>
-            <tab>d4c_Insurance_Product__c</tab>
         </mappings>
         <mappings>
-            <tab>d4c_LOA_Insurance_Product_Mapping__c</tab>
         </mappings>
         <mappings>
             <tab>d4c_License__c</tab>

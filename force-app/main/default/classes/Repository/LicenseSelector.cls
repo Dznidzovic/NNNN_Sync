@@ -62,7 +62,7 @@ public with sharing class LicenseSelector {
     /**
      ********************************************************
      * @Method Name    : getLicensesWithProductsFieldByIds
-     * @description    : Returns list of Licenses with d4c_License_Products__c field by IDs
+     * @description    : Returns list of Licenses with d4c_License_LOBs__c field by IDs
      *                   Used for updating the multi-select picklist of product names
      * @param          : licenseIds - Set of License IDs
      * @return         : List<d4c_License__c> - list of License records
@@ -72,7 +72,7 @@ public with sharing class LicenseSelector {
         return [
             SELECT
                 Id,
-                d4c_License_Products__c
+                d4c_License_LOBs__c
             FROM
                 d4c_License__c
             WHERE

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>d4c_License_Products__c</fullName>
-    <label>License Products</label>
+    <fullName>d4c_License_LOBs__c</fullName>
+    <label>License LOBs</label>
     <length>5000</length>
     <trackTrending>false</trackTrending>
     <type>LongTextArea</type>

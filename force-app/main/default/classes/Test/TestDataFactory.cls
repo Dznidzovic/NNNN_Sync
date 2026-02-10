@@ -747,71 +747,14 @@ private class TestDataFactory {
 	 * @param description - LOA description (e.g., 'Accident & Health or Sickness')
 	 * @param doInsert - Whether to insert the record
 	 * @return The created mapping record
-	 */
-	@TestVisible
-	private static d4c_LOA_Insurance_Product_Mapping__c createLOAInsuranceProductMapping(
-		String state, String code, String description, Boolean doInsert
-	) {
-		d4c_LOA_Insurance_Product_Mapping__c mapping = new d4c_LOA_Insurance_Product_Mapping__c(
-			d4c_StateOrProvinceCode__c = state,
-			d4c_LineOfAuthorityCode__c = code,
-			d4c_LineOfAuthorityDescription__c = description,
-			d4c_UniqueIdentifier__c = state + '-' + code + '-' + description
-		);
-		if (doInsert) {
-			insert mapping;
-		}
-		return mapping;
-	}
-
-	/**
-	 * Creates an Insurance Product record
 	 * @param name - Product name (e.g., 'Health Insurance')
 	 * @param state - State code (e.g., 'CA')
 	 * @param doInsert - Whether to insert the record
 	 * @return The created product record
-	 */
-	@TestVisible
-	private static d4c_Insurance_Product__c createInsuranceProduct(
-		String name, String state, Boolean doInsert
-	) {
-		d4c_Insurance_Product__c product = new d4c_Insurance_Product__c(
-			d4c_ProductName__c = name,
-			d4c_StateOrProvince__c = state,
-			d4c_UniqueIdentifier__c = state + '-' + name
-		);
-		if (doInsert) {
-			insert product;
-		}
-		return product;
-	}
-
-	/**
-	 * Creates a junction record linking Insurance Product to LOA Mapping
 	 * @param productId - Insurance Product ID
 	 * @param mappingId - LOA Mapping ID
 	 * @param doInsert - Whether to insert the record
 	 * @return The created junction record
-	 */
-	@TestVisible
-	private static d4c_Insurance_Product_LOA_Mapping__c createInsuranceProductLOAMappingJunction(
-		Id productId, Id mappingId, Boolean doInsert
-	) {
-		d4c_Insurance_Product_LOA_Mapping__c junction = new d4c_Insurance_Product_LOA_Mapping__c(
-			d4c_InsuranceProduct__c = productId,
-			d4c_LOAMapping__c = mappingId,
-			d4c_UniqueIdentifier__c = String.valueOf(productId) + '-' + String.valueOf(mappingId)
-		);
-		if (doInsert) {
-			insert junction;
-		}
-		return junction;
-	}
-
-	/**
-	 * Creates a Line of Authority record with state/code/description for matching tests
-	 * @param licenseId - Parent License ID
-	 * @param state - State code (e.g., 'CA')
 	 * @param code - LOA code (e.g., '935')
 	 * @param description - LOA description (e.g., 'Accident & Health or Sickness')
 	 * @param doInsert - Whether to insert the record
@@ -840,63 +783,8 @@ private class TestDataFactory {
 	 * @param productId - Insurance Product ID
 	 * @param doInsert - Whether to insert the record
 	 * @return The created junction record
-	 */
-	@TestVisible
-	private static d4c_License_Insurance_Product__c createLicenseInsuranceProductJunction(
-		Id licenseId, Id productId, Boolean doInsert
-	) {
-		d4c_License_Insurance_Product__c junction = new d4c_License_Insurance_Product__c(
-			d4c_License__c = licenseId,
-			d4c_InsuranceProduct__c = productId,
-			d4c_UniqueIdentifier__c = String.valueOf(licenseId) + '-' + String.valueOf(productId)
-		);
-		if (doInsert) {
-			insert junction;
-		}
-		return junction;
-	}
-
-	/**
 	 * Creates complete test data for LOA Product Categorization tests
 	 * Creates: Entity, License, LOA Mapping, Insurance Product, and junction
 	 * @return Map of object type to list of created records
-	 */
-	@TestVisible
-	private static Map<String, List<SObject>> createLOAProductCategorizationTestData() {
-		Map<String, List<SObject>> createdRecords = new Map<String, List<SObject>>();
-
-		// Create Entity
-		d4c_Entity__c entity = createEntity('TEST123456');
-		insert entity;
-		createdRecords.put('d4c_Entity__c', new List<SObject>{ entity });
-
-		// Create License
-		d4c_License__c license = new d4c_License__c(
-			d4c_LicenseNumber__c = 'LIC123456',
-			d4c_Entity__c = entity.Id,
-			d4c_StateOrProvinceCode__c = 'CA',
-			d4c_LicenseClassCode__c = '3',
-			d4c_UniqueIdentifier__c = 'LIC123456CA3'
-		);
-		insert license;
-		createdRecords.put('d4c_License__c', new List<SObject>{ license });
-
-		// Create LOA Mapping
-		d4c_LOA_Insurance_Product_Mapping__c mapping = createLOAInsuranceProductMapping(
-			'CA', '935', 'Accident & Health or Sickness', true
-		);
-		createdRecords.put('d4c_LOA_Insurance_Product_Mapping__c', new List<SObject>{ mapping });
-
-		// Create Insurance Product
-		d4c_Insurance_Product__c product = createInsuranceProduct('Health Insurance', 'CA', true);
-		createdRecords.put('d4c_Insurance_Product__c', new List<SObject>{ product });
-
-		// Create junction between Product and Mapping
-		d4c_Insurance_Product_LOA_Mapping__c junction = createInsuranceProductLOAMappingJunction(
-			product.Id, mapping.Id, true
-		);
-		createdRecords.put('d4c_Insurance_Product_LOA_Mapping__c', new List<SObject>{ junction });
-
-		return createdRecords;
 	}
 }

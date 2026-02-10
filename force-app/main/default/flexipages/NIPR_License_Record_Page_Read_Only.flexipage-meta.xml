@@ -204,7 +204,7 @@
                     <name>uiBehavior</name>
                     <value>readonly</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.d4c_License_Products__c</fieldItem>
+                <fieldItem>Record.d4c_License_LOBs__c</fieldItem>
                 <identifier>Recordd4c_License_Products_cField</identifier>
             </fieldInstance>
         </itemInstances>
@@ -214,17 +214,6 @@
                     <name>uiBehavior</name>
                     <value>none</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.d4c_NumberOfProductMatchedLOAs__c</fieldItem>
-                <identifier>Recordd4c_NumberOfProductMatchedLOAs_cField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>none</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.d4c_NumberOfProductNotMatchedLOAs__c</fieldItem>
                 <identifier>Recordd4c_NumberOfProductNotMatchedLOAs_cField</identifier>
             </fieldInstance>
         </itemInstances>
@@ -234,17 +223,6 @@
                     <name>uiBehavior</name>
                     <value>none</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.d4c_AllLOAsMatchedToProduct__c</fieldItem>
-                <identifier>Recordd4c_AllLOAsMatchedToProduct_cField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <name>Facet-d45faf27-cff5-47a0-a36f-0c3f54275067</name>
-        <type>Facet</type>
-    </flexiPageRegions>
-    <flexiPageRegions>
-        <itemInstances>
-            <componentInstance>
-                <componentInstanceProperties>
                     <name>body</name>
                     <value>Facet-bc663206-d32b-4e79-b567-a407629ae268</value>
                 </componentInstanceProperties>
@@ -586,17 +564,6 @@
                 <identifier>flexipage_richText</identifier>
                 <visibilityRule>
                     <criteria>
-                        <leftValue>{!Record.d4c_AllLOAsMatchedToProduct__c}</leftValue>
-                        <operator>EQUAL</operator>
-                        <rightValue>false</rightValue>
-                    </criteria>
-                </visibilityRule>
-            </componentInstance>
-        </itemInstances>
-        <itemInstances>
-            <componentInstance>
-                <componentInstanceProperties>
-                    <name>actionNames</name>
                 </componentInstanceProperties>
                 <componentInstanceProperties>
                     <name>maxRecordsToDisplay</name>
@@ -608,27 +575,6 @@
                 </componentInstanceProperties>
                 <componentInstanceProperties>
                     <name>relatedListApiName</name>
-                    <value>License_Insurance_Products__r</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>relatedListDisplayType</name>
-                    <value>ADVGRID</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>relatedListFieldAliases</name>
-                    <valueList>
-                        <valueListItems>
-                            <value>d4c_Insurance_Product__c.NAME</value>
-                        </valueListItems>
-                        <valueListItems>
-                            <value>d4c_Insurance_Product__c.d4c_ProductName__c</value>
-                        </valueListItems>
-                        <valueListItems>
-                            <value>d4c_Insurance_Product__c.d4c_StateOrProvince__c</value>
-                        </valueListItems>
-                    </valueList>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
                     <name>relatedListLabel</name>
                     <value>NIPR Insurance Products</value>
                 </componentInstanceProperties>
