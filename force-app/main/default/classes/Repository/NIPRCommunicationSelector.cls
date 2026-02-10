@@ -13,7 +13,7 @@ public with sharing class ProducerCommunicationSelector {
     /**
      ********************************************************
      * @Method Name    : getProducerCommsByProducerNPNs
-     * @description    : Returns list of d4c_ProducerCommunication__c by d4c_NPN__C field of d4c_Producer__c object
+     * @description    : Returns list of d4c_ProducerCommunication__c by d4c_NPN__C field of d4c_Entity__c object
      * @param          : npns - Set of unique NPN values
      * @return         : List<d4c_ProducerCommunication__c> - list of Producer Communication records
      *******************************************************
@@ -27,11 +27,11 @@ public with sharing class ProducerCommunicationSelector {
                 d4c_PhoneNumber__c,
                 d4c_EmailType__c,
                 d4c_EmailAddress__c,
-                d4c_Producer__r.d4c_NPN__c
+                d4c_Entity__r.d4c_NPN__c
             FROM
                 d4c_ProducerCommunication__c
             WHERE
-                d4c_Producer__r.d4c_NPN__c IN :npns
+                d4c_Entity__r.d4c_NPN__c IN :npns
         ];
     }
 }

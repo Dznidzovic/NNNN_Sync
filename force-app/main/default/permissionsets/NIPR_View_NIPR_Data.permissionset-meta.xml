@@ -21,7 +21,7 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>Account.d4c_Producer__c</field>
+        <field>Account.d4c_Entity__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -41,7 +41,7 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>Contact.d4c_Producer__c</field>
+        <field>Contact.d4c_Entity__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -61,7 +61,7 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>Lead.d4c_Producer__c</field>
+        <field>Lead.d4c_Entity__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -531,112 +531,112 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>d4c_Producer__c.d4c_BirthDate__c</field>
+        <field>d4c_Entity__c.d4c_BirthDate__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>d4c_Producer__c.d4c_BranchId__c</field>
+        <field>d4c_Entity__c.d4c_BranchId__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>d4c_Producer__c.d4c_ExcludeCarrierAppointments__c</field>
+        <field>d4c_Entity__c.d4c_ExcludeCarrierAppointments__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>d4c_Producer__c.d4c_FEIN__c</field>
+        <field>d4c_Entity__c.d4c_FEIN__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>d4c_Producer__c.d4c_FullName__c</field>
+        <field>d4c_Entity__c.d4c_FullName__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>d4c_Producer__c.d4c_GivenName__c</field>
+        <field>d4c_Entity__c.d4c_GivenName__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>d4c_Producer__c.d4c_IntegrationError__c</field>
+        <field>d4c_Entity__c.d4c_IntegrationError__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>d4c_Producer__c.d4c_LastNIPRSync__c</field>
+        <field>d4c_Entity__c.d4c_LastNIPRSync__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>d4c_Producer__c.d4c_MiddleName__c</field>
+        <field>d4c_Entity__c.d4c_MiddleName__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>d4c_Producer__c.d4c_NPNStatus__c</field>
+        <field>d4c_Entity__c.d4c_NPNStatus__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>d4c_Producer__c.d4c_NPNSyncError__c</field>
+        <field>d4c_Entity__c.d4c_NPNSyncError__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
-        <field>d4c_Producer__c.d4c_NPN__c</field>
+        <field>d4c_Entity__c.d4c_NPN__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>d4c_Producer__c.d4c_NameSuffix__c</field>
+        <field>d4c_Entity__c.d4c_NameSuffix__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>d4c_Producer__c.d4c_NameTypeCode__c</field>
+        <field>d4c_Entity__c.d4c_NameTypeCode__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>d4c_Producer__c.d4c_OtherGivenName__c</field>
+        <field>d4c_Entity__c.d4c_OtherGivenName__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>d4c_Producer__c.d4c_StateCOID__c</field>
+        <field>d4c_Entity__c.d4c_StateCOID__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>d4c_Producer__c.d4c_StateDomicile__c</field>
+        <field>d4c_Entity__c.d4c_StateDomicile__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>d4c_Producer__c.d4c_StateOrProvinceCode__c</field>
+        <field>d4c_Entity__c.d4c_StateOrProvinceCode__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>d4c_Producer__c.d4c_Subscription__c</field>
+        <field>d4c_Entity__c.d4c_Subscription__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>d4c_Producer__c.d4c_SurName__c</field>
+        <field>d4c_Entity__c.d4c_SurName__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>d4c_Producer__c.d4c_SyncRecordToNIPR__c</field>
+        <field>d4c_Entity__c.d4c_SyncRecordToNIPR__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>d4c_Producer__c.d4c_Type__c</field>
+        <field>d4c_Entity__c.d4c_Type__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -782,7 +782,7 @@
         <allowEdit>false</allowEdit>
         <allowRead>true</allowRead>
         <modifyAllRecords>false</modifyAllRecords>
-        <object>d4c_Producer__c</object>
+        <object>d4c_Entity__c</object>
         <viewAllFields>false</viewAllFields>
         <viewAllRecords>false</viewAllRecords>
     </objectPermissions>
@@ -833,7 +833,7 @@
         <visibility>Visible</visibility>
     </tabSettings>
     <tabSettings>
-        <tab>d4c_Producer__c</tab>
+        <tab>d4c_Entity__c</tab>
         <visibility>Visible</visibility>
     </tabSettings>
     <tabSettings>

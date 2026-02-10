@@ -6,7 +6,7 @@
     <columns>d4c_EmailType__c</columns>
     <columns>d4c_PhoneType__c</columns>
     <columns>d4c_PhoneNumber__c</columns>
-    <columns>d4c_Producer__c</columns>
+    <columns>d4c_Entity__c</columns>
     <filterScope>Everything</filterScope>
     <label>All</label>
 </ListView>

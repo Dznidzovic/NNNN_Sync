@@ -7,7 +7,7 @@
                     <name>actionNames</name>
                     <valueList>
                         <valueListItems>
-                            <value>niprsync__d4c_Producer__c.d4c_Force_NPN_Sync</value>
+                            <value>niprsync__d4c_Entity__c.d4c_Force_NPN_Sync</value>
                             <visibilityRule>
                                 <criteria>
                                     <leftValue>{!Record.d4c_NPNStatus__c}</leftValue>

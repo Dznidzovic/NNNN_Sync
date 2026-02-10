@@ -15,7 +15,7 @@
     <tabs>standard-Lead</tabs>
     <tabs>standard-Account</tabs>
     <tabs>standard-Contact</tabs>
-    <tabs>d4c_Producer__c</tabs>
+    <tabs>d4c_Entity__c</tabs>
     <tabs>d4c_License__c</tabs>
     <tabs>d4c_Carrier__c</tabs>
     <tabs>d4c_CarrierAppointment__c</tabs>
@@ -44,7 +44,7 @@
             <tab>d4c_Log__c</tab>
         </mappings>
         <mappings>
-            <tab>d4c_Producer__c</tab>
+            <tab>d4c_Entity__c</tab>
         </mappings>
         <mappings>
             <tab>standard-Account</tab>

@@ -232,7 +232,7 @@ Legend: BI=beforeInsert, AI=afterInsert, BU=beforeUpdate, AU=afterUpdate,
 +-----------------------------------------------------------------------------+
 | SELECTOR CLASS                       | OBJECT(S)                            |
 +--------------------------------------+--------------------------------------+
-| ProducerSelector                     | d4c_Producer__c                       |
+| ProducerSelector                     | d4c_Entity__c                       |
 | LicenseSelector                      | d4c_License__c                        |
 | LineOfAuthoritySelector              | d4c_LineOfAuthority__c                |
 | CarrierAppointmentSelector           | d4c_CarrierAppointment__c             |

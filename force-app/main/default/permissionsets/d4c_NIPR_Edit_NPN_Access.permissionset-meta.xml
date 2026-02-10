@@ -12,7 +12,7 @@
     <!-- Account - Producer Read Only -->
     <fieldPermissions>
         <editable>false</editable>
-        <field>Account.d4c_Producer__c</field>
+        <field>Account.d4c_Entity__c</field>
         <readable>true</readable>
     </fieldPermissions>
 
@@ -40,7 +40,7 @@
     <!-- Contact - Producer Read Only -->
     <fieldPermissions>
         <editable>false</editable>
-        <field>Contact.d4c_Producer__c</field>
+        <field>Contact.d4c_Entity__c</field>
         <readable>true</readable>
     </fieldPermissions>
 
@@ -68,7 +68,7 @@
     <!-- Lead - Producer Read Only -->
     <fieldPermissions>
         <editable>false</editable>
-        <field>Lead.d4c_Producer__c</field>
+        <field>Lead.d4c_Entity__c</field>
         <readable>true</readable>
     </fieldPermissions>
 

@@ -33,7 +33,7 @@
             </layoutItems>
             <layoutItems>
                 <behavior>Required</behavior>
-                <field>d4c_Producer__c</field>
+                <field>d4c_Entity__c</field>
             </layoutItems>
             <layoutItems>
                 <behavior>Required</behavior>

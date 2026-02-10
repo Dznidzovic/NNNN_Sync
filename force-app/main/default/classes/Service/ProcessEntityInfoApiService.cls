@@ -4,7 +4,7 @@
  * Created Date       : 04-08-2025
  * @description       : Imports data from the NIPR Entity Info API and maps it to Salesforce records.
  *                      This class processes the EntityInfoDTO structure and generates records for
- *                      d4c_Producer__c, d4c_ProducerCommunication__c, d4c_ProducerAddress__c, d4c_License__c,
+ *                      d4c_Entity__c, d4c_ProducerCommunication__c, d4c_ProducerAddress__c, d4c_License__c,
  *                      d4c_LineOfAuthority__c, and d4c_CarrierAppointment__c.
  * @author            : Stefan Nidzovic
  * Modification Log:
@@ -17,7 +17,7 @@ public with sharing class ProcessEntityInfoApiService {
     // Stores the NPN of the producer being processed
     private String producerNPN;
     // Stores the producer record to be upserted
-    private d4c_Producer__c producer;
+    private d4c_Entity__c producer;
     // Stores new or updated producer communication records (Phone, Email)
     private List<d4c_ProducerCommunication__c> producerCommunications = new List<d4c_ProducerCommunication__c>();
     // Stores new or updated producer address records
@@ -104,7 +104,7 @@ public with sharing class ProcessEntityInfoApiService {
     /**
      *********************************************************
      * @methodName      : processProducer
-     * @description     : Maps the INDIVIDUAL(AGENT) node to a d4c_Producer__c record and queues
+     * @description     : Maps the INDIVIDUAL(AGENT) node to a d4c_Entity__c record and queues
      *                    related communications for upsert.
      * @param individual : INDIVIDUAL node from the DTO.
      *********************************************************
@@ -136,7 +136,7 @@ public with sharing class ProcessEntityInfoApiService {
     /**
      *********************************************************
      * @methodName      : processProducer
-     * @description     : Maps the FIRM(AGENCY) node to a d4c_Producer__c record and queues
+     * @description     : Maps the FIRM(AGENCY) node to a d4c_Entity__c record and queues
      *                    related communications for upsert.
      * @param firm      : FIRM node from the DTO.
      *********************************************************
@@ -224,7 +224,7 @@ public with sharing class ProcessEntityInfoApiService {
             if (!uniqueRecordIds.contains(uniqueId)) {
                 d4c_ProducerCommunication__c comm = new d4c_ProducerCommunication__c();
 
-                comm.d4c_Producer__r = new d4c_Producer__c(d4c_NPN__c = producerNPN);
+                comm.d4c_Entity__r = new d4c_Entity__c(d4c_NPN__c = producerNPN);
                 comm.d4c_PhoneType__c = phoneType;
                 comm.d4c_PhoneNumber__c = formattedPhone;
                 comm.d4c_UniqueIdentifier__c = uniqueId;
@@ -254,7 +254,7 @@ public with sharing class ProcessEntityInfoApiService {
         if (!uniqueRecordIds.contains(uniqueId)) {
             d4c_ProducerCommunication__c emailComm = new d4c_ProducerCommunication__c();
 
-            emailComm.d4c_Producer__r = new d4c_Producer__c(d4c_NPN__c = producerNPN);
+            emailComm.d4c_Entity__r = new d4c_Entity__c(d4c_NPN__c = producerNPN);
             emailComm.d4c_EmailType__c = emailType;
             emailComm.d4c_EmailAddress__c = email;
             emailComm.d4c_UniqueIdentifier__c = uniqueId;
@@ -412,7 +412,7 @@ public with sharing class ProcessEntityInfoApiService {
             
             if (appointmentRecord != null) {       
                 // Set the producer lookup using external ID
-                appointmentRecord.d4c_Producer__r = new d4c_Producer__c(d4c_NPN__c = producerNPN);
+                appointmentRecord.d4c_Entity__r = new d4c_Entity__c(d4c_NPN__c = producerNPN);
                 appointmentRecord.d4c_Carrier__r = new d4c_Carrier__c(d4c_UniqueIdentifier__c = carrierRecord.d4c_UniqueIdentifier__c);
 
                 String countyCode = StringUtils.safeParseNullString(appointmentRecord.d4c_CountyCode__c);
@@ -458,10 +458,10 @@ public with sharing class ProcessEntityInfoApiService {
      * @methodName      : createProducerRecord
      * @description     : Creates a producer (Individual) record with data from the biographic section.
      * @param bio       : Biographic data from the Entity Info DTO.
-     * @return          : Populated d4c_Producer__c record.
+     * @return          : Populated d4c_Entity__c record.
      *********************************************************
      **/
-    private d4c_Producer__c createProducerRecord(EntityInfoDTO.BIOGRAPHIC bio) {
+    private d4c_Entity__c createProducerRecord(EntityInfoDTO.BIOGRAPHIC bio) {
         return createProducerRecord(bio, false);
     }
 
@@ -472,11 +472,11 @@ public with sharing class ProcessEntityInfoApiService {
      *                    Can create either an Individual (Agent) or Firm (Agency) record.
      * @param bio       : Biographic data from the Entity Info DTO.
      * @param isFirm    : Boolean flag indicating if this is a Firm (Agency) record.
-     * @return          : Populated d4c_Producer__c record.
+     * @return          : Populated d4c_Entity__c record.
      *********************************************************
      **/
-    private d4c_Producer__c createProducerRecord(EntityInfoDTO.BIOGRAPHIC bio, Boolean isFirm) {
-        d4c_Producer__c producerRecord = new d4c_Producer__c();
+    private d4c_Entity__c createProducerRecord(EntityInfoDTO.BIOGRAPHIC bio, Boolean isFirm) {
+        d4c_Entity__c producerRecord = new d4c_Entity__c();
         
         producerRecord.d4c_NPN__c = producerNPN;
         producerRecord.d4c_NPNStatus__c = 'Active';
@@ -546,8 +546,8 @@ public with sharing class ProcessEntityInfoApiService {
             String addressType = address.ADDR_TYPE == 'Residence' ? 'Residential' : address.ADDR_TYPE;
             producerAddress.d4c_AddressType__c = addressType;            
                 
-            d4c_Producer__c producerForExtId = new d4c_Producer__c(d4c_NPN__c = producerNPN);
-            producerAddress.d4c_Producer__r = producerForExtId;
+            d4c_Entity__c producerForExtId = new d4c_Entity__c(d4c_NPN__c = producerNPN);
+            producerAddress.d4c_Entity__r = producerForExtId;
             
             String uniqueId = 
                 producerAddress.d4c_AddressLineOne__c + 
@@ -719,7 +719,7 @@ public with sharing class ProcessEntityInfoApiService {
         d4c_License__c licenseRecord = new d4c_License__c();
         
         // Set the producer lookup using external ID
-        licenseRecord.d4c_Producer__r = new d4c_Producer__c(d4c_NPN__c = producerNPN);
+        licenseRecord.d4c_Entity__r = new d4c_Entity__c(d4c_NPN__c = producerNPN);
         
         // Set basic license fields
         licenseRecord.d4c_LicenseNumber__c = license.LICENSE_NUM;

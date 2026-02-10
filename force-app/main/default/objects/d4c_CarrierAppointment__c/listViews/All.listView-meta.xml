@@ -7,7 +7,7 @@
     <columns>d4c_AppointmentEffectiveDate__c</columns>
     <columns>d4c_TerminationEffectiveDate__c</columns>
     <columns>d4c_Carrier__c</columns>
-    <columns>d4c_Producer__c</columns>
+    <columns>d4c_Entity__c</columns>
     <filterScope>Everything</filterScope>
     <label>All</label>
 </ListView>

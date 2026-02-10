@@ -39,7 +39,7 @@ private class RunPDBAlertReportBatchable_Test {
     static void testExecuteMethod_reportNotFinished() {
         d4c_Subscription__c sub = TestDataFactory.createSubscription(true);
 
-        d4c_Producer__c prod = TestDataFactory.createProducer('11111');
+        d4c_Entity__c prod = TestDataFactory.createProducer('11111');
         prod.d4c_Subscription__c = sub.Id;
 
         insert prod;

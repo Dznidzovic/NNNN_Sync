@@ -116,7 +116,7 @@ sf project deploy start --source-dir force-app/main/default/classes/TriggerHandl
 ### Data Operations
 ```bash
 # Query data
-sf data query -q "SELECT Id, Name, d4c_NPN__c FROM d4c_Producer__c LIMIT 10"
+sf data query -q "SELECT Id, Name, d4c_NPN__c FROM d4c_Entity__c LIMIT 10"
 
 # Delete a record
 sf data delete record -s d4c_LOA_Insurance_Product_Mapping__c -i <recordId>
@@ -197,13 +197,13 @@ The codebase follows a strict layered architecture:
 
 **NEW Junction Objects** (2):
 1. **`d4c_Producer_Address_Junction__c`**
-   - Master-Detail to `d4c_Producer__c`
+   - Master-Detail to `d4c_Entity__c`
    - Master-Detail to `d4c_ProducerAddress__c`
    - External ID: `d4c_UniqueIdentifier__c` (Producer NPN + Address UniqueIdentifier)
    - Enables many-to-many: One address shared by multiple producers
 
 2. **`d4c_Producer_Communication_Junction__c`**
-   - Master-Detail to `d4c_Producer__c`
+   - Master-Detail to `d4c_Entity__c`
    - Master-Detail to `d4c_ProducerCommunication__c`
    - External ID: `d4c_UniqueIdentifier__c` (Producer NPN + Communication UniqueIdentifier)
    - Enables many-to-many: One communication shared by multiple producers
@@ -288,7 +288,7 @@ Fields:
 **Purpose**: Rename core objects for better clarity and flexibility
 
 **Objects to Rename**:
-1. **Producer → Entity**: `d4c_Producer__c` → `d4c_Entity__c` (Label: "NIPR Entity")
+1. **Producer → Entity**: `d4c_Entity__c` → `d4c_Entity__c` (Label: "NIPR Entity")
 2. **ProducerAddress → NIPR_Address**: `d4c_ProducerAddress__c` → `d4c_NIPR_Address__c` (Label: "NIPR Address")
 3. **ProducerCommunication → NIPR_Communication**: `d4c_ProducerCommunication__c` → `d4c_NIPR_Communication__c` (Label: "NIPR Communication")
 4. **Logger → Log**: `d4c_Logger__c` → `d4c_Log__c` (Label: "NIPR Log")
@@ -666,22 +666,22 @@ The `niprsync` namespace affects how metadata is referenced:
 #### In Your Code (Inside Namespace)
 ```apex
 // ✅ CORRECT - No namespace prefix needed in your code
-d4c_Producer__c producer = new d4c_Producer__c();
+d4c_Entity__c producer = new d4c_Entity__c();
 producer.d4c_NPN__c = '12345';
 Account acc = new Account();
 acc.d4c_NPN__c = '12345'; // Custom field on standard object
 ```
 
 #### In the Org (External API View)
-- Custom objects: `d4c_Producer__c` → `niprsync__d4c_Producer__c`
+- Custom objects: `d4c_Entity__c` → `niprsync__d4c_Entity__c`
 - Fields on standard objects: `Account.d4c_NPN__c` → `Account.niprsync__d4c_NPN__c`
-- Fields on custom objects: `d4c_Producer__c.d4c_NPN__c` → stays as `d4c_NPN__c` (within namespace)
+- Fields on custom objects: `d4c_Entity__c.d4c_NPN__c` → stays as `d4c_NPN__c` (within namespace)
 
 #### In Source Files
 ```
 force-app/main/default/
 ├── objects/
-│   └── d4c_Producer__c/  ← No namespace prefix in folder name
+│   └── d4c_Entity__c/  ← No namespace prefix in folder name
 │       └── fields/
 │           └── d4c_NPN__c.field-meta.xml  ← No namespace in filename
 ```

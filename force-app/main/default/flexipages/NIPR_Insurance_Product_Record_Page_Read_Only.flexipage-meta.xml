@@ -302,7 +302,7 @@
                             <value>d4c_License__c.d4c_LicenseNumber__c</value>
                         </valueListItems>
                         <valueListItems>
-                            <value>d4c_License__c.d4c_Producer__c</value>
+                            <value>d4c_License__c.d4c_Entity__c</value>
                         </valueListItems>
                         <valueListItems>
                             <value>d4c_License__c.d4c_StatusCode__c</value>

@@ -194,7 +194,7 @@
 |   +------------------------+------------------------------------------+     |
 |   | Object                 | External ID Field                        |     |
 |   +------------------------+------------------------------------------+     |
-|   | d4c_Producer__c         | d4c_NPN__c                                |     |
+|   | d4c_Entity__c         | d4c_NPN__c                                |     |
 |   | d4c_License__c          | d4c_UniqueIdentifier__c (LicNum+State+Cls)|     |
 |   | d4c_LineOfAuthority__c  | d4c_UniqueIdentifier__c (License+Code+Dsc)|     |
 |   | d4c_CarrierAppointment__c| d4c_UniqueIdentifier__c                  |     |

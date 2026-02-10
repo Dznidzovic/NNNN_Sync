@@ -17,10 +17,10 @@ private class ContactProducerAssignmentService_Test {
     static void testBeforeInsert_ExistingProducers() {
         // Setup mocks
         MockHelper.resetCounter();
-        d4c_Producer__c producer1 = MockHelper.createMockProducer('11111111');
-        d4c_Producer__c producer2 = MockHelper.createMockProducer('22222222');
+        d4c_Entity__c producer1 = MockHelper.createMockProducer('11111111');
+        d4c_Entity__c producer2 = MockHelper.createMockProducer('22222222');
 
-        Map<String, d4c_Producer__c> mockProducers = new Map<String, d4c_Producer__c>{
+        Map<String, d4c_Entity__c> mockProducers = new Map<String, d4c_Entity__c>{
             '11111111' => producer1,
             '22222222' => producer2
         };
@@ -45,7 +45,7 @@ private class ContactProducerAssignmentService_Test {
 
         // Verify producers were assigned
         for (Contact con : mockContacts) {
-            System.assertNotEquals(null, con.d4c_Producer__c,
+            System.assertNotEquals(null, con.d4c_Entity__c,
                 'Producer should be assigned for NPN: ' + con.d4c_NPN__c);
         }
 
@@ -66,7 +66,7 @@ private class ContactProducerAssignmentService_Test {
 
         // Enable mocks with empty producer map
         ProducerAssignmentService.useMocks = true;
-        ProducerAssignmentService.mockProducersByNPN = new Map<String, d4c_Producer__c>();
+        ProducerAssignmentService.mockProducersByNPN = new Map<String, d4c_Entity__c>();
 
         // Create handler
         ContactTriggerHandler handler = new ContactTriggerHandler();
@@ -78,7 +78,7 @@ private class ContactProducerAssignmentService_Test {
 
         // Verify producers were created and assigned
         for (Contact con : mockContacts) {
-            System.assertNotEquals(null, con.d4c_Producer__c,
+            System.assertNotEquals(null, con.d4c_Entity__c,
                 'Producer should be newly created and assigned');
         }
 
@@ -94,10 +94,10 @@ private class ContactProducerAssignmentService_Test {
     static void testAssignProducers_UpdateNPN_ReassignsProducer() {
         // Setup
         MockHelper.resetCounter();
-        d4c_Producer__c oldProducer = MockHelper.createMockProducer('55555555');
-        d4c_Producer__c newProducer = MockHelper.createMockProducer('66666666');
+        d4c_Entity__c oldProducer = MockHelper.createMockProducer('55555555');
+        d4c_Entity__c newProducer = MockHelper.createMockProducer('66666666');
 
-        Map<String, d4c_Producer__c> mockProducers = new Map<String, d4c_Producer__c>{
+        Map<String, d4c_Entity__c> mockProducers = new Map<String, d4c_Entity__c>{
             '55555555' => oldProducer,
             '66666666' => newProducer
         };
@@ -127,7 +127,7 @@ private class ContactProducerAssignmentService_Test {
         Test.stopTest();
 
         // Verify producer was reassigned
-        System.assertEquals(newProducer.Id, newContact.d4c_Producer__c,
+        System.assertEquals(newProducer.Id, newContact.d4c_Entity__c,
             'Producer should be reassigned to new NPN');
 
         // Cleanup
@@ -140,10 +140,10 @@ private class ContactProducerAssignmentService_Test {
     static void testHandleOrphanedProducers_MultipleSObjectTypes() {
         // Setup
         MockHelper.resetCounter();
-        d4c_Producer__c sharedProducer = MockHelper.createMockProducer('99999999');
-        d4c_Producer__c newProducer = MockHelper.createMockProducer('88888888');
+        d4c_Entity__c sharedProducer = MockHelper.createMockProducer('99999999');
+        d4c_Entity__c newProducer = MockHelper.createMockProducer('88888888');
 
-        Map<String, d4c_Producer__c> mockProducers = new Map<String, d4c_Producer__c>{
+        Map<String, d4c_Entity__c> mockProducers = new Map<String, d4c_Entity__c>{
             '99999999' => sharedProducer,
             '88888888' => newProducer
         };
@@ -177,7 +177,7 @@ private class ContactProducerAssignmentService_Test {
         Test.stopTest();
 
         // Verify new producer assigned
-        System.assertEquals(newProducer.Id, newContact.d4c_Producer__c,
+        System.assertEquals(newProducer.Id, newContact.d4c_Entity__c,
             'New producer should be assigned');
 
         // Old producer should not be deleted (still used by Account)

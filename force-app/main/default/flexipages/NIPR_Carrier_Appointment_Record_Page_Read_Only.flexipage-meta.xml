@@ -60,7 +60,7 @@
                     <name>uiBehavior</name>
                     <value>required</value>
                 </fieldInstanceProperties>
-                <fieldItem>Record.d4c_Producer__c</fieldItem>
+                <fieldItem>Record.d4c_Entity__c</fieldItem>
                 <identifier>Recordd4c_Producer_cField</identifier>
             </fieldInstance>
         </itemInstances>

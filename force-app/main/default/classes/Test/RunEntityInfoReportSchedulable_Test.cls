@@ -23,7 +23,7 @@ private class RunEntityInfoReportSchedulable_Test {
         // Arrange: Create single producer with 'Processing' status
         DateTime scheduledSince = DateTime.now().addSeconds(-5);
 
-        d4c_Producer__c producer = new d4c_Producer__c(
+        d4c_Entity__c producer = new d4c_Entity__c(
             d4c_NPN__c = '123456780',
             d4c_SyncRecordToNIPR__c = 'On',
             d4c_NPNStatus__c = 'Processing'
@@ -53,9 +53,9 @@ private class RunEntityInfoReportSchedulable_Test {
         // Arrange: Create producers with 'Active' status (not 'Processing')
         DateTime scheduledSince = DateTime.now().addSeconds(-5);
 
-        List<d4c_Producer__c> producers = new List<d4c_Producer__c>();
+        List<d4c_Entity__c> producers = new List<d4c_Entity__c>();
         for (Integer i = 0; i < 3; i++) {
-            d4c_Producer__c producer = new d4c_Producer__c(
+            d4c_Entity__c producer = new d4c_Entity__c(
                 d4c_NPN__c = '98765432' + i,
                 d4c_SyncRecordToNIPR__c = 'On',
                 d4c_NPNStatus__c = 'Active'
@@ -84,9 +84,9 @@ private class RunEntityInfoReportSchedulable_Test {
     @isTest
     private static void execute_filtersProducersByLastModifiedDate() {
         // Arrange: Create producers, then set scheduledSince to future (simulating old records)
-        List<d4c_Producer__c> producers = new List<d4c_Producer__c>();
+        List<d4c_Entity__c> producers = new List<d4c_Entity__c>();
         for (Integer i = 0; i < 3; i++) {
-            d4c_Producer__c producer = new d4c_Producer__c(
+            d4c_Entity__c producer = new d4c_Entity__c(
                 d4c_NPN__c = '55566677' + i,
                 d4c_SyncRecordToNIPR__c = 'On',
                 d4c_NPNStatus__c = 'Processing'
@@ -119,20 +119,20 @@ private class RunEntityInfoReportSchedulable_Test {
         // Arrange: Create mix of sync On and Off producers
         DateTime scheduledSince = DateTime.now().addSeconds(-5);
 
-        d4c_Producer__c producerSyncOn = new d4c_Producer__c(
+        d4c_Entity__c producerSyncOn = new d4c_Entity__c(
             d4c_NPN__c = '111111111',
             d4c_SyncRecordToNIPR__c = 'On',
             d4c_NPNStatus__c = 'Processing'
         );
 
-        d4c_Producer__c producerSyncOff = new d4c_Producer__c(
+        d4c_Entity__c producerSyncOff = new d4c_Entity__c(
             d4c_NPN__c = '222222222',
             d4c_SyncRecordToNIPR__c = 'Off',
             d4c_NPNStatus__c = 'Processing'
         );
 
         ProducerTriggerHandler.triggerDisabled = true;
-        insert new List<d4c_Producer__c>{producerSyncOn, producerSyncOff};
+        insert new List<d4c_Entity__c>{producerSyncOn, producerSyncOff};
         ProducerTriggerHandler.triggerDisabled = false;
 
         // Act
@@ -153,20 +153,20 @@ private class RunEntityInfoReportSchedulable_Test {
         // Arrange: Create producer with null NPN
         DateTime scheduledSince = DateTime.now().addSeconds(-5);
 
-        d4c_Producer__c producerWithNPN = new d4c_Producer__c(
+        d4c_Entity__c producerWithNPN = new d4c_Entity__c(
             d4c_NPN__c = '333333333',
             d4c_SyncRecordToNIPR__c = 'On',
             d4c_NPNStatus__c = 'Processing'
         );
 
-        d4c_Producer__c producerNoNPN = new d4c_Producer__c(
+        d4c_Entity__c producerNoNPN = new d4c_Entity__c(
             d4c_NPN__c = null,
             d4c_SyncRecordToNIPR__c = 'On',
             d4c_NPNStatus__c = 'Processing'
         );
 
         ProducerTriggerHandler.triggerDisabled = true;
-        insert new List<d4c_Producer__c>{producerWithNPN, producerNoNPN};
+        insert new List<d4c_Entity__c>{producerWithNPN, producerNoNPN};
         ProducerTriggerHandler.triggerDisabled = false;
 
         // Act

@@ -2,7 +2,7 @@
 *********************************************************
 Apex Class Name    : ProducerSelector
 Created Date       : 2025-03-28
-@description       : Selector class for querying d4c_Producer__c records
+@description       : Selector class for querying d4c_Entity__c records
 @author            : Uros Markovic
 Modification Log:
 Ver   Date         Author          Modification
@@ -15,13 +15,13 @@ public with sharing class ProducerSelector {
 
     /*********************************************************
      @Method Name    : getProducersByNPNs
-     @description    : Returns list of d4c_Producer__c by d4c_NPN__c field
+     @description    : Returns list of d4c_Entity__c by d4c_NPN__c field
      @author         : Uros Markovic
      @param          : npns - Set of unique NPN values
-     @return         : List<d4c_Producer__c> - list of Producer records
+     @return         : List<d4c_Entity__c> - list of Producer records
      *********************************************************
     **/
-    public List<d4c_Producer__c> getProducersByNPNs(Set<String> npns) {
+    public List<d4c_Entity__c> getProducersByNPNs(Set<String> npns) {
         return [
             SELECT
                 Id,
@@ -30,7 +30,7 @@ public with sharing class ProducerSelector {
                 d4c_Subscription__c,
                 d4c_ExcludeCarrierAppointments__c
             FROM 
-                d4c_Producer__c
+                d4c_Entity__c
             WHERE 
                 d4c_NPN__c IN :npns
         ];

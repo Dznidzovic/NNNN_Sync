@@ -22,7 +22,7 @@ public virtual with sharing class SubscriptionService {
     private final String CLASS_NAME = 'SubscriptionService';
 
     // PUBLIC PROPERTY - Set by orchestrator, used throughout service
-    public d4c_Producer__c producer { get; private set; }
+    public d4c_Entity__c producer { get; private set; }
 
     // Selectors and Callouts
     private final MetadataTypeSelector mtdSelector = new MetadataTypeSelector();
@@ -42,7 +42,7 @@ public virtual with sharing class SubscriptionService {
      * @return         : void
      *********************************************************
      **/
-    public void setProducer(d4c_Producer__c producer) {
+    public void setProducer(d4c_Entity__c producer) {
         this.producer = producer;
     }
 
@@ -94,7 +94,7 @@ public virtual with sharing class SubscriptionService {
         }
 
         // Query all producers with these NPNs
-        List<d4c_Producer__c> producers = producerSelector.getProducersByNPNs(npns);
+        List<d4c_Entity__c> producers = producerSelector.getProducersByNPNs(npns);
 
         if (producers.isEmpty()) {
             Logger.warning(CLASS_NAME, methodName, 'No producers found for NPNs', 'NPNs: ' + npns, null);
@@ -103,9 +103,9 @@ public virtual with sharing class SubscriptionService {
 
         // Group NPNs by subscription for efficient API calls
         Map<Id, List<String>> subscriptionToNPNsMap = new Map<Id, List<String>>();
-        List<d4c_Producer__c> producersToUpdate = new List<d4c_Producer__c>();
+        List<d4c_Entity__c> producersToUpdate = new List<d4c_Entity__c>();
 
-        for (d4c_Producer__c prod : producers) {
+        for (d4c_Entity__c prod : producers) {
             if (prod.d4c_Subscription__c == null) {
                 continue; // Skip producers without subscription
             }
@@ -133,7 +133,7 @@ public virtual with sharing class SubscriptionService {
         }
 
         // Step 2: Clear producer subscription lookups in Salesforce (DML after callouts)
-        for (d4c_Producer__c prod : producersToUpdate) {
+        for (d4c_Entity__c prod : producersToUpdate) {
             prod.d4c_Subscription__c = null;
         }
 
@@ -467,7 +467,7 @@ public virtual with sharing class SubscriptionService {
      *********************************************************
      **/
     private void updateProducerSubscription(Id subscriptionId) {
-        d4c_Producer__c producerToUpdate = new d4c_Producer__c(
+        d4c_Entity__c producerToUpdate = new d4c_Entity__c(
             d4c_NPN__c = producer.d4c_NPN__c,
             d4c_Subscription__c = subscriptionId
         );
@@ -634,9 +634,9 @@ public virtual with sharing class SubscriptionService {
         }
 
         // Step 4: Update producers with subscription lookup
-        List<d4c_Producer__c> producersToUpdate = new List<d4c_Producer__c>();
+        List<d4c_Entity__c> producersToUpdate = new List<d4c_Entity__c>();
         for (String npn : allocation.npnsToAdd) {
-            producersToUpdate.add(new d4c_Producer__c(
+            producersToUpdate.add(new d4c_Entity__c(
                 d4c_NPN__c = npn,
                 d4c_Subscription__c = subscriptionId
             ));

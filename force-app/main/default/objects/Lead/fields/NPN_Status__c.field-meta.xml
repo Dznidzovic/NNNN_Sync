@@ -3,15 +3,15 @@
     <fullName>NPN_Status__c</fullName>
     <externalId>false</externalId>
     <formula>IF(
-    ISBLANK(d4c_NPN__c) || ISBLANK(d4c_Producer__c),
+    ISBLANK(d4c_NPN__c) || ISBLANK(d4c_Entity__c),
     &quot;&quot;,
 
     IF(
-        ISBLANK(TEXT(d4c_Producer__r.d4c_NPNStatus__c)),
+        ISBLANK(TEXT(d4c_Entity__r.d4c_NPNStatus__c)),
         &quot;🔘 Not Synced&quot;,
 
         CASE(
-            TEXT(d4c_Producer__r.d4c_NPNStatus__c),
+            TEXT(d4c_Entity__r.d4c_NPNStatus__c),
             &quot;Processing&quot;, &quot;🟠 Processing&quot;,
             &quot;Invalid NPN&quot;, &quot;🔴 Invalid NPN&quot;,
             &quot;Sync Disabled&quot;, &quot;⛔ Sync Disabled&quot;,

@@ -16,7 +16,7 @@ private class LOAProductMappingService_Test {
     @TestSetup
     static void setupTestData() {
         // Create Producer with License using TestDataFactory
-        d4c_Producer__c producer = TestDataFactory.createProducer('12345678');
+        d4c_Entity__c producer = TestDataFactory.createProducer('12345678');
         ProducerTriggerHandler.triggerDisabled = true;
         insert producer;
         ProducerTriggerHandler.triggerDisabled = false;

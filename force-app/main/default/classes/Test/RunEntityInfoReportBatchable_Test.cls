@@ -34,7 +34,7 @@ public class RunEntityInfoReportBatchable_Test {
     @isTest
     static void testRunEntityInfoBatch_Error() {
         // Set data
-        d4c_Producer__c prod = TestDataFactory.createProducer('12345678');
+        d4c_Entity__c prod = TestDataFactory.createProducer('12345678');
         ProducerTriggerHandler.triggerDisabled = true;
         insert prod;
         ProducerTriggerHandler.triggerDisabled = false;
@@ -58,7 +58,7 @@ public class RunEntityInfoReportBatchable_Test {
     @isTest
     static void testRunEntityInfoBatch_SuccessWithExistingProducer() {
         // Set data - create producer with NPN that matches the mock response
-        d4c_Producer__c prod = TestDataFactory.createProducer('535325');
+        d4c_Entity__c prod = TestDataFactory.createProducer('535325');
         ProducerTriggerHandler.triggerDisabled = true;
         insert prod;
         ProducerTriggerHandler.triggerDisabled = false;
@@ -78,7 +78,7 @@ public class RunEntityInfoReportBatchable_Test {
         System.assertNotEquals(null, batchId, 'Batch Job ID should not be null.');
 
         // Verify producer still exists and can be queried with all required fields
-        List<d4c_Producer__c> producers = [SELECT Id, d4c_NPN__c, d4c_NPNStatus__c, d4c_Subscription__c, d4c_ExcludeCarrierAppointments__c FROM d4c_Producer__c WHERE d4c_NPN__c = '535325'];
+        List<d4c_Entity__c> producers = [SELECT Id, d4c_NPN__c, d4c_NPNStatus__c, d4c_Subscription__c, d4c_ExcludeCarrierAppointments__c FROM d4c_Entity__c WHERE d4c_NPN__c = '535325'];
         System.assertEquals(1, producers.size(), 'Producer should exist after batch execution.');
     }
 }

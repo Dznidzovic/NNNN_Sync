@@ -10,7 +10,7 @@
 ==============================================================================
 
                          +-------------------------+
-                         |     d4c_Producer__c      |
+                         |     d4c_Entity__c      |
                          |-------------------------|
                          | d4c_NPN__c (External ID) |<------ Primary Entity
                          | d4c_FirstName__c         |        (Insurance Agent)
@@ -31,7 +31,7 @@
 |d4c_ProducerAddr |    |d4c_ProducerComm   |   |   | d4c_Subscription__c|
 |   ess__c       |    |   unication__c   |   |   |-------------------|
 |----------------|    |------------------|   |   | d4c_SubscriptionId |
-| d4c_Producer__c |    | d4c_Producer__c   |   |   | d4c_Status__c      |
+| d4c_Entity__c |    | d4c_Entity__c   |   |   | d4c_Status__c      |
 | d4c_AddressLine |    | d4c_Type__c       |   |   | d4c_LastNIPRSync__c|
 | d4c_City__c     |    | d4c_Value__c      |   |   | d4c_NPNCount__c    |
 | d4c_State__c    |    +------------------+   |   +-------------------+
@@ -43,7 +43,7 @@
                          |     d4c_License__c       |
                          |-------------------------|
                          | d4c_UniqueIdentifier__c  |<------ External ID
-                         | d4c_Producer__c (MD)     |        (LicNum+State+Class)
+                         | d4c_Entity__c (MD)     |        (LicNum+State+Class)
                          | d4c_LicenseNumber__c     |
                          | d4c_StateOrProvinceCode__c|
                          | d4c_LicenseClassCode__c  |
@@ -75,7 +75,7 @@
                          |d4c_CarrierAppointment__c |   |
                          |-------------------------|   |
                          | d4c_UniqueIdentifier__c  |   |
-                         | d4c_Producer__c (Lookup) |   |
+                         | d4c_Entity__c (Lookup) |   |
                          | d4c_Carrier__c (Lookup)  |---+---> d4c_Carrier__c
                          | d4c_Status__c            |   |     (Carrier Master)
                          | d4c_StateCode__c         |   |
@@ -191,7 +191,7 @@
                     MASTER-DETAIL RELATIONSHIPS (MD)
                     ================================
 
-    d4c_Producer__c ----(MD)----> d4c_License__c
+    d4c_Entity__c ----(MD)----> d4c_License__c
     d4c_License__c  ----(MD)----> d4c_LineOfAuthority__c
     d4c_License__c  ----(MD)----> d4c_License_Insurance_Product__c
     d4c_Insurance_Product__c --(MD)--> d4c_Insurance_Product_LOA_Mapping__c
@@ -200,15 +200,15 @@
                     LOOKUP RELATIONSHIPS
                     ====================
 
-    d4c_Producer__c -----> d4c_Subscription__c
-    d4c_Producer__c <----- d4c_CarrierAppointment__c
-    d4c_Producer__c <----- d4c_ProducerAddress__c
-    d4c_Producer__c <----- d4c_ProducerCommunication__c
+    d4c_Entity__c -----> d4c_Subscription__c
+    d4c_Entity__c <----- d4c_CarrierAppointment__c
+    d4c_Entity__c <----- d4c_ProducerAddress__c
+    d4c_Entity__c <----- d4c_ProducerCommunication__c
     d4c_CarrierAppointment__c ----> d4c_Carrier__c
     d4c_LineOfAuthority__c ----> d4c_LOA_Insurance_Product_Mapping__c
     d4c_Insurance_Product_LOA_Mapping__c ----> d4c_LOA_Insurance_Product_Mapping__c
     d4c_License_Insurance_Product__c ----> d4c_Insurance_Product__c
-    Account/Contact/Lead ----> d4c_Producer__c (by NPN)
+    Account/Contact/Lead ----> d4c_Entity__c (by NPN)
 
 
                     EXTERNAL IDS (For Upsert Operations)
@@ -217,7 +217,7 @@
     +--------------------------------+--------------------------------------+
     | Object                         | External ID Field                    |
     +--------------------------------+--------------------------------------+
-    | d4c_Producer__c                 | d4c_NPN__c                            |
+    | d4c_Entity__c                 | d4c_NPN__c                            |
     | d4c_License__c                  | d4c_UniqueIdentifier__c               |
     | d4c_LineOfAuthority__c          | d4c_UniqueIdentifier__c               |
     | d4c_CarrierAppointment__c       | d4c_UniqueIdentifier__c               |

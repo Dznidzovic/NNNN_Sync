@@ -197,7 +197,7 @@
         <allowEdit>true</allowEdit>
         <allowRead>true</allowRead>
         <modifyAllRecords>true</modifyAllRecords>
-        <object>d4c_Producer__c</object>
+        <object>d4c_Entity__c</object>
         <viewAllFields>false</viewAllFields>
         <viewAllRecords>true</viewAllRecords>
     </objectPermissions>
@@ -248,7 +248,7 @@
         <visibility>Visible</visibility>
     </tabSettings>
     <tabSettings>
-        <tab>d4c_Producer__c</tab>
+        <tab>d4c_Entity__c</tab>
         <visibility>Visible</visibility>
     </tabSettings>
     <tabSettings>

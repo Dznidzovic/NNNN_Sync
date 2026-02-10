@@ -13,7 +13,7 @@ public with sharing class ProducerAddressSelector {
     /**
      ********************************************************
      * @Method Name    : getProducerAddressByProducerNPNs
-     * @description    : Returns list of d4c_ProducerAddress__c by d4c_NPN__C field of d4c_Producer__c object
+     * @description    : Returns list of d4c_ProducerAddress__c by d4c_NPN__C field of d4c_Entity__c object
      * @param          : npns - Set of unique NPN values
      * @return         : List<d4c_ProducerAddress__c> - list of Producer Address records
      *******************************************************
@@ -23,11 +23,11 @@ public with sharing class ProducerAddressSelector {
             SELECT
                 Id,
                 d4c_UniqueIdentifier__c,
-                d4c_Producer__r.d4c_NPN__c
+                d4c_Entity__r.d4c_NPN__c
             FROM
                 d4c_ProducerAddress__c
             WHERE
-                d4c_Producer__r.d4c_NPN__c IN :npns
+                d4c_Entity__r.d4c_NPN__c IN :npns
         ];
     }
 }

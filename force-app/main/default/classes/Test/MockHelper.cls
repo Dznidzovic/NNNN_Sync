@@ -48,7 +48,7 @@ public class MockHelper {
         acc.Id = generateId(Account.SObjectType);
         acc.Name = name;
         acc.d4c_NPN__c = npn;
-        acc.d4c_Producer__c = producerId;
+        acc.d4c_Entity__c = producerId;
         return acc;
     }
 
@@ -67,7 +67,7 @@ public class MockHelper {
         con.FirstName = firstName;
         con.LastName = lastName;
         con.d4c_NPN__c = npn;
-        con.d4c_Producer__c = producerId;
+        con.d4c_Entity__c = producerId;
         return con;
     }
 
@@ -87,7 +87,7 @@ public class MockHelper {
         ld.LastName = lastName;
         ld.Company = 'Test Company';
         ld.d4c_NPN__c = npn;
-        ld.d4c_Producer__c = producerId;
+        ld.d4c_Entity__c = producerId;
         return ld;
     }
 
@@ -95,11 +95,11 @@ public class MockHelper {
     @Method Name    : createMockProducer
     @description    : Creates a mock Producer with NPN
     @param          : npn - NPN value
-    @return         : d4c_Producer__c - Mock producer with fields set
+    @return         : d4c_Entity__c - Mock producer with fields set
     *********************************************************/
-    public static d4c_Producer__c createMockProducer(String npn) {
-        d4c_Producer__c prod = new d4c_Producer__c();
-        prod.Id = generateId(d4c_Producer__c.SObjectType);
+    public static d4c_Entity__c createMockProducer(String npn) {
+        d4c_Entity__c prod = new d4c_Entity__c();
+        prod.Id = generateId(d4c_Entity__c.SObjectType);
         prod.d4c_NPN__c = npn;
         // Name is an auto-number field, cannot be set directly
         return prod;

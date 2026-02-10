@@ -1,7 +1,7 @@
 /*********************************************************
  * Apex Class Name    : ProducerTriggerHandler
  * Created Date       : 04-15-2025
- * @description       : Trigger handler class that gets invoked from the d4c_Producer__c trigger and covers all DML Operation scenarios
+ * @description       : Trigger handler class that gets invoked from the d4c_Entity__c trigger and covers all DML Operation scenarios
  *                    : Invokes the Entity Info API to download NIPR data for producers and if successfull invokes the Add Target Subscription service of the NIPR API
  * @author            : Stefan Nidzovic
  * Modification Log:
@@ -25,7 +25,7 @@ public with sharing class ProducerTriggerHandler extends BaseTriggerHandler {
     @TestVisible
     private static Set<String> producerNPNsForEntityInfoAPIForTest;
     @TestVisible
-    private static List<d4c_Producer__c> deletedProducersForTest;
+    private static List<d4c_Entity__c> deletedProducersForTest;
 
     // NEW: Properties for testing subscription operations (afterUpdate)
     @TestVisible
@@ -48,7 +48,7 @@ public with sharing class ProducerTriggerHandler extends BaseTriggerHandler {
 
     public override void beforeInsert(List<SObject> newItems) {
         for (SObject obj : newItems) {
-            d4c_Producer__c producer = (d4c_Producer__c) obj;
+            d4c_Entity__c producer = (d4c_Entity__c) obj;
 
             String producerNPN = producer.d4c_NPN__c;
             Boolean producerSyncStatus = producer.d4c_SyncRecordToNIPR__c == 'On' ? true : false;
@@ -65,8 +65,8 @@ public with sharing class ProducerTriggerHandler extends BaseTriggerHandler {
         Integer excludeFlagChanges = 0;
 
         for (Id producerId : newItems.keySet()) {
-            d4c_Producer__c oldProducer = (d4c_Producer__c) oldItems.get(producerId);
-            d4c_Producer__c newProducer = (d4c_Producer__c) newItems.get(producerId);
+            d4c_Entity__c oldProducer = (d4c_Entity__c) oldItems.get(producerId);
+            d4c_Entity__c newProducer = (d4c_Entity__c) newItems.get(producerId);
 
             // Check if exclude flag changed
             if (oldProducer.d4c_ExcludeCarrierAppointments__c != newProducer.d4c_ExcludeCarrierAppointments__c) {
@@ -77,8 +77,8 @@ public with sharing class ProducerTriggerHandler extends BaseTriggerHandler {
         // If more than 1 producer is changing the exclude flag, block the transaction
         if (excludeFlagChanges > 1) {
             for (Id producerId : newItems.keySet()) {
-                d4c_Producer__c oldProducer = (d4c_Producer__c) oldItems.get(producerId);
-                d4c_Producer__c newProducer = (d4c_Producer__c) newItems.get(producerId);
+                d4c_Entity__c oldProducer = (d4c_Entity__c) oldItems.get(producerId);
+                d4c_Entity__c newProducer = (d4c_Entity__c) newItems.get(producerId);
 
                 if (oldProducer.d4c_ExcludeCarrierAppointments__c != newProducer.d4c_ExcludeCarrierAppointments__c) {
                     newProducer.addError('You cannot change the "Exclude Carrier Appointments" setting for more than 1 producer in the same transaction. Please update producers individually.');
@@ -88,8 +88,8 @@ public with sharing class ProducerTriggerHandler extends BaseTriggerHandler {
         }
 
         for (Id producerId : newItems.keySet()) {
-            d4c_Producer__c oldProducer = (d4c_Producer__c) oldItems.get(producerId);
-            d4c_Producer__c newProducer = (d4c_Producer__c) newItems.get(producerId);
+            d4c_Entity__c oldProducer = (d4c_Entity__c) oldItems.get(producerId);
+            d4c_Entity__c newProducer = (d4c_Entity__c) newItems.get(producerId);
 
             String oldProducerNPN = oldProducer.d4c_NPN__c;
             String newProducerNPN = newProducer.d4c_NPN__c;
@@ -114,7 +114,7 @@ public with sharing class ProducerTriggerHandler extends BaseTriggerHandler {
 
 
         for (Id producerId : newItems.keySet()) {
-            d4c_Producer__c producer = (d4c_Producer__c) newItems.get(producerId);
+            d4c_Entity__c producer = (d4c_Entity__c) newItems.get(producerId);
 
             String producerNPN = producer.d4c_NPN__c;
             Boolean producerSyncStatus = producer.d4c_SyncRecordToNIPR__c == 'On' ? true : false;
@@ -147,8 +147,8 @@ public with sharing class ProducerTriggerHandler extends BaseTriggerHandler {
         Integer subscriptionOperationCount = 0;
 
         for (Id producerId : newItems.keySet()) {
-            d4c_Producer__c oldProducer = (d4c_Producer__c) oldItems.get(producerId);
-            d4c_Producer__c newProducer = (d4c_Producer__c) newItems.get(producerId);
+            d4c_Entity__c oldProducer = (d4c_Entity__c) oldItems.get(producerId);
+            d4c_Entity__c newProducer = (d4c_Entity__c) newItems.get(producerId);
 
             String oldProducerNPN = oldProducer.d4c_NPN__c;
             String newProducerNPN = newProducer.d4c_NPN__c;
@@ -184,7 +184,7 @@ public with sharing class ProducerTriggerHandler extends BaseTriggerHandler {
         // Skip validation if disabled for bulk data import tests
         if (!disableSubscriptionValidation && subscriptionOperationCount > 1) {
             for (Id producerId : newItems.keySet()) {
-                d4c_Producer__c newProducer = (d4c_Producer__c) newItems.get(producerId);
+                d4c_Entity__c newProducer = (d4c_Entity__c) newItems.get(producerId);
                 newProducer.addError('You cannot perform subscription operations for more than 1 producer in the same transaction. Please update producers individually.');
             }
         }
@@ -217,12 +217,12 @@ public with sharing class ProducerTriggerHandler extends BaseTriggerHandler {
      ********************************************************
      **/
     public override void afterDelete(Map<Id, SObject> oldItems) {
-        List<d4c_Producer__c> oldProducers = (List<d4c_Producer__c>) oldItems.values();
+        List<d4c_Entity__c> oldProducers = (List<d4c_Entity__c>) oldItems.values();
 
         // BULKIFIED - collect all NPNs and their subscriptions for single orchestrator call
         Map<String, Id> npnToSubscriptionMap = new Map<String, Id>();
 
-        for (d4c_Producer__c producer : oldProducers) {
+        for (d4c_Entity__c producer : oldProducers) {
             // Only remove from subscription if producer was active and subscribed
             if (producer.d4c_NPNStatus__c == 'Active' && producer.d4c_Subscription__c != null && String.isNotBlank(producer.d4c_NPN__c)) {
                 npnToSubscriptionMap.put(producer.d4c_NPN__c, producer.d4c_Subscription__c);
@@ -235,8 +235,8 @@ public with sharing class ProducerTriggerHandler extends BaseTriggerHandler {
                 System.enqueueJob(new SubscriptionServiceExecutorQueueable(npnToSubscriptionMap, NIPREnums.SubscriptionOperation.REMOVE_NPN_AFTER_DELETE));
             }
         } else {
-            deletedProducersForTest = new List<d4c_Producer__c>();
-            for (d4c_Producer__c producer : oldProducers) {
+            deletedProducersForTest = new List<d4c_Entity__c>();
+            for (d4c_Entity__c producer : oldProducers) {
                 if (producer.d4c_NPNStatus__c == 'Active' && producer.d4c_Subscription__c != null) {
                     deletedProducersForTest.add(producer);
                 }

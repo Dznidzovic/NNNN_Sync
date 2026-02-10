@@ -258,17 +258,17 @@ public class DMLExecutor implements Queueable {
             objType = upsertRecords[0].getSObjectType().getDescribe().getName();
 
             // Extract NPN context for better debugging
-            if (objType == 'd4c_Producer__c') {
+            if (objType == 'd4c_Entity__c') {
                 Set<String> npns = new Set<String>();
                 for(SObject rec : upsertRecords) {
-                    d4c_Producer__c prod = (d4c_Producer__c)rec;
+                    d4c_Entity__c prod = (d4c_Entity__c)rec;
                     if(prod.d4c_NPN__c != null) npns.add(prod.d4c_NPN__c);
                 }
                 if(!npns.isEmpty()) npnContext = ' | NPNs: ' + String.join(new List<String>(npns), ', ');
             } else if (objType == 'd4c_License__c' || objType == 'd4c_CarrierAppointment__c') {
                 Set<String> npns = new Set<String>();
                 for(SObject rec : upsertRecords) {
-                    SObject producer = rec.getSObject('d4c_Producer__r');
+                    SObject producer = rec.getSObject('d4c_Entity__r');
                     if(producer != null && producer.get('d4c_NPN__c') != null) {
                         npns.add((String)producer.get('d4c_NPN__c'));
                     }

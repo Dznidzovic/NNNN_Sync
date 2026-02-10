@@ -57,9 +57,9 @@ public with sharing class RunEntityInfoReportBatchable implements Database.Batch
 
                 // Track successful NPN for subscription processing in finish()
                 // Query the producer to check its exclude flag
-                List<d4c_Producer__c> producers = producerSelector.getProducersByNPNs(new Set<String>{ npn });
+                List<d4c_Entity__c> producers = producerSelector.getProducersByNPNs(new Set<String>{ npn });
                 if (!producers.isEmpty()) {
-                    d4c_Producer__c producer = producers[0];
+                    d4c_Entity__c producer = producers[0];
                     // Only add NPNs that are Active and don't already have a subscription
                     if (producer.d4c_NPNStatus__c == 'Active' && producer.d4c_Subscription__c == null) {
                         if (producer.d4c_ExcludeCarrierAppointments__c) {
@@ -75,13 +75,13 @@ public with sharing class RunEntityInfoReportBatchable implements Database.Batch
 
                 String exceptionMessage = e.getMessage();
 
-                List<d4c_Producer__c> producers = producerSelector.getProducersByNPNs(new Set<String>{ npn });
+                List<d4c_Entity__c> producers = producerSelector.getProducersByNPNs(new Set<String>{ npn });
 
                 if (producers == null || producers.isEmpty()) {
                     Logger.warning(CLASS_NAME, methodName, 'Producer with this NPN not yet created',
                                  'NPN: ' + npn, null);
                 } else {
-                    d4c_Producer__c producer = producers[0];
+                    d4c_Entity__c producer = producers[0];
 
                     if (exceptionMessage.contains(NIPREnums.EntityInfoError.NO_PRODUCER_DATA.toString())) {
                         producer.d4c_NPNStatus__c = 'Invalid NPN';

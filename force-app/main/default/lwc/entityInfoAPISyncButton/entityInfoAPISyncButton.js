@@ -7,8 +7,8 @@
 * @lastModifiedBy : Stefan Nidzovic
 * @modifications  : Added protection against spam clicking using in-memory tracking,
 *                   shows confirmation if synced today based on database value.
-* @usage		  : Component to be used as a quick action button on d4c_Producer__c records
-* @params		  : recordId - Id of the d4c_Producer__c record
+* @usage		  : Component to be used as a quick action button on d4c_Entity__c records
+* @params		  : recordId - Id of the d4c_Entity__c record
 * @events		  :
 * @limitations	  : Component does not display any UI elements
 */
@@ -17,8 +17,8 @@ import { getRecord, getFieldValue } from 'lightning/uiRecordApi';
 import LightningConfirm from 'lightning/confirm';
 import { showToast } from 'c/utils';
 import processEntityInfoAPI from '@salesforce/apex/EntityInfoApiController.processNPN';
-import PRODUCER_NPN from "@salesforce/schema/d4c_Producer__c.d4c_NPN__c";
-import PRODUCER_LAST_SYNC from "@salesforce/schema/d4c_Producer__c.d4c_LastNIPRSync__c";
+import PRODUCER_NPN from "@salesforce/schema/d4c_Entity__c.d4c_NPN__c";
+import PRODUCER_LAST_SYNC from "@salesforce/schema/d4c_Entity__c.d4c_LastNIPRSync__c";
 
 const ONE_MINUTE_MS = 60 * 1000;
 

@@ -25,13 +25,13 @@ private class LOAProductCategorizationBatchable_Test {
         LicenseInsuranceProductTriggerHandler.triggerDisabled = true;
 
         // Create Producer
-        d4c_Producer__c producer = TestDataFactory.createProducer('1234567890');
+        d4c_Entity__c producer = TestDataFactory.createProducer('1234567890');
         insert producer;
 
         // Create License
         d4c_License__c license = new d4c_License__c(
             d4c_LicenseNumber__c = 'BATCHLIC123',
-            d4c_Producer__c = producer.Id,
+            d4c_Entity__c = producer.Id,
             d4c_StateOrProvinceCode__c = TEST_STATE,
             d4c_LicenseClassCode__c = '3',
             d4c_UniqueIdentifier__c = 'BATCHLIC123CA3'

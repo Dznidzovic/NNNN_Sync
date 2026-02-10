@@ -2,7 +2,7 @@
  * @description       : 
  * @author            : Stefan Nidzovic
  * @group             : 
- * @last modified on  : 02-09-2026
+ * @last modified on  : 02-10-2026
  * @last modified by  : Stefan Nidzovic
 **/
 @isTest
@@ -130,7 +130,7 @@ private class ProcessEntityInfoApiService_Test {
     // ASSERT METHODS
 
     private static void assertInitialRecordCounts() {
-        System.assertEquals(1, getCount('d4c_Producer__c'), 'Should have one initial Producer');
+        System.assertEquals(1, getCount('d4c_Entity__c'), 'Should have one initial Producer');
         System.assertEquals(2, getCount('d4c_ProducerAddress__c'), 'Should have two initial Producer Addresses');
         System.assertEquals(5, getCount('d4c_ProducerCommunication__c'), 'Should have five initial Producer Communications');
         System.assertEquals(2, getCount('d4c_License__c'), 'Should have two initial Licenses');
@@ -141,7 +141,7 @@ private class ProcessEntityInfoApiService_Test {
     }
     
     private static void assertRecordCountsIndividualNode() {
-        System.assertEquals(1, getCount('d4c_Producer__c'), 'Should create one Producer');
+        System.assertEquals(1, getCount('d4c_Entity__c'), 'Should create one Producer');
         System.assertEquals(3, getCount('d4c_ProducerAddress__c'), 'Should create three Producer Addresses');
         System.assertEquals(8, getCount('d4c_ProducerCommunication__c'), 'Should create eight Producer Communications');
         System.assertEquals(3, getCount('d4c_License__c'), 'Should create three Licenses');
@@ -152,7 +152,7 @@ private class ProcessEntityInfoApiService_Test {
     }
 
     private static void assertRecordCountsFirmNode() {
-        System.assertEquals(1, getCount('d4c_Producer__c'), 'Should create one Producer');
+        System.assertEquals(1, getCount('d4c_Entity__c'), 'Should create one Producer');
         System.assertEquals(3, getCount('d4c_ProducerAddress__c'), 'Should create three Producer Addresses');
         System.assertEquals(8, getCount('d4c_ProducerCommunication__c'), 'Should create five Producer Communications');
         System.assertEquals(3, getCount('d4c_License__c'), 'Should create three Licenses');
@@ -163,9 +163,9 @@ private class ProcessEntityInfoApiService_Test {
     }
 
     private static void assertRecordCountsPerParentObject() {
-        System.assertEquals(8, getCount('d4c_ProducerCommunication__c', 'WHERE d4c_Producer__r.d4c_NPN__c = \'' + AGENT_NPN + '\''), 'Should have 8 communications for producer ' + AGENT_NPN);
-        System.assertEquals(3, getCount('d4c_ProducerAddress__c', 'WHERE d4c_Producer__r.d4c_NPN__c = \'' + AGENT_NPN + '\''), 'Should have 3 addresses for producer ' + AGENT_NPN);
-        System.assertEquals(3, getCount('d4c_License__c', 'WHERE d4c_Producer__r.d4c_NPN__c = \'' + AGENT_NPN + '\''), 'Should have 3 licenses for producer ' + AGENT_NPN);
+        System.assertEquals(8, getCount('d4c_ProducerCommunication__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'' + AGENT_NPN + '\''), 'Should have 8 communications for producer ' + AGENT_NPN);
+        System.assertEquals(3, getCount('d4c_ProducerAddress__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'' + AGENT_NPN + '\''), 'Should have 3 addresses for producer ' + AGENT_NPN);
+        System.assertEquals(3, getCount('d4c_License__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'' + AGENT_NPN + '\''), 'Should have 3 licenses for producer ' + AGENT_NPN);
         System.assertEquals(1, getCount('d4c_LineOfAuthority__c', 'WHERE d4c_License__r.d4c_LicenseNumber__c = \'CA123456\''), 'Should have 1 LOA for license CA123456');
         System.assertEquals(3, getCount('d4c_LineOfAuthority__c', 'WHERE d4c_License__r.d4c_LicenseNumber__c = \'NY789012\''), 'Should have 3 LOAs for license NY789012');
         System.assertEquals(1, getCount('d4c_LineOfAuthority__c', 'WHERE d4c_License__r.d4c_LicenseNumber__c = \'NY345678\''), 'Should have 1 LOA for license NY345678');
@@ -314,7 +314,7 @@ private class ProcessEntityInfoApiService_Test {
     }
 
     private static void assertIndividualProducerFields() {
-        d4c_Producer__c producer = queryProducer(AGENT_NPN);
+        d4c_Entity__c producer = queryProducer(AGENT_NPN);
         
         System.assertEquals(AGENT_NPN, producer.d4c_NPN__c, 'NPN should match');
         System.assertEquals('Active', producer.d4c_NPNStatus__c, 'NPN Status should be Active');
@@ -329,7 +329,7 @@ private class ProcessEntityInfoApiService_Test {
     }
 
     private static void assertFirmProducerFields() {
-        d4c_Producer__c producer = queryProducer(AGENCY_NPN);
+        d4c_Entity__c producer = queryProducer(AGENCY_NPN);
 
         System.assertEquals(AGENCY_NPN, producer.d4c_NPN__c, 'NPN should match');
         System.assertEquals('Active', producer.d4c_NPNStatus__c, 'NPN Status should be Active');
@@ -428,7 +428,7 @@ private class ProcessEntityInfoApiService_Test {
     
     // ASSERT METHODS FOR LARGE PRODUCER TESTS
     private static void assertRecordCountsFirmNodeLargeProducer() {
-        System.assertEquals(1, getCount('d4c_Producer__c'), 'Should create one Producer');
+        System.assertEquals(1, getCount('d4c_Entity__c'), 'Should create one Producer');
         System.assertEquals(3, getCount('d4c_ProducerAddress__c'), 'Should create three Producer Addresses');
         System.assertEquals(8, getCount('d4c_ProducerCommunication__c'), 'Should create five Producer Communications');
         System.assertEquals(3, getCount('d4c_License__c'), 'Should create three Licenses');
@@ -451,7 +451,7 @@ private class ProcessEntityInfoApiService_Test {
     
     private static Set<String> queryProducerNPNs() {
         Set<String> npns = new Set<String>();
-        for (d4c_Producer__c producer : [SELECT d4c_NPN__c FROM d4c_Producer__c]) {
+        for (d4c_Entity__c producer : [SELECT d4c_NPN__c FROM d4c_Entity__c]) {
             npns.add(producer.d4c_NPN__c);
         }
         return npns;
@@ -505,7 +505,7 @@ private class ProcessEntityInfoApiService_Test {
         return ids;
     }
     
-    private static d4c_Producer__c queryProducer(String npn) {
+    private static d4c_Entity__c queryProducer(String npn) {
         return [
             SELECT
                 d4c_NPN__c, 
@@ -524,7 +524,7 @@ private class ProcessEntityInfoApiService_Test {
                 d4c_NameTypeCode__c,
                 d4c_ExcludeCarrierAppointments__c
             FROM 
-                d4c_Producer__c
+                d4c_Entity__c
             WHERE
                  d4c_NPN__c = :npn
             LIMIT 1
@@ -546,7 +546,7 @@ private class ProcessEntityInfoApiService_Test {
             FROM 
                 d4c_ProducerAddress__c
             WHERE 
-                d4c_Producer__r.d4c_NPN__c = :AGENT_NPN 
+                d4c_Entity__r.d4c_NPN__c = :AGENT_NPN 
             AND 
                 d4c_AddressType__c = 'Residential'
             LIMIT 1
@@ -561,7 +561,7 @@ private class ProcessEntityInfoApiService_Test {
             FROM 
                 d4c_ProducerCommunication__c
             WHERE 
-                d4c_Producer__r.d4c_NPN__c = :AGENT_NPN
+                d4c_Entity__r.d4c_NPN__c = :AGENT_NPN
             AND 
                 d4c_PhoneNumber__c = '+1-213-555-1234'
             LIMIT 1
@@ -576,7 +576,7 @@ private class ProcessEntityInfoApiService_Test {
             FROM 
                 d4c_ProducerCommunication__c
             WHERE 
-                d4c_Producer__r.d4c_NPN__c = :AGENT_NPN
+                d4c_Entity__r.d4c_NPN__c = :AGENT_NPN
             AND 
                 d4c_EmailAddress__c = 'mjohnson@example.com'
             LIMIT 1
@@ -600,7 +600,7 @@ private class ProcessEntityInfoApiService_Test {
             FROM
                  d4c_License__c
             WHERE 
-                d4c_Producer__r.d4c_NPN__c = :AGENT_NPN
+                d4c_Entity__r.d4c_NPN__c = :AGENT_NPN
             AND 
                 d4c_LicenseNumber__c = 'CA123456'
             LIMIT 1
@@ -626,7 +626,7 @@ private class ProcessEntityInfoApiService_Test {
             WHERE 
                 d4c_License__r.d4c_LicenseNumber__c = 'CA123456'
             AND 
-                d4c_License__r.d4c_Producer__r.d4c_NPN__c = :AGENT_NPN
+                d4c_License__r.d4c_Entity__r.d4c_NPN__c = :AGENT_NPN
             LIMIT 1
         ];
     }
@@ -660,7 +660,7 @@ private class ProcessEntityInfoApiService_Test {
             FROM
                 d4c_CarrierAppointment__c
             WHERE
-                d4c_Producer__r.d4c_NPN__c = :AGENT_NPN
+                d4c_Entity__r.d4c_NPN__c = :AGENT_NPN
             AND
                 d4c_Carrier__r.d4c_CoCode__c = '98765'
             AND

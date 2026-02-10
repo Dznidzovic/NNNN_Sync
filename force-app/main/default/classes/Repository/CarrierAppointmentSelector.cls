@@ -14,7 +14,7 @@ public with sharing class CarrierAppointmentSelector {
     /**
      * *******************************************************
      * @Method Name    : getCarrierAppointmentsByProducerNpn
-     * @description    : Returns list of d4c_Carrier by d4c_NPN__c of d4c_Producer__C object field
+     * @description    : Returns list of d4c_Carrier by d4c_NPN__c of d4c_Entity__c object field
      * @param          : npns - Set of unique NPN values
      * @return         : List<d4c_CarrierAppointment__c> - list of Producer records
      *******************************************************
@@ -24,11 +24,11 @@ public with sharing class CarrierAppointmentSelector {
             SELECT
                 Id,
                 d4c_UniqueIdentifier__c,
-                d4c_Producer__r.d4c_NPN__c
+                d4c_Entity__r.d4c_NPN__c
             FROM
                 d4c_CarrierAppointment__c
             WHERE
-                d4c_Producer__r.d4c_NPN__c IN :npns
+                d4c_Entity__r.d4c_NPN__c IN :npns
         ];
     }
 
@@ -48,12 +48,12 @@ public with sharing class CarrierAppointmentSelector {
             SELECT
                 Id,
                 d4c_UniqueIdentifier__c,
-                d4c_Producer__r.d4c_NPN__c,
+                d4c_Entity__r.d4c_NPN__c,
                 d4c_StateOrProvinceCode__c
             FROM
                 d4c_CarrierAppointment__c
             WHERE
-                d4c_Producer__r.d4c_NPN__c IN :npns
+                d4c_Entity__r.d4c_NPN__c IN :npns
                 AND d4c_StateOrProvinceCode__c IN :states
         ];
     }

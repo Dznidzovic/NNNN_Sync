@@ -133,7 +133,7 @@
     <platformActionList>
         <actionListContext>Record</actionListContext>
         <platformActionListItems>
-            <actionName>d4c_Producer__c.d4c_Force_NPN_Sync</actionName>
+            <actionName>d4c_Entity__c.d4c_Force_NPN_Sync</actionName>
             <actionType>QuickAction</actionType>
             <sortOrder>0</sortOrder>
         </platformActionListItems>
@@ -163,7 +163,7 @@
         <fields>d4c_LicenseClassDescription__c</fields>
         <fields>d4c_StartDate__c</fields>
         <fields>d4c_EndDate__c</fields>
-        <relatedList>d4c_License__c.d4c_Producer__c</relatedList>
+        <relatedList>d4c_License__c.d4c_Entity__c</relatedList>
     </relatedLists>
     <relatedLists>
         <fields>NAME</fields>
@@ -172,7 +172,7 @@
         <fields>d4c_TerminationEffectiveDate__c</fields>
         <fields>d4c_StateOrProvinceCode__c</fields>
         <fields>d4c_Carrier__c.NAME</fields>
-        <relatedList>d4c_CarrierAppointment__c.d4c_Producer__c</relatedList>
+        <relatedList>d4c_CarrierAppointment__c.d4c_Entity__c</relatedList>
     </relatedLists>
     <relatedLists>
         <fields>d4c_EmailAddress__c</fields>
@@ -180,7 +180,7 @@
         <fields>d4c_PhoneNumber__c</fields>
         <fields>d4c_PhoneType__c</fields>
         <fields>CREATED_DATE</fields>
-        <relatedList>d4c_ProducerCommunication__c.d4c_Producer__c</relatedList>
+        <relatedList>d4c_ProducerCommunication__c.d4c_Entity__c</relatedList>
     </relatedLists>
     <relatedLists>
         <fields>d4c_AddressType__c</fields>
@@ -190,28 +190,28 @@
         <fields>d4c_AsOfDate__c</fields>
         <fields>d4c_City__c</fields>
         <fields>d4c_CountryCode__c</fields>
-        <relatedList>d4c_ProducerAddress__c.d4c_Producer__c</relatedList>
+        <relatedList>d4c_ProducerAddress__c.d4c_Entity__c</relatedList>
     </relatedLists>
     <relatedLists>
         <fields>ACCOUNT.NAME</fields>
         <fields>d4c_NPN__c</fields>
         <fields>d4c_NPNStatus__c</fields>
         <fields>d4c_NPNSyncError__c</fields>
-        <relatedList>Account.d4c_Producer__c</relatedList>
+        <relatedList>Account.d4c_Entity__c</relatedList>
     </relatedLists>
     <relatedLists>
         <fields>FULL_NAME</fields>
         <fields>d4c_NPN__c</fields>
         <fields>NPN_Status__c</fields>
         <fields>d4c_NPNSyncError__c</fields>
-        <relatedList>Lead.d4c_Producer__c</relatedList>
+        <relatedList>Lead.d4c_Entity__c</relatedList>
     </relatedLists>
     <relatedLists>
         <fields>FULL_NAME</fields>
         <fields>d4c_NPN__c</fields>
         <fields>d4c_NPNStatus__c</fields>
         <fields>d4c_NPNSyncError__c</fields>
-        <relatedList>Contact.d4c_Producer__c</relatedList>
+        <relatedList>Contact.d4c_Entity__c</relatedList>
     </relatedLists>
     <showEmailCheckbox>false</showEmailCheckbox>
     <showHighlightsPanel>false</showHighlightsPanel>

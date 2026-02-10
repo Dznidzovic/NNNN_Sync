@@ -41,9 +41,9 @@ public class RunEntityInfoReportSchedulable implements Schedulable {
     public void execute(SchedulableContext ctx) {
         // Query all producers awaiting processing created/modified since scheduling
         Set<String> npns = new Set<String>();
-        for (d4c_Producer__c p : [
+        for (d4c_Entity__c p : [
             SELECT d4c_NPN__c
-            FROM d4c_Producer__c
+            FROM d4c_Entity__c
             WHERE d4c_NPNStatus__c = 'Processing'
             AND d4c_SyncRecordToNIPR__c = 'On'
             AND d4c_NPN__c != null

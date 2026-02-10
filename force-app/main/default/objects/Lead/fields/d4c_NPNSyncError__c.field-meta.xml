@@ -4,16 +4,16 @@
     <externalId>false</externalId>
     <formula>IF(
     OR(
-        TEXT(d4c_Producer__r.d4c_NPNStatus__c) = &quot;Active&quot;,
-        TEXT(d4c_Producer__r.d4c_NPNStatus__c) = &quot;Processing&quot;
+        TEXT(d4c_Entity__r.d4c_NPNStatus__c) = &quot;Active&quot;,
+        TEXT(d4c_Entity__r.d4c_NPNStatus__c) = &quot;Processing&quot;
     ),
     &quot;&quot;,
 
     IF(
-        TEXT(d4c_Producer__r.d4c_NPNStatus__c) = &quot;Invalid NPN&quot;,
+        TEXT(d4c_Entity__r.d4c_NPNStatus__c) = &quot;Invalid NPN&quot;,
         &quot;The NPN was rejected by NIPR&quot;,
 
-        d4c_Producer__r.d4c_NPNSyncError__c
+        d4c_Entity__r.d4c_NPNSyncError__c
     )
 )</formula>
     <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>

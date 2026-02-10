@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
     <label><!-- Producer --></label>
-    <name>d4c_Producer__c</name>
+    <name>d4c_Entity__c</name>
     <relationshipLabel><!-- NIPR Producer Communications --></relationshipLabel>
 </CustomFieldTranslation>

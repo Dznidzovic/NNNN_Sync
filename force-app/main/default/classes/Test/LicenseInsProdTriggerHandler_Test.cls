@@ -25,7 +25,7 @@ private class LicenseInsProdTriggerHandler_Test {
         InsuranceProductLOAMappingTriggerHandler.triggerDisabled = true;
 
         // Create Producer
-        d4c_Producer__c producer = TestDataFactory.createProducer('1234567890');
+        d4c_Entity__c producer = TestDataFactory.createProducer('1234567890');
         insert producer;
 
         // Create License

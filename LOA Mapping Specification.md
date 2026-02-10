@@ -87,7 +87,7 @@ A custom object-based categorization system that maps state-specific LOA codes t
 NIPR Data (Existing)           Categorization System (New)              Output (New)
 ─────────────────────          ───────────────────────────────          ────────────────
 ┌─────────────────┐            ┌──────────────────────────┐            ┌──────────────┐
-│  d4c_Producer__c │            │  Product_Category__c     │            │ d4c_License__c│
+│  d4c_Entity__c │            │  Product_Category__c     │            │ d4c_License__c│
 │                 │            │  (CA-HEALTH, CA-LIFE)    │◄───────────│ .d4c_License_ │
 └────────┬────────┘            └────────────┬─────────────┘            │  Products__c │
          │                                  │                          │ (Multi-select)│

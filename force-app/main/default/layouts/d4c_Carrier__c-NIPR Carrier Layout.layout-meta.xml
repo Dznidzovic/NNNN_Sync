@@ -67,8 +67,8 @@
     </layoutSections>
     <relatedLists>
         <fields>NAME</fields>
-        <fields>d4c_Producer__c.d4c_NPN__c</fields>
-        <fields>d4c_Producer__c.d4c_FEIN__c</fields>
+        <fields>d4c_Entity__c.d4c_NPN__c</fields>
+        <fields>d4c_Entity__c.d4c_FEIN__c</fields>
         <fields>d4c_StateOrProvinceCode__c</fields>
         <relatedList>d4c_CarrierAppointment__c.d4c_Carrier__c</relatedList>
     </relatedLists>

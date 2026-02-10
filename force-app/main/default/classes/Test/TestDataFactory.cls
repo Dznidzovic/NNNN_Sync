@@ -69,17 +69,17 @@ private class TestDataFactory {
 	}
 
     @TestVisible
-    private static List<d4c_Producer__c> createProducers(Set<String> npns){
-        List<d4c_Producer__c> producers = new List<d4c_Producer__c>();
+    private static List<d4c_Entity__c> createProducers(Set<String> npns){
+        List<d4c_Entity__c> producers = new List<d4c_Entity__c>();
         for (String npn : npns) {
-            producers.add(new d4c_Producer__c(d4c_NPN__c = npn));
+            producers.add(new d4c_Entity__c(d4c_NPN__c = npn));
         }
         return producers;
     }
 
     @TestVisible
-    private static d4c_Producer__c createProducer(String npn) {
-        d4c_Producer__c producer = new d4c_Producer__c(d4c_NPN__c = npn);
+    private static d4c_Entity__c createProducer(String npn) {
+        d4c_Entity__c producer = new d4c_Entity__c(d4c_NPN__c = npn);
         return producer;
     }
 
@@ -97,7 +97,7 @@ private class TestDataFactory {
     private static d4c_ProducerAddress__c createProducerAddress(Id producerId, String addressType, String addressLineText, String uniqueId) {
 		return new d4c_ProducerAddress__c(
 			d4c_UniqueIdentifier__c = uniqueId,
-			d4c_Producer__c = producerId,
+			d4c_Entity__c = producerId,
 			d4c_AddressType__c = addressType,
 			d4c_AddressLineOne__c= addressLineText
 		);
@@ -107,7 +107,7 @@ private class TestDataFactory {
     private static d4c_ProducerCommunication__c createPhoneCommunication(Id producerId, String phoneNumber, String phoneType, String uniqueId ) {
 		return new d4c_ProducerCommunication__c(
 			d4c_UniqueIdentifier__c = uniqueId,
-			d4c_Producer__c = producerId,
+			d4c_Entity__c = producerId,
 			d4c_PhoneNumber__c = phoneNumber,
 			d4c_PhoneType__c = phoneType
 		);
@@ -117,7 +117,7 @@ private class TestDataFactory {
     private static d4c_ProducerCommunication__c createEmailCommunication(Id producerId, String emailAddress, String emailType, String uniqueId) {
 		return new d4c_ProducerCommunication__c(
 			d4c_UniqueIdentifier__c = uniqueId,
-			d4c_Producer__c = producerId,
+			d4c_Entity__c = producerId,
 			d4c_EmailAddress__c = emailAddress,
 			d4c_EmailType__c = emailType
 		);
@@ -127,7 +127,7 @@ private class TestDataFactory {
     private static d4c_License__c createLicense(String licenseNumber, Id producerId) {
         return new d4c_License__c(
             d4c_LicenseNumber__c = licenseNumber,
-            d4c_Producer__c = producerId
+            d4c_Entity__c = producerId
         );
     }
 
@@ -135,7 +135,7 @@ private class TestDataFactory {
     private static d4c_CarrierAppointment__c createCarrierAppointment(String uid, Id producerId, Id carrierId, String state, String status) {
         return new d4c_CarrierAppointment__c(
             d4c_UniqueIdentifier__c = uid,
-            d4c_Producer__c = producerId,
+            d4c_Entity__c = producerId,
             d4c_Carrier__c = carrierId,
             d4c_StateOrProvinceCode__c = state,
             d4c_StatusCode__c = status
@@ -192,14 +192,14 @@ private class TestDataFactory {
 
 		// Create producers
 		Set<String> npns = new Set<String>{'22138233', '22138253', '22234021', '22166967', '22166100'};
-		List<d4c_Producer__c> producers = createProducers(npns);
+		List<d4c_Entity__c> producers = createProducers(npns);
 
 		insert producers;
 
-		createdRecords.put('d4c_Producer__c', producers);
+		createdRecords.put('d4c_Entity__c', producers);
 
 		Map<String, Id> producerIds = new Map<String, Id>();
-		for (d4c_Producer__c producer : producers) {
+		for (d4c_Entity__c producer : producers) {
 			producerIds.put(producer.d4c_NPN__c, producer.Id);
 		}
 
@@ -274,7 +274,7 @@ private class TestDataFactory {
 			Map<String, String> data = licenseData.get(licenseNum);
 			d4c_License__c license = new d4c_License__c(
 				d4c_LicenseNumber__c = licenseNum,
-				d4c_Producer__c = producerIds.get(data.get('npn')),
+				d4c_Entity__c = producerIds.get(data.get('npn')),
 				d4c_StateOrProvinceCode__c = data.get('state'),
 				d4c_LicenseClassCode__c = data.get('class'),
 				d4c_UniqueIdentifier__c = data.get('uid')
@@ -313,7 +313,7 @@ private class TestDataFactory {
 			Map<String, String> def = appointmentDefs.get(key);
 			d4c_CarrierAppointment__c app = new d4c_CarrierAppointment__c(
 				d4c_UniqueIdentifier__c = key,
-				d4c_Producer__c = producerIds.get(def.get('npn')),
+				d4c_Entity__c = producerIds.get(def.get('npn')),
 				d4c_Carrier__c = carrierId,
 				d4c_StateOrProvinceCode__c = def.get('state'),
 				d4c_StatusCode__c = def.get('status'),
@@ -428,7 +428,7 @@ private class TestDataFactory {
 
 		// Create producer with the same NPN we'll be testing with
 		Set<String> npns = new Set<String>{'12345678'};
-		List<d4c_Producer__c> producers = createProducers(npns);
+		List<d4c_Entity__c> producers = createProducers(npns);
 		
 		// Customize the producer to match some of the XML data
 		producers[0].d4c_GivenName__c = 'Michael';
@@ -440,10 +440,10 @@ private class TestDataFactory {
 		producers[0].d4c_Type__c = 'Agent';
 
 		insert producers;
-		createdRecords.put('d4c_Producer__c', producers);
+		createdRecords.put('d4c_Entity__c', producers);
 
 		Map<String, Id> producerIds = new Map<String, Id>();
-		for (d4c_Producer__c producer : producers) {
+		for (d4c_Entity__c producer : producers) {
 			producerIds.put(producer.d4c_NPN__c, producer.Id);
 		}
 		
@@ -486,14 +486,14 @@ private class TestDataFactory {
 		List<d4c_License__c> licenses = new List<d4c_License__c>{
 			new d4c_License__c(
 				d4c_LicenseNumber__c = 'CA123456',
-				d4c_Producer__c = producerIds.get('12345678'),
+				d4c_Entity__c = producerIds.get('12345678'),
 				d4c_StateOrProvinceCode__c = 'CA',
 				d4c_LicenseClassCode__c = '3',
 				d4c_UniqueIdentifier__c = 'CA123456CA3'
 			),
 			new d4c_License__c(
 				d4c_LicenseNumber__c = 'NY789012',
-				d4c_Producer__c = producerIds.get('12345678'),
+				d4c_Entity__c = producerIds.get('12345678'),
 				d4c_StateOrProvinceCode__c = 'NY',
 				d4c_LicenseClassCode__c = '3',
 				d4c_UniqueIdentifier__c = 'NY789012NY3'
@@ -512,7 +512,7 @@ private class TestDataFactory {
 		List<d4c_CarrierAppointment__c> appointments = new List<d4c_CarrierAppointment__c>{
 			new d4c_CarrierAppointment__c(
 				d4c_UniqueIdentifier__c = '1234567854321123456789CA001Terminated12345678543211234567892026-02-012023-02-0100116',
-				d4c_Producer__c = producerIds.get('12345678'),
+				d4c_Entity__c = producerIds.get('12345678'),
 				d4c_Carrier__c = carrierIds.get('54321123456789'),
 				d4c_StateOrProvinceCode__c = 'CA',
 				d4c_CountyCode__c = '001',
@@ -520,7 +520,7 @@ private class TestDataFactory {
 			),
 			new d4c_CarrierAppointment__c(
 				d4c_UniqueIdentifier__c = '1234567898765987654321NY036Appointed12345678987659876543212026-03-152023-03-1503616',
-				d4c_Producer__c = producerIds.get('12345678'),
+				d4c_Entity__c = producerIds.get('12345678'),
 				d4c_Carrier__c = carrierIds.get('98765987654321'),
 				d4c_StateOrProvinceCode__c = 'NY',
 				d4c_CountyCode__c = '036',
@@ -528,7 +528,7 @@ private class TestDataFactory {
 			),
 			new d4c_CarrierAppointment__c(
 				d4c_UniqueIdentifier__c = '1234567898765987654321NY036Appointed12345678987659876543212026-03-152023-03-1503611',
-				d4c_Producer__c = producerIds.get('12345678'),
+				d4c_Entity__c = producerIds.get('12345678'),
 				d4c_Carrier__c = carrierIds.get('98765987654321'),
 				d4c_StateOrProvinceCode__c = 'NY',
 				d4c_CountyCode__c = '036',
@@ -588,8 +588,8 @@ private class TestDataFactory {
 	}
 
 	@TestVisible
-	private static d4c_Producer__c createProducerWithNPN(String npn, Boolean doInsert) {
-		d4c_Producer__c producer = new d4c_Producer__c(d4c_NPN__c = npn);
+	private static d4c_Entity__c createProducerWithNPN(String npn, Boolean doInsert) {
+		d4c_Entity__c producer = new d4c_Entity__c(d4c_NPN__c = npn);
 		if(doInsert) {
 			insert producer;
 		}
@@ -597,10 +597,10 @@ private class TestDataFactory {
 	}
 
 	@TestVisible
-	private static List<d4c_Producer__c> createProducersWithNPNs(List<String> npns, Boolean doInsert) {
-		List<d4c_Producer__c> producers = new List<d4c_Producer__c>();
+	private static List<d4c_Entity__c> createProducersWithNPNs(List<String> npns, Boolean doInsert) {
+		List<d4c_Entity__c> producers = new List<d4c_Entity__c>();
 		for(String npn : npns) {
-			producers.add(new d4c_Producer__c(d4c_NPN__c = npn));
+			producers.add(new d4c_Entity__c(d4c_NPN__c = npn));
 		}
 		if(doInsert && !producers.isEmpty()) {
 			insert producers;
@@ -866,14 +866,14 @@ private class TestDataFactory {
 		Map<String, List<SObject>> createdRecords = new Map<String, List<SObject>>();
 
 		// Create Producer
-		d4c_Producer__c producer = createProducer('TEST123456');
+		d4c_Entity__c producer = createProducer('TEST123456');
 		insert producer;
-		createdRecords.put('d4c_Producer__c', new List<SObject>{ producer });
+		createdRecords.put('d4c_Entity__c', new List<SObject>{ producer });
 
 		// Create License
 		d4c_License__c license = new d4c_License__c(
 			d4c_LicenseNumber__c = 'LIC123456',
-			d4c_Producer__c = producer.Id,
+			d4c_Entity__c = producer.Id,
 			d4c_StateOrProvinceCode__c = 'CA',
 			d4c_LicenseClassCode__c = '3',
 			d4c_UniqueIdentifier__c = 'LIC123456CA3'

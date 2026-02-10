@@ -25,7 +25,7 @@ private class InsProdLOAMappingHandler_Test {
         InsuranceProductLOAMappingTriggerHandler.triggerDisabled = true;
 
         // Create Producer
-        d4c_Producer__c producer = TestDataFactory.createProducer('1234567890');
+        d4c_Entity__c producer = TestDataFactory.createProducer('1234567890');
         insert producer;
 
         // Create License
@@ -431,7 +431,7 @@ private class InsProdLOAMappingHandler_Test {
         d4c_LOA_Insurance_Product_Mapping__c mapping2 = [SELECT Id FROM d4c_LOA_Insurance_Product_Mapping__c WHERE d4c_StateOrProvinceCode__c = 'TX' LIMIT 1];
 
         // Create multiple producers and licenses
-        d4c_Producer__c producer2 = TestDataFactory.createProducer('9876543210');
+        d4c_Entity__c producer2 = TestDataFactory.createProducer('9876543210');
         insert producer2;
 
         d4c_License__c license1 = [SELECT Id FROM d4c_License__c WHERE d4c_StateOrProvinceCode__c = :TEST_STATE LIMIT 1];

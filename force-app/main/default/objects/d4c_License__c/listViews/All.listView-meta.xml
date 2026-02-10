@@ -7,7 +7,7 @@
     <columns>d4c_StartDate__c</columns>
     <columns>d4c_EndDate__c</columns>
     <columns>d4c_StateOrProvinceCode__c</columns>
-    <columns>d4c_Producer__c</columns>
+    <columns>d4c_Entity__c</columns>
     <filterScope>Everything</filterScope>
     <label>All</label>
 </ListView>

@@ -24,13 +24,13 @@ private class LineOfAuthorityTriggerHandler_Test {
         LineOfAuthorityTriggerHandler.triggerDisabled = true;
 
         // Create Producer
-        d4c_Producer__c producer = TestDataFactory.createProducer('TEST123456');
+        d4c_Entity__c producer = TestDataFactory.createProducer('TEST123456');
         insert producer;
 
         // Create License
         d4c_License__c license = new d4c_License__c(
             d4c_LicenseNumber__c = 'LIC123456',
-            d4c_Producer__c = producer.Id,
+            d4c_Entity__c = producer.Id,
             d4c_StateOrProvinceCode__c = TEST_STATE,
             d4c_LicenseClassCode__c = '3',
             d4c_UniqueIdentifier__c = 'LIC123456CA3'

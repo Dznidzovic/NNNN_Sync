@@ -58,7 +58,7 @@
         <fields>d4c_NPN__c</fields>
         <fields>d4c_FEIN__c</fields>
         <fields>d4c_NPNStatus__c</fields>
-        <relatedList>d4c_Producer__c.d4c_Subscription__c</relatedList>
+        <relatedList>d4c_Entity__c.d4c_Subscription__c</relatedList>
     </relatedLists>
     <showEmailCheckbox>false</showEmailCheckbox>
     <showHighlightsPanel>false</showHighlightsPanel>

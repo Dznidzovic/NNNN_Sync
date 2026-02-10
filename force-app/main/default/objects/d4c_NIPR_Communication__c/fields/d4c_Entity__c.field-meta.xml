@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
-    <fullName>d4c_Producer__c</fullName>
+    <fullName>d4c_Entity__c</fullName>
     <label>Producer</label>
-    <referenceTo>d4c_Producer__c</referenceTo>
+    <referenceTo>d4c_Entity__c</referenceTo>
     <relationshipName>Producer_Communications</relationshipName>
     <relationshipOrder>0</relationshipOrder>
     <reparentableMasterDetail>true</reparentableMasterDetail>
