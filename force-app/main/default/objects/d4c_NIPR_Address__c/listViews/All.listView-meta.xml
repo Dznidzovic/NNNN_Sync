@@ -5,7 +5,6 @@
     <columns>d4c_AddressLineOne__c</columns>
     <columns>d4c_AddressType__c</columns>
     <columns>d4c_PostalCode__c</columns>
-    <columns>d4c_Entity__c</columns>
     <filterScope>Everything</filterScope>
     <label>All</label>
 </ListView>

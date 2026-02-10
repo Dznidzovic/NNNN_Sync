@@ -436,7 +436,7 @@ public without sharing class Logger {
             }
             
             // Create platform event
-            d4c_Log__e logEvent = new d4c_Log__e(
+            d4c_Logger__e logEvent = new d4c_Logger__e(
                 d4c_Content__c = jsonContent
             );
             

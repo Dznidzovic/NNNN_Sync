@@ -83,7 +83,7 @@
         <members>d4c_Carrier__c</members>
         <members>d4c_License__c</members>
         <members>d4c_LineOfAuthority__c</members>
-        <members>d4c_Log__e</members>
+        <members>d4c_Logger__e</members>
         <members>d4c_Log__c</members>
         <members>d4c_NIPRLogger__mdt</members>
         <members>d4c_NIPRTestXMLResponse__mdt</members>
