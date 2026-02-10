@@ -159,13 +159,13 @@
     <enableSharing>true</enableSharing>
     <enableStreamingApi>true</enableStreamingApi>
     <externalSharingModel>Private</externalSharingModel>
-    <label>NIPR Producer</label>
+    <label>NIPR Entity</label>
     <nameField>
         <displayFormat>PR-{0000}</displayFormat>
         <label>Producer Name</label>
         <type>AutoNumber</type>
     </nameField>
-    <pluralLabel>NIPR Producers</pluralLabel>
+    <pluralLabel>NIPR Entities</pluralLabel>
     <searchLayouts></searchLayouts>
     <sharingModel>ReadWrite</sharingModel>
     <visibility>Public</visibility>

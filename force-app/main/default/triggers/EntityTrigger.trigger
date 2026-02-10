@@ -5,7 +5,7 @@
  * @last modified on  : 02-09-2026
  * @last modified by  : Stefan Nidzovic
 **/
-trigger ProducerTrigger on d4c_Producer__c (
+trigger EntityTrigger on d4c_Entity__c (
     before insert, 
     before update, 
     before delete, 
@@ -14,5 +14,5 @@ trigger ProducerTrigger on d4c_Producer__c (
     after delete, 
     after undelete
 ) {
-    TriggerDispatcher.run(new ProducerTriggerHandler(), Trigger.operationType);
+    TriggerDispatcher.run(new EntityTriggerHandler(), Trigger.operationType);
 }

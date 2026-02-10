@@ -327,8 +327,8 @@
         <name>sidebar</name>
         <type>Region</type>
     </flexiPageRegions>
-    <masterLabel>NIPR Producer Address Record Page - Read Only</masterLabel>
-    <sobjectType>d4c_ProducerAddress__c</sobjectType>
+    <masterLabel>NIPR Address Record Page - Read Only</masterLabel>
+    <sobjectType>d4c_NIPR_Address__c</sobjectType>
     <template>
         <name>flexipage:recordHomeTemplateDesktop</name>
         <properties>

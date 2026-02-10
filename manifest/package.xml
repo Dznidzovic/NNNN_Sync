@@ -41,11 +41,11 @@
         <members>PDBAlertReportSchedulable</members>
         <members>PDBAlertResponseConstants</members>
         <members>ProcessEntityInfoApiService</members>
-        <members>ProducerAddressSelector</members>
-        <members>ProducerAssignmentService</members>
-        <members>ProducerCommunicationSelector</members>
-        <members>ProducerSelector</members>
-        <members>ProducerTriggerHandler</members>
+        <members>NIPRAddressSelector</members>
+        <members>EntityAssignmentService</members>
+        <members>NIPRCommunicationSelector</members>
+        <members>EntitySelector</members>
+        <members>EntityTriggerHandler</members>
         <members>RecordTypeSelector</members>
         <members>RegexUtils</members>
         <members>RemoveNPNFromSubscription</members>
@@ -73,7 +73,7 @@
         <members>LeadTrigger</members>
         <members>LicenseTrigger</members>
         <members>LogTrigger</members>
-        <members>ProducerTrigger</members>
+        <members>EntityTrigger</members>
         <name>ApexTrigger</name>
     </types>
 
@@ -89,9 +89,9 @@
         <members>d4c_NIPRTestXMLResponse__mdt</members>
         <members>d4c_NIPR_Subsciption_NPN_Count__mdt</members>
         <members>d4c_NIPR_Subscription_Email__mdt</members>
-        <members>d4c_ProducerAddress__c</members>
-        <members>d4c_ProducerCommunication__c</members>
-        <members>d4c_Producer__c</members>
+        <members>d4c_NIPR_Address__c</members>
+        <members>d4c_NIPR_Communication__c</members>
+        <members>d4c_Entity__c</members>
         <members>d4c_Subscription__c</members>
         <name>CustomObject</name>
     </types>
@@ -101,15 +101,15 @@
         <members>Account.d4c_NPNStatus__c</members>
         <members>Account.d4c_NPNSyncError__c</members>
         <members>Account.d4c_NPN__c</members>
-        <members>Account.d4c_Producer__c</members>
+        <members>Account.d4c_Entity__c</members>
         <members>Contact.d4c_NPNStatus__c</members>
         <members>Contact.d4c_NPNSyncError__c</members>
         <members>Contact.d4c_NPN__c</members>
-        <members>Contact.d4c_Producer__c</members>
+        <members>Contact.d4c_Entity__c</members>
         <members>Lead.NPN_Status__c</members>
         <members>Lead.d4c_NPNSyncError__c</members>
         <members>Lead.d4c_NPN__c</members>
-        <members>Lead.d4c_Producer__c</members>
+        <members>Lead.d4c_Entity__c</members>
         <name>CustomField</name>
     </types>
 
@@ -123,16 +123,16 @@
     <!-- Permission Sets -->
     <types>
         <members>d4c_NIPR_API_Callout</members>
-        <members>d4c_Manage_Producer</members>
+        <members>d4c_Manage_Entity</members>
         <name>PermissionSet</name>
     </types>
 
     <!-- FlexiPages (Lightning Record Pages) -->
     <types>
-        <members>NIPR_Producer_Communication_Record_Page_Read_Only</members>
+        <members>NIPR_Communication_Record_Page_Read_Only</members>
         <members>NIPR_Carrier_Record_Page_Read_Only</members>
-        <members>NIPR_Producer_Address_Record_Page_Read_Only</members>
-        <members>NIPR_Producer_Record_Page_Read_Only</members>
+        <members>NIPR_Address_Record_Page_Read_Only</members>
+        <members>NIPR_Entity_Record_Page_Read_Only</members>
         <members>NIPR_License_Record_Page_Read_Only</members>
         <members>NIPR_Line_of_Authority_Record_Page_Read_Only</members>
         <members>NIPR_Carrier_Appointment_Record_Page_Read_Only</members>
@@ -148,7 +148,7 @@
 
     <!-- Quick Actions -->
     <types>
-        <members>d4c_Producer__c.d4c_Force_NPN_Sync</members>
+        <members>d4c_Entity__c.d4c_Force_NPN_Sync</members>
         <name>QuickAction</name>
     </types>
 

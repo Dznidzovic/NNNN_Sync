@@ -159,13 +159,13 @@
     <enableSharing>true</enableSharing>
     <enableStreamingApi>true</enableStreamingApi>
     <externalSharingModel>ControlledByParent</externalSharingModel>
-    <label>NIPR Producer Address</label>
+    <label>NIPR Address</label>
     <nameField>
         <displayFormat>PRA-{0000}</displayFormat>
-        <label>Producer Address Name</label>
+        <label>Address Name</label>
         <type>AutoNumber</type>
     </nameField>
-    <pluralLabel>NIPR Producer Addresses</pluralLabel>
+    <pluralLabel>NIPR Addresses</pluralLabel>
     <searchLayouts></searchLayouts>
     <sharingModel>ControlledByParent</sharingModel>
     <visibility>Public</visibility>

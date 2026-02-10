@@ -159,13 +159,13 @@
     <enableSharing>true</enableSharing>
     <enableStreamingApi>true</enableStreamingApi>
     <externalSharingModel>ControlledByParent</externalSharingModel>
-    <label>NIPR Producer Communication</label>
+    <label>NIPR Communication</label>
     <nameField>
         <displayFormat>PRC-{0000}</displayFormat>
-        <label>Producer Communication Name</label>
+        <label>Communication Name</label>
         <type>AutoNumber</type>
     </nameField>
-    <pluralLabel>NIPR Producer Communications</pluralLabel>
+    <pluralLabel>NIPR Communications</pluralLabel>
     <searchLayouts></searchLayouts>
     <sharingModel>ControlledByParent</sharingModel>
     <visibility>Public</visibility>
