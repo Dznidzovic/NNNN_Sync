@@ -95,9 +95,10 @@ private class TestDataFactory {
 
     @TestVisible
     private static d4c_ProducerAddress__c createProducerAddress(Id entityId, String addressType, String addressLineText, String uniqueId) {
+		// Note: Address is now standalone - no direct Entity relationship
+		// Use createEntityAddressJunction() to link Entity to Address
 		return new d4c_ProducerAddress__c(
 			d4c_UniqueIdentifier__c = uniqueId,
-			d4c_Entity__c = entityId,
 			d4c_AddressType__c = addressType,
 			d4c_AddressLineOne__c= addressLineText
 		);
@@ -105,9 +106,10 @@ private class TestDataFactory {
 
     @TestVisible
     private static d4c_ProducerCommunication__c createPhoneCommunication(Id entityId, String phoneNumber, String phoneType, String uniqueId ) {
+		// Note: Communication is now standalone - no direct Entity relationship
+		// Use createEntityCommunicationJunction() to link Entity to Communication
 		return new d4c_ProducerCommunication__c(
 			d4c_UniqueIdentifier__c = uniqueId,
-			d4c_Entity__c = entityId,
 			d4c_PhoneNumber__c = phoneNumber,
 			d4c_PhoneType__c = phoneType
 		);
@@ -115,9 +117,10 @@ private class TestDataFactory {
 
     @TestVisible
     private static d4c_ProducerCommunication__c createEmailCommunication(Id entityId, String emailAddress, String emailType, String uniqueId) {
+		// Note: Communication is now standalone - no direct Entity relationship
+		// Use createEntityCommunicationJunction() to link Entity to Communication
 		return new d4c_ProducerCommunication__c(
 			d4c_UniqueIdentifier__c = uniqueId,
-			d4c_Entity__c = entityId,
 			d4c_EmailAddress__c = emailAddress,
 			d4c_EmailType__c = emailType
 		);
@@ -462,25 +465,43 @@ private class TestDataFactory {
 		}
 
 		// Create Addresses - intentionally creating 2 instead of 3 that will come from XML
+		// Note: Addresses are now standalone (no Entity relationship) - linked via junctions
 		List<d4c_ProducerAddress__c> addresses = new List<d4c_ProducerAddress__c>{
-			createProducerAddress(entityIds.get('12345678'), 'Residential', '123 Main Street', '123MainStreetApt4BBuildingCLosAngelesCA90001U.S.A.Residential12345678'),
-			createProducerAddress(entityIds.get('12345678'), 'Mailing', '789 Broadway', '789BroadwayFloor10NewYorkNY10003U.S.A.Mailing12345678')
+			createProducerAddress(null, 'Residential', '123 Main Street', '123MainStreetApt4BBuildingCLosAngelesCA90001U.S.A.Residential'),
+			createProducerAddress(null, 'Mailing', '789 Broadway', '789BroadwayFloor10NewYorkNY10003U.S.A.Mailing')
 		};
 
 		insert addresses;
 		createdRecords.put('d4c_ProducerAddress__c', addresses);
 
+		// Create junction records linking Entity to Addresses
+		List<d4c_Entity_Address_Junction__c> addressJunctions = new List<d4c_Entity_Address_Junction__c>();
+		for (d4c_ProducerAddress__c address : addresses) {
+			addressJunctions.add(createEntityAddressJunction(entityIds.get('12345678'), address.Id, false));
+		}
+		insert addressJunctions;
+		createdRecords.put('d4c_Entity_Address_Junction__c', addressJunctions);
+
 		// Create Entity Communications - intentionally creating 5 instead of 8 that will come from XML
+		// Note: Communications are now standalone (no Entity relationship) - linked via junctions
 		List<d4c_ProducerCommunication__c> communications = new List<d4c_ProducerCommunication__c>{
-			createPhoneCommunication(entityIds.get('12345678'), '+1-213-555-1234', 'Wired', '+1-213-555-1234Wired12345678'),
-			createPhoneCommunication(entityIds.get('12345678'), '+1-213-555-5678', 'Fax', '+1-213-555-5678Fax12345678'),
-			createEmailCommunication(entityIds.get('12345678'), 'mjohnson@example.com', 'Business', 'mjohnson@example.comBusiness12345678'),
-			createPhoneCommunication(entityIds.get('12345678'), '+1-212-555-9876', 'Wired', '+1-212-555-9876Wired12345678'),
-			createEmailCommunication(entityIds.get('12345678'), 'm.johnson.ny@example.com', 'Business', 'm.johnson.ny@example.comBusiness12345678')
+			createPhoneCommunication(null, '+1-213-555-1234', 'Wired', '+1-213-555-1234Wired'),
+			createPhoneCommunication(null, '+1-213-555-5678', 'Fax', '+1-213-555-5678Fax'),
+			createEmailCommunication(null, 'mjohnson@example.com', 'Business', 'mjohnson@example.comBusiness'),
+			createPhoneCommunication(null, '+1-212-555-9876', 'Wired', '+1-212-555-9876Wired'),
+			createEmailCommunication(null, 'm.johnson.ny@example.com', 'Business', 'm.johnson.ny@example.comBusiness')
 		};
 
 		insert communications;
 		createdRecords.put('d4c_ProducerCommunication__c', communications);
+
+		// Create junction records linking Entity to Communications
+		List<d4c_Entity_Communication_Junction__c> communicationJunctions = new List<d4c_Entity_Communication_Junction__c>();
+		for (d4c_ProducerCommunication__c comm : communications) {
+			communicationJunctions.add(createEntityCommunicationJunction(entityIds.get('12345678'), comm.Id, false));
+		}
+		insert communicationJunctions;
+		createdRecords.put('d4c_Entity_Communication_Junction__c', communicationJunctions);
 
 		// Create Licenses - intentionally creating 2 instead of 3 that will come from XML
 		List<d4c_License__c> licenses = new List<d4c_License__c>{
@@ -778,13 +799,48 @@ private class TestDataFactory {
 	}
 
 	/**
-	 * Creates a License Insurance Product junction record
-	 * @param licenseId - License ID
-	 * @param productId - Insurance Product ID
-	 * @param doInsert - Whether to insert the record
-	 * @return The created junction record
-	 * Creates complete test data for LOA Product Categorization tests
-	 * Creates: Entity, License, LOA Mapping, Insurance Product, and junction
-	 * @return Map of object type to list of created records
+	 *********************************************************
+	 * @methodName      : createEntityAddressJunction
+	 * @description     : Creates an Entity-Address junction record
+	 * @param entityId  : The Entity ID to link
+	 * @param addressId : The Address ID to link
+	 * @param doInsert  : Whether to insert the record immediately
+	 * @return          : The created junction record
+	 *********************************************************
+	 **/
+	@TestVisible
+	private static d4c_Entity_Address_Junction__c createEntityAddressJunction(Id entityId, Id addressId, Boolean doInsert) {
+		d4c_Entity_Address_Junction__c junction = new d4c_Entity_Address_Junction__c(
+			d4c_Entity__c = entityId,
+			d4c_NIPR_Address__c = addressId
+			// UniqueIdentifier will be auto-populated by trigger
+		);
+		if (doInsert) {
+			insert junction;
+		}
+		return junction;
+	}
+
+	/**
+	 *********************************************************
+	 * @methodName      : createEntityCommunicationJunction
+	 * @description     : Creates an Entity-Communication junction record
+	 * @param entityId       : The Entity ID to link
+	 * @param communicationId : The Communication ID to link
+	 * @param doInsert       : Whether to insert the record immediately
+	 * @return              : The created junction record
+	 *********************************************************
+	 **/
+	@TestVisible
+	private static d4c_Entity_Communication_Junction__c createEntityCommunicationJunction(Id entityId, Id communicationId, Boolean doInsert) {
+		d4c_Entity_Communication_Junction__c junction = new d4c_Entity_Communication_Junction__c(
+			d4c_Entity__c = entityId,
+			d4c_NIPR_Communication__c = communicationId
+			// UniqueIdentifier will be auto-populated by trigger
+		);
+		if (doInsert) {
+			insert junction;
+		}
+		return junction;
 	}
 }

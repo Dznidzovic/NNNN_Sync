@@ -219,16 +219,15 @@ public with sharing class ProcessEntityInfoApiService {
         String formattedPhone = StringUtils.formatNIPREntityInfoNumber(phoneNumber);
 
         if (String.isNotBlank(formattedPhone)) {
-            String uniqueId = formattedPhone + phoneType + entityNPN;
-            
+            String uniqueId = formattedPhone + phoneType;
+
             if (!uniqueRecordIds.contains(uniqueId)) {
                 d4c_ProducerCommunication__c comm = new d4c_ProducerCommunication__c();
 
-                comm.d4c_Entity__r = new d4c_Entity__c(d4c_NPN__c = entityNPN);
                 comm.d4c_PhoneType__c = phoneType;
                 comm.d4c_PhoneNumber__c = formattedPhone;
                 comm.d4c_UniqueIdentifier__c = uniqueId;
-                
+
                 producerCommunications.add(comm);
                 uniqueRecordIds.add(uniqueId);
             }
@@ -248,17 +247,16 @@ public with sharing class ProcessEntityInfoApiService {
         if (String.isBlank(email) || !StringUtils.isValidEmail(email)) {
             return;
         }
-        
-        String uniqueId = email + emailType + entityNPN;
-        
+
+        String uniqueId = email + emailType;
+
         if (!uniqueRecordIds.contains(uniqueId)) {
             d4c_ProducerCommunication__c emailComm = new d4c_ProducerCommunication__c();
 
-            emailComm.d4c_Entity__r = new d4c_Entity__c(d4c_NPN__c = entityNPN);
             emailComm.d4c_EmailType__c = emailType;
             emailComm.d4c_EmailAddress__c = email;
             emailComm.d4c_UniqueIdentifier__c = uniqueId;
-            
+
             producerCommunications.add(emailComm);
             uniqueRecordIds.add(uniqueId);
         }
@@ -544,21 +542,17 @@ public with sharing class ProcessEntityInfoApiService {
             producerAddress.d4c_State__c = address.NAME_STATE;
 
             String addressType = address.ADDR_TYPE == 'Residence' ? 'Residential' : address.ADDR_TYPE;
-            producerAddress.d4c_AddressType__c = addressType;            
-                
-            d4c_Entity__c entityForExtId = new d4c_Entity__c(d4c_NPN__c = entityNPN);
-            producerAddress.d4c_Entity__r = entityForExtId;
-            
-            String uniqueId = 
-                producerAddress.d4c_AddressLineOne__c + 
+            producerAddress.d4c_AddressType__c = addressType;
+
+            String uniqueId =
+                producerAddress.d4c_AddressLineOne__c +
                 producerAddress.d4c_AddressLineTwo__c +
                 producerAddress.d4c_AddressLineThree__c +
-                producerAddress.d4c_City__c + 
-                producerAddress.d4c_State__c + 
-                producerAddress.d4c_PostalCode__c + 
+                producerAddress.d4c_City__c +
+                producerAddress.d4c_State__c +
+                producerAddress.d4c_PostalCode__c +
                 producerAddress.d4c_CountryCode__c +
-                producerAddress.d4c_AddressType__c + 
-                entityNPN;
+                producerAddress.d4c_AddressType__c;
 
             // Remove spaces and nulls
             List<String> patternsToRemove = new List<String>{ '\\s+', 'null' };
@@ -755,6 +749,50 @@ public with sharing class ProcessEntityInfoApiService {
 
     /**
      *********************************************************
+     * @methodName      : createCommunicationJunctions
+     * @description     : Creates junction records linking the Entity to Communication records.
+     *                    Called after Communications are upserted and have IDs.
+     * @return          : List of junction records to insert
+     *********************************************************
+     **/
+    private List<d4c_Entity_Communication_Junction__c> createCommunicationJunctions() {
+        List<d4c_Entity_Communication_Junction__c> junctions = new List<d4c_Entity_Communication_Junction__c>();
+
+        for (d4c_ProducerCommunication__c comm : producerCommunications) {
+            d4c_Entity_Communication_Junction__c junction = new d4c_Entity_Communication_Junction__c();
+            junction.d4c_Entity__c = entity.Id;
+            junction.d4c_NIPR_Communication__c = comm.Id;
+            // UniqueIdentifier will be auto-populated by trigger
+            junctions.add(junction);
+        }
+
+        return junctions;
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : createAddressJunctions
+     * @description     : Creates junction records linking the Entity to Address records.
+     *                    Called after Addresses are upserted and have IDs.
+     * @return          : List of junction records to insert
+     *********************************************************
+     **/
+    private List<d4c_Entity_Address_Junction__c> createAddressJunctions() {
+        List<d4c_Entity_Address_Junction__c> junctions = new List<d4c_Entity_Address_Junction__c>();
+
+        for (d4c_ProducerAddress__c address : producerAddresses) {
+            d4c_Entity_Address_Junction__c junction = new d4c_Entity_Address_Junction__c();
+            junction.d4c_Entity__c = entity.Id;
+            junction.d4c_NIPR_Address__c = address.Id;
+            // UniqueIdentifier will be auto-populated by trigger
+            junctions.add(junction);
+        }
+
+        return junctions;
+    }
+
+    /**
+     *********************************************************
      * @methodName      : deleteExistingRelatedRecords
      * @description     : Deletes existing entity communications and addresses
      *                    associated with the NPN being processed.
@@ -765,11 +803,11 @@ public with sharing class ProcessEntityInfoApiService {
             // Use a set for the NPN to pass to selector methods
             Set<String> npnSet = new Set<String>{ entityNPN };
             
-            // Delete existing entity communications
-            deleteExistingProducerCommunications(npnSet);
-            
-            // Delete existing entity addresses
-            deleteExistingProducerAddresses(npnSet);
+            // Delete existing entity communication junctions (NOT the communications themselves)
+            deleteExistingCommunicationJunctions(npnSet);
+
+            // Delete existing entity address junctions (NOT the addresses themselves)
+            deleteExistingAddressJunctions(npnSet);
 
             // Delete existing entity licenses
             deleteExistingLicenses(npnSet);
@@ -783,43 +821,45 @@ public with sharing class ProcessEntityInfoApiService {
 
     /**
      *********************************************************
-     * @methodName      : deleteExistingProducerCommunications
-     * @description     : Deletes existing entity communications associated with the NPNs.
-     * @param npnSet    : Set of entity NPNs to query for related communications.
+     * @methodName      : deleteExistingCommunicationJunctions
+     * @description     : Deletes existing entity-communication junction records.
+     *                    The actual communication records are NEVER deleted (many-to-many pattern).
+     * @param npnSet    : Set of entity NPNs to query for related junctions.
      *********************************************************
      **/
-    private void deleteExistingProducerCommunications(Set<String> npnSet) {
-        // Query for existing entity communications
-        ProducerCommunicationSelector communicationSelector = new ProducerCommunicationSelector();
-        List<d4c_ProducerCommunication__c> existingCommunications = communicationSelector.getEntityCommsByEntityNPNs(npnSet);
-        
-        if (!existingCommunications.isEmpty()) {
-            Logger.debug(CLASS_NAME, 'DeleteExistingProducerCommunication', 'Deleting ' + existingCommunications.size() + ' existing Entity Communication records for NPN: ' + entityNPN,
+    private void deleteExistingCommunicationJunctions(Set<String> npnSet) {
+        // Query for existing junctions
+        EntityCommunicationJunctionSelector junctionSelector = new EntityCommunicationJunctionSelector();
+        List<d4c_Entity_Communication_Junction__c> existingJunctions = junctionSelector.getJunctionsByEntityNPNs(npnSet);
+
+        if (!existingJunctions.isEmpty()) {
+            Logger.debug(CLASS_NAME, 'deleteExistingCommunicationJunctions', 'Deleting ' + existingJunctions.size() + ' existing Entity-Communication junction records for NPN: ' + entityNPN,
                 null,
                 null);
 
-            delete existingCommunications;
+            delete existingJunctions;
         }
     }
 
     /**
      *********************************************************
-     * @methodName      : deleteExistingProducerAddresses
-     * @description     : Deletes existing entity addresses associated with the NPNs.
-     * @param npnSet    : Set of entity NPNs to query for related addresses.
+     * @methodName      : deleteExistingAddressJunctions
+     * @description     : Deletes existing entity-address junction records.
+     *                    The actual address records are NEVER deleted (many-to-many pattern).
+     * @param npnSet    : Set of entity NPNs to query for related junctions.
      *********************************************************
      **/
-    private void deleteExistingProducerAddresses(Set<String> npnSet) {
-        // Query for existing entity addresses
-        ProducerAddressSelector addressSelector = new ProducerAddressSelector();
-        List<d4c_ProducerAddress__c> existingAddresses = addressSelector.getProducerAddressByEntityNPNs(npnSet);
-        
-        if (!existingAddresses.isEmpty()) {
-            Logger.debug(CLASS_NAME, 'deleteExistingProducerAddresses', 'Deleting ' + existingAddresses.size() + ' existing Entity Address records for NPN: ' + entityNPN,
+    private void deleteExistingAddressJunctions(Set<String> npnSet) {
+        // Query for existing junctions
+        EntityAddressJunctionSelector junctionSelector = new EntityAddressJunctionSelector();
+        List<d4c_Entity_Address_Junction__c> existingJunctions = junctionSelector.getJunctionsByEntityNPNs(npnSet);
+
+        if (!existingJunctions.isEmpty()) {
+            Logger.debug(CLASS_NAME, 'deleteExistingAddressJunctions', 'Deleting ' + existingJunctions.size() + ' existing Entity-Address junction records for NPN: ' + entityNPN,
                 null,
                 null);
 
-            delete existingAddresses;
+            delete existingJunctions;
         }
     }
 
@@ -896,12 +936,24 @@ public with sharing class ProcessEntityInfoApiService {
                     'Count: ' + producerCommunications.size() + ', NPN: ' + entityNPN, null);
             
             upsert producerCommunications d4c_UniqueIdentifier__c;
-            
-            Logger.info(CLASS_NAME, methodName, 'Entity Address records for Upsert', 
+
+            // Create junction records linking Entity to Communications
+            List<d4c_Entity_Communication_Junction__c> communicationJunctions = createCommunicationJunctions();
+            Logger.info(CLASS_NAME, methodName, 'Entity-Communication Junction records for Insert',
+                    'Count: ' + communicationJunctions.size() + ', NPN: ' + entityNPN, null);
+            insert communicationJunctions;
+
+            Logger.info(CLASS_NAME, methodName, 'Entity Address records for Upsert',
                     'Count: ' + producerAddresses.size() + ', NPN: ' + entityNPN, null);
-            
+
             upsert producerAddresses d4c_UniqueIdentifier__c;
-            
+
+            // Create junction records linking Entity to Addresses
+            List<d4c_Entity_Address_Junction__c> addressJunctions = createAddressJunctions();
+            Logger.info(CLASS_NAME, methodName, 'Entity-Address Junction records for Insert',
+                    'Count: ' + addressJunctions.size() + ', NPN: ' + entityNPN, null);
+            insert addressJunctions;
+
             Logger.info(CLASS_NAME, methodName, 'Carrier records for Upsert', 
                     'Count: ' + carriers.size() + ', NPN: ' + entityNPN, null);
             
@@ -925,6 +977,7 @@ public with sharing class ProcessEntityInfoApiService {
             Logger.info(CLASS_NAME, methodName, 'Successfully completed all upsert operations',
                     'NPN: ' + entityNPN + ', Total records processed: ' +
                     (1 + producerCommunications.size() + producerAddresses.size() +
+                        producerCommunications.size() + producerAddresses.size() + // Junction records
                         carriers.size() + licenses.size() + licenseLoas.size() +
                         carrierAppointments.size()), null);
             

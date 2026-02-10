@@ -3,7 +3,7 @@
     <fullName>d4c_Entity__c</fullName>
     <label>Entity</label>
     <referenceTo>d4c_Entity__c</referenceTo>
-    <relationshipName>Entity_Addresses</relationshipName>
+    <relationshipName>Entity_Communication_Junctions</relationshipName>
     <relationshipOrder>0</relationshipOrder>
     <reparentableMasterDetail>false</reparentableMasterDetail>
     <trackTrending>false</trackTrending>

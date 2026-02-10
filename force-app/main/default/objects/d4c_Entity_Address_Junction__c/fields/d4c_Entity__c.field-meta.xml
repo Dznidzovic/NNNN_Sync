@@ -3,9 +3,9 @@
     <fullName>d4c_Entity__c</fullName>
     <label>Entity</label>
     <referenceTo>d4c_Entity__c</referenceTo>
-    <relationshipName>Entity_Communications</relationshipName>
+    <relationshipName>Entity_Address_Junctions</relationshipName>
     <relationshipOrder>0</relationshipOrder>
-    <reparentableMasterDetail>true</reparentableMasterDetail>
+    <reparentableMasterDetail>false</reparentableMasterDetail>
     <trackTrending>false</trackTrending>
     <type>MasterDetail</type>
     <writeRequiresMasterRead>false</writeRequiresMasterRead>

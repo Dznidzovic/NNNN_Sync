@@ -163,8 +163,9 @@ private class ProcessEntityInfoApiService_Test {
     }
 
     private static void assertRecordCountsPerParentObject() {
-        System.assertEquals(8, getCount('d4c_ProducerCommunication__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'' + AGENT_NPN + '\''), 'Should have 8 communications for entity ' + AGENT_NPN);
-        System.assertEquals(3, getCount('d4c_ProducerAddress__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'' + AGENT_NPN + '\''), 'Should have 3 addresses for entity ' + AGENT_NPN);
+        // Count via junction objects (addresses/communications are now standalone)
+        System.assertEquals(8, getCommunicationCountForEntity(AGENT_NPN), 'Should have 8 communications for entity ' + AGENT_NPN);
+        System.assertEquals(3, getAddressCountForEntity(AGENT_NPN), 'Should have 3 addresses for entity ' + AGENT_NPN);
         System.assertEquals(3, getCount('d4c_License__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'' + AGENT_NPN + '\''), 'Should have 3 licenses for entity ' + AGENT_NPN);
         System.assertEquals(1, getCount('d4c_LineOfAuthority__c', 'WHERE d4c_License__r.d4c_LicenseNumber__c = \'CA123456\''), 'Should have 1 LOA for license CA123456');
         System.assertEquals(3, getCount('d4c_LineOfAuthority__c', 'WHERE d4c_License__r.d4c_LicenseNumber__c = \'NY789012\''), 'Should have 3 LOAs for license NY789012');
@@ -448,7 +449,25 @@ private class ProcessEntityInfoApiService_Test {
         String queryString = 'SELECT count() FROM ' + objectName + ' ' + whereClause;
         return Database.countQuery(queryString);
     }
-    
+
+    /**
+     * Counts communication records for a given Entity NPN via junction records
+     */
+    private static Integer getCommunicationCountForEntity(String entityNpn) {
+        return [SELECT COUNT()
+                FROM d4c_Entity_Communication_Junction__c
+                WHERE d4c_Entity__r.d4c_NPN__c = :entityNpn];
+    }
+
+    /**
+     * Counts address records for a given Entity NPN via junction records
+     */
+    private static Integer getAddressCountForEntity(String entityNpn) {
+        return [SELECT COUNT()
+                FROM d4c_Entity_Address_Junction__c
+                WHERE d4c_Entity__r.d4c_NPN__c = :entityNpn];
+    }
+
     private static Set<String> queryEntityNPNs() {
         Set<String> npns = new Set<String>();
         for (d4c_Entity__c entity : [SELECT d4c_NPN__c FROM d4c_Entity__c]) {

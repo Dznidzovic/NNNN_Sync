@@ -160,10 +160,11 @@ private class ProcessPDBAlertReportService_Test {
     }
 
     private static void assertRecordCountsPerParentObject() {
-        System.assertEquals(9, getCount('d4c_ProducerCommunication__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'22138233\''));
-        System.assertEquals(4, getCount('d4c_ProducerCommunication__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'22166967\''));
-        System.assertEquals(4, getCount('d4c_ProducerAddress__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'22138233\''));
-        System.assertEquals(3, getCount('d4c_ProducerAddress__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'22166967\''));
+        // Count via junction objects (addresses/communications are now standalone)
+        System.assertEquals(9, getCommunicationCountForEntity('22138233'));
+        System.assertEquals(4, getCommunicationCountForEntity('22166967'));
+        System.assertEquals(4, getAddressCountForEntity('22138233'));
+        System.assertEquals(3, getAddressCountForEntity('22166967'));
         System.assertEquals(4, getCount('d4c_LineOfAuthority__c', 'WHERE d4c_License__r.d4c_UniqueIdentifier__c = \'675353522CA3\''));
         System.assertEquals(2, getCount('d4c_CarrierAppointment__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'22138233\''));
         System.assertEquals(1, getCount('d4c_CarrierAppointment__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'22166967\''));
@@ -290,7 +291,25 @@ private class ProcessPDBAlertReportService_Test {
         String queryString = 'SELECT count() FROM ' + objectName + ' ' + whereClause;
         return Database.countQuery(queryString);
     }
-    
+
+    /**
+     * Counts communication records for a given Entity NPN via junction records
+     */
+    private static Integer getCommunicationCountForEntity(String entityNpn) {
+        return [SELECT COUNT()
+                FROM d4c_Entity_Communication_Junction__c
+                WHERE d4c_Entity__r.d4c_NPN__c = :entityNpn];
+    }
+
+    /**
+     * Counts address records for a given Entity NPN via junction records
+     */
+    private static Integer getAddressCountForEntity(String entityNpn) {
+        return [SELECT COUNT()
+                FROM d4c_Entity_Address_Junction__c
+                WHERE d4c_Entity__r.d4c_NPN__c = :entityNpn];
+    }
+
     private static void assertEntityNPNs() {
         Set<String> entityNPNs = new Set<String>{
             '22138253', '22138233', '22234021', '22166967', '22166100'

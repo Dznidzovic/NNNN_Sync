@@ -41,10 +41,13 @@ public with sharing class ProcessPDBAlertReportService {
     // Stores new or updated Carrier Appointments to be upserted to Salesforce
     private List<d4c_CarrierAppointment__c> carrierAppointments = new List<d4c_CarrierAppointment__c>();
     // Stores new or updated Lines Of Authority attached to Carrier Appointments to be upserted to SF
-    // Stores IDs of entity communication records that need to be deleted.
-    private Set<Id> producerCommunicationIdsForDeletion = new Set<Id>();
-    // Stores IDs of producerAddress records that need to be deleted.
-    private Set<Id> producerAddressIdsForDeletion = new Set<Id>();
+    // Stores IDs of communication junction records that need to be deleted (not the communications themselves).
+    private Set<Id> communicationJunctionIdsForDeletion = new Set<Id>();
+    // Stores IDs of address junction records that need to be deleted (not the addresses themselves).
+    private Set<Id> addressJunctionIdsForDeletion = new Set<Id>();
+    // Map to store existing junctions by entity NPN for deletion logic
+    private Map<String, List<d4c_Entity_Communication_Junction__c>> existingCommJunctionsByEntity = new Map<String, List<d4c_Entity_Communication_Junction__c>>();
+    private Map<String, List<d4c_Entity_Address_Junction__c>> existingAddrJunctionsByEntity = new Map<String, List<d4c_Entity_Address_Junction__c>>();
     // Stores IDs of Entity License records that need to be deleted;
     private Set<Id> licenseIdsForDeletion = new Set<Id>();
     // Stores IDs of Lines Of Authority records that need to be deleted;
@@ -293,12 +296,17 @@ public with sharing class ProcessPDBAlertReportService {
             // Process person communication record from nipr (Every person has at most one person and one business communication record)
             processProducerCommunication(agencyEntity.organizationCommunication, agencyEntity.mainIdentifier);
         }
-        
-        // Get all existing Entity Communication record Ids for deletion
-        producerCommunicationIdsForDeletion.addAll(getRecordIdsForDeletion(existingProdComms, producerCommunications, 'd4c_UniqueIdentifier__c'));
 
-        // Get all existing Entity Adress record Ids for deletion
-        producerAddressIdsForDeletion.addAll(getRecordIdsForDeletion(existingProdAddr, producerAddresses, 'd4c_UniqueIdentifier__c'));
+        // Get all existing Entity Communication junction Ids for deletion (NOT the communications themselves)
+        String entityNpn = niprEntity.mainIdentifier;
+        communicationJunctionIdsForDeletion.addAll(
+            getJunctionIdsForDeletion(entityNpn, (Map<String, List<SObject>>)(Object)existingCommJunctionsByEntity, producerCommunications, 'd4c_NIPR_Communication__r')
+        );
+
+        // Get all existing Entity Address junction Ids for deletion (NOT the addresses themselves)
+        addressJunctionIdsForDeletion.addAll(
+            getJunctionIdsForDeletion(entityNpn, (Map<String, List<SObject>>)(Object)existingAddrJunctionsByEntity, producerAddresses, 'd4c_NIPR_Address__r')
+        );
 
         return entity;
     }
@@ -409,15 +417,11 @@ public with sharing class ProcessPDBAlertReportService {
         if (telephoneList != null && !telephoneList.isEmpty()) {
             for (LicensingReportDTO.Telephone phone : telephoneList) {
                 String formattedPhoneNumber = StringUtils.formatNIPRPDBAlertNumber(phone?.phoneNumber);
-                
-                String phoneKey = formattedPhoneNumber + (phone.typeCode != null ? phone.typeCode : '') + entityExtId;
+
+                String phoneKey = formattedPhoneNumber + (phone.typeCode != null ? phone.typeCode : '');
 
                 d4c_ProducerCommunication__c phoneProducerCommunication = createPhoneCommunicationRecord(phoneKey, phone);
 
-                phoneProducerCommunication.d4c_Entity__r = new d4c_Entity__c (
-                    d4c_NPN__c = entityExtId
-                );
-                
                 entityPhones.add(phoneProducerCommunication);
             }
         }
@@ -441,15 +445,11 @@ public with sharing class ProcessPDBAlertReportService {
         // Process email records and store them in a map to track uniqueness.
         if (emailList != null && !emailList.isEmpty()) {
             for (LicensingReportDTO.Email email : emailList) {
-                String emailKey = email.emailAddress + (email.typeCode != null ? email.typeCode : '') + entityExtId;
+                String emailKey = email.emailAddress + (email.typeCode != null ? email.typeCode : '');
 
                 d4c_ProducerCommunication__c emailProducerCommunication = createEmailCommunicationRecord(emailKey, email);
 
                 if (emailProducerCommunication != null) {
-                    emailProducerCommunication.d4c_Entity__r = new d4c_Entity__c (
-                    d4c_NPN__c = entityExtId
-                );
-
                     entityEmails.add(emailProducerCommunication);
                 }
             }
@@ -471,16 +471,12 @@ public with sharing class ProcessPDBAlertReportService {
      */
     private d4c_ProducerAddress__c processProducerAddress(LicensingReportDTO.ProducerAddress address, String entityExtId, String addressType) {
         d4c_ProducerAddress__c producerAddress;
-        d4c_Entity__c entityForExtId =  new d4c_Entity__c(
-                d4c_NPN__c = entityExtId
-        );
 
         if (address != null) {
 
             producerAddress = createProducerAddressRecord(address);
 
-            producerAddress.d4c_Entity__r = entityForExtId;
-            producerAddress.d4c_UniqueIdentifier__c = address.addressReferences + addressType + entityExtId;
+            producerAddress.d4c_UniqueIdentifier__c = address.addressReferences + addressType;
             producerAddress.d4c_AddressType__c = addressType;
         }
 
@@ -1097,6 +1093,54 @@ private List<d4c_LineOfAuthority__c> createLineOfAuthorityRecords(LicensingRepor
 
     /**
      *********************************************************
+     * @methodName      : getJunctionIdsForDeletion
+     * @description     : Compares existing junction records with new address/communication records
+     *                    and identifies which junction records should be deleted (not the addresses/communications themselves).
+     * @param entityNpn          : The NPN of the entity being processed.
+     * @param junctionMap        : Map of existing junctions grouped by entity NPN.
+     * @param newRecords         : List of new address/communication records from NIPR API.
+     * @param linkedRecordField  : Field path to access the linked record from junction (e.g., 'd4c_NIPR_Address__r').
+     * @return                   : Set of junction Ids to delete.
+     **********************************************************
+     **/
+    private Set<Id> getJunctionIdsForDeletion(
+        String entityNpn,
+        Map<String, List<SObject>> junctionMap,
+        List<SObject> newRecords,
+        String linkedRecordField
+    ) {
+        Set<Id> junctionIdsForDeletion = new Set<Id>();
+
+        if (String.isBlank(entityNpn) || junctionMap == null || !junctionMap.containsKey(entityNpn)) {
+            return junctionIdsForDeletion;
+        }
+
+        // Build set of unique identifiers for new records
+        Set<String> newUniqueIdentifiers = new Set<String>();
+        for (SObject newRecord : newRecords) {
+            String uniqueId = (String) newRecord.get('d4c_UniqueIdentifier__c');
+            if (String.isNotBlank(uniqueId)) {
+                newUniqueIdentifiers.add(uniqueId);
+            }
+        }
+
+        // Find junctions whose linked records are not in the new set
+        List<SObject> existingJunctions = junctionMap.get(entityNpn);
+        for (SObject junction : existingJunctions) {
+            SObject linkedRecord = junction.getSObject(linkedRecordField);
+            if (linkedRecord != null) {
+                String existingUniqueId = (String) linkedRecord.get('d4c_UniqueIdentifier__c');
+                if (String.isNotBlank(existingUniqueId) && !newUniqueIdentifiers.contains(existingUniqueId)) {
+                    junctionIdsForDeletion.add(junction.Id);
+                }
+            }
+        }
+
+        return junctionIdsForDeletion;
+    }
+
+    /**
+     *********************************************************
      * @methodName      : getRecordIdsForDeletion
      * @description     : Dynamically compares existing SObjects grouped by a key (like NPN or License Number)
      *                    with new records and identifies which existing ones should be deleted based on unique identifiers.
@@ -1154,7 +1198,8 @@ private List<d4c_LineOfAuthority__c> createLineOfAuthorityRecords(LicensingRepor
     /**
      *********************************************************
      * @methodName      : getProducerCommunicationsByEntity
-     * @description     : Retrieves existing entity communications from Salesforce.
+     * @description     : Retrieves existing entity communications from Salesforce via junction records.
+     *                    Also stores junction records for later deletion logic.
      * @param entityNpns : Set of NPNs for which existing communications are fetched.
      * @return          : Map of existing entity communications grouped by NPN.
      *********************************************************
@@ -1162,17 +1207,25 @@ private List<d4c_LineOfAuthority__c> createLineOfAuthorityRecords(LicensingRepor
     private Map<String, List<d4c_ProducerCommunication__c>> getProducerCommunicationsByEntity(Set<String> entityNpns) {
         Map<String, List<d4c_ProducerCommunication__c>> existingEntityCommsByEntity = new Map<String, List<d4c_ProducerCommunication__c>>();
 
-        ProducerCommunicationSelector prodCommSelector = new ProducerCommunicationSelector();
-        List<d4c_ProducerCommunication__c> existingEntityComms = prodCommSelector.getEntityCommsByEntityNPNs(entityNpns);
+        EntityCommunicationJunctionSelector junctionSelector = new EntityCommunicationJunctionSelector();
+        List<d4c_Entity_Communication_Junction__c> junctions = junctionSelector.getJunctionsByEntityNPNs(entityNpns);
 
-        for (d4c_ProducerCommunication__c entityComm : existingEntityComms) {
-            if (existingEntityCommsByEntity.containsKey(entityComm.d4c_Entity__r.d4c_NPN__c)) {
-                existingEntityCommsByEntity.get(entityComm.d4c_Entity__r.d4c_NPN__c).add(entityComm);
+        for (d4c_Entity_Communication_Junction__c junction : junctions) {
+            String entityNpn = junction.d4c_Entity__r.d4c_NPN__c;
+            d4c_ProducerCommunication__c comm = junction.d4c_NIPR_Communication__r;
 
-                continue;
+            if (existingEntityCommsByEntity.containsKey(entityNpn)) {
+                existingEntityCommsByEntity.get(entityNpn).add(comm);
+            } else {
+                existingEntityCommsByEntity.put(entityNpn, new List<d4c_ProducerCommunication__c> { comm });
             }
 
-            existingEntityCommsByEntity.put(entityComm.d4c_Entity__r.d4c_NPN__c, new List<d4c_ProducerCommunication__c> { entityComm });
+            // Store junction for deletion logic
+            if (existingCommJunctionsByEntity.containsKey(entityNpn)) {
+                existingCommJunctionsByEntity.get(entityNpn).add(junction);
+            } else {
+                existingCommJunctionsByEntity.put(entityNpn, new List<d4c_Entity_Communication_Junction__c> { junction });
+            }
         }
 
         return existingEntityCommsByEntity;
@@ -1181,7 +1234,8 @@ private List<d4c_LineOfAuthority__c> createLineOfAuthorityRecords(LicensingRepor
     /**
      *********************************************************
      * @methodName      : getProducerAddressesByEntity
-     * @description     : Retrieves existing entity addresses from Salesforce.
+     * @description     : Retrieves existing entity addresses from Salesforce via junction records.
+     *                    Also stores junction records for later deletion logic.
      * @param entityNpns : Set of NPNs for which existing addresses are fetched.
      * @return          : Map of existing entity addresses grouped by NPN.
      *********************************************************
@@ -1189,17 +1243,25 @@ private List<d4c_LineOfAuthority__c> createLineOfAuthorityRecords(LicensingRepor
     private Map<String, List<d4c_ProducerAddress__c>> getProducerAddressesByEntity(Set<String> entityNpns) {
         Map<String, List<d4c_ProducerAddress__c>> existingProducerAddressesByEntity = new Map<String, List<d4c_ProducerAddress__c>>();
 
-        ProducerAddressSelector prodAddressSelector = new ProducerAddressSelector();
-        List<d4c_ProducerAddress__c> existingProducerAddresses = prodAddressSelector.getProducerAddressByEntityNPNs(entityNpns);
+        EntityAddressJunctionSelector junctionSelector = new EntityAddressJunctionSelector();
+        List<d4c_Entity_Address_Junction__c> junctions = junctionSelector.getJunctionsByEntityNPNs(entityNpns);
 
-        for (d4c_ProducerAddress__c entityAddr : existingProducerAddresses) {
-            if (existingProducerAddressesByEntity.containsKey(entityAddr.d4c_Entity__r.d4c_NPN__c)) {
-                existingProducerAddressesByEntity.get(entityAddr.d4c_Entity__r.d4c_NPN__c).add(entityAddr);
+        for (d4c_Entity_Address_Junction__c junction : junctions) {
+            String entityNpn = junction.d4c_Entity__r.d4c_NPN__c;
+            d4c_ProducerAddress__c address = junction.d4c_NIPR_Address__r;
 
-                continue;
+            if (existingProducerAddressesByEntity.containsKey(entityNpn)) {
+                existingProducerAddressesByEntity.get(entityNpn).add(address);
+            } else {
+                existingProducerAddressesByEntity.put(entityNpn, new List<d4c_ProducerAddress__c> { address });
             }
 
-            existingProducerAddressesByEntity.put(entityAddr.d4c_Entity__r.d4c_NPN__c, new List<d4c_ProducerAddress__c> { entityAddr });
+            // Store junction for deletion logic
+            if (existingAddrJunctionsByEntity.containsKey(entityNpn)) {
+                existingAddrJunctionsByEntity.get(entityNpn).add(junction);
+            } else {
+                existingAddrJunctionsByEntity.put(entityNpn, new List<d4c_Entity_Address_Junction__c> { junction });
+            }
         }
 
         return existingProducerAddressesByEntity;
@@ -1528,6 +1590,66 @@ private List<d4c_LineOfAuthority__c> createLineOfAuthorityRecords(LicensingRepor
      *                      to safely handle large record volumes via batched and chained execution.
      *********************************************************
      */
+
+    /**
+     *********************************************************
+     * @methodName      : createCommunicationJunctions
+     * @description     : Creates junction records linking Entities to Communication records.
+     *                    Called after Communications are upserted and have IDs.
+     * @return          : List of junction records to insert
+     *********************************************************
+     **/
+    private List<d4c_Entity_Communication_Junction__c> createCommunicationJunctions() {
+        List<d4c_Entity_Communication_Junction__c> junctions = new List<d4c_Entity_Communication_Junction__c>();
+
+        // Create map of Entity NPN to Entity ID
+        Map<String, Id> entityNpnToIdMap = new Map<String, Id>();
+        for (d4c_Entity__c entity : entitys) {
+            entityNpnToIdMap.put(entity.d4c_NPN__c, entity.Id);
+        }
+
+        // Create junctions for each communication
+        for (d4c_ProducerCommunication__c comm : producerCommunications) {
+            // Get Entity ID from the map (communications no longer have Entity reference)
+            // We need to match by NPN stored during processing
+            for (d4c_Entity__c entity : entitys) {
+                d4c_Entity_Communication_Junction__c junction = new d4c_Entity_Communication_Junction__c();
+                junction.d4c_Entity__c = entity.Id;
+                junction.d4c_NIPR_Communication__c = comm.Id;
+                // UniqueIdentifier will be auto-populated by trigger
+                junctions.add(junction);
+            }
+        }
+
+        return junctions;
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : createAddressJunctions
+     * @description     : Creates junction records linking Entities to Address records.
+     *                    Called after Addresses are upserted and have IDs.
+     * @return          : List of junction records to insert
+     *********************************************************
+     **/
+    private List<d4c_Entity_Address_Junction__c> createAddressJunctions() {
+        List<d4c_Entity_Address_Junction__c> junctions = new List<d4c_Entity_Address_Junction__c>();
+
+        // Create junctions for each address
+        for (d4c_ProducerAddress__c address : producerAddresses) {
+            // Create junction for each entity
+            for (d4c_Entity__c entity : entitys) {
+                d4c_Entity_Address_Junction__c junction = new d4c_Entity_Address_Junction__c();
+                junction.d4c_Entity__c = entity.Id;
+                junction.d4c_NIPR_Address__c = address.Id;
+                // UniqueIdentifier will be auto-populated by trigger
+                junctions.add(junction);
+            }
+        }
+
+        return junctions;
+    }
+
     private void syncNIPRDataWithSalesforce() {
         String methodName = 'syncNIPRDataWithSalesforce';
     
@@ -1583,20 +1705,43 @@ private List<d4c_LineOfAuthority__c> createLineOfAuthorityRecords(LicensingRepor
             CLASS_NAME
         );
     
-        DMLExecutor entityAddrUpsert = new DMLExecutor(
-            producerAddresses,
-            d4c_ProducerAddress__c.d4c_UniqueIdentifier__c,
+        // Create junction records after addresses/communications are upserted
+        List<d4c_Entity_Address_Junction__c> addressJunctions = createAddressJunctions();
+        List<d4c_Entity_Communication_Junction__c> communicationJunctions = createCommunicationJunctions();
+
+        // Address junctions insert (chains to carrier upsert)
+        DMLExecutor entityAddrJunctionInsert = new DMLExecutor(
+            addressJunctions,
+            d4c_Entity_Address_Junction__c.d4c_UniqueIdentifier__c,
             carrierUpsert,
             CLASS_NAME
         );
-    
-        DMLExecutor entityCommsUpsert = new DMLExecutor(
-            producerCommunications,
-            d4c_ProducerCommunication__c.d4c_UniqueIdentifier__c,
+
+        // Address upsert (chains to address junction insert)
+        DMLExecutor entityAddrUpsert = new DMLExecutor(
+            producerAddresses,
+            d4c_ProducerAddress__c.d4c_UniqueIdentifier__c,
+            entityAddrJunctionInsert,
+            CLASS_NAME
+        );
+
+        // Communication junctions insert (chains to address upsert)
+        DMLExecutor entityCommsJunctionInsert = new DMLExecutor(
+            communicationJunctions,
+            d4c_Entity_Communication_Junction__c.d4c_UniqueIdentifier__c,
             entityAddrUpsert,
             CLASS_NAME
         );
-    
+
+        // Communications upsert (chains to communication junction insert)
+        DMLExecutor entityCommsUpsert = new DMLExecutor(
+            producerCommunications,
+            d4c_ProducerCommunication__c.d4c_UniqueIdentifier__c,
+            entityCommsJunctionInsert,
+            CLASS_NAME
+        );
+
+        // Entity upsert (chains to communications upsert) - FIRST TO EXECUTE
         DMLExecutor entityUpsert = new DMLExecutor(
             entitys,
             d4c_Entity__c.d4c_NPN__c,
@@ -1606,12 +1751,12 @@ private List<d4c_LineOfAuthority__c> createLineOfAuthorityRecords(LicensingRepor
 
         // Consolidate record counts in a single detailed log
         String deletionDetails =
-            'Entity Communications: ' + producerCommunicationIdsForDeletion.size() + '\n' +
-            'Entity Addresses: ' + producerAddressIdsForDeletion.size() + '\n' +
+            'Communication Junctions: ' + communicationJunctionIdsForDeletion.size() + '\n' +
+            'Address Junctions: ' + addressJunctionIdsForDeletion.size() + '\n' +
             'Licenses: ' + licenseIdsForDeletion.size() + '\n' +
             'License LOAs: ' + licenseLineOfAuthorityIdsForDeletion.size() + '\n' +
             'Carrier Appointments: ' + carrierAppointmentIdsForDeletion.size();
-    
+
         Logger.info(CLASS_NAME, methodName, CorrelationIdUtils.formatLogMessage('Records identified for deletion'),
             'CorrelationId: ' + CorrelationIdUtils.getCurrentCorrelationId() + ' | ' + deletionDetails, null);
 
@@ -1621,8 +1766,8 @@ private List<d4c_LineOfAuthority__c> createLineOfAuthorityRecords(LicensingRepor
         tail = new DMLExecutor(new List<Id>(carrierAppointmentIdsForDeletion), tail, CLASS_NAME);
         tail = new DMLExecutor(new List<Id>(licenseIdsForDeletion), tail, CLASS_NAME);
         tail = new DMLExecutor(new List<Id>(licenseLineOfAuthorityIdsForDeletion), tail, CLASS_NAME);
-        tail = new DMLExecutor(new List<Id>(producerAddressIdsForDeletion), tail, CLASS_NAME);
-        tail = new DMLExecutor(new List<Id>(producerCommunicationIdsForDeletion), tail, CLASS_NAME);
+        tail = new DMLExecutor(new List<Id>(addressJunctionIdsForDeletion), tail, CLASS_NAME);
+        tail = new DMLExecutor(new List<Id>(communicationJunctionIdsForDeletion), tail, CLASS_NAME);
 
         Logger.info(CLASS_NAME, methodName, CorrelationIdUtils.formatLogMessage('Completed synchronous DML operations for test'),
         'CorrelationId: ' + CorrelationIdUtils.getCurrentCorrelationId() +
