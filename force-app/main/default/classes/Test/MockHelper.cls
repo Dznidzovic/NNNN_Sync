@@ -3,10 +3,10 @@
 Apex Class Name    : MockHelper
 Created Date       : 2025-10-23
 @description       : Helper class for creating mock data in tests without DML
-@author            : Stefan Nidzovic
+@author            : Dev4Clouds
 Modification Log:
 Ver   Date         Author                               Modification
-1.0   2025-10-23   Stefan Nidzovic                     Initial Version
+1.0   2025-10-23   Dev4Clouds                     Initial Version
 *********************************************************
 */
 @isTest

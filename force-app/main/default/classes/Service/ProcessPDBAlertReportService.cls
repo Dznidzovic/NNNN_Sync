@@ -4,11 +4,11 @@
  * Created Date       : 03-19-2025
  * @description       : Handles importing NIPR Licensing Report data into Salesforce.
  *                      This class processes the NIPR PDB Alerts API Response which is deserialized into LicensingReportDTO class and maps that data into Salesforce objects
- * @author            : Stefan Nidzovic
+ * @author            : Dev4Clouds
  * Modification Log:
  * Ver   Date         Author                   Modification
- * 1.0   03-19-2025   Stefan Nidzovic          Initial Version
- * 1.1   12-25-2025   Stefan Nidzovic          Renamed from ImportNIPRDataToSalesforceService
+ * 1.0   03-19-2025   Dev4Clouds          Initial Version
+ * 1.1   12-25-2025   Dev4Clouds          Renamed from ImportNIPRDataToSalesforceService
  *********************************************************
  **/
 public with sharing class ProcessPDBAlertReportService {

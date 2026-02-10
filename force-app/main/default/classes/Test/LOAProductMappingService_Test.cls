@@ -3,11 +3,11 @@
 Apex Class Name    : LOAProductMappingService_Test
 Created Date       : 2025-12-15
 @description       : Test class for LOAProductMappingService
-@author            : Stefan Nidzovic
+@author            : Dev4Clouds
 Modification Log:
 Ver   Date         Author         Modification
-1.0   2025-12-15   Stefan Nidzovic         Initial Version
-1.1   2025-12-24   Stefan Nidzovic         Enhanced with TestDataFactory and realistic scenarios
+1.0   2025-12-15   Dev4Clouds         Initial Version
+1.1   2025-12-24   Dev4Clouds         Enhanced with TestDataFactory and realistic scenarios
 *********************************************************
 */
 @isTest

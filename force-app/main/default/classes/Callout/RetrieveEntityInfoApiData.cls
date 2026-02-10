@@ -3,11 +3,11 @@
  * Created Date       : 04-01-2025
  * @description       : Retrieves and parses the NIPR Entity Info API XML response.
  *                      The response is mapped into the EntityInfoDTO Apex class.
- * @author            : Stefan Nidzovic
+ * @author            : Dev4Clouds
  * Modification Log:
  * Ver   Date         Author                   Modification
- * 1.0   04-01-2025   Stefan Nidzovic          Initial Version
- * 1.1   10-24-2025   Stefan Nidzovic          Added Exclude Carrier Appointments logic for large payloads
+ * 1.0   04-01-2025   Dev4Clouds          Initial Version
+ * 1.1   10-24-2025   Dev4Clouds          Added Exclude Carrier Appointments logic for large payloads
  *******************************************************************
  **/
 public with sharing class RetrieveEntityInfoApiData {
@@ -42,8 +42,8 @@ public with sharing class RetrieveEntityInfoApiData {
         try {
             // Query existing producer to check if user manually set exclude flag
             // Producer will always exist when this callout runs
-            ProducerSelector producerSelector = new ProducerSelector();
-            List<d4c_Entity__c> existingProducers = producerSelector.getProducersByNPNs(new Set<String>{ entityNPN });
+            EntitySelector entitySelector = new EntitySelector();
+            List<d4c_Entity__c> existingProducers = entitySelector.getProducersByNPNs(new Set<String>{ entityNPN });
             Boolean existingExcludeValue = false;
             if (!existingProducers.isEmpty()) {
                 existingExcludeValue = existingProducers[0].d4c_ExcludeCarrierAppointments__c;

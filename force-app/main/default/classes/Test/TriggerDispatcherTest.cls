@@ -4,10 +4,10 @@ Apex Class Name    : TriggerDispatcherTest
 Created Date       : 12-22-2025
 @description       : Test class for TriggerDispatcher and BaseTriggerHandler
                      Tests all trigger operation types and custom metadata integration
-@author            : Stefan Nidzovic
+@author            : Dev4Clouds
 Modification Log:
 Ver   Date         Author                               Modification
-1.0   12-22-2025   Stefan Nidzovic                     Initial Version
+1.0   12-22-2025   Dev4Clouds                     Initial Version
 *********************************************************
 */
 @IsTest

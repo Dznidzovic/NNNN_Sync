@@ -3,11 +3,11 @@
 Apex Class Name    : ContactProducerAssignmentService_Test
 Created Date       : 2025-04-01
 @description       : Test class for ContactProducerAssignmentService that validates assignment of Producer__c based on d4c_NPN__c using mocks (no DML)
-@author            : Uros Markovic
+@author            : Dev4Clouds
 Modification Log:
 Ver   Date         Author          Modification
-1.0   2025-04-01   Uros Markovic   Initial Version
-1.1   2025-10-23   Stefan Nidzovic Refactored to use mocks without DML
+1.0   2025-04-01   Dev4Clouds   Initial Version
+1.1   2025-10-23   Dev4Clouds Refactored to use mocks without DML
 *********************************************************
 */
 @isTest

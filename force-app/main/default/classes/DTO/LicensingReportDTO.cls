@@ -7,10 +7,10 @@
  *                      structure for message headers, results, licensing reports, and associated 
  *                      entities such as persons, organizations, and addresses. This class is used to deserialize XML string into Apex objects
  *                      FOR MORE DETAILS SEE THE FOLLOWING LINK -> https://wiki.nipr.com/display/NTD/PDB+Alerts+Schema
- * @author            : Stefan Nidzovic
+ * @author            : Dev4Clouds
  * Modification Log:
  * Ver   Date         Author                   Modification
- * 1.0   03-18-2025   Stefan Nidzovic          Initial Version
+ * 1.0   03-18-2025   Dev4Clouds          Initial Version
  *********************************************************
  **/
 public class LicensingReportDTO {

@@ -3,10 +3,10 @@
 Apex Class Name    : InsuranceProductLOAMappingSelector
 Created Date       : 2025-12-15
 @description       : Selector class for querying d4c_Insurance_Product_LOA_Mapping__c junction records
-@author            : Stefan Nidzovic
+@author            : Dev4Clouds
 Modification Log:
 Ver   Date         Author         Modification
-1.0   2025-12-15   Stefan Nidzovic         Initial Version
+1.0   2025-12-15   Dev4Clouds         Initial Version
 *********************************************************
 */
 public with sharing class InsuranceProductLOAMappingSelector {

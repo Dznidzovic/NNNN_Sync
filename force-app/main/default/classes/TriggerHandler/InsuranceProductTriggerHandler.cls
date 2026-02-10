@@ -4,11 +4,11 @@ Apex Class Name    : InsuranceProductTriggerHandler
 Created Date       : 2025-12-15
 @description       : Handles logic for Insurance Product trigger events.
                      Delegates to UniqueIdentifierService for unique identifier generation.
-@author            : Stefan Nidzovic
+@author            : Dev4Clouds
 Modification Log:
 Ver   Date         Author         Modification
-1.0   2025-12-15   Stefan Nidzovic         Initial Version
-1.1   2025-12-15   Stefan Nidzovic         Refactored to use UniqueIdentifierService
+1.0   2025-12-15   Dev4Clouds         Initial Version
+1.1   2025-12-15   Dev4Clouds         Refactored to use UniqueIdentifierService
 *********************************************************
 */
 public with sharing class InsuranceProductTriggerHandler extends BaseTriggerHandler {

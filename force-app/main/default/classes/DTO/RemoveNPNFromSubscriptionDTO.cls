@@ -4,11 +4,11 @@
  * Created Date       : 04-25-2025
  * @description       : Data Transfer Object (DTO) for representing the response from 
  *                      NIPR API for removing NPNs from a subscription.
- * @author            : Stefan Nidzovic
+ * @author            : Dev4Clouds
  * Modification Log:
  * Ver   Date         Author             Modification
- * 1.0   04-25-2025   Stefan Nidzovic    Initial Version
- * 1.1   04-25-2025   Stefan Nidzovic    Fixed structure to correctly represent actual API response
+ * 1.0   04-25-2025   Dev4Clouds    Initial Version
+ * 1.1   04-25-2025   Dev4Clouds    Fixed structure to correctly represent actual API response
  *********************************************************
  **/
 public class RemoveNPNFromSubscriptionDTO {

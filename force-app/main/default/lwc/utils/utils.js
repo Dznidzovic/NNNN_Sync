@@ -1,10 +1,10 @@
 /**
 * @description	  : Component used for shared functionalities across lwc
-* @author		  : Stefan Nidzovic
+* @author		  : Dev4Clouds
 * @date		      : 01-11-2024
 * @version		  : Initial Version
 * @lastModified	  : 01-11-2024
-* @lastModifiedBy : Stefan Nidzovic
+* @lastModifiedBy : Dev4Clouds
 * @modifications  : Implemented Show Toast message functionality
 * @events		  : Show Toast Event
 */

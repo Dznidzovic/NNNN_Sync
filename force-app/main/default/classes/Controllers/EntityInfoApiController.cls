@@ -4,11 +4,11 @@
  Created Date       : 04-21-2025
  @description       : Controller class used to process entity information via API callout based on NPN provided.
                       Now runs asynchronously via batch job instead of synchronously.
- @author            : Stefan Nidzovic
+ @author            : Dev4Clouds
  Modification Log:
  Ver   Date         Author                           Modification
- 1.0   04-21-2025   Stefan Nidzovic                  Initial Version
- 2.0   12-25-2025   Stefan Nidzovic                  Changed to async batch processing
+ 1.0   04-21-2025   Dev4Clouds                  Initial Version
+ 2.0   12-25-2025   Dev4Clouds                  Changed to async batch processing
  ********************************************************************
  **/
 public with sharing class EntityInfoApiController {
@@ -21,7 +21,7 @@ public with sharing class EntityInfoApiController {
 
     /*********************************************************
      @Method Name    : processNPN
-     @author         : Stefan Nidzovic
+     @author         : Dev4Clouds
      @description    : Enqueues the Entity Info batch job to process the NPN asynchronously.
                        Returns immediately - user will see results after refresh.
      @param          : npn - NPN of the producer to process data for

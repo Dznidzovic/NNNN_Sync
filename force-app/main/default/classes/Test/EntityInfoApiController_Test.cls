@@ -3,10 +3,10 @@
  Apex Class Name    : EntityInfoApiControllerTest
  Created Date       : 04-21-2025
  @description       : Test class for EntityInfoApiController to validate NPN processing functionality
- @author            : Stefan Nidzovic
+ @author            : Dev4Clouds
  Modification Log:
  Ver   Date         Author                           Modification
- 1.0   04-21-2025   Stefan Nidzovic                  Initial Version
+ 1.0   04-21-2025   Dev4Clouds                  Initial Version
  ********************************************************************
  **/
 @isTest
@@ -17,7 +17,7 @@ private class EntityInfoApiController_Test {
     
     /******************************************************
      @Method Name    : testProcessNPN_withValidNPN
-     @author         : Stefan Nidzovic
+     @author         : Dev4Clouds
      @description    : Tests the processNPN method with a valid NPN value
      *******************************************************
      **/
@@ -39,7 +39,7 @@ private class EntityInfoApiController_Test {
     
     /*********************************************************
     @Method Name    : testProcessNPN_withEmptyNPN
-    @author         : Stefan Nidzovic
+    @author         : Dev4Clouds
     @description    : Tests the processNPN method with an empty NPN value, should throw AuraHandledException
     *********************************************************/
     @isTest
@@ -58,7 +58,7 @@ private class EntityInfoApiController_Test {
 
     /*********************************************************
     @Method Name    : testProcessNPN_handlesExceptionGracefully
-    @author         : Stefan Nidzovic
+    @author         : Dev4Clouds
     @description    : Tests the catch block by forcing an exception
     *********************************************************/
     @isTest

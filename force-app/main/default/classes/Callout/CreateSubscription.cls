@@ -3,12 +3,12 @@
  * Apex Class Name    : CreateSubscription
  * Created Date       : 04-23-2025
  * @description       : Handles the creation of subscriptions through the NIPR API service
- * @author            : Stefan Nidzovic
+ * @author            : Dev4Clouds
  * Modification Log:
  * Ver   Date         Author                   Modification
- * 1.0   04-23-2025   Stefan Nidzovic          Initial Version
- * 1.1   04-23-2025   Stefan Nidzovic          Updated to use DOM for XML generation
- * 1.2   10-24-2025   Stefan Nidzovic          Added support for Exclude Carrier Appointments mode
+ * 1.0   04-23-2025   Dev4Clouds          Initial Version
+ * 1.1   04-23-2025   Dev4Clouds          Updated to use DOM for XML generation
+ * 1.2   10-24-2025   Dev4Clouds          Added support for Exclude Carrier Appointments mode
  *******************************************************************
  **/
 public with sharing class CreateSubscription {

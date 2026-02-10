@@ -3,10 +3,10 @@
  * Apex Class Name    : DMLExecutor_Test
  * Created Date       : 03-19-2025
  * @description       : Test Class used for DMLExecutor
- * @author            : Stefan Nidzovic
+ * @author            : Dev4Clouds
  * Modification Log:
  * Ver   Date         Author                   Modification
- * 1.0   03-19-2025   Stefan Nidzovic          Initial Version
+ * 1.0   03-19-2025   Dev4Clouds          Initial Version
  *********************************************************
  **/
 @isTest

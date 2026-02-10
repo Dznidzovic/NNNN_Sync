@@ -3,14 +3,14 @@
  * Apex Class Name    : SubscriptionService
  * Created Date       : 2025-04-16
  * @description       : Service class for managing NIPR subscription operations
- * @author            : Stefan Nidzovic
+ * @author            : Dev4Clouds
  * Modification Log:
  * Ver   Date         Author                   Modification
- * 1.0   2025-04-16   Uros Markovic           Initial Version
- * 1.1   2025-04-25   Stefan Nidzovic         Added removeNPNsFromSubscription method
- * 1.2   2025-10-22   Stefan Nidzovic         Fixed getSubscriptionCounts to exclude large agency subscriptions
- * 1.3   2025-10-24   Stefan Nidzovic         Added support for Exclude Carrier Appointments subscription pools
- * 2.0   10-24-2025   Stefan Nidzovic         Complete refactor - clean architecture with DRY principles
+ * 1.0   2025-04-16   Dev4Clouds           Initial Version
+ * 1.1   2025-04-25   Dev4Clouds         Added removeNPNsFromSubscription method
+ * 1.2   2025-10-22   Dev4Clouds         Fixed getSubscriptionCounts to exclude large agency subscriptions
+ * 1.3   2025-10-24   Dev4Clouds         Added support for Exclude Carrier Appointments subscription pools
+ * 2.0   10-24-2025   Dev4Clouds         Complete refactor - clean architecture with DRY principles
  *********************************************************
  **/
 public virtual with sharing class SubscriptionService {
@@ -27,7 +27,7 @@ public virtual with sharing class SubscriptionService {
     // Selectors and Callouts
     private final MetadataTypeSelector mtdSelector = new MetadataTypeSelector();
     private final SubscriptionSelector subscriptionSelector = new SubscriptionSelector();
-    private final ProducerSelector producerSelector = new ProducerSelector();
+    private final EntitySelector entitySelector = new EntitySelector();
     private final CreateSubscription createSubscriptionAPI = new CreateSubscription();
     private final AddNPNToSubscription addNPNToSubscriptionAPI = new AddNPNToSubscription();
     private final RemoveNPNFromSubscription removeNPNFromSubscriptionAPI = new RemoveNPNFromSubscription();
@@ -94,7 +94,7 @@ public virtual with sharing class SubscriptionService {
         }
 
         // Query all producers with these NPNs
-        List<d4c_Entity__c> producers = producerSelector.getProducersByNPNs(npns);
+        List<d4c_Entity__c> producers = entitySelector.getProducersByNPNs(npns);
 
         if (producers.isEmpty()) {
             Logger.warning(CLASS_NAME, methodName, 'No producers found for NPNs', 'NPNs: ' + npns, null);

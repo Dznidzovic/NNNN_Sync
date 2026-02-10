@@ -5,10 +5,10 @@
  * @description       : Custom HttpCalloutMock implementation to handle multiple
  *                     SOAP mock HTTP responses dynamically based on method names
  *                     present in the request body XML.
- * @author            : Stefan Nidzovic
+ * @author            : Dev4Clouds
  * Modification Log:
  * Ver   Date         Author               Modification
- * 1.0   04-01-2025   Stefan Nidzovic      Initial Version
+ * 1.0   04-01-2025   Dev4Clouds      Initial Version
  **********************************************************
  **/
 @isTest

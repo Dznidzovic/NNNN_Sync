@@ -6,11 +6,11 @@
  *                      This class processes the EntityInfoDTO structure and generates records for
  *                      d4c_Entity__c, d4c_ProducerCommunication__c, d4c_ProducerAddress__c, d4c_License__c,
  *                      d4c_LineOfAuthority__c, and d4c_CarrierAppointment__c.
- * @author            : Stefan Nidzovic
+ * @author            : Dev4Clouds
  * Modification Log:
  * Ver   Date         Author             Modification
- * 1.0   04-08-2025   Stefan Nidzovic    Initial Version
- * 1.1   10-24-2025   Stefan Nidzovic    Added Exclude Carrier Appointments flag handling
+ * 1.0   04-08-2025   Dev4Clouds    Initial Version
+ * 1.1   10-24-2025   Dev4Clouds    Added Exclude Carrier Appointments flag handling
  *********************************************************
  **/
 public with sharing class ProcessEntityInfoApiService {

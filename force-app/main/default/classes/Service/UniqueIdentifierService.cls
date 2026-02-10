@@ -8,10 +8,10 @@ Created Date       : 2025-12-15
                      - d4c_LOA_Insurance_Product_Mapping__c
                      - d4c_Insurance_Product_LOA_Mapping__c (junction)
                      - d4c_License_Insurance_Product__c (junction)
-@author            : Stefan Nidzovic
+@author            : Dev4Clouds
 Modification Log:
 Ver   Date         Author         Modification
-1.0   2025-12-15   Stefan Nidzovic         Initial Version
+1.0   2025-12-15   Dev4Clouds         Initial Version
 *********************************************************
 */
 public with sharing class UniqueIdentifierService {

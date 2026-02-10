@@ -7,11 +7,11 @@
  *                      to collect all pending NPNs before batch execution.
  *                      Only processes producers created/modified after the schedule
  *                      was first created (minus 5 second buffer).
- * @author            : Stefan Nidzovic
+ * @author            : Dev4Clouds
  * Modification Log:
  * Ver   Date         Author         Modification
- * 1.0   2025-12-17   Stefan Nidzovic         Initial Version
- * 1.1   2025-12-17   Stefan Nidzovic         Added scheduledSince filter for producer query
+ * 1.0   2025-12-17   Dev4Clouds         Initial Version
+ * 1.1   2025-12-17   Dev4Clouds         Added scheduledSince filter for producer query
  *********************************************************
  **/
 public class RunEntityInfoReportSchedulable implements Schedulable {

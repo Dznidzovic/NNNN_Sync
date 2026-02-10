@@ -3,10 +3,10 @@
 Apex Class Name    : ContactSelector_Test
 Created Date       : 2025-10-23
 @description       : Test class for ContactSelector
-@author            : Stefan Nidzovic
+@author            : Dev4Clouds
 Modification Log:
 Ver   Date         Author          Modification
-1.0   2025-10-23   Stefan Nidzovic Initial Version
+1.0   2025-10-23   Dev4Clouds Initial Version
 *********************************************************
 */
 @isTest

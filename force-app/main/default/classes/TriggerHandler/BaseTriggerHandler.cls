@@ -4,10 +4,10 @@ Apex Class Name    : BaseTriggerHandler
 Created Date       : 03-16-2025
 @description       : Base class for handling Apex Triggers using the Trigger Dispatcher pattern.
                      Provides virtual methods for handling different trigger events.
-@author            : Stefan Nidzovic
+@author            : Dev4Clouds
 Modification Log:
 Ver   Date         Author                               Modification
-1.0   03-16-2025   Stefan Nidzovic                     Initial Version
+1.0   03-16-2025   Dev4Clouds                     Initial Version
 *********************************************************
 */
 public virtual class BaseTriggerHandler {

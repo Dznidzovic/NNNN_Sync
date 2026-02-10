@@ -3,11 +3,11 @@
 Apex Class Name    : AccountTriggerHandler
 Created Date       : 2025-04-02
 @description       : Handles trigger logic for Account
-@author            : Uros Markovic
+@author            : Dev4Clouds
 Modification Log:
 Ver   Date         Author          Modification
-1.0   2025-04-02   Uros Markovic   Initial Version
-1.1   2025-04-25   Stefan Nidzovic   Added afterUpdate for orphaned producer handling
+1.0   2025-04-02   Dev4Clouds   Initial Version
+1.1   2025-04-25   Dev4Clouds   Added afterUpdate for orphaned producer handling
 *********************************************************
 */
 public with sharing class AccountTriggerHandler extends BaseTriggerHandler{

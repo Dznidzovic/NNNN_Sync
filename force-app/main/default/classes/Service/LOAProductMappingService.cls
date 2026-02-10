@@ -7,10 +7,10 @@ Created Date       : 2025-12-15
                      - Matching LOAs to Insurance Product Mappings by state/code/description
                      - Finding and updating orphan LOAs when new mappings are created
                      - Handling cascade delete cleanup when mappings are removed
-@author            : Stefan Nidzovic
+@author            : Dev4Clouds
 Modification Log:
 Ver   Date         Author         Modification
-1.0   2025-12-15   Stefan Nidzovic         Initial Version
+1.0   2025-12-15   Dev4Clouds         Initial Version
 *********************************************************
 */
 public with sharing class LOAProductMappingService {

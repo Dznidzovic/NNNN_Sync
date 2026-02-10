@@ -3,10 +3,10 @@
 Apex Class Name    : LeadTrigger
 Created Date       : 2025-04-02
 @description       : Handles logic for Lead trigger events.
-@author            : Uros Markovic
+@author            : Dev4Clouds
 Modification Log:
 Ver   Date         Author         Modification
-1.0   2025-04-02   Uros Markovic      Initial Version
+1.0   2025-04-02   Dev4Clouds      Initial Version
 *********************************************************
 */
 

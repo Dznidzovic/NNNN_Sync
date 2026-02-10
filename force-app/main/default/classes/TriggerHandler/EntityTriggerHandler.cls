@@ -3,14 +3,14 @@
  * Created Date       : 04-15-2025
  * @description       : Trigger handler class that gets invoked from the d4c_Entity__c trigger and covers all DML Operation scenarios
  *                    : Invokes the Entity Info API to download NIPR data for producers and if successfull invokes the Add Target Subscription service of the NIPR API
- * @author            : Stefan Nidzovic
+ * @author            : Dev4Clouds
  * Modification Log:
  * Ver   Date         Author                   Modification
- * 1.0   03-30-2025   Stefan Nidzovic          Initial Version
- * 1.1   04-25-2025   Stefan Nidzovic          Added support for removing NPNs from subscriptions
- * 1.2   04-25-2025   Stefan Nidzovic          Added handler for deleted producers
- * 1.3   10-24-2025   Stefan Nidzovic          Added re-subscription logic for Exclude Carrier Appointments flag changes
- * 2.0   10-24-2025   Stefan Nidzovic          Complete refactor - SubscriptionOrchestratorQueueable architecture
+ * 1.0   03-30-2025   Dev4Clouds          Initial Version
+ * 1.1   04-25-2025   Dev4Clouds          Added support for removing NPNs from subscriptions
+ * 1.2   04-25-2025   Dev4Clouds          Added handler for deleted producers
+ * 1.3   10-24-2025   Dev4Clouds          Added re-subscription logic for Exclude Carrier Appointments flag changes
+ * 2.0   10-24-2025   Dev4Clouds          Complete refactor - SubscriptionOrchestratorQueueable architecture
  *********************************************************
  **/
 public with sharing class ProducerTriggerHandler extends BaseTriggerHandler {

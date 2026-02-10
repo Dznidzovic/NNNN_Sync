@@ -3,10 +3,10 @@
  * Apex Class Name    : StringUtils
  * Created Date       : 04-08-2025
  * @description       : Utility class for simple string transformations
- * @author            : Stefan Nidzovic
+ * @author            : Dev4Clouds
  * Modification Log:
  * Ver   Date         Author                   Modification
- * 1.0   04-08-2025   Stefan Nidzovic          Initial Version
+ * 1.0   04-08-2025   Dev4Clouds          Initial Version
  *********************************************************
  **/
 public with sharing class StringUtils {

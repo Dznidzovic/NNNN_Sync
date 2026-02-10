@@ -6,10 +6,10 @@
  *                      for Apex Lists. Apex does not natively support subList, so this 
  *                      provides a reusable alternative. Overloaded methods support 
  *                      List<Id> and List<SObject>.
- * @author            : Stefan Nidzovic
+ * @author            : Dev4Clouds
  * Modification Log:
  * Ver   Date         Author              Modification
- * 1.0   03-30-2025   Stefan Nidzovic     Initial Version
+ * 1.0   03-30-2025   Dev4Clouds     Initial Version
  *********************************************************
 **/
 public class ListUtils {

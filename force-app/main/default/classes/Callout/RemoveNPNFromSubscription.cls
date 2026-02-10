@@ -4,11 +4,11 @@
  * Created Date       : 04-25-2025
  * @description       : Handles the removal of National Producer Numbers (NPNs) from NIPR subscriptions
  *                      through the NIPR API service
- * @author            : Stefan Nidzovic
+ * @author            : Dev4Clouds
  * Modification Log:
  * Ver   Date         Author                   Modification
- * 1.0   04-25-2025   Stefan Nidzovic          Initial Version
- * 1.1   04-25-2025   Stefan Nidzovic          Updated to use DTO for response processing
+ * 1.0   04-25-2025   Dev4Clouds          Initial Version
+ * 1.1   04-25-2025   Dev4Clouds          Updated to use DTO for response processing
  *******************************************************************
  **/
 public with sharing class RemoveNPNFromSubscription {

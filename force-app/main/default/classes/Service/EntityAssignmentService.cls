@@ -1,19 +1,19 @@
 /*
 *********************************************************
-Apex Class Name    : ProducerAssignmentService
+Apex Class Name    : EntityAssignmentService
 Created Date       : 2025-04-08
 @description       : Service class for assigning Producer__c based on d4c_NPN__c for any SObject
-@author            : Uros Markovic
+@author            : Dev4Clouds
 Modification Log:
 Ver   Date         Author          Modification
-1.0   2025-04-08   Uros Markovic   Initial Version
-1.1   2025-04-10   Uros Markovic   Replaced manual insert logic with upsert on d4c_NPN__c
-1.2   2025-04-25   Stefan Nidzovic   Added handling for orphaned producers when NPN is changed
+1.0   2025-04-08   Dev4Clouds   Initial Version
+1.1   2025-04-10   Dev4Clouds   Replaced manual insert logic with upsert on d4c_NPN__c
+1.2   2025-04-25   Dev4Clouds   Added handling for orphaned producers when NPN is changed
 *********************************************************
 */
-public with sharing class ProducerAssignmentService {
+public with sharing class EntityAssignmentService {
 
-    private static final String CLASS_NAME = 'ProducerAssignmentService';
+    private static final String CLASS_NAME = 'EntityAssignmentService';
 
     // Test-visible mock properties for unit testing without DML
     @TestVisible private static Map<String, d4c_Entity__c> mockProducersByNPN;
@@ -22,7 +22,7 @@ public with sharing class ProducerAssignmentService {
     @TestVisible private static List<Lead> mockLeadsByNPN;
     @TestVisible private static Boolean useMocks = false;
 
-    private final ProducerSelector producerSelector = new ProducerSelector();
+    private final EntitySelector entitySelector = new EntitySelector();
     private final AccountSelector accountSelector = new AccountSelector();
     private final ContactSelector contactSelector = new ContactSelector();
     private final LeadSelector leadSelector = new LeadSelector();
@@ -31,7 +31,7 @@ public with sharing class ProducerAssignmentService {
     /*
     *********************************************************
     @Method Name    : assignProducers
-    @author         : Uros Markovic
+    @author         : Dev4Clouds
     @description    : Main entry method to assign Producer__c based on d4c_NPN__c field
     @param          : records - List of incoming SObject records
     @param          : oldRecords - Map of old SObject records (for update comparison)
@@ -47,7 +47,7 @@ public with sharing class ProducerAssignmentService {
         Set<String> newNpns = extractUniqueNPNs(recordsToProcess);
         List<d4c_Entity__c> existingProducers = useMocks && mockProducersByNPN != null
             ? mockProducersByNPN.values()
-            : producerSelector.getProducersByNPNs(newNpns);
+            : entitySelector.getProducersByNPNs(newNpns);
         Map<String, d4c_Entity__c> producerMap = buildProducerMapByNPN(existingProducers);
 
         Boolean upsertFailed = upsertMissingProducers(newNpns, producerMap, recordsToProcess);
@@ -60,7 +60,7 @@ public with sharing class ProducerAssignmentService {
     /*
     *********************************************************
     @Method Name    : handleOrphanedProducers
-    @author         : Stefan Nidzovic
+    @author         : Dev4Clouds
     @description    : Handles producers that may need to be deleted when NPNs are changed
     @param          : newRecords - List of new SObject records
     @param          : oldRecords - Map of old SObject records
@@ -90,7 +90,7 @@ public with sharing class ProducerAssignmentService {
         // Get producers with these NPNs
         List<d4c_Entity__c> potentialOrphanedProducers = useMocks && mockProducersByNPN != null
             ? getProducersFromMockByNPNs(potentialOrphanedNpns)
-            : producerSelector.getProducersByNPNs(potentialOrphanedNpns);
+            : entitySelector.getProducersByNPNs(potentialOrphanedNpns);
         
         if (potentialOrphanedProducers.isEmpty()) return;
         
@@ -128,7 +128,7 @@ public with sharing class ProducerAssignmentService {
     /*
     *********************************************************
     @Method Name    : getProducersFromMockByNPNs
-    @author         : Stefan Nidzovic
+    @author         : Dev4Clouds
     @description    : Helper method to get producers from mock map by NPNs
     @param          : npns - Set of NPNs to search for
     @return         : List<d4c_Entity__c> - List of producers matching the NPNs
@@ -147,7 +147,7 @@ public with sharing class ProducerAssignmentService {
     /*
     *********************************************************
     @Method Name    : checkForRelatedRecords
-    @author         : Stefan Nidzovic
+    @author         : Dev4Clouds
     @description    : Checks if any NPNs are still in use by any records
     @param          : npnsToCheck - Set of NPNs to check for usage
     @return         : Set<String> - Set of NPNs that are still in use
@@ -206,7 +206,7 @@ public with sharing class ProducerAssignmentService {
     /*
     *********************************************************
     @Method Name    : filterChangedAndValidRecords
-    @author         : Uros Markovic
+    @author         : Dev4Clouds
     @description    : Filters records where d4c_NPN__c is changed and valid
     @param          : records - New list of SObject records
     @param          : oldRecords - Map of old SObject records
@@ -252,7 +252,7 @@ public with sharing class ProducerAssignmentService {
     *********************************************************
     @Method Name    : extractUniqueNPNs
     @description    : Extracts unique d4c_NPN__c values from SObject records
-    @author         : Uros Markovic
+    @author         : Dev4Clouds
     @param          : records - List of filtered SObject records
     @return         : Set<String> - set of unique NPNs
     ********************************************************
@@ -269,7 +269,7 @@ public with sharing class ProducerAssignmentService {
     *********************************************************
     @Method Name    : buildProducerMapByNPN
     @description    : Builds map of d4c_Entity__c records by d4c_NPN__c
-    @author         : Uros Markovic
+    @author         : Dev4Clouds
     @param          : producerList - List of Producer records
     @return         : Map<String, d4c_Entity__c>
     ********************************************************
@@ -341,7 +341,7 @@ public with sharing class ProducerAssignmentService {
         }
 
         // Refresh map after successful upsert
-        List<d4c_Entity__c> updatedProducers = producerSelector.getProducersByNPNs(npns);
+        List<d4c_Entity__c> updatedProducers = entitySelector.getProducersByNPNs(npns);
         producerMap.clear();
         producerMap.putAll(buildProducerMapByNPN(updatedProducers));
 
@@ -352,7 +352,7 @@ public with sharing class ProducerAssignmentService {
     *********************************************************
     @Method Name    : assignProducersToRecords
     @description    : Assigns Producer__c lookup to record based on d4c_NPN__c match
-    @author         : Uros Markovic
+    @author         : Dev4Clouds
     @param          : records - List of filtered SObject records
     @param          : producerMap - Map of NPN to d4c_Entity__c records
     @return         : void

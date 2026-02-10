@@ -5,10 +5,10 @@
  * @description       : Utility class for handling XML parsing operations. This class provides 
  *                      helper methods to extract XML data from SOAP MTOM responses and retrieve 
  *                      specific node values as strings or integers.
- * @author            : Stefan Nidzovic
+ * @author            : Dev4Clouds
  * Modification Log:
  * Ver   Date         Author                   Modification
- * 1.0   03-18-2025   Stefan Nidzovic          Initial Version
+ * 1.0   03-18-2025   Dev4Clouds          Initial Version
  *********************************************************
  **/
 public with sharing class XMLUtils {

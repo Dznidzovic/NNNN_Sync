@@ -5,10 +5,10 @@
  * @description       : Test class for LOAProductCategorizationBatchable
  *                      Tests CREATE, UPDATE, and DELETE mode processing
  *                      of License-Insurance Product junctions based on LOA mappings.
- * @author            : Stefan Nidzovic
+ * @author            : Dev4Clouds
  * Modification Log:
  * Ver   Date         Author         Modification
- * 1.0   2025-12-13   Stefan Nidzovic         Initial Version
+ * 1.0   2025-12-13   Dev4Clouds         Initial Version
  *********************************************************
  */
 @isTest

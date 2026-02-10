@@ -1,10 +1,10 @@
 /**
 * @description	  : Component that calls an apex controller to process NPN data asynchronously
-* @author		  : Stefan Nidzovic
+* @author		  : Dev4Clouds
 * @date		      : 04-21-2025
 * @version		  : 2.3 - In-memory click protection
 * @lastModified	  : 12-26-2025
-* @lastModifiedBy : Stefan Nidzovic
+* @lastModifiedBy : Dev4Clouds
 * @modifications  : Added protection against spam clicking using in-memory tracking,
 *                   shows confirmation if synced today based on database value.
 * @usage		  : Component to be used as a quick action button on d4c_Entity__c records

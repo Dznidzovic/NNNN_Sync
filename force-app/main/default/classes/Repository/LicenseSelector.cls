@@ -3,10 +3,10 @@
  * Apex Class Name    : LicenseSelector
  * Created Date       : 03-30-2025
  * @description       : Selector class holding all the queries used for d4c_License__c object
- * @author            : Stefan Nidzovic
+ * @author            : Dev4Clouds
  * Modification Log:
  * Ver   Date         Author                   Modification
- * 1.0   03-30-2025   Stefan Nidzovic          Initial Version
+ * 1.0   03-30-2025   Dev4Clouds          Initial Version
  *********************************************************
  **/
 public with sharing class LicenseSelector {

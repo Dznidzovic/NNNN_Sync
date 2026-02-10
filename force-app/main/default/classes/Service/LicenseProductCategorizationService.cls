@@ -8,10 +8,10 @@ Created Date       : 2025-12-15
                      - Updating junctions when LOA mappings change
                      - Deleting junctions when LOAs are removed
                      - Getting products associated with LOA mappings
-@author            : Stefan Nidzovic
+@author            : Dev4Clouds
 Modification Log:
 Ver   Date         Author         Modification
-1.0   2025-12-15   Stefan Nidzovic         Initial Version
+1.0   2025-12-15   Dev4Clouds         Initial Version
 *********************************************************
 */
 public with sharing class LicenseProductCategorizationService {

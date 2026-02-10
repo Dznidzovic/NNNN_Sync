@@ -3,10 +3,10 @@
 Apex Class Name    : ContactSelector
 Created Date       : 2025-04-25
 @description       : Selector class for querying Contact records
-@author            : Stefan Nidzovic
+@author            : Dev4Clouds
 Modification Log:
 Ver   Date         Author          Modification
-1.0   2025-04-25   Stefan Nidzovic   Initial Version
+1.0   2025-04-25   Dev4Clouds   Initial Version
 *********************************************************
 */
 public without sharing class ContactSelector {
@@ -14,7 +14,7 @@ public without sharing class ContactSelector {
     /*********************************************************
      @Method Name    : getContactsByNPNs
      @description    : Returns list of Contacts by d4c_NPN__c field
-     @author         : Stefan Nidzovic
+     @author         : Dev4Clouds
      @param          : npns - Set of unique NPN values
      @return         : List<Contact> - list of Contact records
      *********************************************************

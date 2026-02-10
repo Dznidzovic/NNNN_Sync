@@ -7,10 +7,10 @@ Created Date       : 2025-12-15
                      - Adding product names to License d4c_License_Products__c field
                      - Removing product names from License d4c_License_Products__c field
                      - Maintaining semicolon-separated list of product names
-@author            : Stefan Nidzovic
+@author            : Dev4Clouds
 Modification Log:
 Ver   Date         Author         Modification
-1.0   2025-12-15   Stefan Nidzovic         Initial Version
+1.0   2025-12-15   Dev4Clouds         Initial Version
 *********************************************************
 */
 public with sharing class LicenseProductPicklistService {

@@ -3,11 +3,11 @@
  * Apex Class Name    : NIPREnums
  * Created Date       : 04-13-2025
  * @description       : Enum container class for NIPR API-related constants.
- * @author            : Stefan Nidzovic
+ * @author            : Dev4Clouds
  * Modification Log:
  * Ver   Date         Author                           Modification
- * 1.0   04-13-2025   Stefan Nidzovic                  Initial Version
- * 1.1   10-24-2025   Stefan Nidzovic                  Added SubscriptionOperation enum
+ * 1.0   04-13-2025   Dev4Clouds                  Initial Version
+ * 1.1   10-24-2025   Dev4Clouds                  Added SubscriptionOperation enum
  *********************************************************************
  **/
 public with sharing class NIPREnums {

@@ -5,10 +5,10 @@
  * @description       : Test class for RunEntityInfoReportSchedulable
  *                      Tests the schedulable class that executes
  *                      RunEntityInfoReportBatchable after a delay.
- * @author            : Stefan Nidzovic
+ * @author            : Dev4Clouds
  * Modification Log:
  * Ver   Date         Author         Modification
- * 1.0   2025-12-17   Stefan Nidzovic         Initial Version
+ * 1.0   2025-12-17   Dev4Clouds         Initial Version
  *********************************************************
  **/
 @isTest

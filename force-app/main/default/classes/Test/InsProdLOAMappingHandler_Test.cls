@@ -4,10 +4,10 @@ Apex Class Name    : InsProdLOAMappingHandler_Test
 Created Date       : 2025-12-13
 @description       : Test class for InsuranceProductLOAMappingTriggerHandler.
                      Tests unique identifier generation and orphan LOA matching.
-@author            : Stefan Nidzovic
+@author            : Dev4Clouds
 Modification Log:
 Ver   Date         Author         Modification
-1.0   2025-12-13   Stefan Nidzovic         Initial Version
+1.0   2025-12-13   Dev4Clouds         Initial Version
 *********************************************************
 */
 @isTest

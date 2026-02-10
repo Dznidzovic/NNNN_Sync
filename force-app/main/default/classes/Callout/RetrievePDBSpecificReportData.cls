@@ -5,10 +5,10 @@
  * @description       : Parses SOAP response from PDB Alerts API and extracts Licensing Report data.
  *                      Manual XML Processing using DOM.XMLNode apex classes is required as the api returns MOTM XML response which Apex WebService class can not parse
  *                      The reponse is serialized into LicensingReportDTO apex classes. The DTO contains data about all agents/agencies/carriers and their details, licenses, lines of authority and carrier appointments
- * @author            : Stefan Nidzovic
+ * @author            : Dev4Clouds
  * Modification Log:
  * Ver   Date         Author                   Modification
- * 1.0   03-18-2025   Stefan Nidzovic          Initial Version
+ * 1.0   03-18-2025   Dev4Clouds          Initial Version
  *********************************************************
  **/
 public class RetrievePDBSpecificReportData {

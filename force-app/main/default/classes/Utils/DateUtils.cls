@@ -1,8 +1,8 @@
 /**
  * @description       : 
- * @author            : Stefan Nidzovic
+ * @author            : Dev4Clouds
  * @group             : 
- * @last modified on  : 04-29-2025
+ * @last modified on  : 02-10-2026
  * @last modified by  : Stefan Nidzovic
 **/
 public with sharing class DateUtils {

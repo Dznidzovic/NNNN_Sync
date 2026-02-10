@@ -4,10 +4,10 @@
  * Created Date       : 11-02-2025
  * @description       : Utility class for managing correlation IDs across NIPR transactions
  *                      to track related operations through the entire flow
- * @author            : Stefan Nidzovic
+ * @author            : Dev4Clouds
  * Modification Log:
  * Ver   Date         Author             Modification
- * 1.0   11-02-2025   Stefan Nidzovic    Initial Version
+ * 1.0   11-02-2025   Dev4Clouds    Initial Version
  *********************************************************
  **/
 public with sharing class CorrelationIdUtils {

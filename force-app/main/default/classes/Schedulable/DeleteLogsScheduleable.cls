@@ -3,10 +3,10 @@ Apex Class Name    : DeleteLogsBatchScheduler
 Created Date       : 25-12-2024
 @description       : Scheduler class to invoke the DeleteLogsBatch batch class to delete Logger__c records.
 
-@author            : Stefan Nidzovic
+@author            : Dev4Clouds
 Modification Log:
 Ver   Date         Author                           Modification
-1.0   25-12-2024   Stefan Nidzovic                  Initial Version
+1.0   25-12-2024   Dev4Clouds                  Initial Version
 *********************************************************************/
 global with sharing class DeleteLogsScheduleable implements Schedulable {
     global void execute(SchedulableContext sc) {

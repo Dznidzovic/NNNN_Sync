@@ -4,14 +4,14 @@
  * Created Date       : 04-15-2025
  * @description       : Test Class used for ProducerTriggerHandler class.
  *                      Tests only the business logic found in the Producer Trigger Handler and mocks any other services called from inside
- * @author            : Stefan Nidzovic
+ * @author            : Dev4Clouds
  * Modification Log:
  * Ver   Date         Author                   Modification
- * 1.0   04-15-2025   Stefan Nidzovic          Initial Version
- * 1.1   04-22-2025   Stefan Nidzovic          Added additional test methods for complete coverage
- * 1.2   04-25-2025   Stefan Nidzovic          Added tests for NPN removal logic
- * 2.0   10-27-2025   Stefan Nidzovic          Updated for new SubscriptionServiceExecutorQueueable architecture
- * 2.1   12-17-2025   Stefan Nidzovic                   Added tests for smart scheduling logic
+ * 1.0   04-15-2025   Dev4Clouds          Initial Version
+ * 1.1   04-22-2025   Dev4Clouds          Added additional test methods for complete coverage
+ * 1.2   04-25-2025   Dev4Clouds          Added tests for NPN removal logic
+ * 2.0   10-27-2025   Dev4Clouds          Updated for new SubscriptionServiceExecutorQueueable architecture
+ * 2.1   12-17-2025   Dev4Clouds                   Added tests for smart scheduling logic
  *********************************************************
  **/
 @isTest

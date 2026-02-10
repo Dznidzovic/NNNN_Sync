@@ -5,10 +5,10 @@ Created Date       : 03-16-2025
 @description       : Handles the execution of Apex Triggers by dispatching 
                      them to the appropriate methods in the provided TriggerHandler.
                      Implements the Trigger Dispatcher pattern for modular trigger management.
-@author            : Stefan Nidzovic
+@author            : Dev4Clouds
 Modification Log:
 Ver   Date         Author                               Modification
-1.0   03-16-2025   Stefan Nidzovic                     Initial Version
+1.0   03-16-2025   Dev4Clouds                     Initial Version
 *********************************************************
 */
 public without sharing class TriggerDispatcher {

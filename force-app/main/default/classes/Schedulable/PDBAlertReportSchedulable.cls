@@ -5,10 +5,10 @@
  * @description       : Schedulable class that runs the RunPDBAlertReportBatchable daily
  *                      at 11 AM CT. Also handles scheduling retry attempts when
  *                      reports are not available.
- * @author            : Stefan Nidzovic
+ * @author            : Dev4Clouds
  * Modification Log:
  * Ver   Date         Author                   Modification
- * 1.0   04-29-2025   Stefan Nidzovic          Initial Version
+ * 1.0   04-29-2025   Dev4Clouds          Initial Version
  *********************************************************
  **/
 global class PDBAlertReportSchedulable implements Schedulable {

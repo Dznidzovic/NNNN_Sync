@@ -3,10 +3,10 @@
 Apex Class Name    : LOAInsuranceProductMappingSelector
 Created Date       : 2025-12-15
 @description       : Selector class for querying d4c_LOA_Insurance_Product_Mapping__c records
-@author            : Stefan Nidzovic
+@author            : Dev4Clouds
 Modification Log:
 Ver   Date         Author         Modification
-1.0   2025-12-15   Stefan Nidzovic         Initial Version
+1.0   2025-12-15   Dev4Clouds         Initial Version
 *********************************************************
 */
 public with sharing class LOAInsuranceProductMappingSelector {

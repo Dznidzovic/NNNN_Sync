@@ -3,10 +3,10 @@
 Apex Class Name    : InsuranceProductSelector
 Created Date       : 2025-12-15
 @description       : Selector class for querying d4c_Insurance_Product__c records
-@author            : Stefan Nidzovic
+@author            : Dev4Clouds
 Modification Log:
 Ver   Date         Author         Modification
-1.0   2025-12-15   Stefan Nidzovic         Initial Version
+1.0   2025-12-15   Dev4Clouds         Initial Version
 *********************************************************
 */
 public with sharing class InsuranceProductSelector {

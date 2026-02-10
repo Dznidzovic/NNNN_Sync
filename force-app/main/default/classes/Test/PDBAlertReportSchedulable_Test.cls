@@ -3,10 +3,10 @@
  * Apex Class Name    : PDBAlertReportSchedulable_Test
  * Created Date       : 04-29-2025
  * @description       : Test Class used for PDBAlertReportSchedulable
- * @author            : Stefan Nidzovic
+ * @author            : Dev4Clouds
  * Modification Log:
  * Ver   Date         Author                   Modification
- * 1.0   04-29-2025   Stefan Nidzovic          Initial Version
+ * 1.0   04-29-2025   Dev4Clouds          Initial Version
  *********************************************************
  **/
 @isTest

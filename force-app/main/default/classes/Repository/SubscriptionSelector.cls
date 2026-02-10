@@ -3,11 +3,11 @@
  * Apex Class Name    : SubscriptionSelector
  * Created Date       : 04-23-2025
  * @description       : Selector class holding all the queries used for d4c_Subscription__c and related objects
- * @author            : Stefan Nidzovic
+ * @author            : Dev4Clouds
  * Modification Log:
  * Ver   Date         Author                   Modification
- * 1.0   04-23-2025   Stefan Nidzovic          Initial Version
- * 1.1   10-24-2025   Stefan Nidzovic          Added methods for subscription refactoring
+ * 1.0   04-23-2025   Dev4Clouds          Initial Version
+ * 1.1   10-24-2025   Dev4Clouds          Added methods for subscription refactoring
  *********************************************************
  **/
 public with sharing class SubscriptionSelector {     

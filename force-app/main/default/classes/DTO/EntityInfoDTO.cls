@@ -6,10 +6,10 @@
  *                      This class defines the structure for processing both Individual (Agent) 
  *                      and Firm (Agency) data from NIPR Entity Info API. It maps XML elements
  *                      to Apex objects for easy processing in Salesforce.
- * @author            : Stefan Nidzovic
+ * @author            : Dev4Clouds
  * Modification Log:
  * Ver   Date         Author             Modification
- * 1.0   04-12-2025   Stefan Nidzovic    Initial Version
+ * 1.0   04-12-2025   Dev4Clouds    Initial Version
  *********************************************************
  **/
 public class EntityInfoDTO {

@@ -12,10 +12,10 @@
  *                      - RESUBSCRIBE_TO_DIFFERENT_POOL: Sync - moves producer between subscription pools
  *                      - ADD_NPNS_BULK: Chained - processes allocations one per transaction
  *
- * @author            : Stefan Nidzovic
+ * @author            : Dev4Clouds
  * Modification Log:
  * Ver   Date         Author                   Modification
- * 1.0   2025-12-25   Stefan Nidzovic          Initial Version - Merged orchestrator + executor
+ * 1.0   2025-12-25   Dev4Clouds          Initial Version - Merged orchestrator + executor
  *********************************************************
  **/
 public class SubscriptionServiceExecutorQueueable extends SubscriptionService implements Queueable, Database.AllowsCallouts {
@@ -34,7 +34,7 @@ public class SubscriptionServiceExecutorQueueable extends SubscriptionService im
     private List<NPNWithExcludeFlag> npnsWithFlags;              // For ADD_NPNS_BULK (initial call)
 
     // Selectors
-    private final ProducerSelector producerSelector = new ProducerSelector();
+    private final EntitySelector entitySelector = new EntitySelector();
 
     // ==================== INNER CLASS ====================
 

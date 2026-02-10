@@ -4,10 +4,10 @@ Apex Class Name    : LOAInsProdMappingTriggerHandler_Test
 Created Date       : 2025-12-15
 @description       : Test class for LOAInsuranceProductMappingTriggerHandler.
                      Tests unique identifier auto-generation on insert and update.
-@author            : Stefan Nidzovic
+@author            : Dev4Clouds
 Modification Log:
 Ver   Date         Author         Modification
-1.0   2025-12-15   Stefan Nidzovic         Initial Version
+1.0   2025-12-15   Dev4Clouds         Initial Version
 *********************************************************
 */
 @isTest

@@ -118,4 +118,4 @@ This mapping is **business logic** that each organization must define based on t
 ---
 
 **Date**: January 26, 2026
-**Researched By**: Stefan Nidzovic
+**Researched By**: Dev4Clouds

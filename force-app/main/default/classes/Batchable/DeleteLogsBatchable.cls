@@ -3,10 +3,10 @@ Apex Class Name    : DeleteLogsBatch
 Created Date       : 25-12-2024
 @description       : Deletes all records of the d4c_Log__c object in Salesforce. 
 
-@author            : Stefan Nidzovic
+@author            : Dev4Clouds
 Modification Log:
 Ver   Date         Author                           Modification
-1.0   25-12-2024   Stefan Nidzovic                  Initial Version
+1.0   25-12-2024   Dev4Clouds                  Initial Version
 *********************************************************************/
 public with sharing class DeleteLogsBatchable implements Database.Batchable<SObject>, Database.Stateful {
 

@@ -5,11 +5,11 @@
  * @description       : Batchable class that processes LOA changes and manages
  *                      License-Insurance Product junctions. Delegates to
  *                      LicenseProductCategorizationService for business logic.
- * @author            : Stefan Nidzovic
+ * @author            : Dev4Clouds
  * Modification Log:
  * Ver   Date         Author         Modification
- * 1.0   2025-12-13   Stefan Nidzovic         Initial Version
- * 1.1   2025-12-15   Stefan Nidzovic         Refactored to use services and selectors
+ * 1.0   2025-12-13   Dev4Clouds         Initial Version
+ * 1.1   2025-12-15   Dev4Clouds         Refactored to use services and selectors
  *********************************************************
 **/
 public with sharing class LOAProductCategorizationBatchable implements Database.Batchable<SObject>, Database.Stateful {

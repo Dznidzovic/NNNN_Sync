@@ -4,10 +4,10 @@
  * Created Date       : 10-27-2025
  * @description       : Comprehensive test class for SubscriptionService and SubscriptionServiceExecutorQueueable
  *                      Tests all subscription operations by synchronously executing the orchestrator
- * @author            : Stefan Nidzovic
+ * @author            : Dev4Clouds
  * Modification Log:
  * Ver   Date         Author                   Modification
- * 1.0   10-27-2025   Stefan Nidzovic          Initial Version - Complete refactor test coverage
+ * 1.0   10-27-2025   Dev4Clouds          Initial Version - Complete refactor test coverage
  *********************************************************
  **/
 @isTest

@@ -4,10 +4,10 @@
  * @description       : Trigger handler for d4c_Subscription__c that increments the
  *                      custom settings counter (d4c_NIPRSubscriptionDetails__c.d4c_Latest_Number__c)
  *                      whenever a new subscription is created
- * @author            : Stefan Nidzovic
+ * @author            : Dev4Clouds
  * Modification Log:
  * Ver   Date         Author                   Modification
- * 1.0   2025-12-24   Stefan Nidzovic                   Initial Version
+ * 1.0   2025-12-24   Dev4Clouds                   Initial Version
  *********************************************************
  **/
 public with sharing class SubscriptionTriggerHandler extends BaseTriggerHandler {

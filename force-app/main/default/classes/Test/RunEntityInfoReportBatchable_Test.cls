@@ -6,10 +6,10 @@
  *                      This test ensures the batchable can be executed properly.
  *                      No logic is tested here because the inner service class is
  *                      already unit tested separately.
- * @author            : Stefan Nidzovic
+ * @author            : Dev4Clouds
  * Modification Log:
  * Ver   Date         Author                   Modification
- * 1.0   04-13-2025   Stefan Nidzovic          Initial Version
+ * 1.0   04-13-2025   Dev4Clouds          Initial Version
  *********************************************************
  **/
 @isTest

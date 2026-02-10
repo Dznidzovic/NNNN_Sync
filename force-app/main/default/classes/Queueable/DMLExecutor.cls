@@ -5,10 +5,10 @@
  * @description       : Handles batched execution of Delete and Upsert DML operations. 
  *                      Automatically slices input records into batches and enqueues 
  *                      chained jobs when needed. Uses ListUtils to emulate subList behavior.
- * @author            : Stefan Nidzovic
+ * @author            : Dev4Clouds
  * Modification Log:
  * Ver   Date         Author              Modification
- * 1.0   03-30-2025   Stefan Nidzovic     Initial Version
+ * 1.0   03-30-2025   Dev4Clouds     Initial Version
  *********************************************************
 **/
 public class DMLExecutor implements Queueable {

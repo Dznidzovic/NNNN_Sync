@@ -8,16 +8,16 @@
  *                      Producer status fields as needed.
  *                      Uses Database.Stateful to collect successful NPNs and process
  *                      subscription additions in finish() via SubscriptionServiceExecutorQueueable.
- * @author            : Stefan Nidzovic
+ * @author            : Dev4Clouds
  * Modification Log:
  * Ver   Date         Author              Modification
- * 1.0   04-13-2025   Stefan Nidzovic     Initial Version
- * 2.0   12-25-2025   Stefan Nidzovic     Added Stateful interface for bulk subscription processing
- * 2.1   12-25-2025   Stefan Nidzovic     Refactored to use unified SubscriptionServiceExecutorQueueable
+ * 1.0   04-13-2025   Dev4Clouds     Initial Version
+ * 2.0   12-25-2025   Dev4Clouds     Added Stateful interface for bulk subscription processing
+ * 2.1   12-25-2025   Dev4Clouds     Refactored to use unified SubscriptionServiceExecutorQueueable
  *********************************************************
 **/
 public with sharing class RunEntityInfoReportBatchable implements Database.Batchable<String>, Database.AllowsCallouts, Database.Stateful {
-    private final ProducerSelector producerSelector = new ProducerSelector();
+    private final EntitySelector entitySelector = new EntitySelector();
     private List<String> npnList;
     private final String CLASS_NAME = 'RunEntityInfoReportBatchable';
 

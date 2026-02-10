@@ -3,12 +3,12 @@
  * Apex Class Name    : BaseApiInvoker
  * Created Date       : 11-05-2024
  * @description       : Base class for handling API invocations with different authentication methods.
- * @author            : Stefan Nidzovic
+ * @author            : Dev4Clouds
  * Modification Log:
  * Ver   Date         Author                           Modification
- * 1.0   11-05-2024   Stefan Nidzovic                  Initial Version
- * 2.0   11-13-2024   Stefan Nidzovic                  Implementing other Rest Methods
- * 3.0   12-02-2024   Stefan Nidzovic                  Added validation, enhanced comments, and exceptions.
+ * 1.0   11-05-2024   Dev4Clouds                  Initial Version
+ * 2.0   11-13-2024   Dev4Clouds                  Implementing other Rest Methods
+ * 3.0   12-02-2024   Dev4Clouds                  Added validation, enhanced comments, and exceptions.
  *********************************************************************
  **/
 public virtual class BaseApiInvoker {

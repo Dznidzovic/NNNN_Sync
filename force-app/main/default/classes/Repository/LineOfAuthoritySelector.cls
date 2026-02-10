@@ -3,10 +3,10 @@
 Apex Class Name    : LineOfAuthoritySelector
 Created Date       : 2025-04-09
 @description       : Selector class for querying d4c_LineOfAuthority__c records
-@author            : Uros Markovic
+@author            : Dev4Clouds
 Modification Log:
 Ver   Date         Author         Modification
-1.0   2025-04-09   Uros Markovic  Initial Version
+1.0   2025-04-09   Dev4Clouds  Initial Version
 *********************************************************
 */
 public virtual class LineOfAuthoritySelector {
@@ -36,7 +36,7 @@ public virtual class LineOfAuthoritySelector {
     @Method Name    : getOrphanLoasByStateCodeDesc
     @description    : Retrieves "orphan" LOA records where d4c_LOAMapping__c is null
                       and matching state/code/description values exist
-    @author         : Stefan Nidzovic
+    @author         : Dev4Clouds
     @param          : states - Set of state/province codes
     @param          : codes - Set of LOA codes
     @param          : descriptions - Set of LOA descriptions
@@ -68,7 +68,7 @@ public virtual class LineOfAuthoritySelector {
     /*********************************************************
     @Method Name    : getLoasByMappingIds
     @description    : Retrieves LOA records linked to specific LOA Insurance Product Mapping IDs
-    @author         : Stefan Nidzovic
+    @author         : Dev4Clouds
     @param          : mappingIds - Set of d4c_LOA_Insurance_Product_Mapping__c IDs
     @return         : List<d4c_LineOfAuthority__c> - List of LOA records
     *********************************************************/

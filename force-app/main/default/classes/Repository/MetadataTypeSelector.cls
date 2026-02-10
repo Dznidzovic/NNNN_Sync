@@ -3,10 +3,10 @@
  * Apex Class Name    : MetadataTypeSelector
  * Created Date       : 04-23-2025
  * @description       : Selector class holding all the queries used for custom metadata type objects
- * @author            : Stefan Nidzovic
+ * @author            : Dev4Clouds
  * Modification Log:
  * Ver   Date         Author                   Modification
- * 1.0   04-23-2025   Stefan Nidzovic          Initial Version
+ * 1.0   04-23-2025   Dev4Clouds          Initial Version
  * 1.1   04-30-2025   HipTen Admin             Added Logger configuration selector
  *********************************************************
  **/
