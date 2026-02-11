@@ -131,8 +131,8 @@ private class ProcessEntityInfoApiService_Test {
 
     private static void assertInitialRecordCounts() {
         System.assertEquals(1, getCount('d4c_Entity__c'), 'Should have one initial Entity');
-        System.assertEquals(2, getCount('d4c_ProducerAddress__c'), 'Should have two initial Entity Addresses');
-        System.assertEquals(5, getCount('d4c_ProducerCommunication__c'), 'Should have five initial Entity Communications');
+        System.assertEquals(2, getCount('d4c_NIPR_Address__c'), 'Should have two initial Entity Addresses');
+        System.assertEquals(5, getCount('d4c_NIPR_Communication__c'), 'Should have five initial Entity Communications');
         System.assertEquals(2, getCount('d4c_License__c'), 'Should have two initial Licenses');
         System.assertEquals(3, getCount('d4c_LineOfAuthority__c', 'WHERE d4c_License__c != NULL'), 'Should have three initial License Lines of Authority');
         System.assertEquals(2, getCount('d4c_Carrier__c'), 'Should have two initial Carriers');
@@ -142,8 +142,8 @@ private class ProcessEntityInfoApiService_Test {
     
     private static void assertRecordCountsIndividualNode() {
         System.assertEquals(1, getCount('d4c_Entity__c'), 'Should create one Entity');
-        System.assertEquals(3, getCount('d4c_ProducerAddress__c'), 'Should create three Entity Addresses');
-        System.assertEquals(8, getCount('d4c_ProducerCommunication__c'), 'Should create eight Entity Communications');
+        System.assertEquals(3, getCount('d4c_NIPR_Address__c'), 'Should create three Entity Addresses');
+        System.assertEquals(8, getCount('d4c_NIPR_Communication__c'), 'Should create eight Entity Communications');
         System.assertEquals(3, getCount('d4c_License__c'), 'Should create three Licenses');
         System.assertEquals(5, getCount('d4c_LineOfAuthority__c', 'WHERE d4c_License__c != NULL'), 'Should create five License Lines of Authority');
         System.assertEquals(2, getCount('d4c_Carrier__c'), 'Should create two Carriers');
@@ -153,8 +153,8 @@ private class ProcessEntityInfoApiService_Test {
 
     private static void assertRecordCountsFirmNode() {
         System.assertEquals(1, getCount('d4c_Entity__c'), 'Should create one Entity');
-        System.assertEquals(3, getCount('d4c_ProducerAddress__c'), 'Should create three Entity Addresses');
-        System.assertEquals(8, getCount('d4c_ProducerCommunication__c'), 'Should create five Entity Communications');
+        System.assertEquals(3, getCount('d4c_NIPR_Address__c'), 'Should create three Entity Addresses');
+        System.assertEquals(8, getCount('d4c_NIPR_Communication__c'), 'Should create five Entity Communications');
         System.assertEquals(3, getCount('d4c_License__c'), 'Should create three Licenses');
         System.assertEquals(5, getCount('d4c_LineOfAuthority__c', 'WHERE d4c_License__c != NULL'), 'Should create five License Lines of Authority');
         System.assertEquals(2, getCount('d4c_Carrier__c'), 'Should create two Carriers');
@@ -202,9 +202,9 @@ private class ProcessEntityInfoApiService_Test {
 
     private static void assertIndividualProducerAddressIds() {
         Set<String> expectedIds = new Set<String>{
-            '123MainStreetApt4BBuildingCLosAngelesCA90001U.S.A.Residential12345678',
-            '456ParkAvenueSuite789NewYorkNY10022U.S.A.Business12345678',
-            '789BroadwayFloor10NewYorkNY10003U.S.A.Mailing12345678'
+            '123MainStreetApt4BBuildingCLosAngelesCA90001U.S.A.Residential',
+            '456ParkAvenueSuite789NewYorkNY10022U.S.A.Business',
+            '789BroadwayFloor10NewYorkNY10003U.S.A.Mailing'
         };
         
         Set<String> actualIds = queryProducerAddressIds();
@@ -217,14 +217,14 @@ private class ProcessEntityInfoApiService_Test {
 
     private static void assertIndividualProducerCommunicationIds() {
         Set<String> expectedIds = new Set<String>{
-            '+1-213-555-1234Wired12345678',
-            '+1-213-555-5678Fax12345678',
-            'mjohnson@example.comBusiness12345678',
-            '+1-212-555-9876Wired12345678',
-            '+1-212-555-5432Fax12345678',
-            'michael.johnson@example.comBusiness12345678',
-            '+1-917-555-1111Wired12345678',
-            'm.johnson.ny@example.comBusiness12345678'
+            '+1-213-555-1234Wired',
+            '+1-213-555-5678Fax',
+            'mjohnson@example.comBusiness',
+            '+1-212-555-9876Wired',
+            '+1-212-555-5432Fax',
+            'michael.johnson@example.comBusiness',
+            '+1-917-555-1111Wired',
+            'm.johnson.ny@example.comBusiness'
         };
         
         Set<String> actualIds = queryProducerCommunicationIds();
@@ -343,8 +343,8 @@ private class ProcessEntityInfoApiService_Test {
     }
 
     private static void assertIndividualProducerAddressFields() {
-        d4c_ProducerAddress__c address = queryProducerAddress();
-        
+        d4c_NIPR_Address__c address = queryProducerAddress();
+
         System.assertEquals('Residential', address.d4c_AddressType__c, 'Address type should be Residential');
         System.assertEquals('123 Main Street', address.d4c_AddressLineOne__c, 'Address line 1 should match');
         System.assertEquals('Apt 4B', address.d4c_AddressLineTwo__c, 'Address line 2 should match');
@@ -357,11 +357,11 @@ private class ProcessEntityInfoApiService_Test {
     }
 
     private static void assertIndividualProducerCommunicationFields() {
-        d4c_ProducerCommunication__c phone = queryEntityPhone();
+        d4c_NIPR_Communication__c phone = queryEntityPhone();
         System.assertEquals('Wired', phone.d4c_PhoneType__c, 'Phone type should be Wired');
         System.assertEquals('+1-213-555-1234', phone.d4c_PhoneNumber__c, 'Phone number should match');
-        
-        d4c_ProducerCommunication__c email = queryEntityEmail();
+
+        d4c_NIPR_Communication__c email = queryEntityEmail();
         System.assertEquals('Business', email.d4c_EmailType__c, 'Email type should be Business');
         System.assertEquals('mjohnson@example.com', email.d4c_EmailAddress__c, 'Email address should match');
     }
@@ -430,8 +430,8 @@ private class ProcessEntityInfoApiService_Test {
     // ASSERT METHODS FOR LARGE PRODUCER TESTS
     private static void assertRecordCountsFirmNodeLargeEntity() {
         System.assertEquals(1, getCount('d4c_Entity__c'), 'Should create one Entity');
-        System.assertEquals(3, getCount('d4c_ProducerAddress__c'), 'Should create three Entity Addresses');
-        System.assertEquals(8, getCount('d4c_ProducerCommunication__c'), 'Should create five Entity Communications');
+        System.assertEquals(3, getCount('d4c_NIPR_Address__c'), 'Should create three Entity Addresses');
+        System.assertEquals(8, getCount('d4c_NIPR_Communication__c'), 'Should create five Entity Communications');
         System.assertEquals(3, getCount('d4c_License__c'), 'Should create three Licenses');
         System.assertEquals(5, getCount('d4c_LineOfAuthority__c', 'WHERE d4c_License__c != NULL'), 'Should create five License Lines of Authority');
         System.assertEquals(0, getCount('d4c_Carrier__c'), 'Should create 0 Carriers');
@@ -478,15 +478,15 @@ private class ProcessEntityInfoApiService_Test {
     
     private static Set<String> queryProducerAddressIds() {
         Set<String> ids = new Set<String>();
-        for (d4c_ProducerAddress__c address : [SELECT d4c_UniqueIdentifier__c FROM d4c_ProducerAddress__c]) {
+        for (d4c_NIPR_Address__c address : [SELECT d4c_UniqueIdentifier__c FROM d4c_NIPR_Address__c]) {
             ids.add(address.d4c_UniqueIdentifier__c);
         }
         return ids;
     }
-    
+
     private static Set<String> queryProducerCommunicationIds() {
         Set<String> ids = new Set<String>();
-        for (d4c_ProducerCommunication__c comm : [SELECT d4c_UniqueIdentifier__c FROM d4c_ProducerCommunication__c]) {
+        for (d4c_NIPR_Communication__c comm : [SELECT d4c_UniqueIdentifier__c FROM d4c_NIPR_Communication__c]) {
             ids.add(comm.d4c_UniqueIdentifier__c);
         }
         return ids;
@@ -550,54 +550,78 @@ private class ProcessEntityInfoApiService_Test {
         ];
     }
     
-    private static d4c_ProducerAddress__c queryProducerAddress() {
+    private static d4c_NIPR_Address__c queryProducerAddress() {
+        // Query via junction to get address ID for entity
+        d4c_Entity_Address_Junction__c junction = [
+            SELECT d4c_NIPR_Address__c
+            FROM d4c_Entity_Address_Junction__c
+            WHERE d4c_Entity__r.d4c_NPN__c = :AGENT_NPN
+            AND d4c_NIPR_Address__r.d4c_AddressType__c = 'Residential'
+            LIMIT 1
+        ];
+
+        // Query the address record
         return [
-            SELECT 
-                d4c_AddressType__c, 
-                d4c_AddressLineOne__c, 
-                d4c_AddressLineTwo__c, 
+            SELECT
+                d4c_AddressType__c,
+                d4c_AddressLineOne__c,
+                d4c_AddressLineTwo__c,
                 d4c_AddressLineThree__c,
-                d4c_City__c, 
-                d4c_State__c, 
-                d4c_PostalCode__c, 
-                d4c_CountryCode__c, 
+                d4c_City__c,
+                d4c_State__c,
+                d4c_PostalCode__c,
+                d4c_CountryCode__c,
                 d4c_AsOfDate__c
-            FROM 
-                d4c_ProducerAddress__c
-            WHERE 
-                d4c_Entity__r.d4c_NPN__c = :AGENT_NPN 
-            AND 
-                d4c_AddressType__c = 'Residential'
+            FROM
+                d4c_NIPR_Address__c
+            WHERE
+                Id = :junction.d4c_NIPR_Address__c
             LIMIT 1
         ];
     }
     
-    private static d4c_ProducerCommunication__c queryEntityPhone() {
+    private static d4c_NIPR_Communication__c queryEntityPhone() {
+        // Query via junction to get communication ID for entity
+        d4c_Entity_Communication_Junction__c junction = [
+            SELECT d4c_NIPR_Communication__c
+            FROM d4c_Entity_Communication_Junction__c
+            WHERE d4c_Entity__r.d4c_NPN__c = :AGENT_NPN
+            AND d4c_NIPR_Communication__r.d4c_PhoneNumber__c = '+1-213-555-1234'
+            LIMIT 1
+        ];
+
+        // Query the communication record
         return [
-            SELECT 
-                d4c_PhoneType__c, 
+            SELECT
+                d4c_PhoneType__c,
                 d4c_PhoneNumber__c
-            FROM 
-                d4c_ProducerCommunication__c
-            WHERE 
-                d4c_Entity__r.d4c_NPN__c = :AGENT_NPN
-            AND 
-                d4c_PhoneNumber__c = '+1-213-555-1234'
+            FROM
+                d4c_NIPR_Communication__c
+            WHERE
+                Id = :junction.d4c_NIPR_Communication__c
             LIMIT 1
         ];
     }
     
-    private static d4c_ProducerCommunication__c queryEntityEmail() {
+    private static d4c_NIPR_Communication__c queryEntityEmail() {
+        // Query via junction to get communication ID for entity
+        d4c_Entity_Communication_Junction__c junction = [
+            SELECT d4c_NIPR_Communication__c
+            FROM d4c_Entity_Communication_Junction__c
+            WHERE d4c_Entity__r.d4c_NPN__c = :AGENT_NPN
+            AND d4c_NIPR_Communication__r.d4c_EmailAddress__c = 'mjohnson@example.com'
+            LIMIT 1
+        ];
+
+        // Query the communication record
         return [
-            SELECT 
-                d4c_EmailType__c, 
+            SELECT
+                d4c_EmailType__c,
                 d4c_EmailAddress__c
-            FROM 
-                d4c_ProducerCommunication__c
-            WHERE 
-                d4c_Entity__r.d4c_NPN__c = :AGENT_NPN
-            AND 
-                d4c_EmailAddress__c = 'mjohnson@example.com'
+            FROM
+                d4c_NIPR_Communication__c
+            WHERE
+                Id = :junction.d4c_NIPR_Communication__c
             LIMIT 1
         ];
     }

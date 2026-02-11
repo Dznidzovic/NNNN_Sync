@@ -53,8 +53,8 @@ private class ProcessPDBAlertReportService_Test {
             );
 
 
-        // Assert that desired counts of records are currently in the database
-        assertRecordCounts();
+        // Assert that desired counts of records are currently in the database (from test setup)
+        assertRecordCountsFromTestSetup();
 
         Test.setMock(HttpCalloutMock.class, mockFactory);
 
@@ -140,8 +140,8 @@ private class ProcessPDBAlertReportService_Test {
     // ASSERT METHODS
     private static void assertRecordCounts() {
         System.assertEquals(5, getCount('d4c_Entity__c'), 'Entity count mismatch');
-        System.assertEquals(7, getCount('d4c_ProducerAddress__c'), 'Address count mismatch');
-        System.assertEquals(13, getCount('d4c_ProducerCommunication__c'), 'Communications count mismatch');
+        System.assertEquals(5, getCount('d4c_NIPR_Address__c'), 'Address count mismatch - Junction model deduplicates addresses via External ID');
+        System.assertEquals(9, getCount('d4c_NIPR_Communication__c'), 'Communications count mismatch - Junction model deduplicates communications via External ID');
         System.assertEquals(1, getCount('d4c_Carrier__c'), 'Carrier count mismatch');
         System.assertEquals(12, getCount('d4c_License__c'), 'License count mismatch');
         System.assertEquals(36, getCount('d4c_LineOfAuthority__c'), 'LOA count mismatch - only License LOAs, no Carrier Appointment LOAs');
@@ -149,11 +149,22 @@ private class ProcessPDBAlertReportService_Test {
         System.assertEquals(5, getCount('d4c_CarrierAppointment__c', 'WHERE d4c_LineOfAuthorityCode__c != NULL'), 'Should have 5 carrier appointments with LOA fields populated (1 appointment has no LOA data)');
     }
 
+    // Assert counts for test setup data (before importData runs)
+    private static void assertRecordCountsFromTestSetup() {
+        System.assertEquals(5, getCount('d4c_Entity__c'), 'Entity count mismatch');
+        System.assertEquals(5, getCount('d4c_NIPR_Address__c'), 'Address count from test setup - 5 unique addresses after deduplication (7 created, 2 duplicates removed)');
+        System.assertEquals(9, getCount('d4c_NIPR_Communication__c'), 'Communications count from test setup - 9 unique communications after deduplication (13 created, 4 duplicates removed)');
+        System.assertEquals(1, getCount('d4c_Carrier__c'), 'Carrier count mismatch');
+        System.assertEquals(12, getCount('d4c_License__c'), 'License count mismatch');
+        System.assertEquals(36, getCount('d4c_LineOfAuthority__c'), 'LOA count mismatch');
+        System.assertEquals(6, getCount('d4c_CarrierAppointment__c'), 'Appointment count mismatch');
+    }
+
     // ASSERT METHODS
     private static void assertRecordCountsMixedDelete() {
         System.assertEquals(5, getCount('d4c_Entity__c'), 'Entity count mismatch');
-        System.assertEquals(7, getCount('d4c_ProducerAddress__c'), 'Address count mismatch');
-        System.assertEquals(13, getCount('d4c_ProducerCommunication__c'), 'Communications count mismatch');
+        System.assertEquals(5, getCount('d4c_NIPR_Address__c'), 'Address count mismatch - Junction model deduplicates addresses via External ID');
+        System.assertEquals(9, getCount('d4c_NIPR_Communication__c'), 'Communications count mismatch - Junction model deduplicates communications via External ID');
         System.assertEquals(1, getCount('d4c_Carrier__c'), 'Carrier count mismatch');
         System.assertEquals(9, getCount('d4c_License__c'), 'License count mismatch');
         System.assertEquals(3, getCount('d4c_CarrierAppointment__c'), 'Appointment count mismatch');
@@ -161,10 +172,11 @@ private class ProcessPDBAlertReportService_Test {
 
     private static void assertRecordCountsPerParentObject() {
         // Count via junction objects (addresses/communications are now standalone)
-        System.assertEquals(9, getCommunicationCountForEntity('22138233'));
-        System.assertEquals(4, getCommunicationCountForEntity('22166967'));
-        System.assertEquals(4, getAddressCountForEntity('22138233'));
-        System.assertEquals(3, getAddressCountForEntity('22166967'));
+        // Junction counts must match old Master-Detail counts (see PDB_ALERT_TEST_DATA_COUNTS.md)
+        System.assertEquals(9, getCommunicationCountForEntity('22138233'), 'Communication count for entity 22138233 - 5 exclusive + 4 shared = 9 total junctions');
+        System.assertEquals(4, getCommunicationCountForEntity('22166967'), 'Communication count for entity 22166967 - 0 exclusive + 4 shared = 4 total junctions');
+        System.assertEquals(4, getAddressCountForEntity('22138233'), 'Address count for entity 22138233 - 1 exclusive + 3 shared = 4 total junctions');
+        System.assertEquals(3, getAddressCountForEntity('22166967'), 'Address count for entity 22166967 - 1 exclusive + 2 shared = 3 total junctions');
         System.assertEquals(4, getCount('d4c_LineOfAuthority__c', 'WHERE d4c_License__r.d4c_UniqueIdentifier__c = \'675353522CA3\''));
         System.assertEquals(2, getCount('d4c_CarrierAppointment__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'22138233\''));
         System.assertEquals(1, getCount('d4c_CarrierAppointment__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'22166967\''));
@@ -172,8 +184,8 @@ private class ProcessPDBAlertReportService_Test {
 
     private static void assertRecordCountsInvalidResponse() {
         System.assertEquals(0, getCount('d4c_Entity__c'), 'Entity count mismatch');
-        System.assertEquals(0, getCount('d4c_ProducerAddress__c'), 'Address count mismatch');
-        System.assertEquals(0, getCount('d4c_ProducerCommunication__c'), 'Communications count mismatch');
+        System.assertEquals(0, getCount('d4c_NIPR_Address__c'), 'Address count mismatch');
+        System.assertEquals(0, getCount('d4c_NIPR_Communication__c'), 'Communications count mismatch');
         System.assertEquals(0, getCount('d4c_Carrier__c'), 'Carrier count mismatch');
         System.assertEquals(0, getCount('d4c_License__c'), 'License count mismatch');
         System.assertEquals(0, getCount('d4c_LineOfAuthority__c'), 'LOA count mismatch - only License LOAs');
@@ -324,44 +336,42 @@ private class ProcessPDBAlertReportService_Test {
     }
     
 private static void assertProducerCommunicationIds() {
+        // Junction model: Communications are standalone without NPN in External ID
+        // Shared communications are deduplicated (e.g., +1-219-313-6370Wired used by both entities)
         Set<String> producerCommunicationIds = new Set<String>{
-            '+1-219-313-6379Wired22138233',
-            '+1-419-906-3223Fax22138233',
-            '+1-419-906-3221Wired22138233',
-            'silvana1.zapoticky@cblmaycfqw.comBusiness22138233',
-            'silvana2.zapoticky@cblmaycfqw.comPersonal22138233',
-            '+1-219-313-6370Wired22138233',
-            '+1-419-906-3229Fax22138233',
-            'silvana3.zapoticky@cblmaycfqw.comBusiness22138233',
-            'silvana4.zapoticky@cblmaycfqw.comPersonal22138233',
-            '+1-219-313-6370Wired22166967',
-            '+1-419-906-3229Fax22166967',
-            'silvana3.zapoticky@cblmaycfqw.comBusiness22166967',
-            'silvana4.zapoticky@cblmaycfqw.comPersonal22166967'
+            '+1-219-313-6379Wired',
+            '+1-419-906-3223Fax',
+            '+1-419-906-3221Wired',
+            'silvana1.zapoticky@cblmaycfqw.comBusiness',
+            'silvana2.zapoticky@cblmaycfqw.comPersonal',
+            '+1-219-313-6370Wired',  // Shared by both entities
+            '+1-419-906-3229Fax',  // Shared by both entities
+            'silvana3.zapoticky@cblmaycfqw.comBusiness',  // Shared by both entities
+            'silvana4.zapoticky@cblmaycfqw.comPersonal'  // Shared by both entities
         };
     
-        List<d4c_ProducerCommunication__c> communications = getAllProducerCommunications();
+        List<d4c_NIPR_Communication__c> communications = getAllProducerCommunications();
 
-        for (d4c_ProducerCommunication__c comm : communications) {
+        for (d4c_NIPR_Communication__c comm : communications) {
             System.assert(producerCommunicationIds.contains(comm.d4c_UniqueIdentifier__c),
                 'Unexpected entity communication ID: ' + comm.d4c_UniqueIdentifier__c);
         }
     }
     
     private static void assertProducerAddressIds() {
+        // Junction model: Addresses are standalone without NPN in External ID
+        // Shared addresses are deduplicated
         Set<String> producerAddressIds = new Set<String>{
-            '245FrancisLewisBlvd#9536GardenaCA90248U.S.A.Mailing22138233',
-            '245FrancisLewisBlvd#9536GardenaCA90248U.S.A.Residential22138233',
-            '7SeBishopAve#9SanBernardinoCA92410U.S.A.Mailing22138233',
-            '245FrancisLewisBlvd#9536GardenaCA90248U.S.A.Physical22138233',
-            '7SeBishopAve#9SanBernardinoCA92410U.S.A.Mailing22166967',
-            '245FrancisLewisBlvd#9536GardenaCA90248U.S.A.Physical22166967',
-            '7SeBishopAve#9SanBernardinoCA92410U.S.A.Principal22166967'
+            '245FrancisLewisBlvd#9536GardenaCA90248U.S.A.Mailing',
+            '245FrancisLewisBlvd#9536GardenaCA90248U.S.A.Residential',
+            '7SeBishopAve#9SanBernardinoCA92410U.S.A.Mailing',  // Shared by both entities
+            '245FrancisLewisBlvd#9536GardenaCA90248U.S.A.Physical',  // Shared by both entities
+            '7SeBishopAve#9SanBernardinoCA92410U.S.A.Principal'
         };
 
-        List<d4c_ProducerAddress__c> addresses = getAllProducerAddresses();
+        List<d4c_NIPR_Address__c> addresses = getAllProducerAddresses();
 
-        for (d4c_ProducerAddress__c address : addresses) {
+        for (d4c_NIPR_Address__c address : addresses) {
             System.assert(producerAddressIds.contains(address.d4c_UniqueIdentifier__c),
                 'Unexpected entity address ID: ' + address.d4c_UniqueIdentifier__c);
         }
@@ -452,22 +462,24 @@ private static void assertProducerCommunicationIds() {
     
     private static void assertProducerCommunicationFields() {
         d4c_Entity__c entity = getEntityByNPN('22138233');
-        
+
         // Assert Phone communication data
-        d4c_ProducerCommunication__c phoneComm = getProducerCommunicationByIdentifier('+1-219-313-6379Wired22138233');
-        
-        System.assertEquals('+1-219-313-6379Wired22138233', phoneComm.d4c_UniqueIdentifier__c, 'Incorrect Unique Identifier for Phone Communication');
+        // Junction model: External ID is phoneNumber + type (no NPN suffix)
+        d4c_NIPR_Communication__c phoneComm = getProducerCommunicationByIdentifier('+1-219-313-6379Wired');
+
+        System.assertEquals('+1-219-313-6379Wired', phoneComm.d4c_UniqueIdentifier__c, 'Incorrect Unique Identifier for Phone Communication');
         System.assertEquals('Wired', phoneComm.d4c_PhoneType__c, 'Incorrect Phone Type');
         System.assertEquals('+1-219-313-6379', phoneComm.d4c_PhoneNumber__c, 'Incorrect Phone Number');
-        System.assertEquals(entity.Id, phoneComm.d4c_Entity__c, 'Incorrect Entity');
-        
+        // Note: Communication is now standalone - entity relationship via junction
+
         // Assert Email Communication data
-        d4c_ProducerCommunication__c emailComm = getProducerCommunicationByIdentifier('silvana1.zapoticky@cblmaycfqw.comBusiness22138233');
-        
-        System.assertEquals('silvana1.zapoticky@cblmaycfqw.comBusiness22138233', emailComm.d4c_UniqueIdentifier__c, 'Incorrect Unique Identifier for Email Communication');
+        // Junction model: External ID is email + type (no NPN suffix)
+        d4c_NIPR_Communication__c emailComm = getProducerCommunicationByIdentifier('silvana1.zapoticky@cblmaycfqw.comBusiness');
+
+        System.assertEquals('silvana1.zapoticky@cblmaycfqw.comBusiness', emailComm.d4c_UniqueIdentifier__c, 'Incorrect Unique Identifier for Email Communication');
         System.assertEquals('Business', emailComm.d4c_EmailType__c, 'Incorrect Email Type');
         System.assertEquals('silvana1.zapoticky@cblmaycfqw.com', emailComm.d4c_EmailAddress__c, 'Incorrect Email Address');
-        System.assertEquals(entity.Id, emailComm.d4c_Entity__c, 'Incorrect Entity');
+        // Note: Communication is now standalone - entity relationship via junction
     }
     
     private static void assertCarrierFields() {
@@ -599,37 +611,36 @@ private static void assertProducerCommunicationIds() {
         ];
     }
     
-    private static List<d4c_ProducerCommunication__c> getAllProducerCommunications() {
+    private static List<d4c_NIPR_Communication__c> getAllProducerCommunications() {
         return [
             SELECT 
                 Id, 
                 d4c_UniqueIdentifier__c 
-            FROM d4c_ProducerCommunication__c
+            FROM d4c_NIPR_Communication__c
         ];
     }
     
-    private static d4c_ProducerCommunication__c getProducerCommunicationByIdentifier(String identifier) {
+    private static d4c_NIPR_Communication__c getProducerCommunicationByIdentifier(String identifier) {
         return [
-            SELECT 
-                Id, 
-                d4c_UniqueIdentifier__c, 
-                d4c_PhoneType__c, 
-                d4c_PhoneNumber__c, 
-                d4c_EmailType__c, 
-                d4c_EmailAddress__c, 
-                d4c_Entity__c
-            FROM d4c_ProducerCommunication__c
+            SELECT
+                Id,
+                d4c_UniqueIdentifier__c,
+                d4c_PhoneType__c,
+                d4c_PhoneNumber__c,
+                d4c_EmailType__c,
+                d4c_EmailAddress__c
+            FROM d4c_NIPR_Communication__c
             WHERE d4c_UniqueIdentifier__c = :identifier
             LIMIT 1
         ];
     }
     
-    private static List<d4c_ProducerAddress__c> getAllProducerAddresses() {
+    private static List<d4c_NIPR_Address__c> getAllProducerAddresses() {
         return [
             SELECT 
                 Id, 
                 d4c_UniqueIdentifier__c 
-            FROM d4c_ProducerAddress__c
+            FROM d4c_NIPR_Address__c
         ];
     }
     

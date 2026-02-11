@@ -94,10 +94,10 @@ private class TestDataFactory {
 	}
 
     @TestVisible
-    private static d4c_ProducerAddress__c createProducerAddress(Id entityId, String addressType, String addressLineText, String uniqueId) {
+    private static d4c_NIPR_Address__c createProducerAddress(Id entityId, String addressType, String addressLineText, String uniqueId) {
 		// Note: Address is now standalone - no direct Entity relationship
 		// Use createEntityAddressJunction() to link Entity to Address
-		return new d4c_ProducerAddress__c(
+		return new d4c_NIPR_Address__c(
 			d4c_UniqueIdentifier__c = uniqueId,
 			d4c_AddressType__c = addressType,
 			d4c_AddressLineOne__c= addressLineText
@@ -105,10 +105,10 @@ private class TestDataFactory {
 	}
 
     @TestVisible
-    private static d4c_ProducerCommunication__c createPhoneCommunication(Id entityId, String phoneNumber, String phoneType, String uniqueId ) {
+    private static d4c_NIPR_Communication__c createPhoneCommunication(Id entityId, String phoneNumber, String phoneType, String uniqueId ) {
 		// Note: Communication is now standalone - no direct Entity relationship
 		// Use createEntityCommunicationJunction() to link Entity to Communication
-		return new d4c_ProducerCommunication__c(
+		return new d4c_NIPR_Communication__c(
 			d4c_UniqueIdentifier__c = uniqueId,
 			d4c_PhoneNumber__c = phoneNumber,
 			d4c_PhoneType__c = phoneType
@@ -116,10 +116,10 @@ private class TestDataFactory {
 	}
 
     @TestVisible
-    private static d4c_ProducerCommunication__c createEmailCommunication(Id entityId, String emailAddress, String emailType, String uniqueId) {
+    private static d4c_NIPR_Communication__c createEmailCommunication(Id entityId, String emailAddress, String emailType, String uniqueId) {
 		// Note: Communication is now standalone - no direct Entity relationship
 		// Use createEntityCommunicationJunction() to link Entity to Communication
-		return new d4c_ProducerCommunication__c(
+		return new d4c_NIPR_Communication__c(
 			d4c_UniqueIdentifier__c = uniqueId,
 			d4c_EmailAddress__c = emailAddress,
 			d4c_EmailType__c = emailType
@@ -216,44 +216,112 @@ private class TestDataFactory {
 
 		Id carrierId = carriers[0].Id;
 
-		// Create Addresses
-		List<d4c_ProducerAddress__c> addresses = new List<d4c_ProducerAddress__c>{
-			createProducerAddress(entityIds.get('22138233'), 'Mailing', '245', '245FrancisLewisBlvd#9536GardenaCA90248U.S.A.Mailing22138233'),
-			createProducerAddress(entityIds.get('22138233'), 'Residential', '245', '245FrancisLewisBlvd#9536GardenaCA90248U.S.A.Residential22138233'),
-			createProducerAddress(entityIds.get('22138233'), 'Physical', '245', '245FrancisLewisBlvd#9536GardenaCA90248U.S.A.Physical22138233'),
-			createProducerAddress(entityIds.get('22138233'), 'Mailing', '7', '7SeBishopAve#9SanBernardinoCA92410U.S.A.Mailing22138233'),
-			createProducerAddress(entityIds.get('22166967'), 'Mailing', '7', '7SeBishopAve#9SanBernardinoCA92410U.S.A.Mailing22166967'),
-			createProducerAddress(entityIds.get('22166967'), 'Physical', '245', '245FrancisLewisBlvd#9536GardenaCA90248U.S.A.Physical22166967'),
-			createProducerAddress(entityIds.get('22166967'), 'Principal', '7', '7SeBishopAve#9SanBernardinoCA92410U.S.A.Principal22166967')
+		// Create Addresses (junction model: External IDs without NPN suffix)
+		List<d4c_NIPR_Address__c> addresses = new List<d4c_NIPR_Address__c>{
+			createProducerAddress(entityIds.get('22138233'), 'Mailing', '245', '245FrancisLewisBlvd#9536GardenaCA90248U.S.A.Mailing'),
+			createProducerAddress(entityIds.get('22138233'), 'Residential', '245', '245FrancisLewisBlvd#9536GardenaCA90248U.S.A.Residential'),
+			createProducerAddress(entityIds.get('22138233'), 'Physical', '245', '245FrancisLewisBlvd#9536GardenaCA90248U.S.A.Physical'),
+			createProducerAddress(entityIds.get('22138233'), 'Mailing', '7', '7SeBishopAve#9SanBernardinoCA92410U.S.A.Mailing'),
+			createProducerAddress(entityIds.get('22166967'), 'Mailing', '7', '7SeBishopAve#9SanBernardinoCA92410U.S.A.Mailing'),
+			createProducerAddress(entityIds.get('22166967'), 'Physical', '245', '245FrancisLewisBlvd#9536GardenaCA90248U.S.A.Physical'),
+			createProducerAddress(entityIds.get('22166967'), 'Principal', '7', '7SeBishopAve#9SanBernardinoCA92410U.S.A.Principal')
 		};
 
-		insert addresses;
+		// Junction model: Deduplicate addresses by External ID, then upsert
+		Map<String, d4c_NIPR_Address__c> uniqueAddresses = new Map<String, d4c_NIPR_Address__c>();
+		for (d4c_NIPR_Address__c addr : addresses) {
+			uniqueAddresses.put(addr.d4c_UniqueIdentifier__c, addr);
+		}
+		List<d4c_NIPR_Address__c> deduplicatedAddresses = uniqueAddresses.values();
+		Database.upsert(deduplicatedAddresses, d4c_NIPR_Address__c.d4c_UniqueIdentifier__c, true);
 
-		createdRecords.put('d4c_ProducerAddress__c', addresses);
+		createdRecords.put('d4c_NIPR_Address__c', deduplicatedAddresses);
 
-		// Create Entity Communications
-		List<d4c_ProducerCommunication__c> communications = new List<d4c_ProducerCommunication__c>{
+		// Create Entity Communications (junction model: External IDs without NPN suffix)
+		List<d4c_NIPR_Communication__c> communications = new List<d4c_NIPR_Communication__c>{
 			// Entity: 22138233
-			createPhoneCommunication(entityIds.get('22138233'), '+1-219-313-6379', 'Wired', '+1-219-313-6379Wired22138233'),
-			createPhoneCommunication(entityIds.get('22138233'), '+1-419-906-3223', 'Fax', '+1-419-906-3223Fax22138233'),
-			createPhoneCommunication(entityIds.get('22138233'), '+1-419-906-3221', 'Wired', '+1-419-906-3221Wired22138233'),
-			createEmailCommunication(entityIds.get('22138233'), 'silvana1.zapoticky@cblmaycfqw.com', 'Business', 'silvana1.zapoticky@cblmaycfqw.comBusiness22138233'),
-			createEmailCommunication(entityIds.get('22138233'), 'silvana2.zapoticky@cblmaycfqw.com', 'Personal', 'silvana2.zapoticky@cblmaycfqw.comPersonal22138233'),
-			createPhoneCommunication(entityIds.get('22138233'), '+1-219-313-6370', 'Wired', '+1-219-313-6370Wired22138233'),
-			createPhoneCommunication(entityIds.get('22138233'), '+1-419-906-3229', 'Fax', '+1-419-906-3229Fax22138233'),
-			createEmailCommunication(entityIds.get('22138233'), 'silvana3.zapoticky@cblmaycfqw.com', 'Business', 'silvana3.zapoticky@cblmaycfqw.comBusiness22138233'),
-			createEmailCommunication(entityIds.get('22138233'), 'silvana4.zapoticky@cblmaycfqw.com', 'Personal', 'silvana4.zapoticky@cblmaycfqw.comPersonal22138233'),
-		
+			createPhoneCommunication(entityIds.get('22138233'), '+1-219-313-6379', 'Wired', '+1-219-313-6379Wired'),
+			createPhoneCommunication(entityIds.get('22138233'), '+1-419-906-3223', 'Fax', '+1-419-906-3223Fax'),
+			createPhoneCommunication(entityIds.get('22138233'), '+1-419-906-3221', 'Wired', '+1-419-906-3221Wired'),
+			createEmailCommunication(entityIds.get('22138233'), 'silvana1.zapoticky@cblmaycfqw.com', 'Business', 'silvana1.zapoticky@cblmaycfqw.comBusiness'),
+			createEmailCommunication(entityIds.get('22138233'), 'silvana2.zapoticky@cblmaycfqw.com', 'Personal', 'silvana2.zapoticky@cblmaycfqw.comPersonal'),
+			createPhoneCommunication(entityIds.get('22138233'), '+1-219-313-6370', 'Wired', '+1-219-313-6370Wired'),
+			createPhoneCommunication(entityIds.get('22138233'), '+1-419-906-3229', 'Fax', '+1-419-906-3229Fax'),
+			createEmailCommunication(entityIds.get('22138233'), 'silvana3.zapoticky@cblmaycfqw.com', 'Business', 'silvana3.zapoticky@cblmaycfqw.comBusiness'),
+			createEmailCommunication(entityIds.get('22138233'), 'silvana4.zapoticky@cblmaycfqw.com', 'Personal', 'silvana4.zapoticky@cblmaycfqw.comPersonal'),
+
 			// Entity: 22166967
-			createPhoneCommunication(entityIds.get('22166967'), '+1-219-313-6370', 'Wired', '+1-219-313-6370Wired22166967'),
-			createPhoneCommunication(entityIds.get('22166967'), '+1-419-906-3229', 'Fax', '+1-419-906-3229Fax22166967'),
-			createEmailCommunication(entityIds.get('22166967'), 'silvana3.zapoticky@cblmaycfqw.com', 'Business', 'silvana3.zapoticky@cblmaycfqw.comBusiness22166967'),
-			createEmailCommunication(entityIds.get('22166967'), 'silvana4.zapoticky@cblmaycfqw.com', 'Personal', 'silvana4.zapoticky@cblmaycfqw.comPersonal22166967')
+			createPhoneCommunication(entityIds.get('22166967'), '+1-219-313-6370', 'Wired', '+1-219-313-6370Wired'),
+			createPhoneCommunication(entityIds.get('22166967'), '+1-419-906-3229', 'Fax', '+1-419-906-3229Fax'),
+			createEmailCommunication(entityIds.get('22166967'), 'silvana3.zapoticky@cblmaycfqw.com', 'Business', 'silvana3.zapoticky@cblmaycfqw.comBusiness'),
+			createEmailCommunication(entityIds.get('22166967'), 'silvana4.zapoticky@cblmaycfqw.com', 'Personal', 'silvana4.zapoticky@cblmaycfqw.comPersonal')
 		};
 
-		insert communications;
+		// Junction model: Deduplicate communications by External ID, then upsert
+		Map<String, d4c_NIPR_Communication__c> uniqueComms = new Map<String, d4c_NIPR_Communication__c>();
+		for (d4c_NIPR_Communication__c comm : communications) {
+			uniqueComms.put(comm.d4c_UniqueIdentifier__c, comm);
+		}
+		List<d4c_NIPR_Communication__c> deduplicatedComms = uniqueComms.values();
+		Database.upsert(deduplicatedComms, d4c_NIPR_Communication__c.d4c_UniqueIdentifier__c, true);
 
-		createdRecords.put('d4c_ProducerCommunication__c', communications);
+		createdRecords.put('d4c_NIPR_Communication__c', deduplicatedComms);
+
+		// Create map of Communication External ID to Communication Id for junction creation
+		Map<String, Id> commExternalIdToIdMap = new Map<String, Id>();
+		for (d4c_NIPR_Communication__c comm : deduplicatedComms) {
+			commExternalIdToIdMap.put(comm.d4c_UniqueIdentifier__c, comm.Id);
+		}
+
+		// Create Communication Junctions (must match old Master-Detail counts)
+		// Entity 22138233: 9 junctions (5 exclusive + 4 shared)
+		// Entity 22166967: 4 junctions (all 4 shared with 22138233)
+		List<d4c_Entity_Communication_Junction__c> communicationJunctions = new List<d4c_Entity_Communication_Junction__c>();
+
+		// Entity 22138233 - 9 communication junctions
+		communicationJunctions.add(createEntityCommunicationJunction(entityIds.get('22138233'), commExternalIdToIdMap.get('+1-219-313-6379Wired'), false));
+		communicationJunctions.add(createEntityCommunicationJunction(entityIds.get('22138233'), commExternalIdToIdMap.get('+1-419-906-3223Fax'), false));
+		communicationJunctions.add(createEntityCommunicationJunction(entityIds.get('22138233'), commExternalIdToIdMap.get('+1-419-906-3221Wired'), false));
+		communicationJunctions.add(createEntityCommunicationJunction(entityIds.get('22138233'), commExternalIdToIdMap.get('silvana1.zapoticky@cblmaycfqw.comBusiness'), false));
+		communicationJunctions.add(createEntityCommunicationJunction(entityIds.get('22138233'), commExternalIdToIdMap.get('silvana2.zapoticky@cblmaycfqw.comPersonal'), false));
+		communicationJunctions.add(createEntityCommunicationJunction(entityIds.get('22138233'), commExternalIdToIdMap.get('+1-219-313-6370Wired'), false));
+		communicationJunctions.add(createEntityCommunicationJunction(entityIds.get('22138233'), commExternalIdToIdMap.get('+1-419-906-3229Fax'), false));
+		communicationJunctions.add(createEntityCommunicationJunction(entityIds.get('22138233'), commExternalIdToIdMap.get('silvana3.zapoticky@cblmaycfqw.comBusiness'), false));
+		communicationJunctions.add(createEntityCommunicationJunction(entityIds.get('22138233'), commExternalIdToIdMap.get('silvana4.zapoticky@cblmaycfqw.comPersonal'), false));
+
+		// Entity 22166967 - 4 communication junctions (all shared)
+		communicationJunctions.add(createEntityCommunicationJunction(entityIds.get('22166967'), commExternalIdToIdMap.get('+1-219-313-6370Wired'), false));
+		communicationJunctions.add(createEntityCommunicationJunction(entityIds.get('22166967'), commExternalIdToIdMap.get('+1-419-906-3229Fax'), false));
+		communicationJunctions.add(createEntityCommunicationJunction(entityIds.get('22166967'), commExternalIdToIdMap.get('silvana3.zapoticky@cblmaycfqw.comBusiness'), false));
+		communicationJunctions.add(createEntityCommunicationJunction(entityIds.get('22166967'), commExternalIdToIdMap.get('silvana4.zapoticky@cblmaycfqw.comPersonal'), false));
+
+		insert communicationJunctions;
+		createdRecords.put('d4c_Entity_Communication_Junction__c', communicationJunctions);
+
+		// Create map of Address External ID to Address Id for junction creation
+		Map<String, Id> addrExternalIdToIdMap = new Map<String, Id>();
+		for (d4c_NIPR_Address__c addr : deduplicatedAddresses) {
+			addrExternalIdToIdMap.put(addr.d4c_UniqueIdentifier__c, addr.Id);
+		}
+
+		// Create Address Junctions (must match old Master-Detail counts)
+		// Entity 22138233: 4 junctions
+		// Entity 22166967: 3 junctions
+		List<d4c_Entity_Address_Junction__c> addressJunctions = new List<d4c_Entity_Address_Junction__c>();
+
+		// Entity 22138233 - 4 address junctions
+		addressJunctions.add(createEntityAddressJunction(entityIds.get('22138233'), addrExternalIdToIdMap.get('245FrancisLewisBlvd#9536GardenaCA90248U.S.A.Mailing'), false));
+		addressJunctions.add(createEntityAddressJunction(entityIds.get('22138233'), addrExternalIdToIdMap.get('245FrancisLewisBlvd#9536GardenaCA90248U.S.A.Residential'), false));
+		addressJunctions.add(createEntityAddressJunction(entityIds.get('22138233'), addrExternalIdToIdMap.get('7SeBishopAve#9SanBernardinoCA92410U.S.A.Mailing'), false));
+		addressJunctions.add(createEntityAddressJunction(entityIds.get('22138233'), addrExternalIdToIdMap.get('245FrancisLewisBlvd#9536GardenaCA90248U.S.A.Physical'), false));
+
+		// Entity 22166967 - 3 address junctions
+		addressJunctions.add(createEntityAddressJunction(entityIds.get('22166967'), addrExternalIdToIdMap.get('7SeBishopAve#9SanBernardinoCA92410U.S.A.Mailing'), false));
+		addressJunctions.add(createEntityAddressJunction(entityIds.get('22166967'), addrExternalIdToIdMap.get('245FrancisLewisBlvd#9536GardenaCA90248U.S.A.Physical'), false));
+		addressJunctions.add(createEntityAddressJunction(entityIds.get('22166967'), addrExternalIdToIdMap.get('7SeBishopAve#9SanBernardinoCA92410U.S.A.Principal'), false));
+
+		insert addressJunctions;
+		createdRecords.put('d4c_Entity_Address_Junction__c', addressJunctions);
 
 		// Create Licenses with updated unique identifiers
 		Map<String, Map<String, String>> licenseData = new Map<String, Map<String, String>>{
@@ -466,17 +534,17 @@ private class TestDataFactory {
 
 		// Create Addresses - intentionally creating 2 instead of 3 that will come from XML
 		// Note: Addresses are now standalone (no Entity relationship) - linked via junctions
-		List<d4c_ProducerAddress__c> addresses = new List<d4c_ProducerAddress__c>{
+		List<d4c_NIPR_Address__c> addresses = new List<d4c_NIPR_Address__c>{
 			createProducerAddress(null, 'Residential', '123 Main Street', '123MainStreetApt4BBuildingCLosAngelesCA90001U.S.A.Residential'),
 			createProducerAddress(null, 'Mailing', '789 Broadway', '789BroadwayFloor10NewYorkNY10003U.S.A.Mailing')
 		};
 
 		insert addresses;
-		createdRecords.put('d4c_ProducerAddress__c', addresses);
+		createdRecords.put('d4c_NIPR_Address__c', addresses);
 
 		// Create junction records linking Entity to Addresses
 		List<d4c_Entity_Address_Junction__c> addressJunctions = new List<d4c_Entity_Address_Junction__c>();
-		for (d4c_ProducerAddress__c address : addresses) {
+		for (d4c_NIPR_Address__c address : addresses) {
 			addressJunctions.add(createEntityAddressJunction(entityIds.get('12345678'), address.Id, false));
 		}
 		insert addressJunctions;
@@ -484,7 +552,7 @@ private class TestDataFactory {
 
 		// Create Entity Communications - intentionally creating 5 instead of 8 that will come from XML
 		// Note: Communications are now standalone (no Entity relationship) - linked via junctions
-		List<d4c_ProducerCommunication__c> communications = new List<d4c_ProducerCommunication__c>{
+		List<d4c_NIPR_Communication__c> communications = new List<d4c_NIPR_Communication__c>{
 			createPhoneCommunication(null, '+1-213-555-1234', 'Wired', '+1-213-555-1234Wired'),
 			createPhoneCommunication(null, '+1-213-555-5678', 'Fax', '+1-213-555-5678Fax'),
 			createEmailCommunication(null, 'mjohnson@example.com', 'Business', 'mjohnson@example.comBusiness'),
@@ -493,11 +561,11 @@ private class TestDataFactory {
 		};
 
 		insert communications;
-		createdRecords.put('d4c_ProducerCommunication__c', communications);
+		createdRecords.put('d4c_NIPR_Communication__c', communications);
 
 		// Create junction records linking Entity to Communications
 		List<d4c_Entity_Communication_Junction__c> communicationJunctions = new List<d4c_Entity_Communication_Junction__c>();
-		for (d4c_ProducerCommunication__c comm : communications) {
+		for (d4c_NIPR_Communication__c comm : communications) {
 			communicationJunctions.add(createEntityCommunicationJunction(entityIds.get('12345678'), comm.Id, false));
 		}
 		insert communicationJunctions;

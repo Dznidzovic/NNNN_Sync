@@ -1,6 +1,6 @@
 /**
  *********************************************************
- * Apex Class Name    : EntityCommunicationJunctionTriggerHandler_Test
+ * Apex Class Name    : EntityCommJunctionTriggerHandler_Test
  * Created Date       : 02-10-2026
  * @description       : Test class for EntityCommunicationJunctionTriggerHandler
  * @author            : Dev4Clouds
@@ -10,7 +10,7 @@
  *********************************************************
  **/
 @isTest
-private class EntityCommunicationJunctionTriggerHandler_Test {
+private class EntityCommJunctionTriggerHandler_Test {
 
     /**
      ********************************************************
@@ -22,20 +22,18 @@ private class EntityCommunicationJunctionTriggerHandler_Test {
     static void setup() {
         // Create Entity
         d4c_Entity__c entity = new d4c_Entity__c(
-            d4c_NPN__c = '87654321',
-            d4c_FirstName__c = 'Jane',
-            d4c_LastName__c = 'Smith'
+            d4c_NPN__c = '87654321'
         );
         insert entity;
 
         // Create Communications (standalone objects)
-        List<d4c_ProducerCommunication__c> communications = new List<d4c_ProducerCommunication__c>{
-            new d4c_ProducerCommunication__c(
+        List<d4c_NIPR_Communication__c> communications = new List<d4c_NIPR_Communication__c>{
+            new d4c_NIPR_Communication__c(
                 d4c_UniqueIdentifier__c = 'PHONE-555-1234',
                 d4c_PhoneType__c = 'Mobile',
                 d4c_PhoneNumber__c = '555-1234'
             ),
-            new d4c_ProducerCommunication__c(
+            new d4c_NIPR_Communication__c(
                 d4c_UniqueIdentifier__c = 'EMAIL-test@example.com',
                 d4c_EmailType__c = 'Work',
                 d4c_EmailAddress__c = 'test@example.com'
@@ -54,7 +52,7 @@ private class EntityCommunicationJunctionTriggerHandler_Test {
     static void testBeforeInsert_SingleRecord() {
         // Get test data
         d4c_Entity__c entity = [SELECT Id FROM d4c_Entity__c LIMIT 1];
-        d4c_ProducerCommunication__c communication = [SELECT Id FROM d4c_ProducerCommunication__c WHERE d4c_PhoneType__c = 'Mobile' LIMIT 1];
+        d4c_NIPR_Communication__c communication = [SELECT Id FROM d4c_NIPR_Communication__c WHERE d4c_PhoneType__c = 'Mobile' LIMIT 1];
 
         Test.startTest();
 
@@ -91,9 +89,9 @@ private class EntityCommunicationJunctionTriggerHandler_Test {
         d4c_Entity__c entity = [SELECT Id FROM d4c_Entity__c LIMIT 1];
 
         // Create 200 communications
-        List<d4c_ProducerCommunication__c> communications = new List<d4c_ProducerCommunication__c>();
+        List<d4c_NIPR_Communication__c> communications = new List<d4c_NIPR_Communication__c>();
         for (Integer i = 0; i < 200; i++) {
-            communications.add(new d4c_ProducerCommunication__c(
+            communications.add(new d4c_NIPR_Communication__c(
                 d4c_UniqueIdentifier__c = 'BULK-EMAIL-' + i + '@test.com',
                 d4c_EmailType__c = 'Business',
                 d4c_EmailAddress__c = 'bulk' + i + '@test.com'
@@ -105,7 +103,7 @@ private class EntityCommunicationJunctionTriggerHandler_Test {
 
         // Create 200 junctions
         List<d4c_Entity_Communication_Junction__c> junctions = new List<d4c_Entity_Communication_Junction__c>();
-        for (d4c_ProducerCommunication__c communication : communications) {
+        for (d4c_NIPR_Communication__c communication : communications) {
             junctions.add(new d4c_Entity_Communication_Junction__c(
                 d4c_Entity__c = entity.Id,
                 d4c_NIPR_Communication__c = communication.Id
@@ -134,43 +132,43 @@ private class EntityCommunicationJunctionTriggerHandler_Test {
     /**
      ********************************************************
      * @Method Name    : testBeforeUpdate_UpdatesUniqueIdentifier
-     * @description    : Tests that unique identifier is updated when Entity or Communication changes
+     * @description    : Tests that unique identifier is repopulated if cleared/corrupted
      *******************************************************
      **/
     @isTest
     static void testBeforeUpdate_UpdatesUniqueIdentifier() {
         // Get test data
         d4c_Entity__c entity = [SELECT Id FROM d4c_Entity__c LIMIT 1];
-        List<d4c_ProducerCommunication__c> communications = [SELECT Id FROM d4c_ProducerCommunication__c ORDER BY d4c_PhoneType__c];
+        d4c_NIPR_Communication__c communication = [SELECT Id FROM d4c_NIPR_Communication__c LIMIT 1];
 
-        // Create junction with first communication
+        // Create junction
         d4c_Entity_Communication_Junction__c junction = new d4c_Entity_Communication_Junction__c(
             d4c_Entity__c = entity.Id,
-            d4c_NIPR_Communication__c = communications[0].Id
+            d4c_NIPR_Communication__c = communication.Id
         );
         insert junction;
 
         // Verify initial unique identifier
-        junction = [SELECT d4c_UniqueIdentifier__c FROM d4c_Entity_Communication_Junction__c WHERE Id = :junction.Id];
-        String originalUniqueId = junction.d4c_UniqueIdentifier__c;
+        junction = [SELECT d4c_UniqueIdentifier__c, d4c_Entity__c, d4c_NIPR_Communication__c
+                    FROM d4c_Entity_Communication_Junction__c WHERE Id = :junction.Id];
+        String expectedUniqueId = String.valueOf(entity.Id) + '-' + String.valueOf(communication.Id);
+        System.assertEquals(expectedUniqueId, junction.d4c_UniqueIdentifier__c,
+            'Unique identifier should be populated on insert');
 
         Test.startTest();
 
-        // Update junction to point to different communication
-        junction.d4c_NIPR_Communication__c = communications[1].Id;
+        // Simulate clearing the unique identifier (data corruption scenario)
+        junction.d4c_UniqueIdentifier__c = null;
         update junction;
 
         Test.stopTest();
 
-        // Verify unique identifier was updated
+        // Verify unique identifier was repopulated by beforeUpdate trigger
         junction = [SELECT d4c_UniqueIdentifier__c, d4c_Entity__c, d4c_NIPR_Communication__c
                     FROM d4c_Entity_Communication_Junction__c WHERE Id = :junction.Id];
 
-        String expectedNewUniqueId = String.valueOf(entity.Id) + '-' + String.valueOf(communications[1].Id);
-        System.assertNotEquals(originalUniqueId, junction.d4c_UniqueIdentifier__c,
-            'Unique identifier should have changed');
-        System.assertEquals(expectedNewUniqueId, junction.d4c_UniqueIdentifier__c,
-            'Unique identifier should match new Entity and Communication IDs');
+        System.assertEquals(expectedUniqueId, junction.d4c_UniqueIdentifier__c,
+            'Unique identifier should be repopulated on update');
     }
 
     /**
@@ -182,7 +180,7 @@ private class EntityCommunicationJunctionTriggerHandler_Test {
     @isTest
     static void testBeforeInsert_NullSafety_NullEntity() {
         // Get test data
-        d4c_ProducerCommunication__c communication = [SELECT Id FROM d4c_ProducerCommunication__c LIMIT 1];
+        d4c_NIPR_Communication__c communication = [SELECT Id FROM d4c_NIPR_Communication__c LIMIT 1];
 
         Test.startTest();
 
@@ -240,7 +238,7 @@ private class EntityCommunicationJunctionTriggerHandler_Test {
     /**
      ********************************************************
      * @Method Name    : testBeforeUpdate_BulkUpdate
-     * @description    : Tests that unique identifier is updated for bulk updates
+     * @description    : Tests that unique identifier is repopulated for bulk updates
      *******************************************************
      **/
     @isTest
@@ -249,9 +247,9 @@ private class EntityCommunicationJunctionTriggerHandler_Test {
         d4c_Entity__c entity = [SELECT Id FROM d4c_Entity__c LIMIT 1];
 
         // Create multiple communications
-        List<d4c_ProducerCommunication__c> communications = new List<d4c_ProducerCommunication__c>();
+        List<d4c_NIPR_Communication__c> communications = new List<d4c_NIPR_Communication__c>();
         for (Integer i = 0; i < 50; i++) {
-            communications.add(new d4c_ProducerCommunication__c(
+            communications.add(new d4c_NIPR_Communication__c(
                 d4c_UniqueIdentifier__c = 'UPDATE-EMAIL-' + i + '@test.com',
                 d4c_EmailType__c = 'Business',
                 d4c_EmailAddress__c = 'update' + i + '@test.com'
@@ -259,7 +257,7 @@ private class EntityCommunicationJunctionTriggerHandler_Test {
         }
         insert communications;
 
-        // Create junctions pointing to first 25 communications
+        // Create junctions pointing to communications
         List<d4c_Entity_Communication_Junction__c> junctions = new List<d4c_Entity_Communication_Junction__c>();
         for (Integer i = 0; i < 25; i++) {
             junctions.add(new d4c_Entity_Communication_Junction__c(
@@ -269,17 +267,22 @@ private class EntityCommunicationJunctionTriggerHandler_Test {
         }
         insert junctions;
 
+        // Query to get IDs and verify initial state
+        junctions = [SELECT Id, d4c_UniqueIdentifier__c, d4c_Entity__c, d4c_NIPR_Communication__c
+                     FROM d4c_Entity_Communication_Junction__c
+                     WHERE Id IN :junctions];
+
         Test.startTest();
 
-        // Update all junctions to point to the next 25 communications
-        for (Integer i = 0; i < junctions.size(); i++) {
-            junctions[i].d4c_NIPR_Communication__c = communications[i + 25].Id;
+        // Simulate clearing unique identifiers (data corruption scenario)
+        for (d4c_Entity_Communication_Junction__c junction : junctions) {
+            junction.d4c_UniqueIdentifier__c = null;
         }
         update junctions;
 
         Test.stopTest();
 
-        // Verify all unique identifiers were updated
+        // Verify all unique identifiers were repopulated
         List<d4c_Entity_Communication_Junction__c> results = [
             SELECT d4c_UniqueIdentifier__c, d4c_Entity__c, d4c_NIPR_Communication__c
             FROM d4c_Entity_Communication_Junction__c
@@ -291,7 +294,7 @@ private class EntityCommunicationJunctionTriggerHandler_Test {
         for (d4c_Entity_Communication_Junction__c result : results) {
             String expectedUniqueId = String.valueOf(entity.Id) + '-' + String.valueOf(result.d4c_NIPR_Communication__c);
             System.assertEquals(expectedUniqueId, result.d4c_UniqueIdentifier__c,
-                'Each junction should have updated unique identifier');
+                'Each junction should have repopulated unique identifier');
         }
     }
 }

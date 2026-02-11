@@ -117,6 +117,69 @@ sf package install --package "<version-id>" --target-org "NIPR Package Test" --w
 
 ---
 
+## 🧪 TEST CLASS DEPLOYMENT TRACKING
+
+**Deployment Strategy**: Deploy and test ONE class at a time
+- Deploy test class → Fix errors → Run ONLY that test → Move to next
+- Track progress here to resume after session compaction
+
+### Helper/Mock Classes (Deploy First):
+- ✅ HttpMockFactory.cls - **DEPLOYED** (Layer 4)
+- ✅ HttpSoapMultiMockFactory.cls - **DEPLOYED** (Layer 4)
+- ✅ MockHelper.cls - **DEPLOYED**
+- ✅ TestDataFactory.cls - **DEPLOYED** (Fixed: d4c_ProducerAddress__c → d4c_NIPR_Address__c, d4c_ProducerCommunication__c → d4c_NIPR_Communication__c)
+
+### Test Classes to Deploy (26 total):
+
+**CRITICAL - Junction Object Model Changes:**
+- ⚠️ ProcessEntityInfoApiService_Test.cls - **Junction model - EXTREME CARE**
+- ⚠️ ProcessPDBAlertReportService_Test.cls - **Junction model - EXTREME CARE**
+
+**Standard Tests:**
+1. ✅ AccountEntityAssignmentService_Test.cls - **DEPLOYED & PASSED** (7/7 tests, 100% pass rate, 249ms)
+2. ✅ AccountSelector_Test.cls - **DEPLOYED & PASSED** (3/3 tests, 100% pass rate, 69ms)
+3. ✅ BaseApiInvoker_Test.cls - **DEPLOYED & PASSED** (7/7 tests, 100% pass rate, 71ms) - NOTE: HttpMockFactory was missing and deployed
+4. ✅ ContactEntityAssignmentService_Test.cls - **DEPLOYED & PASSED** (4/4 tests, 100% pass rate, 227ms)
+5. ✅ ContactSelector_Test.cls - **DEPLOYED & PASSED** (3/3 tests, 100% pass rate, 123ms)
+6. ✅ CorrelationIdUtils_Test.cls - **DEPLOYED & PASSED** (8/8 tests, 100% pass rate, 148ms)
+7. ✅ DMLExecutor_Test.cls - **DEPLOYED & PASSED** (6/6 tests, 100% pass rate, 34739ms)
+8. ✅ DeleteLogsBatchableTest.cls - **DEPLOYED & PASSED** (3/3 tests, 100% pass rate, 1120ms)
+9. ✅ EntityAddressJunctionTriggerHandler_Test.cls - **DEPLOYED & PASSED** (7/7 tests, 100% pass rate, 1723ms) - NOTE: Fixed 2 failing tests by testing UniqueIdentifier repopulation instead of MD field updates
+10. ✅ EntityCommJunctionTriggerHandler_Test.cls - **DEPLOYED & PASSED** (7/7 tests, 100% pass rate, 1068ms) - NOTE: Renamed from EntityCommunicationJunctionTriggerHandler_Test (49 chars → 39 chars). Fixed 2 failing tests by testing UniqueIdentifier repopulation instead of MD field updates
+11. ✅ EntityInfoApiController_Test.cls - **DEPLOYED & PASSED** (3/3 tests, 100% pass rate, 3065ms)
+12. ✅ EntityInfoOrchestratorService_Test.cls - **DEPLOYED & PASSED** (10/10 tests, 100% pass rate, 2067ms)
+13. ✅ EntityTriggerHandler_Test.cls - **DEPLOYED & PASSED** (22/22 tests, 100% pass rate, 5240ms)
+14. ✅ LeadEntityAssignmentService_Test.cls - **DEPLOYED & PASSED** (4/4 tests, 100% pass rate, 108ms)
+15. ✅ LeadSelector_Test.cls - **DEPLOYED & PASSED** (3/3 tests, 100% pass rate, 121ms)
+16. ✅ Logger_Test.cls - **DEPLOYED & PASSED** (4/4 tests, 100% pass rate, 1300ms)
+17. ✅ PDBAlertReportSchedulable_Test.cls - **DEPLOYED & PASSED** (3/3 tests, 100% pass rate, 405ms)
+18. ✅ ProcessEntityInfoApiService_Test.cls - **DEPLOYED & PASSED** (6/6 tests, 100% pass rate, 4252ms) ⚠️ CRITICAL - Junction model test - Fixed: Renamed objects, rewrote queries to use junction pattern, fixed UniqueIdentifier expectations
+19. ⏳ ProcessPDBAlertReportService_Test.cls - **PENDING** ⚠️
+20. ⏳ RunEntityInfoReportBatchable_Test.cls - **PENDING**
+21. ⏳ RunEntityInfoReportSchedulable_Test.cls - **PENDING**
+22. ⏳ RunPDBAlertReportBatchable_Test.cls - **PENDING**
+23. ⏳ RunPDBAlert_Test.cls - **PENDING**
+24. ⏳ SubscriptionService_Test.cls - **PENDING**
+25. ⏳ TriggerDispatcherTest.cls - **PENDING**
+
+### Junction Object Test Requirements:
+**For ProcessEntityInfoApiService_Test and ProcessPDBAlertReportService_Test:**
+
+✅ **MUST VERIFY**:
+1. **Junction Creation**: When new addresses/communications added → junctions created
+2. **Junction Deletion**: When addresses/communications removed → junctions deleted (NOT main objects)
+3. **Main Object Upsert**: NIPR_Address/NIPR_Communication upserted via d4c_UniqueIdentifier__c
+4. **No Duplicate Main Objects**: Same address used by multiple entities → shared via different junctions
+5. **Junction Updates**: When Entity-Address/Communication link changes → old junction deleted, new junction created
+
+✅ **ADD NEW TEST METHODS IF NEEDED**:
+- Test method for junction deletion when address removed
+- Test method for junction creation when address added
+- Test method for shared address (multiple entities → one address → multiple junctions)
+- Test method for address update (main object updated via upsert, junctions unchanged)
+
+---
+
 ## Repository Overview
 This is a Salesforce DX project that integrates with the National Insurance Entity Registry (NIPR) to manage insurance agent licensing and carrier appointments. The codebase follows enterprise architectural patterns with clear separation of concerns across service, repository, and controller layers.
 
