@@ -94,7 +94,7 @@ public virtual with sharing class SubscriptionService {
         }
 
         // Query all entitys with these NPNs
-        List<d4c_Entity__c> entitys = entitySelector.getEntitysByNPNs(npns);
+        List<d4c_Entity__c> entitys = entitySelector.getEntitiesByNPNs(npns);
 
         if (entitys.isEmpty()) {
             Logger.warning(CLASS_NAME, methodName, 'No entitys found for NPNs', 'NPNs: ' + npns, null);

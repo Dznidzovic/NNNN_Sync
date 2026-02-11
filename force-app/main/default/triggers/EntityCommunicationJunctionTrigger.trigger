@@ -9,5 +9,5 @@ trigger EntityCommunicationJunctionTrigger on d4c_Entity_Communication_Junction_
     before insert,
     before update
 ) {
-    TriggerDispatcher.run(new EntityCommunicationJunctionTriggerHandler(), Trigger.operationType);
+    TriggerDispatcher.run(new EntityCommJunctionTriggerHandler(), Trigger.operationType);
 }

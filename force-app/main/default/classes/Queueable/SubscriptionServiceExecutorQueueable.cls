@@ -191,7 +191,7 @@ public class SubscriptionServiceExecutorQueueable extends SubscriptionService im
             return;
         }
 
-        List<d4c_Entity__c> entitys = entitySelector.getEntitysByNPNs(new Set<String>{ npn });
+        List<d4c_Entity__c> entitys = entitySelector.getEntitiesByNPNs(new Set<String>{ npn });
         if (entitys.isEmpty()) {
             Logger.error(CLASS_NAME, methodName, 'Entity not found', 'NPN: ' + npn, null, null);
             return;
@@ -238,7 +238,7 @@ public class SubscriptionServiceExecutorQueueable extends SubscriptionService im
             return;
         }
 
-        List<d4c_Entity__c> entitys = entitySelector.getEntitysByNPNs(new Set<String>{ npn });
+        List<d4c_Entity__c> entitys = entitySelector.getEntitiesByNPNs(new Set<String>{ npn });
         if (entitys.isEmpty()) {
             Logger.error(CLASS_NAME, methodName, 'Entity not found', 'NPN: ' + npn, null, null);
             return;

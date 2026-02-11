@@ -1,25 +1,25 @@
 /**
  *********************************************************
- * Apex Class Name    : ProducerCommunicationSelector
+ * Apex Class Name    : NIPRCommunicationSelector
  * Created Date       : 03-30-2025
- * @description       : Selector class holding all the queries used for d4c_ProducerCommunication__c object
+ * @description       : Selector class holding all the queries used for d4c_NIPR_Communication__c object
  * @author            : Dev4Clouds
  * Modification Log:
  * Ver   Date         Author                   Modification
  * 1.0   03-30-2025   Dev4Clouds          Initial Version
  *********************************************************
  **/
-public with sharing class ProducerCommunicationSelector {
+public with sharing class NIPRCommunicationSelector {
     /**
      ********************************************************
      * @Method Name    : getEntityCommsByEntityNPNs
-     * @description    : Returns list of d4c_ProducerCommunication__c by Entity NPN via junction records.
+     * @description    : Returns list of d4c_NIPR_Communication__c by Entity NPN via junction records.
      *                   Communications are now standalone objects - queried through junctions.
      * @param          : npns - Set of unique NPN values
-     * @return         : List<d4c_ProducerCommunication__c> - list of Entity Communication records
+     * @return         : List<d4c_NIPR_Communication__c> - list of Entity Communication records
      *******************************************************
      **/
-    public List<d4c_ProducerCommunication__c> getEntityCommsByEntityNPNs(Set<String> npns) {
+    public List<d4c_NIPR_Communication__c> getEntityCommsByEntityNPNs(Set<String> npns) {
         // Query junctions to get communications for these entities
         List<d4c_Entity_Communication_Junction__c> junctions = [
             SELECT
@@ -50,7 +50,7 @@ public with sharing class ProducerCommunicationSelector {
                 d4c_EmailType__c,
                 d4c_EmailAddress__c
             FROM
-                d4c_ProducerCommunication__c
+                d4c_NIPR_Communication__c
             WHERE
                 Id IN :communicationIds
         ];

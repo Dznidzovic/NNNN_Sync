@@ -4,7 +4,7 @@
  * Created Date       : 04-08-2025
  * @description       : Imports data from the NIPR Entity Info API and maps it to Salesforce records.
  *                      This class processes the EntityInfoDTO structure and generates records for
- *                      d4c_Entity__c, d4c_ProducerCommunication__c, d4c_ProducerAddress__c, d4c_License__c,
+ *                      d4c_Entity__c, d4c_NIPR_Communication__c, d4c_NIPR_Address__c, d4c_License__c,
  *                      d4c_LineOfAuthority__c, and d4c_CarrierAppointment__c.
  * @author            : Dev4Clouds
  * Modification Log:
@@ -19,9 +19,9 @@ public with sharing class ProcessEntityInfoApiService {
     // Stores the entity record to be upserted
     private d4c_Entity__c entity;
     // Stores new or updated entity communication records (Phone, Email)
-    private List<d4c_ProducerCommunication__c> producerCommunications = new List<d4c_ProducerCommunication__c>();
+    private List<d4c_NIPR_Communication__c> producerCommunications = new List<d4c_NIPR_Communication__c>();
     // Stores new or updated entity address records
-    private List<d4c_ProducerAddress__c> producerAddresses = new List<d4c_ProducerAddress__c>();
+    private List<d4c_NIPR_Address__c> producerAddresses = new List<d4c_NIPR_Address__c>();
     // Stores new or updated license records
     private List<d4c_License__c> licenses = new List<d4c_License__c>();
     // Stores new or updated Line of Authority records for licenses
@@ -169,7 +169,7 @@ public with sharing class ProcessEntityInfoApiService {
      *********************************************************
      * @methodName      : processProducerCommunications
      * @description     : Extracts business phones, faxes, and emails from CONTACT_INFOS and
-     *                    stores them as `d4c_ProducerCommunication__c` records for the given NPN.
+     *                    stores them as `d4c_NIPR_Communication__c` records for the given NPN.
      * @param contactInfos : Contact info section of the EntityInfoDTO.
      *********************************************************
      **/
@@ -222,7 +222,7 @@ public with sharing class ProcessEntityInfoApiService {
             String uniqueId = formattedPhone + phoneType;
 
             if (!uniqueRecordIds.contains(uniqueId)) {
-                d4c_ProducerCommunication__c comm = new d4c_ProducerCommunication__c();
+                d4c_NIPR_Communication__c comm = new d4c_NIPR_Communication__c();
 
                 comm.d4c_PhoneType__c = phoneType;
                 comm.d4c_PhoneNumber__c = formattedPhone;
@@ -251,7 +251,7 @@ public with sharing class ProcessEntityInfoApiService {
         String uniqueId = email + emailType;
 
         if (!uniqueRecordIds.contains(uniqueId)) {
-            d4c_ProducerCommunication__c emailComm = new d4c_ProducerCommunication__c();
+            d4c_NIPR_Communication__c emailComm = new d4c_NIPR_Communication__c();
 
             emailComm.d4c_EmailType__c = emailType;
             emailComm.d4c_EmailAddress__c = email;
@@ -296,7 +296,7 @@ public with sharing class ProcessEntityInfoApiService {
                 continue;
             }
             
-            d4c_ProducerAddress__c producerAddress = createProducerAddressRecord(address);
+            d4c_NIPR_Address__c producerAddress = createProducerAddressRecord(address);
 
             if (producerAddress != null && !uniqueRecordIds.contains(producerAddress.d4c_UniqueIdentifier__c)) {
                 producerAddresses.add(producerAddress);
@@ -520,11 +520,11 @@ public with sharing class ProcessEntityInfoApiService {
      * @methodName      : createProducerAddressRecord
      * @description     : Creates a Entity Address record based on provided address information.
      * @param address   : Address information from the Entity Info DTO.
-     * @return          : A new d4c_ProducerAddress__c record.
+     * @return          : A new d4c_NIPR_Address__c record.
      *********************************************************
      **/
-    private d4c_ProducerAddress__c createProducerAddressRecord(EntityInfoDTO.ADDRESS address) {
-        d4c_ProducerAddress__c producerAddress = new d4c_ProducerAddress__c();
+    private d4c_NIPR_Address__c createProducerAddressRecord(EntityInfoDTO.ADDRESS address) {
+        d4c_NIPR_Address__c producerAddress = new d4c_NIPR_Address__c();
         
         if (address != null) {
             // Format and parse as of date
@@ -758,7 +758,7 @@ public with sharing class ProcessEntityInfoApiService {
     private List<d4c_Entity_Communication_Junction__c> createCommunicationJunctions() {
         List<d4c_Entity_Communication_Junction__c> junctions = new List<d4c_Entity_Communication_Junction__c>();
 
-        for (d4c_ProducerCommunication__c comm : producerCommunications) {
+        for (d4c_NIPR_Communication__c comm : producerCommunications) {
             d4c_Entity_Communication_Junction__c junction = new d4c_Entity_Communication_Junction__c();
             junction.d4c_Entity__c = entity.Id;
             junction.d4c_NIPR_Communication__c = comm.Id;
@@ -780,7 +780,7 @@ public with sharing class ProcessEntityInfoApiService {
     private List<d4c_Entity_Address_Junction__c> createAddressJunctions() {
         List<d4c_Entity_Address_Junction__c> junctions = new List<d4c_Entity_Address_Junction__c>();
 
-        for (d4c_ProducerAddress__c address : producerAddresses) {
+        for (d4c_NIPR_Address__c address : producerAddresses) {
             d4c_Entity_Address_Junction__c junction = new d4c_Entity_Address_Junction__c();
             junction.d4c_Entity__c = entity.Id;
             junction.d4c_NIPR_Address__c = address.Id;

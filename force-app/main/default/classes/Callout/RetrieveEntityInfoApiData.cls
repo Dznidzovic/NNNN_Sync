@@ -43,7 +43,7 @@ public with sharing class RetrieveEntityInfoApiData {
             // Query existing entity to check if user manually set exclude flag
             // Entity will always exist when this callout runs
             EntitySelector entitySelector = new EntitySelector();
-            List<d4c_Entity__c> existingEntitys = entitySelector.getEntitysByNPNs(new Set<String>{ entityNPN });
+            List<d4c_Entity__c> existingEntitys = entitySelector.getEntitiesByNPNs(new Set<String>{ entityNPN });
             Boolean existingExcludeValue = false;
             if (!existingEntitys.isEmpty()) {
                 existingExcludeValue = existingEntitys[0].d4c_ExcludeCarrierAppointments__c;

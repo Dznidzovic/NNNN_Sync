@@ -26,12 +26,12 @@ public with sharing class EntityAddressJunctionTriggerHandler extends BaseTrigge
      ********************************************************
      * @Method Name    : beforeUpdate
      * @description    : Populates unique identifier before update
-     * @param          : newRecords - List of updated junction records
-     * @param          : oldRecords - List of old junction records
+     * @param          : newItems - Map of updated junction records (new values)
+     * @param          : oldItems - Map of old junction records (old values)
      *******************************************************
      **/
-    public override void beforeUpdate(List<SObject> newRecords, List<SObject> oldRecords) {
-        populateUniqueIdentifier((List<d4c_Entity_Address_Junction__c>) newRecords);
+    public override void beforeUpdate(Map<Id, SObject> newItems, Map<Id, SObject> oldItems) {
+        populateUniqueIdentifier((List<d4c_Entity_Address_Junction__c>) newItems.values());
     }
 
     /**

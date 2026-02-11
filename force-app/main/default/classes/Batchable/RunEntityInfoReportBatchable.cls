@@ -57,7 +57,7 @@ public with sharing class RunEntityInfoReportBatchable implements Database.Batch
 
                 // Track successful NPN for subscription processing in finish()
                 // Query the entity to check its exclude flag
-                List<d4c_Entity__c> entitys = entitySelector.getEntitysByNPNs(new Set<String>{ npn });
+                List<d4c_Entity__c> entitys = entitySelector.getEntitiesByNPNs(new Set<String>{ npn });
                 if (!entitys.isEmpty()) {
                     d4c_Entity__c entity = entitys[0];
                     // Only add NPNs that are Active and don't already have a subscription
@@ -75,7 +75,7 @@ public with sharing class RunEntityInfoReportBatchable implements Database.Batch
 
                 String exceptionMessage = e.getMessage();
 
-                List<d4c_Entity__c> entitys = entitySelector.getEntitysByNPNs(new Set<String>{ npn });
+                List<d4c_Entity__c> entitys = entitySelector.getEntitiesByNPNs(new Set<String>{ npn });
 
                 if (entitys == null || entitys.isEmpty()) {
                     Logger.warning(CLASS_NAME, methodName, 'Entity with this NPN not yet created',

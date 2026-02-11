@@ -47,7 +47,7 @@ public with sharing class EntityAssignmentService {
         Set<String> newNpns = extractUniqueNPNs(recordsToProcess);
         List<d4c_Entity__c> existingEntitys = useMocks && mockEntitysByNPN != null
             ? mockEntitysByNPN.values()
-            : entitySelector.getEntitysByNPNs(newNpns);
+            : entitySelector.getEntitiesByNPNs(newNpns);
         Map<String, d4c_Entity__c> entityMap = buildEntityMapByNPN(existingEntitys);
 
         Boolean upsertFailed = upsertMissingEntitys(newNpns, entityMap, recordsToProcess);
@@ -90,7 +90,7 @@ public with sharing class EntityAssignmentService {
         // Get entitys with these NPNs
         List<d4c_Entity__c> potentialOrphanedEntitys = useMocks && mockEntitysByNPN != null
             ? getEntitysFromMockByNPNs(potentialOrphanedNpns)
-            : entitySelector.getEntitysByNPNs(potentialOrphanedNpns);
+            : entitySelector.getEntitiesByNPNs(potentialOrphanedNpns);
         
         if (potentialOrphanedEntitys.isEmpty()) return;
         
@@ -341,7 +341,7 @@ public with sharing class EntityAssignmentService {
         }
 
         // Refresh map after successful upsert
-        List<d4c_Entity__c> updatedEntitys = entitySelector.getEntitysByNPNs(npns);
+        List<d4c_Entity__c> updatedEntitys = entitySelector.getEntitiesByNPNs(npns);
         entityMap.clear();
         entityMap.putAll(buildEntityMapByNPN(updatedEntitys));
 

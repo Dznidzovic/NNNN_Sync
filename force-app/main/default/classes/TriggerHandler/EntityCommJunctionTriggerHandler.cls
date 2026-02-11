@@ -1,6 +1,6 @@
 /**
  *********************************************************
- * Apex Class Name    : EntityCommunicationJunctionTriggerHandler
+ * Apex Class Name    : EntityCommJunctionTriggerHandler
  * Created Date       : 02-10-2026
  * @description       : Trigger handler for d4c_Entity_Communication_Junction__c
  *                      Populates unique identifier as combination of Entity ID + Communication ID
@@ -10,7 +10,7 @@
  * 1.0   02-10-2026   Dev4Clouds          Initial Version
  *********************************************************
  **/
-public with sharing class EntityCommunicationJunctionTriggerHandler extends BaseTriggerHandler {
+public with sharing class EntityCommJunctionTriggerHandler extends BaseTriggerHandler {
     /**
      ********************************************************
      * @Method Name    : beforeInsert
@@ -26,12 +26,12 @@ public with sharing class EntityCommunicationJunctionTriggerHandler extends Base
      ********************************************************
      * @Method Name    : beforeUpdate
      * @description    : Populates unique identifier before update
-     * @param          : newRecords - List of updated junction records
-     * @param          : oldRecords - List of old junction records
+     * @param          : newItems - Map of updated junction records (new values)
+     * @param          : oldItems - Map of old junction records (old values)
      *******************************************************
      **/
-    public override void beforeUpdate(List<SObject> newRecords, List<SObject> oldRecords) {
-        populateUniqueIdentifier((List<d4c_Entity_Communication_Junction__c>) newRecords);
+    public override void beforeUpdate(Map<Id, SObject> newItems, Map<Id, SObject> oldItems) {
+        populateUniqueIdentifier((List<d4c_Entity_Communication_Junction__c>) newItems.values());
     }
 
     /**

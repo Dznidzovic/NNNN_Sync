@@ -85,6 +85,38 @@ sf package install --package "<version-id>" --target-org "NIPR Package Test" --w
 
 ---
 
+## 🚨 APEX CLASS DEPLOYMENT RULES - CRITICAL 🚨
+
+**When deploying Apex classes and fixing errors, follow these strict rules:**
+
+### ✅ ALLOWED FIXES:
+1. **Renamed Objects**: Update references from old object names to new object names
+   - Example: `d4c_Producer__c` → `d4c_Entity__c`
+   - Example: `d4c_ProducerAddress__c` → `d4c_NIPR_Address__c`
+   - Example: `d4c_ProducerCommunication__c` → `d4c_NIPR_Communication__c`
+
+2. **Renamed Fields**: Update field references due to refactoring
+   - Example: Field name changes on objects
+   - Example: Relationship field name changes
+
+3. **Junction Object Pattern**: Update logic ONLY for the new many-to-many relationship pattern
+   - **Old Pattern**: Direct Master-Detail from Entity to Address/Communication
+   - **New Pattern**: Junction objects (`d4c_Entity_Address_Junction__c`, `d4c_Entity_Communication_Junction__c`)
+   - **Allowed Change**: Update queries and relationships to use junction pattern instead of direct relationship
+   - **Example**: Change from `entity.d4c_NIPR_Addresses__r` to querying junction object
+
+### ❌ NOT ALLOWED:
+1. **NO business logic changes** - Do not modify how the code works
+2. **NO optimization** - Do not refactor code for performance
+3. **NO new features** - Do not add new functionality
+4. **NO code cleanup** - Do not remove "unnecessary" code unless it references deleted objects
+5. **NO variable renaming** - Keep variable names as-is unless they reference renamed objects
+
+### 🎯 GOAL:
+**Make ONLY the minimum changes required to deploy successfully due to refactoring. The code should work exactly the same way as before, just with updated object/field names and junction object pattern.**
+
+---
+
 ## Repository Overview
 This is a Salesforce DX project that integrates with the National Insurance Entity Registry (NIPR) to manage insurance agent licensing and carrier appointments. The codebase follows enterprise architectural patterns with clear separation of concerns across service, repository, and controller layers.
 
