@@ -17,22 +17,37 @@
 
 ---
 
+## 🚨🚨🚨 CRITICAL WARNING - NEVER DEPLOY TO "NIPR DEV" ORG 🚨🚨🚨
+
+**⛔️ ABSOLUTE RULE: DO NOT DEPLOY ANYTHING TO "NIPR DEV" ORG ⛔️**
+
+**The "NIPR DEV" org (hiptenadmins@hipten.com.d4c_nipr) is OFF LIMITS for deployments.**
+
+- ❌ **NEVER** run `sf project deploy start` with `--target-org "NIPR DEV"`
+- ❌ **NEVER** deploy metadata to this org
+- ❌ **NEVER** deploy objects, classes, flows, or ANY metadata to "NIPR DEV"
+- ✅ **ONLY** work with "DEVELOPER_ORG" for development
+
+**This org has been disconnected. If you see "NIPR DEV" in any deployment command, STOP IMMEDIATELY.**
+
+---
+
 ## 🚨 MANDATORY DEVELOPMENT WORKFLOW - READ THIS FIRST! 🚨
 
 **ALL NIPR development MUST follow this workflow:**
 
-1. ✅ **DEVELOP IN "NIPR DEV" ORG ONLY**
-   - Make ALL code changes in the "NIPR DEV" org (hiptenadmins@hipten.com.d4c_nipr)
-   - **NEVER develop locally or in scratch orgs**
+1. ✅ **DEVELOP IN "DEVELOPER_ORG" ONLY**
+   - Make ALL code changes in the "DEVELOPER_ORG" org
+   - **NEVER deploy to "NIPR DEV" org**
    - Scratch orgs are ONLY for testing package installations
 
-2. ✅ **DEPLOY TO NIPR DEV FIRST**
-   - Deploy all changes to "NIPR DEV" org
-   - Test thoroughly in "NIPR DEV" org
+2. ✅ **DEPLOY TO DEVELOPER_ORG FIRST**
+   - Deploy all changes to "DEVELOPER_ORG" org
+   - Test thoroughly in "DEVELOPER_ORG" org
    - Pull changes back to local repository
 
 3. ✅ **ONLY THEN create package versions**
-   - After changes are tested in "NIPR DEV", pull metadata locally
+   - After changes are tested in "DEVELOPER_ORG", pull metadata locally
    - Create package version from local repository
    - Promote to Released
 
@@ -47,16 +62,16 @@
    - Include latest package version ID in the release notes
    - Claude will automatically remind you if release notes are not updated
 
-**Commands for NIPR DEV workflow:**
+**Commands for DEVELOPER_ORG workflow:**
 ```bash
-# 1. Deploy to NIPR DEV
-sf project deploy start --source-dir force-app --target-org "NIPR DEV"
+# 1. Deploy to DEVELOPER_ORG
+sf project deploy start --source-dir force-app --target-org "DEVELOPER_ORG"
 
-# 2. Test in NIPR DEV
-sf org open --target-org "NIPR DEV"
+# 2. Test in DEVELOPER_ORG
+sf org open --target-org "DEVELOPER_ORG"
 
 # 3. Pull changes back
-sf project retrieve start --source-dir force-app --target-org "NIPR DEV"
+sf project retrieve start --source-dir force-app --target-org "DEVELOPER_ORG"
 
 # 4. Create package version (with code coverage)
 sf package version create --package "NIPR" --installation-key-bypass --code-coverage --wait 20 --target-dev-hub "HIPTEN DEV HUB"
@@ -466,15 +481,12 @@ This section provides step-by-step instructions for team members to set up their
   - Manages namespace registration
   - Tracks package subscribers
 
-#### 2. NIPR DEV (Namespaced Developer Org)
-- **Purpose**: Primary development and testing org with namespace enabled
+#### 2. NIPR DEV (Namespaced Developer Org) - ⚠️ DO NOT USE
+- **Purpose**: ❌ **THIS ORG IS OFF LIMITS - DO NOT DEPLOY HERE**
 - **Org Type**: Developer Edition org with `niprsync` namespace
 - **Username**: `hiptenadmins@hipten.com.d4c_nipr`
-- **What it does**:
-  - All metadata automatically gets `niprsync__` prefix
-  - Used for developing and testing package features
-  - Can create and pull metadata with namespace
-  - Tests run with namespace enabled
+- **⛔️ CRITICAL**: This org has been disconnected. **NEVER deploy to this org.**
+- **Use "DEVELOPER_ORG" instead for all development work.**
 
 #### 3. Scratch Orgs (Temporary Developer Orgs)
 - **Purpose**: Short-lived, disposable orgs for isolated development
@@ -534,14 +546,16 @@ sf org list --all
 # You should see 🌳 icon next to HIPTEN DEV HUB
 ```
 
-#### Step 2: Authenticate to NIPR DEV Org
+#### Step 2: Authenticate to DEVELOPER_ORG
 ```bash
-# Login to namespaced dev org (opens browser)
-sf org login web --alias "NIPR DEV" --set-default
+# Login to developer org (opens browser)
+sf org login web --alias "DEVELOPER_ORG" --set-default
 
 # Verify authentication
-sf org display --target-org "NIPR DEV"
+sf org display --target-org "DEVELOPER_ORG"
 ```
+
+**⚠️ NOTE**: The "NIPR DEV" org has been disconnected and should NEVER be used.
 
 #### Step 3: Clone the Repository
 ```bash
@@ -609,30 +623,32 @@ sf org display --target-org nipr-scratch
 
 ### Development Workflow
 
-#### Workflow 1: Develop in NIPR DEV Org
+#### Workflow 1: Develop in DEVELOPER_ORG
 **Best for**: Feature development, testing with real data
 
 ```bash
 # 1. Pull latest code from repo
 git pull origin main
 
-# 2. Deploy to NIPR DEV org
-sf project deploy start --source-dir force-app --target-org "NIPR DEV"
+# 2. Deploy to DEVELOPER_ORG
+sf project deploy start --source-dir force-app --target-org "DEVELOPER_ORG"
 
 # 3. Develop in the org (create classes, fields, etc.)
-sf org open --target-org "NIPR DEV"
+sf org open --target-org "DEVELOPER_ORG"
 
 # 4. Pull changes back to local
-sf project retrieve start --source-dir force-app --target-org "NIPR DEV"
+sf project retrieve start --source-dir force-app --target-org "DEVELOPER_ORG"
 
 # 5. Run tests
-sf apex run test --test-level RunLocalTests --code-coverage --target-org "NIPR DEV"
+sf apex run test --test-level RunLocalTests --code-coverage --target-org "DEVELOPER_ORG"
 
 # 6. Commit changes
 git add .
 git commit -m "Add new feature"
 git push origin feature-branch
 ```
+
+**⚠️ NEVER use "NIPR DEV" org - it has been disconnected.**
 
 #### Workflow 2: Develop in Scratch Org
 **Best for**: Isolated feature development, testing clean installations
@@ -788,6 +804,11 @@ Example `sfdx-project.json` with version aliases:
    sf org login web --alias "HIPTEN DEV HUB" --set-default-dev-hub
    ```
 
+#### Accidentally Using "NIPR DEV" Org
+**Problem**: Accidentally tried to deploy to "NIPR DEV"
+**Solution**: STOP IMMEDIATELY. This org is disconnected and off-limits.
+- Use "DEVELOPER_ORG" instead for all development work
+
 #### Test Failures with Namespace
 **Problem**: Tests fail with "field not found" errors after namespace enabled
 **Solution**: MockHelper uses direct field assignment (not JSON deserialization) to handle namespaced fields correctly. Follow existing mock patterns in test classes.
@@ -914,15 +935,17 @@ If you encounter issues:
 > **For Developers**: Ask Claude to run these command sets instead of typing them manually.
 > Claude has these workflows memorized and can execute them for you.
 
-### Command Set 1: Pull Metadata from NIPR DEV
+### Command Set 1: Pull Metadata from DEVELOPER_ORG
 
-**When to ask**: "Pull latest metadata from NIPR DEV"
+**When to ask**: "Pull latest metadata from DEVELOPER_ORG"
 
 ```bash
-sf project retrieve start --source-dir force-app --target-org "NIPR DEV"
+sf project retrieve start --source-dir force-app --target-org "DEVELOPER_ORG"
 git status
 git diff
 ```
+
+**⚠️ NOTE**: NEVER use "NIPR DEV" org - always use "DEVELOPER_ORG"
 
 ### Command Set 2: Create and Release Package Version
 
@@ -976,37 +999,39 @@ sf apex run test \
   --target-org "Hipten QA"
 ```
 
-### Command Set 4: Deploy Specific Changes to NIPR DEV
+### Command Set 4: Deploy Specific Changes to DEVELOPER_ORG
 
-**When to ask**: "Deploy [file/directory] to NIPR DEV"
+**When to ask**: "Deploy [file/directory] to DEVELOPER_ORG"
 
 ```bash
 # Deploy specific class
 sf project deploy start \
   --source-dir force-app/main/default/classes/YourClass.cls \
-  --target-org "NIPR DEV" \
+  --target-org "DEVELOPER_ORG" \
   --wait 10
 
 # Deploy entire directory
 sf project deploy start \
   --source-dir force-app/main/default/flows \
-  --target-org "NIPR DEV" \
+  --target-org "DEVELOPER_ORG" \
   --wait 10
 
 # Deploy multiple files/directories
 sf project deploy start \
   --source-dir force-app/main/default/classes/Class1.cls \
   --source-dir force-app/main/default/objects/Object1 \
-  --target-org "NIPR DEV" \
+  --target-org "DEVELOPER_ORG" \
   --wait 10
 ```
+
+**⚠️ NEVER deploy to "NIPR DEV" org**
 
 ### Command Set 5: Full Development Cycle (Pull → Package → Install → Test)
 
 **When to ask**: "Run full packaging workflow for version 0.X.0"
 
 **Claude will execute:**
-1. Pull metadata from NIPR DEV
+1. Pull metadata from DEVELOPER_ORG
 2. Update version number in sfdx-project.json
 3. Create package version with coverage
 4. Promote to Released
@@ -1015,8 +1040,8 @@ sf project deploy start \
 7. Open scratch org for testing
 
 ```bash
-# 1. Pull from NIPR DEV
-sf project retrieve start --source-dir force-app --target-org "NIPR DEV"
+# 1. Pull from DEVELOPER_ORG
+sf project retrieve start --source-dir force-app --target-org "DEVELOPER_ORG"
 
 # 2. Update sfdx-project.json (automated)
 
@@ -1069,9 +1094,9 @@ sf package version report \
   --target-dev-hub "HIPTEN DEV HUB"
 ```
 
-### Command Set 7: Run Tests in NIPR DEV
+### Command Set 7: Run Tests in DEVELOPER_ORG
 
-**When to ask**: "Run all tests in NIPR DEV" or "Run tests for [TestClass]"
+**When to ask**: "Run all tests in DEVELOPER_ORG" or "Run tests for [TestClass]"
 
 ```bash
 # Run all tests with coverage
@@ -1079,21 +1104,23 @@ sf apex run test \
   --test-level RunLocalTests \
   --code-coverage \
   --result-format human \
-  --target-org "NIPR DEV"
+  --target-org "DEVELOPER_ORG"
 
 # Run specific test class
 sf apex run test \
   --class-names YourTestClass_Test \
   --result-format human \
-  --target-org "NIPR DEV"
+  --target-org "DEVELOPER_ORG"
 
 # Run test suite
 sf apex run test \
   --test-level RunSpecifiedTests \
   --suite-names NIPRTestSuite \
   --code-coverage \
-  --target-org "NIPR DEV"
+  --target-org "DEVELOPER_ORG"
 ```
+
+**⚠️ NEVER use "NIPR DEV" org for testing**
 
 ### Command Set 8: Deploy to Client Production
 
@@ -1121,22 +1148,24 @@ sf package install \
 
 ## 📋 Package Information Summary
 
-**Package Name**: NIPR Integration  
-**Namespace**: `niprsync`  
-**Package ID**: `0HoPB00000001P70AI`  
-**Dev Hub**: HIPTEN DEV HUB (`stefan.nidzovic@hipten.com`)  
-**Dev Org**: NIPR DEV (`hiptenadmins@hipten.com.d4c_nipr`)  
-**GitHub Repo**: [https://github.com/stefan-nidzovic_hipten/NIPR](https://github.com/stefan-nidzovic_hipten/NIPR)  
+**Package Name**: NIPR Integration
+**Namespace**: `niprsync`
+**Package ID**: `0HoPB00000001P70AI`
+**Dev Hub**: HIPTEN DEV HUB (`stefan.nidzovic@hipten.com`)
+**Dev Org**: DEVELOPER_ORG (⚠️ "NIPR DEV" has been DISCONNECTED - DO NOT USE)
+**GitHub Repo**: [https://github.com/stefan-nidzovic_hipten/NIPR](https://github.com/stefan-nidzovic_hipten/NIPR)
 
-**Current Version**: Check `sfdx-project.json` → `versionNumber`  
-**Latest Released Version**: Ask Claude or run Command Set 6  
+**Current Version**: Check `sfdx-project.json` → `versionNumber`
+**Latest Released Version**: Ask Claude or run Command Set 6
+
+**⚠️ CRITICAL**: The "NIPR DEV" org is OFF LIMITS. Always use "DEVELOPER_ORG" for development.  
 
 ---
 
 ## 🚀 Common Developer Questions for Claude
 
 ### Package Management
-- "Pull latest metadata from NIPR DEV"
+- "Pull latest metadata from DEVELOPER_ORG"
 - "Create package version 0.5.0"
 - "Promote package version 04tXXX..."
 - "Install latest package in scratch org"
@@ -1144,15 +1173,17 @@ sf package install \
 - "What's the latest Released version?"
 
 ### Deployment
-- "Deploy [ClassName] to NIPR DEV"
-- "Deploy all flows to NIPR DEV"
+- "Deploy [ClassName] to DEVELOPER_ORG"
+- "Deploy all flows to DEVELOPER_ORG"
 - "Install package in Hipten QA org"
 - "Deploy to [Client Name] production"
 
 ### Testing
-- "Run all tests in NIPR DEV"
+- "Run all tests in DEVELOPER_ORG"
 - "Run tests for ProcessPDBAlertReportService"
 - "Check test coverage"
+
+**⚠️ REMINDER**: NEVER mention or use "NIPR DEV" org in any commands
 
 ### Full Workflows
 - "Run full packaging workflow for version 0.6.0"
@@ -1193,5 +1224,7 @@ After creating and promoting a new package version, you **MUST** update the rele
 
 ---
 
-**Last Updated**: 2026-01-26
+**Last Updated**: 2026-02-11
 **Maintained By**: Hipten Development Team
+
+**⚠️ CRITICAL CHANGE (2026-02-11)**: "NIPR DEV" org has been DISCONNECTED and is OFF LIMITS. All development must use "DEVELOPER_ORG" only.

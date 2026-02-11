@@ -318,6 +318,8 @@
         <type>Region</type>
     </flexiPageRegions>
     <masterLabel>NIPR Address Record Page - Read Only</masterLabel>
+    <recordType>Master</recordType>
+
     <sobjectType>d4c_NIPR_Address__c</sobjectType>
     <template>
         <name>flexipage:recordHomeTemplateDesktop</name>

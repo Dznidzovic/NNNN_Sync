@@ -526,6 +526,8 @@
     </flexiPageRegions>
     <masterLabel>NIPR Entity Record Page - Read Only</masterLabel>
     <parentFlexiPage>flexipage__default_rec_L</parentFlexiPage>
+    <recordType>Master</recordType>
+
     <sobjectType>d4c_Entity__c</sobjectType>
     <template>
         <name>flexipage:recordHomeTemplateDesktop</name>
