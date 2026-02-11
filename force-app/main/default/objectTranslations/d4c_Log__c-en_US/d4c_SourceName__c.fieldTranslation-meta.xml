@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<CustomFieldTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
-    <help><!-- Stores the Apex Class name or Flow Name where the log originated. --></help>
-    <label><!-- Apex Class / Flow Name --></label>
-    <name>d4c_SourceName__c</name>
-</CustomFieldTranslation>
