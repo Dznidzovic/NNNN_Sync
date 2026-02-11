@@ -15,12 +15,7 @@
             &quot;Processing&quot;, &quot;🟠 Processing&quot;,
             &quot;Invalid NPN&quot;, &quot;🔴 Invalid NPN&quot;,
             &quot;Sync Disabled&quot;, &quot;⛔ Sync Disabled&quot;,
-            &quot;Active&quot;,
-            IF(
-                ISPICKVAL(d4c_Entity__r.d4c_Type__c, &apos;Agent&apos;),
-                &quot;🟢 Active&quot;,
-                &quot;🔴 Error&quot;
-            ),
+            &quot;Active&quot;, &quot;🟢 Active&quot;,
             &quot;🔴 Error&quot;
         )
     )
