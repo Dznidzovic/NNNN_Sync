@@ -332,16 +332,6 @@
                 <identifier>RecordLastModifiedByIdField</identifier>
             </fieldInstance>
         </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>none</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.d4c_LOAMapping__c</fieldItem>
-                <identifier>Recordd4c_LOAMapping_cField</identifier>
-            </fieldInstance>
-        </itemInstances>
         <name>Facet-57f0d91f-faf1-47b3-9a26-df8e75c9a217</name>
         <type>Facet</type>
     </flexiPageRegions>

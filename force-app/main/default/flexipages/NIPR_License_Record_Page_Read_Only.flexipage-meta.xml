@@ -135,19 +135,9 @@
             </fieldInstance>
         </itemInstances>
         <name>Facet-bc663206-d32b-4e79-b567-a407629ae268</name>
-        <type>Facet</type>
+        <type>Region</type>
     </flexiPageRegions>
     <flexiPageRegions>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>required</value>
-                </fieldInstanceProperties>
-                <fieldItem>Record.d4c_Entity__c</fieldItem>
-                <identifier>Recordd4c_Entity_cField</identifier>
-            </fieldInstance>
-        </itemInstances>
         <itemInstances>
             <fieldInstance>
                 <fieldInstanceProperties>
@@ -209,20 +199,8 @@
             </fieldInstance>
         </itemInstances>
         <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>none</value>
-                </fieldInstanceProperties>
-                <identifier>Recordd4c_NumberOfProductNotMatchedLOAs_cField</identifier>
-            </fieldInstance>
-        </itemInstances>
-        <itemInstances>
-            <fieldInstance>
-                <fieldInstanceProperties>
-                    <name>uiBehavior</name>
-                    <value>none</value>
-                </fieldInstanceProperties>
+            <componentInstance>
+                <componentInstanceProperties>
                     <name>body</name>
                     <value>Facet-bc663206-d32b-4e79-b567-a407629ae268</value>
                 </componentInstanceProperties>
@@ -230,18 +208,8 @@
                 <identifier>flexipage_column</identifier>
             </componentInstance>
         </itemInstances>
-        <itemInstances>
-            <componentInstance>
-                <componentInstanceProperties>
-                    <name>body</name>
-                    <value>Facet-d45faf27-cff5-47a0-a36f-0c3f54275067</value>
-                </componentInstanceProperties>
-                <componentName>flexipage:column</componentName>
-                <identifier>flexipage_column2</identifier>
-            </componentInstance>
-        </itemInstances>
         <name>Facet-46ca4273-8d99-4f08-9278-423860883597</name>
-        <type>Facet</type>
+        <type>Region</type>
     </flexiPageRegions>
     <flexiPageRegions>
         <itemInstances>
@@ -275,7 +243,7 @@
             </fieldInstance>
         </itemInstances>
         <name>Facet-2f2e6d30-9310-4b7e-a7a3-4c32d396f18e</name>
-        <type>Facet</type>
+        <type>Region</type>
     </flexiPageRegions>
     <flexiPageRegions>
         <itemInstances>
@@ -299,7 +267,7 @@
             </fieldInstance>
         </itemInstances>
         <name>Facet-d7e268eb-1878-4b7b-b246-dd3b779dbbef</name>
-        <type>Facet</type>
+        <type>Region</type>
     </flexiPageRegions>
     <flexiPageRegions>
         <itemInstances>
@@ -323,7 +291,7 @@
             </componentInstance>
         </itemInstances>
         <name>Facet-796e160a-e856-4a8b-a99a-f8d38f3aab09</name>
-        <type>Facet</type>
+        <type>Region</type>
     </flexiPageRegions>
     <flexiPageRegions>
         <itemInstances>
@@ -347,7 +315,7 @@
             </fieldInstance>
         </itemInstances>
         <name>Facet-9ead7b9d-a1a9-46dc-b61c-1ba1866475f3</name>
-        <type>Facet</type>
+        <type>Region</type>
     </flexiPageRegions>
     <flexiPageRegions>
         <itemInstances>
@@ -361,7 +329,7 @@
             </fieldInstance>
         </itemInstances>
         <name>Facet-92de2345-e6dd-42f0-be89-6c38b91be9c7</name>
-        <type>Facet</type>
+        <type>Region</type>
     </flexiPageRegions>
     <flexiPageRegions>
         <itemInstances>
@@ -385,7 +353,7 @@
             </componentInstance>
         </itemInstances>
         <name>Facet-b884561d-3d67-4458-ba5e-a1d885420b9f</name>
-        <type>Facet</type>
+        <type>Region</type>
     </flexiPageRegions>
     <flexiPageRegions>
         <itemInstances>
@@ -443,7 +411,7 @@
             </componentInstance>
         </itemInstances>
         <name>Facet-cde5479c-e454-4495-a00d-8afa98d42b9e</name>
-        <type>Facet</type>
+        <type>Region</type>
     </flexiPageRegions>
     <flexiPageRegions>
         <itemInstances>
@@ -465,7 +433,7 @@
             </componentInstance>
         </itemInstances>
         <name>Facet-5edf1c92-f0b6-4704-b79e-53877a3adb84</name>
-        <type>Facet</type>
+        <type>Region</type>
     </flexiPageRegions>
     <flexiPageRegions>
         <itemInstances>
@@ -548,50 +516,6 @@
                 </componentInstanceProperties>
                 <componentName>lst:dynamicRelatedList</componentName>
                 <identifier>lst_dynamicRelatedList2</identifier>
-            </componentInstance>
-        </itemInstances>
-        <itemInstances>
-            <componentInstance>
-                <componentInstanceProperties>
-                    <name>decorate</name>
-                    <value>true</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>richTextValue</name>
-                    <value>&lt;p style=&quot;text-align: center;&quot;&gt;&lt;span style=&quot;color: rgb(231, 5, 5);&quot;&gt;Some LOAs under this License have not been matched to an Insurance Product.&lt;/span&gt;&lt;/p&gt;</value>
-                </componentInstanceProperties>
-                <componentName>flexipage:richText</componentName>
-                <identifier>flexipage_richText</identifier>
-                <visibilityRule>
-                    <criteria>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>maxRecordsToDisplay</name>
-                    <value>5</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>parentFieldApiName</name>
-                    <value>d4c_License__c.Id</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>relatedListApiName</name>
-                    <name>relatedListLabel</name>
-                    <value>NIPR Insurance Products</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>showActionBar</name>
-                    <value>true</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>sortFieldAlias</name>
-                    <value>__DEFAULT__</value>
-                </componentInstanceProperties>
-                <componentInstanceProperties>
-                    <name>sortFieldOrder</name>
-                    <value>Default</value>
-                </componentInstanceProperties>
-                <componentName>lst:dynamicRelatedList</componentName>
-                <identifier>lst_dynamicRelatedList</identifier>
             </componentInstance>
         </itemInstances>
         <name>sidebar</name>

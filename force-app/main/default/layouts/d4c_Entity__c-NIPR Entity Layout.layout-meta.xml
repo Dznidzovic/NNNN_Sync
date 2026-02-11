@@ -120,6 +120,7 @@
         </layoutColumns>
         <style>TwoColumnsTopToBottom</style>
     </layoutSections>
+    <!-- TODO: Add back platformActionList with d4c_Force_NPN_Sync quick action after quick actions are deployed -->
     <layoutSections>
         <customLabel>true</customLabel>
         <detailHeading>false</detailHeading>
@@ -130,35 +131,10 @@
         <layoutColumns/>
         <style>CustomLinks</style>
     </layoutSections>
-    <platformActionList>
-        <actionListContext>Record</actionListContext>
-        <platformActionListItems>
-            <actionName>d4c_Entity__c.d4c_Force_NPN_Sync</actionName>
-            <actionType>QuickAction</actionType>
-            <sortOrder>0</sortOrder>
-        </platformActionListItems>
-        <platformActionListItems>
-            <actionName>Edit</actionName>
-            <actionType>StandardButton</actionType>
-            <sortOrder>1</sortOrder>
-        </platformActionListItems>
-        <platformActionListItems>
-            <actionName>Delete</actionName>
-            <actionType>StandardButton</actionType>
-            <sortOrder>2</sortOrder>
-        </platformActionListItems>
-        <platformActionListItems>
-            <actionName>Clone</actionName>
-            <actionType>StandardButton</actionType>
-            <sortOrder>3</sortOrder>
-        </platformActionListItems>
-    </platformActionList>
     <relatedLists>
         <fields>NAME</fields>
         <fields>d4c_LicenseNumber__c</fields>
         <fields>d4c_StatusCode__c</fields>
-        <fields>d4c_License_Products__c</fields>
-        <fields>d4c_AllLOAsMatchedToProduct__c</fields>
         <fields>d4c_StateOrProvinceName__c</fields>
         <fields>d4c_LicenseClassDescription__c</fields>
         <fields>d4c_StartDate__c</fields>
@@ -175,22 +151,10 @@
         <relatedList>d4c_CarrierAppointment__c.d4c_Entity__c</relatedList>
     </relatedLists>
     <relatedLists>
-        <fields>d4c_EmailAddress__c</fields>
-        <fields>d4c_EmailType__c</fields>
-        <fields>d4c_PhoneNumber__c</fields>
-        <fields>d4c_PhoneType__c</fields>
-        <fields>CREATED_DATE</fields>
-        <relatedList>d4c_ProducerCommunication__c.d4c_Entity__c</relatedList>
+        <relatedList>d4c_Entity_Communication_Junction__c.d4c_Entity__c</relatedList>
     </relatedLists>
     <relatedLists>
-        <fields>d4c_AddressType__c</fields>
-        <fields>d4c_AddressLineOne__c</fields>
-        <fields>d4c_AddressLineThree__c</fields>
-        <fields>d4c_AddressLineTwo__c</fields>
-        <fields>d4c_AsOfDate__c</fields>
-        <fields>d4c_City__c</fields>
-        <fields>d4c_CountryCode__c</fields>
-        <relatedList>d4c_ProducerAddress__c.d4c_Entity__c</relatedList>
+        <relatedList>d4c_Entity_Address_Junction__c.d4c_Entity__c</relatedList>
     </relatedLists>
     <relatedLists>
         <fields>ACCOUNT.NAME</fields>
