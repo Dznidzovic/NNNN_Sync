@@ -528,9 +528,24 @@ public class RetrievePDBSpecificReportData {
             // It is extremely important that during the merge, we store all the keys per NPN, as later one whichever service processes this response, it won't be able to match the rest of the data to Person records correctly without all Keys
             // Lastly NIPR can sometimes return nodes without any info used for matching it with child records and we use IsExisting field to indicate we expect this record to already exist in Salesforce
             List<String> combinedKeys = new List<String>();
-            
+
+            // CRITICAL FIX (2026-02-12): Collect ALL PersonCommunication and BusinessCommunication from ALL nodes
+            // NIPR can return 27+ Person nodes for one NPN (see CLAUDE.md - NPN 9306586 example)
+            // Communication data (phones, emails, addresses) is spread across different state-specific nodes
+            // We MUST collect ALL communication data to prevent data loss
+            List<LicensingReportDTO.PersonCommunication> allPersonComms = new List<LicensingReportDTO.PersonCommunication>();
+            List<LicensingReportDTO.BusinessCommunication> allBusinessComms = new List<LicensingReportDTO.BusinessCommunication>();
+
             for (LicensingReportDTO.Person person : personList) {
                 combinedKeys.add(person.key);
+
+                // Collect communication data from ALL nodes
+                if (person.personCommunication != null) {
+                    allPersonComms.add(person.personCommunication);
+                }
+                if (person.businessCommunication != null) {
+                    allBusinessComms.add(person.businessCommunication);
+                }
 
                 if (person.personName != null && person.personName.typeCode == 'Primary') {
                     primaryNode = new LicensingReportDTO.Person();
@@ -552,7 +567,7 @@ public class RetrievePDBSpecificReportData {
                     tertiaryNode.mainIdentifier = person.mainIdentifier;
                     tertiaryNode.mainIdentifierType = person.mainIdentifierType;
                     tertiaryNode.isExisting = true;
-                } 
+                }
             }
 
             if (primaryNode != null || secondaryNode != null || tertiaryNode != null) {
@@ -563,12 +578,102 @@ public class RetrievePDBSpecificReportData {
                 }
 
                 newPerson.combinedKeys = combinedKeys;
-            } 
+
+                // CRITICAL FIX (2026-02-12): Merge ALL collected communication data into the chosen node
+                // This ensures we capture unique phones, emails, addresses from all 27+ state-specific Person nodes
+                // ListUtils.deduplicateByField() will handle duplicates via d4c_UniqueIdentifier__c later
+                newPerson.personCommunication = mergePersonCommunications(allPersonComms);
+                newPerson.businessCommunication = mergeBusinessCommunications(allBusinessComms);
+            }
 
             mergedPersonList.add(newPerson);
         }
 
         return mergedPersonList;
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : mergePersonCommunications
+     * @description     : Merges PersonCommunication data from multiple Person nodes into a single PersonCommunication object.
+     *                   NIPR returns communication data (addresses, phones, emails) spread across multiple state-specific Person nodes.
+     *                   This method collects ALL unique communication data to prevent data loss.
+     * @param allComms  : List of PersonCommunication objects from all Person nodes for the same NPN
+     * @return          : A single merged PersonCommunication object containing all unique data
+     * @created         : 2026-02-12
+     *********************************************************
+     **/
+    private LicensingReportDTO.PersonCommunication mergePersonCommunications(List<LicensingReportDTO.PersonCommunication> allComms) {
+        if (allComms == null || allComms.isEmpty()) {
+            return null;
+        }
+
+        LicensingReportDTO.PersonCommunication merged = new LicensingReportDTO.PersonCommunication();
+        merged.telephoneList = new List<LicensingReportDTO.Telephone>();
+        merged.emailList = new List<LicensingReportDTO.Email>();
+        merged.addressList = new List<LicensingReportDTO.Address>();
+
+        // Collect all communication data from all nodes
+        for (LicensingReportDTO.PersonCommunication comm : allComms) {
+            if (comm.telephoneList != null && !comm.telephoneList.isEmpty()) {
+                merged.telephoneList.addAll(comm.telephoneList);
+            }
+            if (comm.emailList != null && !comm.emailList.isEmpty()) {
+                merged.emailList.addAll(comm.emailList);
+            }
+            if (comm.addressList != null && !comm.addressList.isEmpty()) {
+                merged.addressList.addAll(comm.addressList);
+            }
+        }
+
+        // Return null if no data was collected (all lists empty)
+        if (merged.telephoneList.isEmpty() && merged.emailList.isEmpty() && merged.addressList.isEmpty()) {
+            return null;
+        }
+
+        return merged;
+    }
+
+    /**
+     *********************************************************
+     * @methodName      : mergeBusinessCommunications
+     * @description     : Merges BusinessCommunication data from multiple Person nodes into a single BusinessCommunication object.
+     *                   NIPR returns communication data (addresses, phones, emails) spread across multiple state-specific Person nodes.
+     *                   This method collects ALL unique communication data to prevent data loss.
+     * @param allComms  : List of BusinessCommunication objects from all Person nodes for the same NPN
+     * @return          : A single merged BusinessCommunication object containing all unique data
+     * @created         : 2026-02-12
+     *********************************************************
+     **/
+    private LicensingReportDTO.BusinessCommunication mergeBusinessCommunications(List<LicensingReportDTO.BusinessCommunication> allComms) {
+        if (allComms == null || allComms.isEmpty()) {
+            return null;
+        }
+
+        LicensingReportDTO.BusinessCommunication merged = new LicensingReportDTO.BusinessCommunication();
+        merged.telephoneList = new List<LicensingReportDTO.Telephone>();
+        merged.emailList = new List<LicensingReportDTO.Email>();
+        merged.addressList = new List<LicensingReportDTO.Address>();
+
+        // Collect all communication data from all nodes
+        for (LicensingReportDTO.BusinessCommunication comm : allComms) {
+            if (comm.telephoneList != null && !comm.telephoneList.isEmpty()) {
+                merged.telephoneList.addAll(comm.telephoneList);
+            }
+            if (comm.emailList != null && !comm.emailList.isEmpty()) {
+                merged.emailList.addAll(comm.emailList);
+            }
+            if (comm.addressList != null && !comm.addressList.isEmpty()) {
+                merged.addressList.addAll(comm.addressList);
+            }
+        }
+
+        // Return null if no data was collected (all lists empty)
+        if (merged.telephoneList.isEmpty() && merged.emailList.isEmpty() && merged.addressList.isEmpty()) {
+            return null;
+        }
+
+        return merged;
     }
 
     /**

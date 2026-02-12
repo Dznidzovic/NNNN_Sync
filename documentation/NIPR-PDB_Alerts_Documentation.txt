@@ -1,0 +1,3309 @@
+Skip to main content
+assistive.skiplink.to.breadcrumbs
+assistive.skiplink.to.header.menu
+assistive.skiplink.to.action.menu
+assistive.skiplink.to.quick.search
+Skip to sidebar
+Skip to main content
+Skip to breadcrumbs
+Skip to search
+NIPR Wiki
+Spaces
+Calendars
+Analytics
+
+Search
+Help
+0
+
+
+
+
+Configure
+PDB Alerts Web Service
+ View inline comments
+
+ Save for later Watch Share
+Pages NIPR Industry Portal Getting Started with PDB Alerts
+Analytics
+Created by THembree@nipr.com, last updated by KHinson@nipr.com on Aug 26, 2025  35 minute read
+The data in NIPR’s Producer Database (PDB) is constantly changing. Producers move, obtain new licenses, or get appointed with new carriers. It's important for companies to be informed of these changes in a timely manner because there may be regulatory requirements or consequences related to these changes.
+
+PDB Alerts notifies you when certain information changes in the PDB.
+
+Use PDB Alerts if your company:
+
+Needs timely notification of changes to the PDB
+Is keeping its own database in sync with the Producer Database. 
+Your company can get daily alerts on any producer or business entity on your subscription target list. 
+Subscriptions define the types of alerts you want to receive. Set up one or more subscriptions and add a target list of producers to begin generating alerts.
+
+To get started, email businessdevelopment@nipr.com and ask to sign up for PDB Alerts. 
+
+What Updates Trigger Alerts?
+Daily alerts are generated when changes like the following occur:
+
+Appointment renewal
+Appointment status change
+Address update
+Name change
+License status change
+Expiration date change
+Continuing education status change
+RIRS action
+NIPR groups this data into 4 categories: Demographics, Licensing, Appointments, and Regulatory Actions (RIRS).
+You can filter alerts based on the category if you do not wish to receive all of the data elements.
+
+Refer to the below chart for a complete list of Alert triggers.
+ 
+
+Click here to expand...
+Pricing
+Pricing is based on the delivery method selection, the number of targeted producers, and your contract rates. The prices below reflect the standard rates. 
+
+Email: Receive a free email each day + $1.30 charge for a full PDB report for each targeted producer with changes when a report is ordered
+Web Service or Composite: $1.30 full detail report for initial onboarding of each producer + $0.25 monthly charge for ongoing maintenance via web service access
+Tip: Set up and test your alerts for free in the beta environment before moving to the production environment to save unintended costs.
+For more information about our beta environment, see Beta Testing Environment
+
+Delivery Methods
+Get alerts on targeted producers through one of the following delivery methods:
+
+Email
+Receive a free email notification like below when a change is detected
+
+Producer data is retrieved by ordering full PDB Batch reports from the PDB Alerts landing page
+Ideal use case: An organization with a relatively small number of producers which are maintained manually and have minimal changes
+Benefits:
+No coding necessary to receive alerts
+Charged only when a target producer’s data changes and a report is ordered
+Web Service
+Producer data is retrieved via web service
+In production, selecting this option enables monthly charges
+Ideal use case: A large organization with many (>1000) producers, programming for automated maintenance of constantly changing data
+Benefits:
+Code a custom solution to automatically keep your database in sync with the PDB
+Charged the same monthly rate per producer, regardless of the number of data changes processed
+Composite
+continue receiving free emails in addition to web service access
+Your account Administrator selects the delivery method using the PDB Alerts web application:
+
+
+
+Alert schedule
+Targets should be added / removed by 9 PM Central to be considered for the next run
+Alert data is updated nightly, Monday through Saturday
+Updated reports are available for download by 10:00 AM Central 
+Processing usually begins around 4 AM Central. Most runs are complete by 7 AM Central
+Could be delayed if the nightly processing is delayed
+If not complete by 10 AM, a notice will be posted at Reported production and beta issues
+If not complete by 11 PM, alerts will be processed in the next run
+Weekends and Holidays
+Changes that occur Saturday and Sunday evening are included in Monday's alerts
+NIPR does not normally process incoming state data when our offices are closed therefore it is typical to have no alerts the day after a holiday
+Despite the schedule, web service users are advised to call the service every day to confirm nothing is missed
+The service response will specify whether a new alert file is expected that day and is still in progress, or if there are no alerts scheduled for the day
+Exceptions will be posted at NIPR product and state licensing updates
+Web Service Process Overview
+The following information is a high-level overview of how PDB Alerts work. For more details about how to use PDB Alerts, see Web Service Technical Information. 
+
+
+
+Initial Setup
+Work with your NIPR Account Coordinator to set up user accounts and assign PDB Alerts roles
+The admin for your company selects a Delivery Method
+Subscription Setup
+Give the subscription a name and contact email address
+Select the categories to monitor
+Select state filters
+Select company affiliation filters
+Producer Onboarding
+Obtain a baseline of PDB data for the producer one time ($1.30 per producer) using either
+Batch report
+Recommended for the initial load
+
+Detail report (entityInfo API call)
+
+Recommended for daily onboarding of new producers
+
+Add Targets to the Subscription Target List ($0.25 per producer per month) the same day to avoid gaps in monitoring
+
+The recommended maximum number of targets for one subscription is 10K
+Group targets into as few subscriptions as possible
+Input options: NPN, FEIN, or SSN + Last Name
+During the Alerts processing, NIPR records the run date, NPN, category, state, and branch that changed
+
+Daily Maintenance
+
+Retrieve Alerts Reports Daily for each subscription
+
+Compare New Data to Previous Data
+
+Load New Data
+
+Trigger other business processes
+
+Recovering from missed Alerts
+Alerts reports can be backdated up to 14 days if a report is missed
+Alerts will always provide current data so it is OK if reports are retrieved and processed out of order
+For example:
+
+Timeline
+
+Day 1
+
+Day 2
+
+Day 3
+
+Action
+
+Report is Missed
+
+Retrieve Day 2
+
+Retrieve Day 3 & Day 1
+
+NPN 1
+
+License status is updated to "Expired"
+
+Same license is reinstated back to "Active" status
+
+No Changes
+
+Change was not captured Day 1
+
+The change is processed, updating the license with "Active" status and the new expiration date
+
+When processing Day 1, receive the same license info a second time, showing the most recent (Active) status
+
+NPN 2
+
+New license added
+
+No Changes
+
+No Changes
+
+Change was not captured Day 1
+
+
+When processing Day 1, receive information about this new license
+
+NPN 3
+
+No Changes
+
+No Changes
+
+License is updated
+
+
+
+Change is captured with Day 3 updates
+No updates for this NPN when processing Day 1
+
+
+Web Service Technical Information
+In order to begin scoping out the programming effort for implementing PDB Alerts, it is recommended that developers download the WSDL (Web Service Definition Language) and generate a code stub first:
+
+WSDL URLs:
+
+Beta	https://pdb-alerts-industry-services.api.beta.nipr.com/pdb-alerts-industry-services/services/industry-ws?WSDL=
+Production	https://pdb-alerts-industry-services.api.nipr.com/pdb-alerts-industry-services/services/industry-ws?WSDL=
+
+
+The PDB Alerts Web Service can be accessed at the following 
+Endpoints:
+
+Beta	https://pdb-alerts-industry-services.api.beta.nipr.com/pdb-alerts-industry-services/services/industry-ws
+Production	https://pdb-alerts-industry-services.api.nipr.com/pdb-alerts-industry-services/services/industry-ws
+
+
+The NIPR team has created a Postman project to easily get started with web services
+
+Security
+NIPR services require Basic Authentication to access. For more information, see Basic Authentication.
+
+For information about User ID and Password requirements, see User ID Maintenance.
+
+Web Service Methods
+All methods use the same endpoint. Use the SOAPAction header to inform the service which action to take.
+
+Subscription Management
+Add Subscription 
+Adds a Subscription and associated elements to an Alerts account
+SOAPAction: "https://pdb-services.nipr.com/pdb-alerts-industry-services/industry-ws/addSubscription"
+Retrieve all Subscriptions
+Retrieve all subscriptions associated to an Alerts account.
+SOAPAction: "https://pdb-services.nipr.com/pdb-alerts-industry-services/industry-ws/retrieveallsubscriptions"
+Remove Subscription
+Removes the given subscription from an Alerts account
+SOAPAction: "https://pdb-services.nipr.com/pdb-alerts-industry-services/industry-ws/removesubscription"
+Edit Subscription
+Modifies details of a subscription associated to an Alerts account. Note: Subscriptions cannot be renamed
+SOAPAction: "https://pdb-services.nipr.com/pdb-alerts-industry-services/industry-ws/EditSubscription"
+Target Management
+Add Targets
+Adds a list of targets to the subscriber’s target list.
+SOAPAction: "https://pdb-services.nipr.com/pdb-alerts-industry-services/industry-ws/addTargets"
+Retrieve Targets
+Returns the subscriber’s current list of targets.
+SOAPAction: "https://pdb-services.nipr.com/pdb-alerts-industry-services/industry-ws/retrieveTargets"
+Remove Targets
+Removes a list of targets from the subscriber’s target list.
+SOAPAction: "https://pdb-services.nipr.com/pdb-alerts-industry-services/industry-ws/removeTargets"
+Remove All Targets
+Removes all targets from a Subscription.
+SOAPAction: "https://pdb-services.nipr.com/pdb-alerts-industry-services/industry-ws/removeallTargets"
+Report Retrieval
+Recommended options:
+
+Receive Specific Alerts Report
+Return a report containing PDB alert data for all targets with changes on the given date for all subscriptions
+
+SOAPAction: "https://pdb-services.nipr.com/pdb-alerts-industry-services/industry-ws/receiveSpecificReport"
+Receive Specific Alerts Report For Subscription
+Return a report containing PDB alert data for all targets with changes on the given date for a single subscription
+
+SOAPAction: "https://pdb-services.nipr.com/pdb-alerts-industry-services/industry-ws/receiveSpecificReportForSubscription"
+Deprecated options (not recommended):
+
+Receive Current Alerts Report
+Return a report containing PDB alert data for all targets with changes in the last PDB working day for all subscriptions
+
+SOAPAction: "https://pdb-services.nipr.com/pdb-alerts-industry-services/industry-ws/receiveCurrentAlertsReport"
+Receive Current Alerts Report For Subscription
+Return a report containing PDB alert data for all targets with changes in the last PDB working day for a single subscription
+
+SOAPAction: "https://pdb-services.nipr.com/pdb-alerts-industry-services/industry-ws/receiveCurrentAlertsReportForSubscription"
+Generate Catch Up Report
+Return a report containing PDB alert data for all targets with changes since the last retrieved report for all subscriptions
+
+SOAPAction: "https://pdb-services.nipr.com/pdb-alerts-industry-services/industry-ws/generateCatchUpReport"
+Generate Catch Up Report For Subscription
+Return a report containing PDB alert data for all targets with changes since the last retrieved report for a single subscription
+
+SOAPAction: "https://pdb-services.nipr.com/pdb-alerts-industry-services/industry-ws/generateCatchUpReportForSubscription"
+Technical Definitions of Web Service Methods
+Click here to expand. . .
+
+Errors
+PDB Alerts uses standard HTTPS responses for SOAP. 
+
+Informational responses (100 – 199)
+Successful responses (200 – 299)
+Redirection messages (300 – 399)
+Client error responses (400 – 499)
+Indicate an issue with authorization or authentication
+Server error responses (500 – 599)
+Used when the request could not be fulfilled by the application
+Credit: HTTP response status codes - HTTP | MDN (mozilla.org)
+
+Faults
+If an error response is returned, the message body will include Fault information with details about the issue. The possible Faults are below:
+
+Fault
+
+Code
+
+Description
+
+UserAuthenticationFault
+
+1
+
+User failed authentication.
+
+UserAuthorizationFault
+
+2
+
+User is not authorized to use this producer
+
+WebServiceSubscriberFault
+
+3
+
+Subscriber is currently not set up to receive alerts via the Alerts web service
+
+GenericFault
+
+4
+
+A fault has occurred
+
+ReportUnavailableFault
+
+5
+
+There are no alerts reports available for this subscriber.
+
+InternalError
+
+6
+
+There has been an internal error.  Please contact the NIPR Help Desk.
+
+InputFormatFault
+
+7
+
+Please populate the input format.
+
+TargetInputFault
+
+8
+
+Please provide a list of targets to input.
+
+ValidProducerFault
+
+9
+
+None of your input resolved to a valid insurance producer.
+
+InvalidAllStatesFault
+
+10
+
+If you want ALL states, please remove all other state entries.
+
+InvalidStateEntryFault
+
+11
+
+One of the state list entries is invalid.  Please remove or correct the invalid entry.
+
+SUBSCRIPTION_NAME_NOT_UNIQUE
+
+12
+
+A subscription with this name already exists for this subscriber.
+
+Please provide a unique one.
+
+CATEGORY_REQUIRED
+
+13
+
+Please provide at least one Alert Type.
+
+SUBSCRIPTION_NONEXISTENT
+
+14
+
+There are no existing subscriptions with this name.
+
+SUBSCRIPTION_NAME_EMPTY
+
+15
+
+Please provide a subscription name.
+
+EMAIL_EMPTY
+
+16
+
+Please provide an email for your new subscription.
+
+STATELIST_EMPTY
+
+17
+
+Please provide at least one state for your new subscription.
+
+AFFILIATIONLIST_EMPTY
+
+18
+
+Please provide at least one affiliation for your new subscription
+
+STATELIST_INVALID
+
+19
+
+The state list contains an invalid entry.
+
+INVALID_DATE
+
+20
+
+The date provided was invalid.
+
+RUN_NOT_FINISHED
+
+21
+
+The requested report is not available or complete.
+
+NO_ALERTS_RUN_TODAY
+
+22
+
+There are no alerts scheduled for the day.
+
+Fault codes 21 and 22 are important for recovering if the requested report is not available.
+
+21 indicates the report is still pending and to retry later
+
+22 indicates there are no runs scheduled for the day, and it's not necessary to retry
+
+Scope of data in the XML
+Alerts reports are generated live upon request for producers with changes on the requested alerts run date
+They include the producer's current data for the state, category, and branch that changed
+Producer data is keyed back to the producer's NPN
+
+When a change occurs to the PDB data, the Alerts XML returns all related information for that state. For example: 
+
+Any change to an appointment brings back all appointment data for that state.
+Any change to a license brings back all license data for that state.
+Any change to demographics or contact information brings back all demographic and contact data for that state.
+Any change to RIRS actions brings back all RIRS data from that state.
+Deleted Licensing and Appointment Information
+When all License or Appointment information is deleted from the PDB for a producer in a state for a given branch (JurisdictionReportItem), Alerts are triggered and the Licensing Report from the PDB Alerts Web Service XML will return a set of tags for that branch. When Demographic information is deleted in this same manner, Alerts will also trigger for this event and an empty tag is returned. RIRS deletions do not trigger Alerts.
+
+ For deleted Appointments or Terminations, we will write the following empty tags:
+
+Deleted Appt/Terms Response Example Collapse source
+
+
+<InsuranceAppointment>
+ <StateOrProvinceCode></StateOrProvinceCode>
+ <InsurerReferences></InsurerReferences>
+ <LicenseeReferences></LicenseeReferences>
+</InsuranceAppointment> 
+
+
+NOTE: These empty tags will only appear in situations where ALL appointments or terminations have been deleted within a branch but will not appear if at least one appointment or termination was not deleted. If an empty tag is present for a branch and other branches aren't displayed, no updates were made to records under the other branches.
+
+Example 1: There are three appointments in the data for a producer on day 1. One of the three appointments is deleted. On day 2, the two remaining appointments will return in the Alerts data for that state and no empty tags will be returned for the deleted appointment for that state.
+
+Example 2: There are three appointments in the data for a producer under branch 1 and three appointments for a producer under branch 2. One appointment is deleted under branch 1. No changes are made to appointments under branch 2. On day 2, the two remaining appointments under branch 1 will return in the Alerts data for that state. No appointment records will display for branch 2 and no empty tags will be returned for the deleted appointment for that state.
+
+Example 3: There is one appointment in the data for a producer under branch 1 and one appointment for a producer under branch 2. The appointment under branch 1 is deleted. On day 2, the empty tag will display under branch 1. No license records will display for branch 2.
+
+For deleted Licenses, we will write the following tags:
+
+Deleted Licenses Response Example Collapse source
+
+
+<InsuranceLicense>
+ <TypeCode>Producer</TypeCode>
+</InsuranceLicense> 
+
+
+NOTE: These tags will only appear in situations where ALL licenses have been deleted for a branch but will not appear if at least one license the producer held was not deleted. The TypeCode of “Producer” will display regardless of what types of licenses were deleted. If this tag is present for a branch and other branches aren't displayed, no updates were made to records under the other branches.
+
+Example 1: There are two licenses in the data for a producer on day 1. One of the two licenses is deleted. On day 2, the remaining license will return in the Alerts data for that state and no tags will be returned for the deleted license for that state.
+
+Example 2: There are three licenses in the data for a producer under branch 1 and three licenses for a producer under branch 2. One license is deleted under branch 1. No changes are made to licenses under branch 2. On day 2, the two remaining licenses under branch 1 will return in the Alerts data for that state. No license records will display for branch 2 and no tags will be returned for the deleted license for that state.
+
+Example 3: There is one license in the data for a producer under branch 1 and one license for a producer under branch 2. The license under branch 1 is deleted. On day 2, the tag will display under branch 1. No license records will display for branch 2.
+
+Key References and Relationships
+When it comes to Key References and Relationships, there are a few important things to remember:
+
+As part of the defined XML structure, many wrapper tags have a “key” attribute.
+This “key” attribute is similar to the idea of a primary key in a database table.
+When the “key” attribute is defined in a wrapper tag for a particular aggregate piece of data, the full description of the data is contained within that aggregate tag.
+For instance, a licensee’s appointment has a reference that points back to the person object that contains the real business data about the person. Every time the person is referenced, a key is used to reference the original object that contains all of the aggregate data about the person rather than repeating the aggregate data multiple times over.
+
+Data normalization in XML is done for the same reason that you do data normalization in a database. Whenever you have the same data stored in multiple places you run the risk of introducing data integrity errors.
+
+PDB data is comprised of data supplied by many states. NIPR aggregates the data while maintaining record of which states supplied the data.
+
+PersonPRI Key – The primary key for an individual
+OrgPRI Key – The primary key for an organization
+State Key – The state demographic record
+For example, 1 organization may have 3 different names reported to PDB by 3 different states. The state demographic record would indicate which state supplied each name, as well as other information from that state such as state company ID, branch ID, addresses, etc. All 3 state demographic records would tie back to the organization’s OrgPRI key, which holds the NPN.
+
+It is possible for the same entity to have multiple state key nodes for the same state, if they have changes to multiple branch licenses
+
+Tag descriptions and definitions
+The Alerts Schema document can be found at PDB Alerts Schema
+This has not been maintained and may contain some inaccuracies. 
+Descriptions of the tags returned by Alerts are below.
+
+Top Level XML Entry
+Attribute Tag
+
+Data Type
+
+Max. Length
+
+Min / Max
+
+Description / Notes
+
+<LicensingReportProcessResult>
+
+N/A
+
+N/A
+
+N/A
+
+This is the type of report.
+
+<LicensingReportProcessResult>
+Attribute Tag
+
+Data Type
+
+Max. Length
+
+Min / Max
+
+Description / Notes
+
+<MessageHeader>
+
+N/A
+
+N/A
+
+1 / 1
+
+This contains message processing information that repeats in every message.
+
+<MessageResult>
+
+N/A
+
+N/A
+
+1 / 1
+
+The result status information for the entire message.
+
+<LicensingReport>
+
+N/A
+
+N/A
+
+0 / 1
+
+A message document that communicates a Licensing Report for a given period.
+
+<MessageHeader>
+Attribute Tag
+
+Data Type
+
+Max. Length
+
+Min / Max
+
+Description / Notes
+
+<MessageId>
+
+N/A
+
+N/A
+
+1 / 1
+
+This is a non-unique identifier generated by NIPR for one instance of this report.
+This tag is not currently used by NIPR at this time. 
+Tags exist but the data within is zeroed out (00000000-0000-0000-0000-000000000000)
+
+<CorrelationId>
+
+N/A
+
+N/A
+
+1 / 1
+
+This is a non-unique identifier passed by the customer to NIPR and then returned with the report.
+This tag is not currently used by NIPR at this time. 
+Tags exist but the data within is zeroed out (00000000-0000-0000-0000-000000000000)
+
+<MessageDateTime>
+
+N/A
+
+N/A
+
+1 / 1
+
+This is the system time at report generation.
+
+<MessageDocumentCount>
+
+N/A
+
+N/A
+
+1 / 1
+
+The number of entities that are returned in the report.
+
+<MessageResult>
+Attribute Tag
+
+Data Type
+
+Max. Length
+
+Min / Max
+
+Description / Notes
+
+<StatusCode>
+
+N/A
+
+N/A
+
+1 / 1
+
+This indicates whether NIPR could fulfill the report request.
+
+<MessageDocumentResult>
+
+N/A
+
+N/A
+
+1 / unbounded
+
+This indicates The result status information for the referenced Message Document
+
+<MessageDocumentResult>
+Attribute Tag
+
+Data Type
+
+Max. Length
+
+Min / Max
+
+Description / Notes
+
+<StatusCode>
+
+N/A
+
+N/A
+
+1 / 1
+
+A code that identifies the current state or condition of a Message Document.
+
+<MessageDocumentReferences>
+
+N/A
+
+N/A
+
+1 / 1
+
+The reference to a Message Document.
+
+<SuccessCode>
+
+N/A
+
+N/A
+
+1 / 1
+
+A code for identifying a level of successful processing of a Message Document.
+
+<MessageDocumentReferences>
+Attribute Tag
+
+Data Type
+
+Max. Length
+
+Min / Max
+
+Description / Notes
+
+<DocumentId>
+
+N/A
+
+N/A
+
+1 / 1
+
+This is a unique identifier generated by NIPR for one instance of this report.
+This tag is not currently used by NIPR at this time. 
+Tags exist but the data within is zeroed out (00000000-0000-0000-0000-000000000000)
+
+<LicensingReport>
+Attribute Tag
+
+Data Type
+
+Max. Length
+
+Min / Max
+
+Description / Notes
+
+<Address>
+
+N/A
+
+N/A
+
+0 / unbounded
+
+The “key” attribute of this tag is referenced in AddressReferences in both the <Person> and the <Organization> sections of the LicensingReport.
+
+<Person>
+
+N/A
+
+N/A
+
+0 / unbounded
+
+The “key” attribute of this tag beginning with “PRI” is a primary reference is found in AddressReferences in both the <Person> and the <Organization> sections of the LicensingReport.
+
+Key=ST ABREV
+
+Only shows with a LicenseeReferences or InsuranceAppointment
+
+<Organization>
+
+N/A
+
+N/A
+
+0 / unbounded
+
+The “key” attribute of this tag is pointed to by the state-specific licensing record.
+
+<DocumentId>
+
+N/A
+
+N/A
+
+1 / 1
+
+This is the same value and meaning as the LicensingReportProcessResult:MessageHeader:MessageId.
+This tag is not currently used by NIPR at this time.
+Tags exist but the data within is zeroed out (00000000-0000-0000-0000-000000000000)
+
+<TypeCode>
+
+N/A
+
+N/A
+
+1 / 1
+
+This is the message (report) type. The <TypeCode> value will always be “PDBDetail”, which indicates a single or batch detail report. 
+
+<JurisdictionReport>
+
+N/A
+
+N/A
+
+0 / unbounded
+
+A document that communicates a Jurisdiction Report for a given period.
+
+<Address>
+Attribute Tag
+
+Data Type
+
+Max. Length
+
+Min / Max
+
+Description / Notes
+
+<LineOne>
+
+VARCHAR2
+
+150 BYTE
+
+0 / 1
+
+Address line 1.
+
+<LineTwo>
+
+VARCHAR2
+
+150 BYTE
+
+0 / 1
+
+Address line 2.
+
+<LineThree>
+
+VARCHAR2
+
+150 BYTE
+
+0 / 1
+
+Address line 3.
+
+<CityName>
+
+VARCHAR2
+
+35 BYTE
+
+0 / 1
+
+City name.
+
+<StateOrProvinceCode>
+
+VARCHAR2
+
+3
+
+0 / 1
+
+A code identifying the state or province. The specific meaning is derived from the usage.
+For the USA, the source of the code list is the U.S. Postal Service: 
+http://apps.cybersource.com/library/documentation/sbc/quickref/states_and_provinces.pdf
+
+<PostalCode>
+
+VARCHAR2
+
+10 BYTE
+
+0 / 1
+
+Postal/Zip code.
+
+<CountryCode>
+
+NUMBER
+
+5
+
+0 / 1
+
+A code that identifies a country. The name of the code list is International Organization for Standardization/DIS-3166.
+
+<Person>
+Attribute Tag
+
+Data Type
+
+Max. Length
+
+Min / Max
+
+Description / Notes
+
+<ExternalIdentifier>
+
+N/A
+
+N/A
+
+0 / unbounded
+
+Generic construct used to represent the identifier of an object. Used when the identifier is assigned by an actor that is explicitely identified, such as an external permanent actor.
+
+<PersonName>
+
+N/A
+
+N/A
+
+0 / unbounded
+
+A collection of data providing information about an individual's name.
+
+<PersonCommunication>
+
+N/A
+
+N/A
+
+0 / 1
+
+A collection of phone numbers, emails, websites, and addresses for a person.
+
+<BusinessCommunication>
+
+N/A
+
+N/A
+
+0 / 1
+
+A collection of phone numbers, emails, websites, and addresses for a person's business.
+
+<BirthDate>
+
+Date
+
+Format: 
+yyyy-mm-dd
+
+0 / 1
+
+Represents the person’s birth date (primary name record) if the KEY= “Primary”.
+
+Represents the person’s birth date (state-specific records) if the KEY= “Alias”.
+
+<Organization>
+Attribute Tag
+
+Data Type
+
+Max. Length
+
+Min / Max
+
+Description / Notes
+
+<ExternalIdentifier>
+
+N/A
+
+N/A
+
+0 / unbounded
+
+Generic construct used to represent the identifier of an object. Used when the identifier is assigned by an actor that is explicitely identified, such as an external permanent actor.
+
+<OrganizationName>
+
+N/A
+
+N/A
+
+0 / unbounded
+
+The name of an organization.
+
+<AssignedIdentifier>
+
+N/A
+
+N/A
+
+0 / unbounded
+
+Generic construct used to represent the identifier of an object. Used when the identifier is assigned by an actor that is only identified by its role.
+
+<OrganizationCommunication>
+
+N/A
+
+N/A
+
+0 / 1
+
+A collection of phone numbers, emails, websites, and addresses for an organization.
+
+<JurisdictionReport>
+Attribute Tag
+
+Data Type
+
+Max. Length
+
+Min / Max
+
+Description / Notes
+
+<PersonReferences>
+
+N/A
+
+N/A
+
+0 / 1
+
+This reference points to the subject of the license report.
+
+<OrganizationReferences>
+
+N/A
+
+N/A
+
+0 / 1
+
+This reference points to the subject of the license report.
+
+<JurisdictionReportItem>
+
+N/A
+
+N/A
+
+0 / unbounded
+
+JurisdictionReportItem represents the data for one particular jurisdiction. For agencies, the "Key" for JurisdictionReportItem represents the Branch ID.
+
+<ExternalIdentifier>
+Attribute Tag
+
+Data Type
+
+Max. Length
+
+Min / Max
+
+Description / Notes
+
+<TypeCode>
+
+N/A
+
+N/A
+
+1 / 1
+
+Defined locally.
+
+<Id>
+
+
+
+Number
+
+10
+
+1 / 1
+
+
+
+Represents the person’s NPN if contained within the <Person> tag and the <TypeCode> attribute is “NAICProducerCode”.
+
+Number
+
+10
+
+Represents the Organization NPN (Agency on NIPR XML) if contained within the <Organization> tag and the <TypeCode> attribute is “NAICProducerCode”.
+
+VARCHAR2
+
+10 BYTE
+
+Represents the Organization FEIN (Agency on NIPR XML) if contained within the <Organization> tag and the <TypeCode> attribute is “FEINId”.
+
+Number
+
+10
+
+Represents the Organization COCODE (Insurer on NIPR XML) if contained within the <Organization> tag and the <TypeCode> attribute is “NAICInsurerCode”.
+
+VARCHAR2
+
+10 BYTE
+
+Represents the Organization FEIN (Insurer on NIPR XML) if contained within the <Organization> tag and the <TypeCode> attribute is “FEINId”.
+
+VARCHAR2
+
+15 BYTE
+
+Represents the Organization State Company ID if contained within the <Organization> tag and the <TypeCode> attribute is “JurisdictionId”
+
+VARCHAR2
+
+25 BYTE
+
+Represents the jurisdiction-assigned file reference number for the regulatory action if contained within the <RegulatoryAction> tag and the <TypeCode> attribute is “RegulatoryAgencyFileReferenceNumber”.
+
+VARCHAR2
+
+25 BYTE
+
+Represents the jurisdiction-assigned state RIRS Id if contained within the <RegulatoryAction> tag and the <TypeCode> attribute is “RegulatoryAgencyRIRSId”.
+VARCHAR2
+
+15 CHAR
+
+Represents the organization branch identifier for the Agency (on NIPR XML) if contained within the <Organization> tag and the <TypeCode> attribute is “BranchId”.
+
+<PersonName>
+Attribute Tag
+
+Data Type
+
+Max. Length
+
+Min / Max
+
+Description / Notes
+
+<TypeCode>
+
+Number
+
+5
+
+0 / 1
+
+Report primary name.
+
+State-specific record, primary or alias for this state if it is a subsequent instance of the same object.
+
+<FullName>
+
+VARCHAR2
+
+unbounded
+
+0 / 1
+
+The complete name of a person or organization in one text string.
+
+<Surname>
+
+VARCHAR2
+
+50 BYTE
+
+0 / 1
+
+Person last name (primary)
+
+
+
+VARCHAR2
+
+25 BYTE
+
+0 / 1
+
+Person last name (primary | alias) if it is a subsequent instance of the same object.
+
+<GivenName>
+
+VARCHAR2
+
+35 BYTE
+
+0 / 1
+
+Person first name (primary)
+
+Person first name (primary | alias) if it is a subsequent instance of the same object.
+
+<PersonCommunication>
+Attribute Tag
+
+Data Type
+
+Max. Length
+
+Min / Max
+
+Description / Notes
+
+<Telephone>
+
+N/A
+
+N/A
+
+0 / unbounded
+
+Telephone Information.
+
+<Email>
+
+N/A
+
+N/A
+
+0 / unbounded
+
+Email Information.
+
+<MailingAddress>
+
+N/A
+
+N/A
+
+0 / unbounded
+
+The address to which any type of mail or shipment is to be sent.
+
+<ResidentialAddress>
+
+N/A
+
+N/A
+
+0 / 1
+
+The address representing the place of residence.
+
+<BusinessCommunication>
+Attribute Tag
+
+Data Type
+
+Max. Length
+
+Min / Max
+
+Description / Notes
+
+<Telephone>
+
+N/A
+
+N/A
+
+0 / unbounded
+
+Telephone Information.
+
+<Email>
+
+N/A
+
+N/A
+
+0 / unbounded
+
+Email Information
+
+<MailingAddress>
+
+N/A
+
+N/A
+
+0 / unbounded
+
+The address to which any type of mail or shipment is to be sent.
+
+<PhysicalAddress>
+
+N/A
+
+N/A
+
+0 / 1
+
+The physical address to which any type of mail or shipment is to be sent.
+
+<OrganizationName>
+Attribute Tag
+
+Data Type
+
+Max. Length
+
+Min / Max
+
+Description / Notes
+
+<TypeCode>
+
+N/A
+
+N/A
+
+0 / 1
+
+Defined locally.
+
+<FullName>
+
+
+
+VARCHAR2
+
+
+
+100 BYTE
+
+
+
+0 / 1
+
+
+
+Organization name of the Agency (on NIPR XML). Organization name can be “Primary”, “DoingBusinessAs”, or “Previous” depending on the <TypeCode> attribute value
+
+If the attribute value of “Primary” is present in the <OrganizationName> tag rather than the <TypeCode> tag, then the <FullName> tag value represents the Organization name of the Insurer (on NIPR XML).
+
+<AssignedIdentifier>
+Attribute Tag
+
+Data Type
+
+Max. Length
+
+Min / Max
+
+Description / Notes
+
+<RoleCode>
+
+N/A
+
+N/A
+
+1 / 1
+
+The role of the assigning party.
+
+<Id>
+
+Number
+
+10
+
+1 / 1
+
+Represents the jurisdiction-assigned regulatory action id if contained within the <RegulatoryAction> tag and the <RoleCode> attribute is “RegulatoryAgency”.
+
+<OrganizationCommunication>
+Attribute Tag
+
+Data Type
+
+Max. Length
+
+Min / Max
+
+Description / Notes
+
+<Telephone>
+
+N/A
+
+N/A
+
+0 / unbounded
+
+Telephone Information.
+
+<Email>
+
+N/A
+
+N/A
+
+0 / unbounded
+
+Email Information
+
+<MailingAddress>
+
+N/A
+
+N/A
+
+0 / unbounded
+
+The address to which any type of mail or shipment is to be sent.
+
+<PrincipalAddress>
+
+N/A
+
+N/A
+
+0 / 1
+
+This is an address designated as an organizations principal address.
+
+<PhysicalAddress>
+
+N/A
+
+N/A
+
+0 / 1
+
+The physical address to which any type of mail or shipment is to be sent.
+
+<JurisdictionReportItem>
+Attribute Tag
+
+Data Type
+
+Max. Length
+
+Min / Max
+
+Description / Notes
+
+<StateOrProvinceCode>
+
+VARCHAR2
+
+3 BYTE
+
+1 / 1
+
+The jurisdiction A code identifying the state or province for this particular set of license, appointment, and RIRS data. The specific meaning is derived from the usage.
+For the USA, the source of the code list is the U.S. Postal Service: http://apps.cybersource.com/library/documentation/sbc/quickref/states_and_provinces.pdf
+
+<Licensee>
+
+N/A
+
+N/A
+
+0 / 1
+
+A collection of data providing information about the Licensee.
+
+<ResidentialAddress>
+Attribute Tag
+
+Data Type
+
+Max. Length
+
+Min / Max
+
+Description / Notes
+
+<AsOfDate>
+
+Date
+
+Format: 
+ yyyy-mm-dd
+
+0 / 1
+
+The date this address was loaded into SPL.
+
+<AddressReferences>
+
+Number
+
+10
+
+0 / 1
+
+The person’s residential address.
+
+<MailingAddress>
+Attribute Tag
+
+Data Type
+
+Max. Length
+
+Min / Max
+
+Description / Notes
+
+<AsOfDate>
+
+Date
+
+Format: 
+ yyyy-mm-dd
+
+0 / 1
+
+The date this address was loaded into SPL.
+
+<AddressReferences>
+
+Number
+
+10
+
+0 / 1
+
+Represents the person’s mailing address when contained within the <PersonCommunication> tag.
+
+*Depends on address data
+
+*Depends on address data
+
+Represents the person’s business address when contained within the <BusinessCommunication> tag.
+
+Number
+
+10
+
+Represents the organization’s mailing address when contained within the <OrganizationCommunication> tag.
+
+<Email>
+Attribute Tag
+
+Data Type
+
+Max. Length
+
+Min / Max
+
+Description / Notes
+
+<TypeCode>
+
+N/A
+
+N/A
+
+0 / 1
+
+Defined locally.
+
+<EmailAddress>
+
+
+
+Number
+
+
+
+10
+
+
+
+0 / unbounded
+
+
+
+The person’s personal email address when the <TypeCode>=”Personal”.
+
+The person’s business email address when the <TypeCode>=”Business”.
+
+<Telephone>
+Attribute Tag
+
+Data Type
+
+Max. Length
+
+Min / Max
+
+Description / Notes
+
+<TypeCode>
+
+N/A
+
+N/A
+
+1 / 1
+
+Defined locally.
+
+<PhoneNumber>
+
+
+
+VARCHAR2
+
+
+
+32 BYTE
+
+
+
+0 / 1
+
+
+
+If the <TypeCode> attribute is “Wired”, then the <PhoneNumber> tag represents the person’s business land line number.
+
+If the <TypeCode> attribute is “Fax”, then the <PhoneNumber> tag represents the person’s business fax number.
+
+<PrincipalAddress>
+Attribute Tag
+
+Data Type
+
+Max. Length
+
+Min / Max
+
+Description / Notes
+
+<AsOfDate>
+
+Date
+
+Format: 
+ yyyy-mm-dd
+
+0 / 1
+
+The date this address was loaded into SPL. Only for organizations when within this tag.
+
+<AddressReferences>
+
+Number
+
+10
+
+0 / 1
+
+The organization's business address.
+
+<PhysicalAddress>
+Attribute Tag
+
+Data Type
+
+Max. Length
+
+Min / Max
+
+Description / Notes
+
+<AsOfDate>
+
+Date
+
+Format: 
+ yyyy-mm-dd
+
+0 / 1
+
+The date this address was loaded into SPL.
+
+<AddressReferences>
+
+Number
+
+10
+
+0 / 1
+
+The organization's residence address.
+
+<Licensee>
+Attribute Tag
+
+Data Type
+
+Max. Length
+
+Min / Max
+
+Description / Notes
+
+<LicenseeReferences>
+
+N/A
+
+N/A
+
+0 / unbounded
+
+The element used to refer to a Licensee by its key identifiers from the report.
+
+<InsuranceLicense>
+
+N/A
+
+N/A
+
+0 / unbounded
+
+This is a wrapper to associate one license with one or more LOAs. Optional key for qualifying reference.
+
+<InsuranceAppointment>
+
+N/A
+
+N/A
+
+0 / unbounded
+
+A collection of data providing information about an insurance appointment.
+
+<RegulatoryAction>
+
+N/A
+
+N/A
+
+0 / unbounded
+
+A collection of data providing information about an insurance regulatory action.
+
+<ContinuingEducation>	N/A	N/A	0 / unbounded	Represents the common attributes of any continuing education for example to maintain a producer license
+<LicenseeReferences>
+Attribute Tag
+
+Data Type
+
+Max. Length
+
+Min / Max
+
+Description / Notes
+
+<AssignedIdentifier>
+
+N/A
+
+N/A
+
+0 / unbounded
+
+Generic construct used to represent the identifier of an object. Used when the identifier is assigned by an actor that is only identified by its role.
+
+<PersonReferences>
+
+N/A
+
+N/A
+
+0 / 1
+
+This reference associates a specific branch license with a specific branch address through biographic if <LicenseeReferences> is contained within the <Licensee> tag.
+
+0 / 1
+
+This reference value points to the appointee (person) if the <LicenseeReferences> tag is contained within the <InsuranceAppointment> tag.
+
+<OrganizationReferences>
+
+N/A
+
+N/A
+
+0 / 1
+
+This reference associates a specific branch license with a specific branch address through biographic if <LicenseeReferences> is contained within the <Licensee> tag.
+
+0 / 1
+
+This reference value points to the appointee (organization) if the <LicenseeReferences> tag is contained within the <InsuranceAppointment> tag.
+
+<InsuranceLicense>
+Attribute Tag
+
+Data Type
+
+Max. Length
+
+Min / Max
+
+Description / Notes
+
+<ResidentLicenseIndicator>
+
+Boolean
+
+N/A
+
+0 / 1
+
+Indicates a resident license by true or false
+
+<QualifyingInsuranceLicenseIndicator>
+
+N/A
+
+N/A
+
+0 / 1
+
+Indicates whether another license depends upon this license making this a qualifying license.
+
+[This tag is not currently used by NIPR at this time]
+
+<TypeCode>
+
+N/A
+
+N/A
+
+0 / 1
+
+Defined locally.
+
+<License>
+
+N/A
+
+N/A
+
+0 / 1
+
+Represents the common attributes of any producer license.
+
+<LineOfAuthority>
+
+N/A
+
+N/A
+
+0 / unbounded
+
+Information about Lines of Authority associated with a producer license.
+
+<QualifyingInsuranceLicenseReferences>
+
+N/A
+
+N/A
+
+0 / unbounded
+
+NIPR – the state designated home state for the adjuster license.
+
+<InsuranceAppointment>
+Attribute Tag
+
+Data Type
+
+Max. Length
+
+Min / Max
+
+Description / Notes
+
+<StateOrProvinceCode>
+
+VARCHAR2
+
+3 BYTE
+
+1 / 1
+
+A code identifying the state or province of the jurisdiction of this appointment. The specific meaning is derived from the usage.
+For the USA, the source of the code list is the U.S. Postal Service: 
+http://apps.cybersource.com/library/documentation/sbc/quickref/states_and_provinces.pdf
+
+<CountyNames>
+
+N/A
+
+N/A
+
+0/1
+
+The element that contains a list of counties.
+
+<CountyName>
+
+VARCHAR2
+
+25 BYTE
+
+0 / unbounded
+
+The county name that is assigned to the appointment.
+
+<InsurerReferences>
+
+N/A
+
+N/A
+
+1 / 1
+
+The element used to refer to a Insurer by its key identifiers from the policy. As used here, this is a reference to the insurer that provides this appointment.
+
+<LicenseeReferences>
+
+N/A
+
+N/A
+
+1 / 1
+
+The element used to refer to a Licensee by its key identifiers from the report.
+
+<StatusCode>
+
+N/A
+
+N/A
+
+0 / 1
+
+A code that identifies the current state or condition.
+
+<StatusDescription>
+
+VARCHAR2
+
+30 BYTE
+
+0 / 1
+
+The status of this appointment.
+
+<StatusReasonCode>
+
+N/A
+
+N/A
+
+0 / 1
+
+The reason for the status.
+
+<StatusReasonDescription>
+
+VARCHAR2
+
+30 BYTE
+
+0 / 1
+
+The reason for the current state of this appointment.
+
+<AppointmentEffectiveDate>
+
+Date
+
+Format: 
+ yyyy-mm-dd
+
+0 / 1
+
+If appointed, this is the date effective for the appointment.
+
+<TerminationEffectiveDate>
+
+Date
+
+Format: 
+ yyyy-mm-dd
+
+0 / 1
+
+If terminated, this is the date effective for the termination.
+
+<LineOfAuthority>
+
+N/A
+
+N/A
+
+0 / unbounded
+
+Information about Lines of Authority associated with a producer license.
+
+<AsOfDate>
+
+N/A
+
+N/A
+
+0 / 1
+
+The date this appointment was loaded into SPL.
+
+<RegulatoryAction>
+Attribute Tag
+
+Data Type
+
+Max. Length
+
+Min / Max
+
+Description / Notes
+
+<PersonReferences>
+
+N/A
+
+N/A
+
+0 / 1
+
+This reference points to the subject of the regulatory action (not required if report points to non-state-specific entity)
+
+<OrganizationReferences>
+
+N/A
+
+N/A
+
+0 / 1
+
+This reference points to the subject of the regulatory action (not required if report points to non-state-specific entity)
+
+<ExternalIdentifier>
+
+N/A
+
+N/A
+
+0 / unbounded
+
+Generic construct used to represent the identifier of an object. Used when the identifier is assigned by an actor that is explicitely identified, such as an external permanent actor. As used here, this contains a defined type of Regulatory Action identifier assigned by different party roles.
+
+<AssignedIdentifier>
+
+N/A
+
+N/A
+
+0 / unbounded
+
+Generic construct used to represent the identifier of an object. Used when the identifier is assigned by an actor that is only identified by its role. As used here, this contains the section identifier assigned by different party roles.
+
+<StateOrProvinceCode>
+
+VARCHAR2
+
+3 BYTE
+
+0 / 1
+
+A code identifying the state or province of the jurisdiction supplying the RIRS data. The specific meaning is derived from the usage. For the USA, the source of the code list is the U.S. Postal Service: 
+http://apps.cybersource.com/library/documentation/sbc/quickref/states_and_provinces.pdf
+
+<PenaltyAmount>
+
+Number
+
+10
+
+0 / 1
+
+The amount of the penalty in US dollars.
+
+<ActionInceptionCode>
+
+VARCHAR2
+
+100 BYTE
+
+0 / unbounded
+
+How the activity was discovered (“Other States Action”, “Field Investigation”, etc.).
+
+<ActionReasonDescription>
+
+VARCHAR2
+
+100 BYTE
+
+0 / unbounded
+
+The event that resulted in the regulatory action ("Failure To Pay Tax", "Overcharged Consumers", etc.).
+
+<Disposition>
+
+VARCHAR2
+
+100 BYTE
+
+0 / unbounded
+
+The disposition of the action.
+
+<ActionDate>
+
+Date
+
+Format: 
+ yyyy-mm-dd
+
+0 / 1
+
+The date the regulatory action occurred.
+
+<ActionRegulatoryEntryDate>
+
+Date
+
+Format: 
+ yyyy-mm-dd
+
+0 / 1
+
+The date the regulatory action was entered in the jurisdiction system.
+
+<RegulatoryActionPeriod>
+
+N/A
+
+N/A
+
+0 / 1
+
+The sanction period.
+
+<AsOfDate>
+
+N/A
+
+N/A
+
+0 / 1
+
+The date this regulatory action was loaded into the database.
+
+<License>
+Attribute Tag
+
+Data Type
+
+Max. Length
+
+Min / Max
+
+Description / Notes
+
+<LicenseNumberId>
+
+VARCHAR2
+
+14 BYTE
+
+0 / 1
+
+The license identifier given by the jurisdiction.
+
+<LicensePeriod>
+
+N/A
+
+N/A
+
+0 / 1
+
+The period of time this license is in effect.
+
+<StatusCode>
+
+N/A
+
+N/A
+
+0 / 1
+
+The status of the license (code).
+
+<StatusDescription>
+
+VARCHAR2
+
+30 BYTE
+
+0 / 1
+
+The status of the license.
+
+<IssueDate>
+
+Date
+
+Format: 
+ yyyy-mm-dd
+
+0 / 1
+
+This is the original issue date of this license.
+
+<LicenseClassCode>
+
+Number
+
+5
+
+0 / 1
+
+The code of the license class.
+
+<LicenseClassDescription>
+
+VARCHAR2
+
+100 BYTE
+
+0 / 1
+
+The name of the license class.
+
+<StateOrProvinceCode>
+
+VARCHAR2
+
+3 BYTE
+
+0 / 1
+
+A code identifying the state or province of the jurisdiction code for this license. The specific meaning is derived from the usage.
+For the USA, the source of the code list is the U.S. Postal Service: 
+http://apps.cybersource.com/library/documentation/sbc/quickref/states_and_provinces.pdf
+
+<StateOrProvinceName>
+
+VARCHAR2
+
+3 BYTE
+
+0 / 1
+
+The state, province, canton or similar geographic location when not contained within the U.S. Postal Service code list.
+
+<ContinuingEducation>
+
+N/A
+
+N/A
+
+0 / unbounded
+
+Represents the common attributes of any continuing education to maintain a producer license.
+
+<AsOfDate>
+
+Date
+
+Format: 
+ yyyy-mm-dd
+
+0 / 1
+
+The date this license was loaded into the database.
+
+<LineOfAuthority>
+Attribute Tag
+
+Data Type
+
+Max. Length
+
+Min / Max
+
+Description / Notes
+
+<IssueDate>
+
+Date
+
+Format: 
+ yyyy-mm-dd
+
+0 / 1
+
+Date of issuance.
+
+<RenewalDate>
+
+Date
+
+Format: 
+ yyyy-mm-dd
+
+0 / 1
+
+Represents the renewal date of the producer’s appointment.
+
+<StateOrProvinceCode>
+
+VARCHAR2
+
+3 BYTE
+
+0 / 1
+
+A code identifying the state or province of the jurisdiction code for this LOA. The specific meaning is derived from the usage.
+For the USA, the source of the code list is the U.S. Postal Service: 
+http://apps.cybersource.com/library/documentation/sbc/quickref/states_and_provinces.pdf
+
+<StateOrProvinceName>
+
+VARCHAR2
+
+3 BYTE
+
+0 / 1
+
+The state, province, canton or similar geographic location when not contained within the U.S. Postal Service code list.
+
+<LineOfAuthorityCode>
+
+Number
+
+5
+
+0 / 1
+
+Represents the code of the LOA if contained within the <InsuranceLicense> tag.
+
+Represents the code of the LOA for the appointment if contained within the <InsuranceAppointment> tag.
+
+<LineOfAuthorityDescription>
+
+VARCHAR2
+
+100 BYTE
+
+0 / 1
+
+Represents the name of the LOA if contained within the <InsuranceLicense> tag.
+
+Represents the name of the LOA for the appointment if contained within the <InsuranceAppointment> tag.
+
+<StatusCode>
+
+N/A
+
+N/A
+
+0 / 1
+
+The status of the LOA (code).
+
+<StatusDescription>
+
+VARCHAR2
+
+30 BYTE
+
+0 / 1
+
+The status of the LOA.
+
+<StatusReasonCode>
+
+N/A
+
+N/A
+
+0 / 1
+
+The status reason of the LOA (code).
+
+<StatusReasonDescription>
+
+VARCHAR2
+
+100 BYTE
+
+0 / 1
+
+The status reason of the LOA.
+
+<StatusPeriod>
+
+N/A
+
+N/A
+
+0 / 1
+
+The period covered by this status.
+
+<ContinuingEducation>
+
+N/A
+
+N/A
+
+0 / unbounded
+
+Represents the common attributes of any continuing education to maintain a producer license.
+
+<InsurerReferences>
+Attribute Tag
+
+Data Type
+
+Max. Length
+
+Min / Max
+
+Description / Notes
+
+<OrganizationReferences>
+
+
+
+
+
+N/A
+
+
+
+
+
+N/A
+
+
+
+
+
+0 / 1
+
+
+
+
+
+This reference value points to the appointer organization.
+
+Can be the appointer name.
+
+Can be the appointer NAIC Company Code.
+
+<RegulatoryActionPeriod>
+Attribute Tag
+
+Data Type
+
+Max. Length
+
+Min / Max
+
+Description / Notes
+
+<StartDate>
+
+Date
+
+Format: 
+ yyyy-mm-dd
+
+0 / 1
+
+The date the sanction period started.
+
+<PeriodDuration>
+
+Number
+
+5
+
+0 / 1
+
+The length of the sanction in days.
+
+<LicensePeriod>
+Attribute Tag
+
+Data Type
+
+Max. Length
+
+Min / Max
+
+Description / Notes
+
+<StartDate>
+
+Date
+
+Format: 
+ yyyy-mm-dd
+
+0 / 1
+
+This is the start date of the current status.
+
+<EndDate>
+
+Date
+
+Format: 
+ yyyy-mm-dd
+
+0 / 1
+
+This is the expiration date of this license.
+
+<ContinuingEducation>
+Attribute Tag
+
+Data Type
+
+Max. Length
+
+Min / Max
+
+Description / Notes
+
+<StateOrProvinceCode>
+
+VARCHAR2
+
+3 BYTE
+
+0 / 1
+
+A code identifying the state or province of the jurisdiction of the CE requirement.
+The specific meaning is derived from the usage.
+For the USA, the source of the code list is the U.S. Postal Service: 
+http://apps.cybersource.com/library/documentation/sbc/quickref/states_and_provinces.pdf
+
+<StatusDescription>
+
+VARCHAR2
+
+20 BYTE
+
+0 / 1
+
+This indicates whether the licensee is in compliance with CE if contained within the <License> tag.
+
+This indicates whether the licensee is in compliance with CE for the LOA if contained within the <LineOfAuthority> tag.
+
+<ContinuingEducationPeriod>
+
+N/A
+
+N/A
+
+0 / 1
+
+The period covered by this continuing education.
+
+<ContinuingEducationUnitsRequiredMeasure>
+
+Number
+
+3
+
+0 / 1
+
+The number of units required for this continuing education
+
+<StatusPeriod>
+Attribute Tag
+
+Data Type
+
+Max. Length
+
+Min / Max
+
+Description / Notes
+
+<StartDate>
+
+Date
+
+Format: 
+ yyyy-mm-dd
+
+0 / 1
+
+The start date of the current status of this LOA.
+
+<ContinuingEducationPeriod>
+Attribute Tag
+
+Data Type
+
+Max. Length
+
+Min / Max
+
+Description / Notes
+
+<EndDate>
+
+Date
+
+Format: 
+ yyyy-mm-dd
+
+0 / 1
+
+The date that the CE period ends.
+
+Additional Tag Information
+<ResidentLicenseIndicator>
+Indicates whether the producer is a resident in the state in which the license was issued.
+
+
+
+CODE
+
+RESIDENT INDICATOR
+
+true
+
+They're a resident
+
+false
+
+They're a non-resident
+
+<StatusDescription>
+Indicates the status of the license when contained within the <License> tag or <LineOfAuthority> tag.
+
+ 
+
+STATUS of License LOA
+
+Active
+
+Inactive
+
+Canceled
+
+N/A
+
+ How you represent Cancelled or N/A at the LOA level in your system should be what makes sense to you. You can map to an existing status in your system or capture the statuses that would be new to it.
+
+Date Tag Information
+ 
+
+PDB Report Field
+
+ 
+
+Tag Info
+
+License Issue Date	<IssueDate> under <License> tag
+LOA Issue Date	<IssueDate> under <LineOfAuthority> tag
+LOA Status Date (if StatusCode = Active)	<StartDate> under <StatusPeriod> tag, under <LineOfAuthority> tag
+LOA Status Date (if StatusCode != Active)	<EndDate> under <StatusPeriod> tag, under <LineOfAuthority> tag
+Expiration Date	<EndDate> under <LicensePeriod> tag
+Example XML returned from specific changes:
+LICENSING CHANGES
+Any License Changes will trigger an alert. In this example, the license expiration date changes. For any license change, the following is an example of what XML would return:
+
+License Change Response Example Collapse source
+
+
+<Person key="PersonPRI727818694">
+<ExternalIdentifier>
+<TypeCode>NAICProducerCode</TypeCode>
+<Id>17646617</Id>
+</ExternalIdentifier>
+<BirthDate>1942-07-23</BirthDate>
+</Person>
+<JurisdictionReport>
+<PersonReferences personReference="PersonPRI727818694"/>
+<JurisdictionReportItem>
+<StateOrProvinceCode>WA</StateOrProvinceCode>
+<Licensee>
+<InsuranceLicense>
+<ResidentLicenseIndicator>true</ResidentLicenseIndicator>
+<TypeCode>Producer</TypeCode>
+<License key="34316WA">
+<LicenseNumberId>34316</LicenseNumberId>
+<LicensePeriod>
+<EndDate>2016-09-30</EndDate>
+</LicensePeriod>
+<StatusCode>Active</StatusCode>
+<IssueDate>2009-07-01</IssueDate>
+<LicenseClassCode>3</LicenseClassCode>
+<LicenseClassDescription>Producer</LicenseClassDescription>
+<StateOrProvinceCode>WA</StateOrProvinceCode>
+<StateOrProvinceName>WA</StateOrProvinceName>
+<AsOfDate>2016-09-09</AsOfDate>
+</License>
+<LineOfAuthority>
+<IssueDate>2009-07-01</IssueDate>
+<StateOrProvinceCode>WA</StateOrProvinceCode>
+<StateOrProvinceName>WA</StateOrProvinceName>
+<LineOfAuthorityCode>5</LineOfAuthorityCode>
+<LineOfAuthorityDescription>Disability</LineOfAuthorityDescription>
+<StatusCode>Active</StatusCode>
+<StatusDescription>Active</StatusDescription>
+<StatusPeriod>
+<StartDate>2009-07-01</StartDate>
+</StatusPeriod>
+</LineOfAuthority>
+<LineOfAuthority>
+<IssueDate>2009-07-01</IssueDate>
+<StateOrProvinceCode>WA</StateOrProvinceCode>
+<StateOrProvinceName>WA</StateOrProvinceName>
+<LineOfAuthorityCode>16</LineOfAuthorityCode>
+<LineOfAuthorityDescription>Life</LineOfAuthorityDescription>
+<StatusCode>Active</StatusCode>
+<StatusDescription>Active</StatusDescription>
+<StatusPeriod>
+<StartDate>2009-07-01</StartDate>
+</StatusPeriod>
+</LineOfAuthority>
+<LineOfAuthority>
+<IssueDate>2010-06-01</IssueDate>
+<StateOrProvinceCode>WA</StateOrProvinceCode>
+<StateOrProvinceName>WA</StateOrProvinceName>
+<LineOfAuthorityCode>5114</LineOfAuthorityCode>
+<LineOfAuthorityDescription>VARIABLE LINE</LineOfAuthorityDescription>
+<StatusCode>Active</StatusCode>
+<StatusDescription>Active</StatusDescription>
+<StatusPeriod>
+<StartDate>2010-06-01</StartDate>
+</StatusPeriod>
+</LineOfAuthority>
+</InsuranceLicense>
+</Licensee>
+</JurisdictionReportItem>
+</JurisdictionReport> 
+APPOINTMENT CHANGES
+For any change to an appointment, this XML would return (as an example):
+
+Appointment Change Response Example Collapse source
+
+
+<PersonReferences personReference="PersonPRI717516640"/>
+<JurisdictionReportItem>
+<StateOrProvinceCode>NY</StateOrProvinceCode>
+<Licensee>
+<InsuranceAppointment>
+<StateOrProvinceCode>NY</StateOrProvinceCode>
+<InsurerReferences>
+<OrganizationReferences organizationReference="Org93610John Hancock Life &amp; Health Ins Co"/>
+</InsurerReferences>
+<LicenseeReferences>
+<PersonReferences personReference="PersonNY14176234"/>
+</LicenseeReferences>
+<StatusCode>Appointed</StatusCode>
+<AppointmentEffectiveDate>2009-04-08</AppointmentEffectiveDate>
+<LineOfAuthority>
+<LineOfAuthorityCode>394</LineOfAuthorityCode>
+<LineOfAuthorityDescription>LA Appointments</LineOfAuthorityDescription>
+</LineOfAuthority>
+</InsuranceAppointment>
+<InsuranceAppointment>
+<StateOrProvinceCode>NY</StateOrProvinceCode>
+<InsurerReferences>
+<OrganizationReferences organizationReference="Org61360Reliastar Life Ins Co Of New York"/>
+</InsurerReferences>
+<LicenseeReferences>
+<PersonReferences personReference="PersonNY14176234"/>
+</LicenseeReferences>
+<StatusCode>Terminated</StatusCode>
+<TerminationEffectiveDate>2009-08-18</TerminationEffectiveDate>
+<LineOfAuthority>
+<RenewalDate>2016-08-01</RenewalDate>
+<LineOfAuthorityCode>394</LineOfAuthorityCode>
+<LineOfAuthorityDescription>LA Appointments</LineOfAuthorityDescription>
+</LineOfAuthority>
+<AsOfDate>2016-02-09</AsOfDate>
+</InsuranceAppointment>
+</InsuranceAppointment>
+</Licensee>
+</JurisdictionReportItem> 
+DEMOGRAPHICS CHANGES
+The XML report should return the following way for any demographics changes such as residential address, business address etc.
+
+Demographics Changes Response Example Collapse source
+
+
+<Person key="PersonPRI701004442">
+<ExternalIdentifier>
+<TypeCode>NAICProducerCode</TypeCode>
+<Id>260025</Id>
+</ExternalIdentifier>
+<BirthDate>1942-08-02</BirthDate>
+</Person>
+<Person key="PersonIL13076346">
+<ExternalIdentifier>
+<TypeCode>NAICProducerCode</TypeCode>
+<Id>260025</Id>
+</ExternalIdentifier>
+<PersonName>
+<FullName>Gary Lynn Pierce</FullName>
+<Surname>Pierce</Surname>
+<GivenName>Gary</GivenName>
+</PersonName>
+<PersonCommunication>
+<MailingAddress>
+<AsOfDate>2015-07-02</AsOfDate>
+<AddressReferences addressReference="4428PrattLaneFranklinTN37064U.S.A."/>
+</MailingAddress>
+<ResidentialAddress>
+<AddressReferences addressReference="1100WALNUTSt"/>
+</ResidentialAddress>
+</PersonCommunication>
+<BusinessCommunication>
+<Telephone>
+<TypeCode>Wired</TypeCode>
+<PhoneNumber>+1-615-7642577</PhoneNumber>
+</Telephone>
+<MailingAddress>
+<AsOfDate>2015-07-02</AsOfDate>
+<AddressReferences addressReference="4428PrattLanekansascityTN37064U.S.A."/>
+</MailingAddress>
+</BusinessCommunication>
+</Person> 
+NAME CHANGES
+Name Change (for an individual), would return the following (as an example):
+
+Individual Name Change Example Collapse source
+
+
+<Person key="PersonPRI714436174">
+<ExternalIdentifier>
+<TypeCode>NAICProducerCode</TypeCode>
+<Id>968634</Id>
+</ExternalIdentifier>
+<BirthDate>1950-01-17</BirthDate>
+</Person>
+<Person key="PersonIN13346131">
+<ExternalIdentifier>
+<TypeCode>NAICProducerCode</TypeCode>
+<Id>968634</Id>
+</ExternalIdentifier>
+<PersonName>
+<FullName>William Wilson</FullName>
+<Surname>Wilson</Surname>
+<GivenName>William</GivenName>
+</PersonName>
+<PersonCommunication>
+<MailingAddress>
+<AsOfDate>2014-12-02</AsOfDate>
+<AddressReferences addressReference="26084CountyRoad50NappaneeIN46550-0000U.S.A."/>
+</MailingAddress>
+<ResidentialAddress>
+<AsOfDate>2014-12-02</AsOfDate>
+<AddressReferences addressReference="26084CountyRoad50NappaneeIN46550-0000U.S.A."/>
+</ResidentialAddress>
+</PersonCommunication>
+<BusinessCommunication>
+<Telephone>
+<TypeCode>Wired</TypeCode>
+<PhoneNumber>+1-574-7732502</PhoneNumber>
+</Telephone>
+<Telephone>
+<TypeCode>Fax</TypeCode>
+<PhoneNumber>+1-574-7732699</PhoneNumber>
+</Telephone>
+<Email>
+<TypeCode>Business</TypeCode>
+<EmailAddress>test@test.com</EmailAddress>
+</Email>
+<MailingAddress>
+<AsOfDate>2014-12-02</AsOfDate>
+<AddressReferences addressReference="320DalMarWayP.O.Box92NappaneeIN46550U.S.A."/>
+</MailingAddress>
+</BusinessCommunication>
+</Person> 
+
+
+Name change for an Agency:
+
+Name Change Response Example Collapse source
+
+
+<Organization key="OrgPRI710205874">
+<ExternalIdentifier>
+<TypeCode>NAICProducerCode</TypeCode>
+<Id>39207</Id>
+</ExternalIdentifier>
+</Organization>
+<Organization key="OrgAK40384559">
+<ExternalIdentifier>
+<TypeCode>NAICProducerCode</TypeCode>
+<Id>39207</Id>
+</ExternalIdentifier>
+<ExternalIdentifier>
+<TypeCode>FEINId</TypeCode>
+<Id>132896238</Id>
+</ExternalIdentifier>
+<ExternalIdentifier>
+<TypeCode>JurisdictionId</TypeCode>
+<Id>26455</Id>
+</ExternalIdentifier>
+<OrganizationName>
+<FullName>ABC INC</FullName>
+</OrganizationName>
+<OrganizationCommunication>
+<Telephone>
+<TypeCode>Wired</TypeCode>
+<PhoneNumber>+1-443-6274934</PhoneNumber>
+</Telephone>
+<Telephone>
+<TypeCode>Fax</TypeCode>
+<PhoneNumber>+1-443-4518218</PhoneNumber>
+</Telephone>
+<Email>
+<TypeCode>Business</TypeCode>
+<EmailAddress>sb_licensing@morganstanley.com</EmailAddress>
+</Email>
+<MailingAddress>
+<AsOfDate>2014-08-14</AsOfDate>
+<AddressReferences addressReference="1300ThamesStreetCorpLic6thFloorBaltimoreMD21231U.S.A."/>
+</MailingAddress>
+<PrincipalAddress>
+<AsOfDate>2014-08-14</AsOfDate>
+<AddressReferences addressReference="2550DenaliStAnchorageAK99503U.S.A."/>
+</PrincipalAddress>
+</OrganizationCommunication>
+</Organization>
+<Organization key="Org41136607590611Allianz Life Insurance Company Of North America">
+<ExternalIdentifier>
+<TypeCode>NAICInsurerCode</TypeCode>
+<Id>90611</Id>
+</ExternalIdentifier>
+<ExternalIdentifier>
+<TypeCode>FEINId</TypeCode>
+<Id>411366075</Id>
+</ExternalIdentifier>
+<OrganizationName>
+<FullName>Allianz Life Insurance Company Of North America</FullName>
+</OrganizationName>
+</Organization> 
+CONTACT CHANGES
+For any contact changes (business email, personal email phone etc), the following XML would return (as an example):
+
+Contact Change Response Example Collapse source
+
+
+<Person key="PersonPRI701396701">
+<ExternalIdentifier>
+<TypeCode>NAICProducerCode</TypeCode>
+<Id>9034572</Id>
+</ExternalIdentifier>
+<BirthDate>1970-04-16</BirthDate>
+</Person>
+<Person key="PersonMD39863421">
+<ExternalIdentifier>
+<TypeCode>NAICProducerCode</TypeCode>
+<Id>9034572</Id>
+</ExternalIdentifier>
+<PersonName>
+<FullName>Michael Schoffman</FullName>
+<Surname>Schoffman</Surname>
+<GivenName>Michael</GivenName>
+</PersonName>
+<PersonCommunication>
+<MailingAddress>
+<AsOfDate>2015-08-31</AsOfDate>
+<AddressReferences addressReference="13100MargateStreetShermanOaksCA91401U.S.A."/>
+</MailingAddress>
+</PersonCommunication>
+<BusinessCommunication>
+<Telephone>
+<TypeCode>Wired</TypeCode>
+<PhoneNumber>+1-800-7778777</PhoneNumber>
+</Telephone>
+<Email>
+<TypeCode>Business</TypeCode>
+<EmailAddress>test@test.com</EmailAddress>
+</Email>
+<MailingAddress>
+<AsOfDate>2015-08-31</AsOfDate>
+<AddressReferences addressReference="13100MargateStreetShermanOaksCA91401U.S.A."/>
+</MailingAddress>
+</BusinessCommunication>
+</Person> 
+RIRS CHANGES
+For any RIRS change, the XML returned would be as per the following example:
+
+RIRS Change Response Example Collapse source
+
+
+<Organization key="OrgPRI711020944">
+<ExternalIdentifier>
+<TypeCode>NAICProducerCode</TypeCode>
+<Id>7753518</Id>
+</ExternalIdentifier>
+<JurisdictionReport>
+<OrganizationReferences organizationReference="OrgPRI711020944"/>
+<JurisdictionReportItem>
+<StateOrProvinceCode>UT</StateOrProvinceCode>
+<Licensee>
+<RegulatoryAction>
+<ExternalIdentifier>
+<TypeCode>RegulatoryAgencyFileReferenceNumber</TypeCode>
+<Id>E-2246</Id>
+</ExternalIdentifier>
+<AssignedIdentifier>
+<RoleCode>RegulatoryAgency</RoleCode>
+<Id>12066127</Id>
+</AssignedIdentifier>
+<StateOrProvinceCode>UT</StateOrProvinceCode>
+<PenaltyAmount>500</PenaltyAmount>
+<ActionInceptionCode>OtherStatesAction</ActionInceptionCode>
+<ActionReasonDescription>FailureToReportOtherStateAction</ActionReasonDescription>
+<Disposition>FinalOrder</Disposition>
+<ActionDate>2008-12-15</ActionDate>
+<ActionRegulatoryEntryDate>2008-12-18</ActionRegulatoryEntryDate>
+<RegulatoryActionPeriod>
+<StartDate>2008-12-15</StartDate>
+<PeriodDuration>P0D</PeriodDuration>
+</RegulatoryActionPeriod>
+<AsOfDate>2010-11-10</AsOfDate>
+</RegulatoryAction>
+</Licensee>
+</JurisdictionReportItem>
+</JurisdictionReport> 
+ A sample Java class
+The sample class below will help create the SOAP messages needed to call the PDB Alerts web service. This is not production code. Its purpose is to illustrate what is needed to consume the PDB Alerts web service.
+
+Java Class Example Collapse source
+
+
+package com.nipr.pdb.alerts.ws.gen;
+ 
+/**
+ * Please modify this class to meet your needs
+ * This class is not complete
+ */
+ 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import javax.xml.namespace.QName;
+import javax.jws.WebMethod;
+import javax.jws.WebParam;
+import javax.jws.WebResult;
+import javax.jws.WebService;
+import javax.jws.soap.SOAPBinding;
+import javax.xml.bind.annotation.XmlSeeAlso;
+import javax.xml.ws.RequestWrapper;
+import javax.xml.ws.ResponseWrapper;
+ 
+/**
+ *
+This class was generated by Apache CXF 2.6.1
+ * 2015-12-09T16:39:41.795-06:00
+ * Generated source version: 2.6.1
+ *
+ */
+public final class IndustryWs_PdbAlertsIndustryWsPort_Client {
+ 
+ private static final QName SERVICE_NAME = new QName("https://pdb-services.nipr.com/pdb-alerts-industry-services/industry-ws", "PdbAlertsIndustryWs_Service");
+ 
+ private IndustryWs_PdbAlertsIndustryWsPort_Client() {
+ }
+ 
+ public static void main(String args[]) throws java.lang.Exception {
+  URL wsdlURL = PdbAlertsIndustryWsService.WSDL_LOCATION;
+  
+if (args.length > 0 && args[0] != null &&
+!"".equals(args[0])) {
+  File wsdlFile = new File(args[0]);
+  try {
+   if (wsdlFile.exists()) {
+    wsdlURL = wsdlFile.toURI().toURL();
+   } else {
+    wsdlURL = new URL(args[0]);
+   }
+  } catch (MalformedURLException e) {
+   e.printStackTrace();
+  }
+  }
+  
+  PdbAlertsIndustryWsService ss = new PdbAlertsIndustryWsService(wsdlURL, SERVICE_NAME);
+  IndustryWs port = ss.getPdbAlertsIndustryWsPort(); 
+  
+  {
+  System.out.println("Invoking removeTargets..");
+  java.lang.String _removeTargets_subscriptionName = "";
+  com.nipr.pdb.alerts.ws.gen.TargetInputDataType _removeTargets_targetInputData = null;
+  try {
+  com.nipr.pdb.alerts.ws.gen.TargetResultsDataType _removeTargets__return = port.removeTargets(_removeTargets_subscriptionName, _removeTargets_targetInputData);
+   System.out.println("removeTargets.result=" + _removeTargets__return);
+ 
+  } catch (PdbAlertsFaultMsg e) {
+  System.out.println("Expected exception: pdbAlertsFaultMsg has occurred.");
+  System.out.println(e.toString());
+  }
+  }
+  {
+  System.out.println("Invoking removeSubscription..");
+  java.lang.String _removeSubscription_subscriptionName = "";
+  try {
+   port.removeSubscription(_removeSubscription_subscriptionName);
+ 
+  } catch (PdbAlertsFaultMsg e) {
+  System.out.println("Expected exception: pdbAlertsFaultMsg has occurred.");
+  System.out.println(e.toString());
+  }
+  }
+  {
+  System.out.println("Invoking retrieveAllSubscriptions..");
+  try {
+   com.nipr.pdb.alerts.ws.gen.SubscriptionList _retrieveAllSubscriptions__return = port.retrieveAllSubscriptions();
+   System.out.println("retrieveAllSubscriptions.result=" + _retrieveAllSubscriptions__return);
+ 
+  } catch (PdbAlertsFaultMsg e) {
+  System.out.println("Expected exception: pdbAlertsFaultMsg has occurred.");
+  System.out.println(e.toString());
+  }
+  }
+  {
+  System.out.println("Invoking editSubscription..");
+  java.lang.String _editSubscription_subscriptionName = "";
+  com.nipr.pdb.alerts.ws.gen.SubscriptionInputDataType _editSubscription_subscriptionInputData = null;
+  try {
+   port.editSubscription(_editSubscription_subscriptionName, _editSubscription_subscriptionInputData);
+ 
+  } catch (PdbAlertsFaultMsg e) {
+  System.out.println("Expected exception: pdbAlertsFaultMsg has occurred.");
+  System.out.println(e.toString());
+  }
+  }
+  {
+  System.out.println("Invoking receiveSpecificReport..");
+  javax.xml.datatype.XMLGregorianCalendar _receiveSpecificReport_reportDate = null;
+  try {
+   com.nipr.pdb.alerts.ws.gen.AlertsReportType _receiveSpecificReport__return = port.receiveSpecificReport(_receiveSpecificReport_reportDate);
+   System.out.println("receiveSpecificReport.result=" + _receiveSpecificReport__return);
+ 
+  } catch (PdbAlertsFaultMsg e) {
+  System.out.println("Expected exception: pdbAlertsFaultMsg has occurred.");
+  System.out.println(e.toString());
+  }
+  }
+  {
+  System.out.println("Invoking addSubscription..");
+  com.nipr.pdb.alerts.ws.gen.SubscriptionInputDataType _addSubscription_subscriptionInputData = null;
+  try {
+   port.addSubscription(_addSubscription_subscriptionInputData);
+ 
+  } catch (PdbAlertsFaultMsg e) {
+  System.out.println("Expected exception: pdbAlertsFaultMsg has occurred.");
+  System.out.println(e.toString());
+  }
+  }
+  {
+  System.out.println("Invoking retrieveTargets..");
+  java.lang.String _retrieveTargets_subscriptionName = "";
+  try {
+  java.util.List<com.nipr.pdb.alerts.ws.gen.TargetType> _retrieveTargets__return = port.retrieveTargets(_retrieveTargets_subscriptionName);
+   System.out.println("retrieveTargets.result=" + _retrieveTargets__return);
+ 
+  } catch (PdbAlertsFaultMsg e) {
+  System.out.println("Expected exception: pdbAlertsFaultMsg has occurred.");
+  System.out.println(e.toString());
+  }
+  }
+  {
+  System.out.println("Invoking receiveCurrentAlertsReport..");
+  try {
+  com.nipr.pdb.alerts.ws.gen.AlertsReportType _receiveCurrentAlertsReport__return = port.receiveCurrentAlertsReport();
+   System.out.println("receiveCurrentAlertsReport.result=" + _receiveCurrentAlertsReport__return);
+ 
+  } catch (PdbAlertsFaultMsg e) {
+  System.out.println("Expected exception: pdbAlertsFaultMsg has occurred.");
+  System.out.println(e.toString());
+  }
+  }
+  {
+  System.out.println("Invoking removeAllTargets..");
+  java.lang.String _removeAllTargets_subscriptionName = "";
+  try {
+   port.removeAllTargets(_removeAllTargets_subscriptionName);
+ 
+  } catch (PdbAlertsFaultMsg e) {
+  System.out.println("Expected exception: pdbAlertsFaultMsg has occurred.");
+  System.out.println(e.toString());
+  }
+  }
+  {
+  System.out.println("Invoking generateCatchUpReport..");
+  try {
+   com.nipr.pdb.alerts.ws.gen.AlertsReportType _generateCatchUpReport__return = port.generateCatchUpReport();
+   System.out.println("generateCatchUpReport.result=" + _generateCatchUpReport__return);
+ 
+  } catch (PdbAlertsFaultMsg e) {
+  System.out.println("Expected exception: pdbAlertsFaultMsg has occurred.");
+  System.out.println(e.toString());
+  }
+  }
+  {
+  System.out.println("Invoking addTargets..");
+  java.lang.String _addTargets_subscriptionName = "";
+  com.nipr.pdb.alerts.ws.gen.TargetInputDataType _addTargets_targetInputData = null;
+  try {
+   com.nipr.pdb.alerts.ws.gen.TargetResultsDataType _addTargets__return = port.addTargets(_addTargets_subscriptionName, _addTargets_targetInputData);
+   System.out.println("addTargets.result=" + _addTargets__return);
+ 
+  } catch (PdbAlertsFaultMsg e) {
+  System.out.println("Expected exception: pdbAlertsFaultMsg has occurred.");
+  System.out.println(e.toString());
+  }
+  }
+ 
+  System.exit(0);
+ }
+ 
+} 
+
+
+
+
+What Updates Trigger Alerts?
+Pricing
+Delivery Methods
+Alert schedule
+Web Service Process Overview
+Recovering from missed Alerts
+Web Service Technical Information
+Security
+Web Service Methods
+Subscription Management
+Target Management
+Report Retrieval
+Technical Definitions of Web Service Methods
+Errors
+Faults
+Scope of data in the XML
+Deleted Licensing and Appointment Information
+Key References and Relationships
+Tag descriptions and definitions
+Top Level XML Entry
+<LicensingReportProcessResult>
+<MessageHeader>
+<MessageResult>
+<MessageDocumentResult>
+<MessageDocumentReferences>
+<LicensingReport>
+<Address>
+<Person>
+<Organization>
+<JurisdictionReport>
+<ExternalIdentifier>
+<PersonName>
+<PersonCommunication>
+<BusinessCommunication>
+<OrganizationName>
+<AssignedIdentifier>
+<OrganizationCommunication>
+<JurisdictionReportItem>
+<ResidentialAddress>
+<MailingAddress>
+<Email>
+<Telephone>
+<PrincipalAddress>
+<PhysicalAddress>
+<Licensee>
+<LicenseeReferences>
+<InsuranceLicense>
+<InsuranceAppointment>
+<RegulatoryAction>
+<License>
+<LineOfAuthority>
+<InsurerReferences>
+<RegulatoryActionPeriod>
+<LicensePeriod>
+<ContinuingEducation>
+<StatusPeriod>
+<ContinuingEducationPeriod>
+Additional Tag Information
+<ResidentLicenseIndicator>
+<StatusDescription>
+Date Tag Information
+Example XML returned from specific changes:
+LICENSING CHANGES
+APPOINTMENT CHANGES
+DEMOGRAPHICS CHANGES
+NAME CHANGES
+CONTACT CHANGES
+RIRS CHANGES
+ A sample Java class
+LikeBe the first to like this
+No labelsEdit Labels
+Powered by Atlassian Confluence 9.2.13 Report a bug Atlassian News
+Atlassian

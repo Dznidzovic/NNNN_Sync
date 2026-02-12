@@ -41,13 +41,7 @@ public with sharing class ProcessPDBAlertReportService {
     // Stores new or updated Carrier Appointments to be upserted to Salesforce
     private List<d4c_CarrierAppointment__c> carrierAppointments = new List<d4c_CarrierAppointment__c>();
     // Stores new or updated Lines Of Authority attached to Carrier Appointments to be upserted to SF
-    // Stores IDs of communication junction records that need to be deleted (not the communications themselves).
-    private Set<Id> communicationJunctionIdsForDeletion = new Set<Id>();
-    // Stores IDs of address junction records that need to be deleted (not the addresses themselves).
-    private Set<Id> addressJunctionIdsForDeletion = new Set<Id>();
-    // Map to store existing junctions by entity NPN for deletion logic
-    private Map<String, List<d4c_Entity_Communication_Junction__c>> existingCommJunctionsByEntity = new Map<String, List<d4c_Entity_Communication_Junction__c>>();
-    private Map<String, List<d4c_Entity_Address_Junction__c>> existingAddrJunctionsByEntity = new Map<String, List<d4c_Entity_Address_Junction__c>>();
+    // REMOVED (2026-02-12): Deletion logic for address/communication junctions - accept data accumulation instead
     // Maps to track which Entities each Communication/Address belongs to (for junction creation)
     // Changed to Set<String> to support shared communications/addresses between multiple entities
     private Map<String, Set<String>> commUniqueIdToEntityNpnMap = new Map<String, Set<String>>();  // Communication UniqueIdentifier → Set of Entity NPNs
@@ -301,16 +295,8 @@ public with sharing class ProcessPDBAlertReportService {
             processProducerCommunication(agencyEntity.organizationCommunication, agencyEntity.mainIdentifier);
         }
 
-        // Get all existing Entity Communication junction Ids for deletion (NOT the communications themselves)
-        String entityNpn = niprEntity.mainIdentifier;
-        communicationJunctionIdsForDeletion.addAll(
-            getJunctionIdsForDeletion(entityNpn, (Map<String, List<SObject>>)(Object)existingCommJunctionsByEntity, producerCommunications, 'd4c_NIPR_Communication__r')
-        );
-
-        // Get all existing Entity Address junction Ids for deletion (NOT the addresses themselves)
-        addressJunctionIdsForDeletion.addAll(
-            getJunctionIdsForDeletion(entityNpn, (Map<String, List<SObject>>)(Object)existingAddrJunctionsByEntity, producerAddresses, 'd4c_NIPR_Address__r')
-        );
+        // REMOVED (2026-02-12): Junction deletion logic - accept data accumulation instead
+        // No longer call getJunctionIdsForDeletion() for communication and address junctions
 
         return entity;
     }
@@ -1121,54 +1107,6 @@ private List<d4c_LineOfAuthority__c> createLineOfAuthorityRecords(LicensingRepor
 
     /**
      *********************************************************
-     * @methodName      : getJunctionIdsForDeletion
-     * @description     : Compares existing junction records with new address/communication records
-     *                    and identifies which junction records should be deleted (not the addresses/communications themselves).
-     * @param entityNpn          : The NPN of the entity being processed.
-     * @param junctionMap        : Map of existing junctions grouped by entity NPN.
-     * @param newRecords         : List of new address/communication records from NIPR API.
-     * @param linkedRecordField  : Field path to access the linked record from junction (e.g., 'd4c_NIPR_Address__r').
-     * @return                   : Set of junction Ids to delete.
-     **********************************************************
-     **/
-    private Set<Id> getJunctionIdsForDeletion(
-        String entityNpn,
-        Map<String, List<SObject>> junctionMap,
-        List<SObject> newRecords,
-        String linkedRecordField
-    ) {
-        Set<Id> junctionIdsForDeletion = new Set<Id>();
-
-        if (String.isBlank(entityNpn) || junctionMap == null || !junctionMap.containsKey(entityNpn)) {
-            return junctionIdsForDeletion;
-        }
-
-        // Build set of unique identifiers for new records
-        Set<String> newUniqueIdentifiers = new Set<String>();
-        for (SObject newRecord : newRecords) {
-            String uniqueId = (String) newRecord.get('d4c_UniqueIdentifier__c');
-            if (String.isNotBlank(uniqueId)) {
-                newUniqueIdentifiers.add(uniqueId);
-            }
-        }
-
-        // Find junctions whose linked records are not in the new set
-        List<SObject> existingJunctions = junctionMap.get(entityNpn);
-        for (SObject junction : existingJunctions) {
-            SObject linkedRecord = junction.getSObject(linkedRecordField);
-            if (linkedRecord != null) {
-                String existingUniqueId = (String) linkedRecord.get('d4c_UniqueIdentifier__c');
-                if (String.isNotBlank(existingUniqueId) && !newUniqueIdentifiers.contains(existingUniqueId)) {
-                    junctionIdsForDeletion.add(junction.Id);
-                }
-            }
-        }
-
-        return junctionIdsForDeletion;
-    }
-
-    /**
-     *********************************************************
      * @methodName      : getRecordIdsForDeletion
      * @description     : Dynamically compares existing SObjects grouped by a key (like NPN or License Number)
      *                    with new records and identifies which existing ones should be deleted based on unique identifiers.
@@ -1807,9 +1745,8 @@ private List<d4c_LineOfAuthority__c> createLineOfAuthorityRecords(LicensingRepor
         );
 
         // Consolidate record counts in a single detailed log
+        // REMOVED (2026-02-12): Communication/Address junction deletion counts - no longer deleting junctions
         String deletionDetails =
-            'Communication Junctions: ' + communicationJunctionIdsForDeletion.size() + '\n' +
-            'Address Junctions: ' + addressJunctionIdsForDeletion.size() + '\n' +
             'Licenses: ' + licenseIdsForDeletion.size() + '\n' +
             'License LOAs: ' + licenseLineOfAuthorityIdsForDeletion.size() + '\n' +
             'Carrier Appointments: ' + carrierAppointmentIdsForDeletion.size();
@@ -1823,8 +1760,7 @@ private List<d4c_LineOfAuthority__c> createLineOfAuthorityRecords(LicensingRepor
         tail = new DMLExecutor(new List<Id>(carrierAppointmentIdsForDeletion), tail, CLASS_NAME);
         tail = new DMLExecutor(new List<Id>(licenseIdsForDeletion), tail, CLASS_NAME);
         tail = new DMLExecutor(new List<Id>(licenseLineOfAuthorityIdsForDeletion), tail, CLASS_NAME);
-        tail = new DMLExecutor(new List<Id>(addressJunctionIdsForDeletion), tail, CLASS_NAME);
-        tail = new DMLExecutor(new List<Id>(communicationJunctionIdsForDeletion), tail, CLASS_NAME);
+        // REMOVED (2026-02-12): DMLExecutor calls for address/communication junction deletion - no longer deleting junctions
 
         Logger.info(CLASS_NAME, methodName, CorrelationIdUtils.formatLogMessage('Completed synchronous DML operations for test'),
         'CorrelationId: ' + CorrelationIdUtils.getCurrentCorrelationId() +
@@ -1848,8 +1784,7 @@ private List<d4c_LineOfAuthority__c> createLineOfAuthorityRecords(LicensingRepor
 
     // Private method that does DML synchronously so we can test our records
     private void importDataForApexTest() {
-        Database.delete(new List<Id>(communicationJunctionIdsForDeletion));
-        Database.delete(new List<Id>(addressJunctionIdsForDeletion));
+        // REMOVED (2026-02-12): Communication/Address junction deletion - accept data accumulation instead
         Database.delete(new List<Id>(licenseLineOfAuthorityIdsForDeletion));
         Database.delete(new List<Id>(licenseIdsForDeletion));
         Database.delete(new List<Id>(carrierAppointmentIdsForDeletion));

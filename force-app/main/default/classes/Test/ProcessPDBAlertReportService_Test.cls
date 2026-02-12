@@ -180,6 +180,83 @@ private class ProcessPDBAlertReportService_Test {
         System.assertEquals(4, getCount('d4c_LineOfAuthority__c', 'WHERE d4c_License__r.d4c_UniqueIdentifier__c = \'675353522CA3\''));
         System.assertEquals(2, getCount('d4c_CarrierAppointment__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'22138233\''));
         System.assertEquals(1, getCount('d4c_CarrierAppointment__c', 'WHERE d4c_Entity__r.d4c_NPN__c = \'22166967\''));
+
+        // COMPREHENSIVE ASSERTIONS: Verify EVERY unique communication is preserved (multi-node pattern test)
+        // NPN 22138233 has 10 Person nodes with communication data spread across them
+        // This verifies the merge logic captures ALL data from ALL nodes (not just primary)
+
+        // ===== VERIFY EVERY UNIQUE PHONE =====
+        // Phone 1: +1-219-3136379 (appears in PersonCA PersonComm + PersonID BusinessComm)
+        System.assertEquals(1, getCount('d4c_NIPR_Communication__c',
+            'WHERE d4c_PhoneNumber__c = \'+1-219-3136379\' AND d4c_CommunicationType__c = \'Phone\''),
+            'Phone +1-219-3136379 must exist (from PersonCA70650253 and PersonID22138233)');
+
+        // Phone 2: +1-419-9063223 (appears in PersonCA PersonComm + PersonMD BusinessComm)
+        System.assertEquals(1, getCount('d4c_NIPR_Communication__c',
+            'WHERE d4c_PhoneNumber__c = \'+1-419-9063223\' AND d4c_CommunicationType__c = \'Phone\''),
+            'Phone +1-419-9063223 must exist (from PersonCA70650253 and PersonMD22138233)');
+
+        // Phone 3: +1-419-9063221 (appears in PersonCA PersonComm + PersonND PersonComm)
+        System.assertEquals(1, getCount('d4c_NIPR_Communication__c',
+            'WHERE d4c_PhoneNumber__c = \'+1-419-9063221\' AND d4c_CommunicationType__c = \'Phone\''),
+            'Phone +1-419-9063221 must exist (from PersonCA70650253 and PersonND22138233)');
+
+        // Phone 4: +1-219-3136370 (appears in PersonCA BusinessComm + PersonNE BusinessComm + PersonTX PersonComm)
+        System.assertEquals(1, getCount('d4c_NIPR_Communication__c',
+            'WHERE d4c_PhoneNumber__c = \'+1-219-3136370\' AND d4c_CommunicationType__c = \'Phone\''),
+            'Phone +1-219-3136370 must exist (from PersonCA70650253, PersonNE71819190, PersonTX22138233)');
+
+        // Phone 5: +1-419-9063229 (appears in PersonCA BusinessComm)
+        System.assertEquals(1, getCount('d4c_NIPR_Communication__c',
+            'WHERE d4c_PhoneNumber__c = \'+1-419-9063229\' AND d4c_CommunicationType__c = \'Phone\''),
+            'Phone +1-419-9063229 must exist (from PersonCA70650253)');
+
+        // ===== VERIFY EVERY UNIQUE EMAIL =====
+        // Email 1: silvana1.zapoticky@cblmaycfqw.com (appears in PersonCA PersonComm + PersonIN PersonComm)
+        System.assertEquals(1, getCount('d4c_NIPR_Communication__c',
+            'WHERE d4c_Email__c = \'silvana1.zapoticky@cblmaycfqw.com\' AND d4c_CommunicationType__c = \'Email\''),
+            'Email silvana1.zapoticky@cblmaycfqw.com must exist (from PersonCA70650253 and PersonIN22138233)');
+
+        // Email 2: silvana2.zapoticky@cblmaycfqw.com (appears in PersonCA PersonComm + PersonMD BusinessComm)
+        System.assertEquals(1, getCount('d4c_NIPR_Communication__c',
+            'WHERE d4c_Email__c = \'silvana2.zapoticky@cblmaycfqw.com\' AND d4c_CommunicationType__c = \'Email\''),
+            'Email silvana2.zapoticky@cblmaycfqw.com must exist (from PersonCA70650253 and PersonMD22138233)');
+
+        // Email 3: silvana3.zapoticky@cblmaycfqw.com (appears in PersonCA BusinessComm + PersonND PersonComm)
+        System.assertEquals(1, getCount('d4c_NIPR_Communication__c',
+            'WHERE d4c_Email__c = \'silvana3.zapoticky@cblmaycfqw.com\' AND d4c_CommunicationType__c = \'Email\''),
+            'Email silvana3.zapoticky@cblmaycfqw.com must exist (from PersonCA70650253 and PersonND22138233)');
+
+        // Email 4: silvana4.zapoticky@cblmaycfqw.com (appears in PersonCA BusinessComm)
+        System.assertEquals(1, getCount('d4c_NIPR_Communication__c',
+            'WHERE d4c_Email__c = \'silvana4.zapoticky@cblmaycfqw.com\' AND d4c_CommunicationType__c = \'Email\''),
+            'Email silvana4.zapoticky@cblmaycfqw.com must exist (from PersonCA70650253)');
+
+        // Email 5: silvana.zapoticky@cblmaycfqw.com (appears in PersonNE BusinessComm + PersonTX PersonComm)
+        System.assertEquals(1, getCount('d4c_NIPR_Communication__c',
+            'WHERE d4c_Email__c = \'silvana.zapoticky@cblmaycfqw.com\' AND d4c_CommunicationType__c = \'Email\''),
+            'Email silvana.zapoticky@cblmaycfqw.com must exist (from PersonNE71819190 and PersonTX22138233)');
+
+        // ===== VERIFY EVERY UNIQUE ADDRESS =====
+        // Address 1: 245 Francis Lewis Blvd #9536 (appears in PersonCA PersonComm/BusinessComm + PersonNE PersonComm + PersonMO PersonComm)
+        System.assertEquals(1, getCount('d4c_NIPR_Address__c',
+            'WHERE d4c_LineOne__c = \'245 Francis Lewis Blvd #9536\' AND d4c_City__c = \'Gardena\' AND d4c_StateOrProvinceCode__c = \'CA\''),
+            'Address 245 Francis Lewis Blvd Gardena CA must exist (from PersonCA70650253, PersonNE71819190, PersonMO22138233)');
+
+        // Address 2: 20 Nw 21st Ave (appears in PersonNE PersonComm + PersonOH BusinessComm)
+        System.assertEquals(1, getCount('d4c_NIPR_Address__c',
+            'WHERE d4c_LineOne__c = \'20 Nw 21st Ave\' AND d4c_City__c = \'Huntington Park\' AND d4c_StateOrProvinceCode__c = \'CA\''),
+            'Address 20 Nw 21st Ave Huntington Park CA must exist (from PersonNE71819190 and PersonOH22138233)');
+
+        // Address 3: 7 Se Bishop Ave #9 (appears in PersonCA BusinessComm + PersonNE BusinessComm)
+        System.assertEquals(1, getCount('d4c_NIPR_Address__c',
+            'WHERE d4c_LineOne__c = \'7 Se Bishop Ave #9\' AND d4c_City__c = \'San Bernardino\' AND d4c_StateOrProvinceCode__c = \'CA\''),
+            'Address 7 Se Bishop Ave San Bernardino CA must exist (from PersonCA70650253 and PersonNE71819190)');
+
+        // ===== VERIFY JUNCTION COUNT PRESERVATION (NO DELETION) =====
+        // The above assertions verify unique records exist (deduplication working)
+        // The junction count assertions (lines 176-179) verify ALL junctions preserved (no deletion)
+        // Together they prove: merge all data + no deletion + deduplication = data integrity
     }
 
     private static void assertRecordCountsInvalidResponse() {

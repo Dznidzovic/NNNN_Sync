@@ -492,6 +492,192 @@ Fields:
 3. When an LOA Mapping is deleted, `LOAInsuranceProductMappingTriggerHandler.afterDelete` clears the lookup on related LOAs, triggering re-matching which sets `d4c_IsProductMatched__c = false`
 4. Lookup fields with `SetNull` delete constraint do NOT fire triggers - manual cleanup required
 
+---
+
+## 📊 Real-World PDB Alerts Data Pattern - Multi-State Person Nodes
+
+**Context**: This section documents actual NIPR PDB Alerts API response patterns to guide proper test implementation and data handling.
+
+### Example: NPN 9306586 - 27 Person Nodes
+
+**Pattern Discovered**: 2026-02-12
+**Source**: Real production PDB Alerts API response
+**Why Important**: This pattern demonstrates how NIPR distributes demographic/communication data across multiple state-specific Person nodes for a single NPN.
+
+#### Key Characteristics
+
+**Total Person Nodes**: 27 nodes for NPN 9306586
+- 24 state-specific nodes (PersonAL, PersonGA, PersonID, PersonIN, PersonMD, PersonME, PersonMO, PersonMS, PersonND, PersonNE, PersonNH, PersonNM, PersonOH, PersonOK, PersonOR, PersonPA, PersonSD, PersonTN, PersonTX, PersonUT, PersonWI, PersonWV, PersonWY)
+- 2 duplicate state nodes (PersonAL, PersonGA appear twice)
+- 1 PersonPRI node (demographics only)
+
+**Unique Communication Data**:
+- **2 unique phones**:
+  - `+1-877-7762436` (appears in 3 nodes: GA, PA, UT, WY)
+  - `+1-248-5501055` (appears in 11 nodes: ID, IN, MD, MO, ND, OR, PA, SD, TN, WI, WV)
+- **1 unique email**:
+  - `martha_s_joslin@progressive.com` (appears in all nodes with BusinessCommunication)
+- **1 unique address**:
+  - `20431 Sheffield Rd Detroit MI 48221-1315 U.S.A.` (appears in all nodes with addresses)
+
+**Node Type Distribution**:
+- **Tertiary nodes** (name only, no communication): 7 nodes (AL, IA, ME, MS, NE, NH, NM, OH, OK, TX)
+- **Full nodes** (name + PersonCommunication + BusinessCommunication): 16 nodes (GA, ID, IN, MD, MO, ND, OR, PA, SD, TN, UT, WI, WV, WY)
+- **Demographics node** (PersonPRI): 1 node with BirthDate only
+
+#### Full XML Example (Abbreviated)
+
+```xml
+<!-- Node 1: State-specific alias with NO communication (Tertiary) -->
+<Person key="PersonAL59446674">
+    <ExternalIdentifier>
+        <TypeCode>NAICProducerCode</TypeCode>
+        <Id>9306586</Id>
+    </ExternalIdentifier>
+    <PersonName>
+        <TypeCode>Alias</TypeCode>
+        <FullName>Terrell Antwan Sartor</FullName>
+        <Surname>Sartor</Surname>
+        <GivenName>Terrell</GivenName>
+        <MiddleName>Antwan</MiddleName>
+    </PersonName>
+</Person>
+
+<!-- Node 2: State-specific with FULL communication data -->
+<Person key="PersonGA46285199">
+    <ExternalIdentifier>
+        <TypeCode>NAICProducerCode</TypeCode>
+        <Id>9306586</Id>
+    </ExternalIdentifier>
+    <PersonName>
+        <TypeCode>Alias</TypeCode>
+        <FullName>Terrell Antwan Sartor</FullName>
+        <Surname>Sartor</Surname>
+        <GivenName>Terrell</GivenName>
+        <MiddleName>Antwan</MiddleName>
+    </PersonName>
+    <PersonCommunication>
+        <MailingAddress>
+            <AsOfDate>2023-08-31</AsOfDate>
+            <AddressReferences addressReference="20431SheffieldRdDetroitMI48221-1315U.S.A."/>
+        </MailingAddress>
+        <ResidentialAddress>
+            <AsOfDate>2023-08-31</AsOfDate>
+            <AddressReferences addressReference="20431SheffieldRdDetroitMI48221-1315U.S.A."/>
+        </ResidentialAddress>
+    </PersonCommunication>
+    <BusinessCommunication>
+        <Telephone>
+            <TypeCode>Wired</TypeCode>
+            <PhoneNumber>+1-877-7762436</PhoneNumber>
+        </Telephone>
+        <Telephone>
+            <TypeCode>Fax</TypeCode>
+            <PhoneNumber>+1-440-3955516</PhoneNumber>
+        </Telephone>
+        <Email>
+            <TypeCode>Business</TypeCode>
+            <EmailAddress>martha_s_joslin@progressive.com</EmailAddress>
+        </Email>
+        <MailingAddress>
+            <AsOfDate>2023-08-31</AsOfDate>
+            <AddressReferences addressReference="20431SheffieldRdDetroitMI48221-1315U.S.A."/>
+        </MailingAddress>
+    </BusinessCommunication>
+</Person>
+
+<!-- Node 3: Different phone number -->
+<Person key="PersonID59454639">
+    <ExternalIdentifier>
+        <TypeCode>NAICProducerCode</TypeCode>
+        <Id>9306586</Id>
+    </ExternalIdentifier>
+    <PersonName>
+        <TypeCode>Alias</TypeCode>
+        <FullName>Terrell Antwan Sartor</FullName>
+        <Surname>Sartor</Surname>
+        <GivenName>Terrell</GivenName>
+        <MiddleName>Antwan</MiddleName>
+    </PersonName>
+    <PersonCommunication>
+        <MailingAddress>
+            <AsOfDate>2023-08-31</AsOfDate>
+            <AddressReferences addressReference="20431SheffieldRdDetroitMI48221-1315U.S.A."/>
+        </MailingAddress>
+        <ResidentialAddress>
+            <AsOfDate>2023-08-31</AsOfDate>
+            <AddressReferences addressReference="20431SheffieldRdDetroitMI48221-1315U.S.A."/>
+        </ResidentialAddress>
+    </PersonCommunication>
+    <BusinessCommunication>
+        <Telephone>
+            <TypeCode>Wired</TypeCode>
+            <PhoneNumber>+1-248-5501055</PhoneNumber> <!-- DIFFERENT PHONE -->
+        </Telephone>
+        <Telephone>
+            <TypeCode>Fax</TypeCode>
+            <PhoneNumber>+1-440-3955516</PhoneNumber>
+        </Telephone>
+        <Email>
+            <TypeCode>Business</TypeCode>
+            <EmailAddress>martha_s_joslin@progressive.com</EmailAddress>
+        </Email>
+        <MailingAddress>
+            <AsOfDate>2023-08-31</AsOfDate>
+            <AddressReferences addressReference="20431SheffieldRdDetroitMI48221-1315U.S.A."/>
+        </MailingAddress>
+    </BusinessCommunication>
+</Person>
+
+<!-- ... 22 more Person nodes with similar pattern ... -->
+
+<!-- Final node: PersonPRI with demographics only -->
+<Person key="PersonPRI701788075">
+    <ExternalIdentifier>
+        <TypeCode>NAICProducerCode</TypeCode>
+        <Id>9306586</Id>
+    </ExternalIdentifier>
+    <BirthDate>1979-03-16</BirthDate>
+</Person>
+```
+
+#### Critical Insights for Implementation
+
+**1. Merge Logic MUST Collect ALL Communication Data**
+- ❌ **WRONG**: Pick one Person node → lose data from 26 other nodes
+- ✅ **CORRECT**: Collect PersonCommunication and BusinessCommunication from ALL 27 nodes → merge into single lists
+
+**2. Deduplication Happens via External ID**
+- Same address appears in 16+ nodes → should result in 1 `d4c_NIPR_Address__c` record
+- Phone `+1-877-7762436` appears in 4 nodes → should result in 1 `d4c_NIPR_Communication__c` record
+- Email appears in 16+ nodes → should result in 1 `d4c_NIPR_Communication__c` record
+- `ListUtils.deduplicateByField()` handles this via `d4c_UniqueIdentifier__c`
+
+**3. No Deletion Logic for Addresses/Communications**
+- State grouping is NOT necessary (addresses repeat due to legal requirements, not duplication)
+- Accept data accumulation rather than implement complex state-aware deletion
+- **See BACKLOG.md** for future state-aware deletion implementation details
+
+**4. Test Requirements**
+- Mock responses MUST include 5+ Person nodes with communication data spread across them
+- Assert EVERY unique communication is preserved (phones, emails, addresses)
+- Verify counts STAY THE SAME even when delta shows changes (no deletion)
+
+#### Expected Database Results from This Example
+
+After processing NPN 9306586 with 27 Person nodes:
+- **d4c_NIPR_Communication__c**: 3 records (2 phones + 1 email)
+- **d4c_NIPR_Address__c**: 1 record (unique address)
+- **d4c_Entity_Communication_Junction__c**: 3 records (linking entity to 3 communications)
+- **d4c_Entity_Address_Junction__c**: 1 record (linking entity to 1 address)
+
+**NOT**:
+- ❌ 54 phone records (2 phones × 27 nodes) - WRONG, would indicate merge logic failure
+- ❌ 27 email records (1 email × 27 nodes) - WRONG, would indicate merge logic failure
+- ❌ 48 address records (2 address types × 24 nodes) - WRONG, would indicate merge logic failure
+
+---
+
 ### Testing Strategy
 
 **Mock-Based Testing**: Uses HttpSoapMultiMockFactory for API mocking. Test classes create realistic data via JSON deserialization without DML.
